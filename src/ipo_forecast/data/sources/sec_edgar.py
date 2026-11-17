@@ -12,6 +12,7 @@ import json
 import os
 import time
 from datetime import date
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -31,6 +32,11 @@ def filing_document_url(cik: int | str, accession_number: str, primary_document:
     accession_path = accession_number.replace("-", "")
     document_path = quote(primary_document, safe="/._-")
     return f"{SEC_ARCHIVES_BASE}/{cik_path}/{accession_path}/{document_path}"
+
+
+def _table_value(table: dict[str, Any], index: int, name: str, default: str = "") -> str:
+    values = table.get(name, [])
+    return values[index] if index < len(values) else default
 
 
 def _in_date_range(
@@ -61,29 +67,27 @@ def extract_ipo_filings(
             if form not in IPO_FORMS:
                 continue
 
-            def field(name: str, default: str = "") -> str:
-                values = table.get(name, [])
-                return values[index] if index < len(values) else default
-
-            filing_date = field("filingDate")
+            filing_date = _table_value(table, index, "filingDate")
             if not filing_date or not _in_date_range(filing_date, start_date, end_date):
                 continue
 
-            accession = field("accessionNumber")
+            accession = _table_value(table, index, "accessionNumber")
             if not accession or accession in seen:
                 continue
             seen.add(accession)
 
-            primary_document = field("primaryDocument")
+            primary_document = _table_value(table, index, "primaryDocument")
             rows.append(
                 {
                     "cik": str(int(cik)),
                     "form": form,
                     "filing_date": filing_date,
-                    "acceptance_datetime": field("acceptanceDateTime") or None,
-                    "report_date": field("reportDate") or None,
+                    "acceptance_datetime": (
+                        _table_value(table, index, "acceptanceDateTime") or None
+                    ),
+                    "report_date": _table_value(table, index, "reportDate") or None,
                     "accession_number": accession,
-                    "file_number": field("fileNumber") or None,
+                    "file_number": _table_value(table, index, "fileNumber") or None,
                     "primary_document": primary_document or None,
                     "document_url": (
                         filing_document_url(cik, accession, primary_document)
@@ -161,8 +165,12 @@ class SecEdgarClient:
                 if error.code not in {429, 500, 502, 503, 504} or attempt >= self.max_retries:
                     raise
                 retry_after = error.headers.get("Retry-After")
-                delay = float(retry_after) if retry_after else min(2**attempt, 30)
-                time.sleep(delay)
+                try:
+                    delay = float(retry_after) if retry_after else min(2**attempt, 30)
+                except ValueError:
+                    retry_time = parsedate_to_datetime(retry_after)
+                    delay = max(0.0, retry_time.timestamp() - time.time())
+                time.sleep(min(delay, 60))
             except URLError as error:
                 last_error = error
                 if attempt >= self.max_retries:
