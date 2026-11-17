@@ -6,11 +6,11 @@ import csv
 import io
 import os
 import zipfile
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from ipo_forecast.data.sources.http import HttpTransport, MarketDataApiError
+from ipo_forecast.data.sources.http import HttpTransport
 from ipo_forecast.data.sources.market_data import (
     Candle,
     first_value,
@@ -33,7 +33,7 @@ TINVEST_INTERVALS = {
 def _utc_iso(value: datetime) -> str:
     if value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("T-Invest request timestamps must be timezone-aware")
-    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
 class TInvestClient:
@@ -124,7 +124,7 @@ class TInvestClient:
         if not instrument_id:
             raise ValueError("T-Invest instrument must include uid or instrument_id")
 
-        api_interval, limit, _ = TINVEST_INTERVALS[interval]
+        api_interval, _, _ = TINVEST_INTERVALS[interval]
         response = self.transport.request_json(
             "POST",
             f"{TINVEST_REST_PREFIX}/MarketDataService/GetCandles",
@@ -134,7 +134,6 @@ class TInvestClient:
                 "interval": api_interval,
                 "instrumentId": instrument_id,
                 "candleSourceType": "CANDLE_SOURCE_EXCHANGE",
-                "limit": limit,
             },
             refresh=refresh,
         )
@@ -166,7 +165,7 @@ class TInvestClient:
         )
         if not instrument_id:
             raise ValueError("T-Invest instrument must include uid or instrument_id")
-        if year < 1990 or year > datetime.now(timezone.utc).year:
+        if year < 1990 or year > datetime.now(UTC).year:
             raise ValueError("year is outside the supported calendar range")
         return self.transport.request_bytes(
             "GET",
