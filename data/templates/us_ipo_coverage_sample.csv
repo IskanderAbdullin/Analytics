@@ -1,0 +1,21 @@
+ticker,issuer_name,exchange,listing_date,event_type,training_eligible,probe_days_ago,notes
+SNOW,Snowflake,NYSE,2020-09-16,traditional_ipo,true,,Historical IPO coverage test
+ABNB,Airbnb,NASDAQ,2020-12-10,traditional_ipo,true,,Historical IPO coverage test
+UBER,Uber Technologies,NYSE,2019-05-10,traditional_ipo,true,,Historical IPO coverage test
+LYFT,Lyft,NASDAQ,2019-03-29,traditional_ipo,true,,Historical IPO coverage test
+HOOD,Robinhood Markets,NASDAQ,2021-07-29,traditional_ipo,true,,Historical IPO coverage test
+RIVN,Rivian Automotive,NASDAQ,2021-11-10,traditional_ipo,true,,Historical IPO coverage test
+CAVA,CAVA Group,NYSE,2023-06-15,traditional_ipo,true,,Historical IPO coverage test
+CART,Maplebear (Instacart),NASDAQ,2023-09-19,traditional_ipo,true,,Historical IPO coverage test
+ARM,Arm Holdings,NASDAQ,2023-09-14,traditional_ipo,true,,Historical IPO coverage test
+KVYO,Klaviyo,NYSE,2023-09-20,traditional_ipo,true,,Historical IPO coverage test
+RDDT,Reddit,NYSE,2024-03-21,traditional_ipo,true,,Historical IPO coverage test
+FIG,Figma,NASDAQ,2025-07-31,traditional_ipo,true,,Recent IPO coverage test
+CRCL,Circle Internet Group,NYSE,2025-06-05,traditional_ipo,true,,Recent IPO coverage test
+CHYM,Chime Financial,NASDAQ,2025-06-12,traditional_ipo,true,,Recent IPO coverage test
+KLAR,Klarna Group,NYSE,2025-09-10,traditional_ipo,true,,Recent IPO coverage test
+GEMI,Gemini Space Station,NASDAQ,2025-09-12,traditional_ipo,true,,Recent IPO coverage test
+STUB,StubHub Holdings,NYSE,2025-09-17,traditional_ipo,true,,Recent IPO coverage test
+TWTR,Twitter,NYSE,2013-11-07,delisted_control,false,,Delisted/acquired control; do not use as a training IPO row
+ANT,Anthropic,NASDAQ,,pending_case,false,,Pending case; no listing date or realised outcome as of 2026-11-17
+AAPL,Apple,NASDAQ,,active_data_control,false,1,Recent price-data smoke test only; not an IPO

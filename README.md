@@ -30,7 +30,7 @@ Initial target horizons (trading sessions): first trade, day 1 close, day 5, day
 
     config/                 Model and project configuration
     data/
-      templates/            Empty CSV templates; no fabricated observations
+      templates/            Empty CSV templates and coverage-test universes
       cases/anthropic/      Verified SEC filing manifest for the first case
       raw/                  Immutable source snapshots (local, git-ignored)
       interim/              Normalised intermediate data (git-ignored)
@@ -61,6 +61,17 @@ Set SEC_USER_AGENT to an application name and contact email before using EDGAR:
     ipo-forecast sec-search --query "Anthropic"
     ipo-forecast sec-filings --cik 2130357 --start-date 2026-01-01
 
+Set broker credentials locally (never commit them):
+
+    $env:FINAM_API_SECRET = "your Finam API secret"
+    $env:TINVEST_TOKEN = "your T-Invest API token"
+
+Run the dual-broker historical coverage pilot:
+
+    ipo-forecast market-data-audit
+
+The command writes a CSV detail report and a JSON summary under data/interim/. Use --providers tinvest to run only one adapter, --no-minute-archives to skip annual T-Invest minute ZIP downloads, or --refresh to bypass cached responses. See [market-data adapter documentation](docs/market_data_providers.md).
+
 Scan SEC quarterly filing indexes (this downloads four index files per year):
 
     ipo-forecast sec-index --start-year 2000 --end-year 2026
@@ -75,7 +86,7 @@ Train one task at a time; do not mix forecast origins or target horizons:
       --forecast-origin after_pricing_pre_open --target-horizon day1_close \
       --features revenue_growth_yoy gross_margin deal_size_usd --model ridge
 
-The implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, and a cached SEC EDGAR adapter. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
+The implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, a cached SEC EDGAR adapter, and broker market-data coverage adapters. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
 
 ## Data policy
 
@@ -87,7 +98,7 @@ The implementation provides schemas, CSV/Parquet loading, source-registry valida
 - Do not scrape private communities or bypass access controls. Respect platform terms, robots policies, rate limits, and applicable law.
 - Do not commit credentials, paid datasets, personal data, or raw data whose licence does not permit redistribution.
 
-See [research protocol](docs/research_protocol.md), [data dictionary](docs/data_dictionary.md), [source catalogue](docs/source_catalog.md), and [SEC EDGAR connector](docs/sec_edgar.md).
+See [research protocol](docs/research_protocol.md), [data dictionary](docs/data_dictionary.md), [source catalogue](docs/source_catalog.md), [SEC EDGAR connector](docs/sec_edgar.md), and [broker market-data adapters](docs/market_data_providers.md).
 
 ## Initial model strategy
 
@@ -111,6 +122,6 @@ Complex NLP and deep learning are later additions. They must demonstrate out-of-
 
 ## Status
 
-**Milestone 1 — foundation committed.** SEC filing discovery and an Anthropic filing manifest are now in place. Historical outcome data, cross-market coverage, sentiment connectors, probability calibration, and model comparison remain pending.
+**Milestone 2 — broker market-data adapters and coverage audit committed.** The adapters are implemented and covered by mocked tests. Live provider coverage is not yet measured; run the audit locally with Finam and/or T-Invest credentials to produce the empirical report.
 
 No forecasts should be interpreted as investment advice. The system is a research and decision-support tool; model outputs are uncertain and can fail under regime changes.

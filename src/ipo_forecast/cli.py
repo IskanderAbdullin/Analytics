@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from datetime import date
 from pathlib import Path
 
@@ -9,8 +10,11 @@ import joblib
 import numpy as np
 import pandas as pd
 
+from ipo_forecast.data.coverage import run_coverage_audit
 from ipo_forecast.data.io import load_modeling_dataset
+from ipo_forecast.data.sources.finam import FinamClient
 from ipo_forecast.data.sources.sec_edgar import SecEdgarClient
+from ipo_forecast.data.sources.tinvest import TInvestClient
 from ipo_forecast.data.validate import select_forecast_task
 from ipo_forecast.evaluation.metrics import regression_metrics
 from ipo_forecast.models.baseline import fit_regression_baseline, predict_returns
@@ -125,6 +129,58 @@ def _sec_index_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def _market_data_audit_command(args: argparse.Namespace) -> int:
+    providers = {}
+    cache_root = Path(args.cache_dir)
+    selected = set(args.providers)
+
+    if "finam" in selected:
+        secret = os.getenv("FINAM_API_SECRET") or os.getenv("FINAM_TOKEN")
+        if secret:
+            providers["finam"] = FinamClient(
+                api_secret=secret,
+                source_app_id=os.getenv("FINAM_SOURCE_APP_ID"),
+                cache_dir=cache_root / "finam",
+            )
+        else:
+            raise ValueError(
+                "Finam selected but FINAM_API_SECRET is not set. "
+                "Set it in the local environment; do not commit it."
+            )
+
+    if "tinvest" in selected:
+        token = os.getenv("TINVEST_TOKEN") or os.getenv("TINKOFF_INVEST_TOKEN")
+        if token:
+            providers["tinvest"] = TInvestClient(
+                token=token,
+                cache_dir=cache_root / "tinvest",
+            )
+        else:
+            raise ValueError(
+                "T-Invest selected but TINVEST_TOKEN is not set. "
+                "Set it in the local environment; do not commit it."
+            )
+
+    rows, summary = run_coverage_audit(
+        args.universe,
+        providers,
+        daily_window_days=args.daily_window_days,
+        include_minute_archives=not args.no_minute_archives,
+        refresh=args.refresh,
+    )
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).to_csv(output_path, index=False)
+    summary_path = output_path.with_suffix(".summary.json")
+    summary_path.write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    print(f"Coverage detail: {output_path}")
+    print(f"Coverage summary: {summary_path}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="ipo-forecast")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -193,6 +249,31 @@ def main() -> int:
     sec_index_parser.add_argument("--cache-dir", default="data/raw/sec_edgar/cache")
     sec_index_parser.add_argument("--output", default="data/interim/sec_ipo_filing_index.csv")
     sec_index_parser.set_defaults(func=_sec_index_command)
+
+    market_data_parser = subparsers.add_parser(
+        "market-data-audit",
+        help="Audit Finam and T-Invest historical price coverage for an IPO universe",
+    )
+    market_data_parser.add_argument(
+        "--universe", default="data/templates/us_ipo_coverage_sample.csv"
+    )
+    market_data_parser.add_argument(
+        "--output", default="data/interim/market_data_coverage.csv"
+    )
+    market_data_parser.add_argument(
+        "--providers", nargs="+", choices=["finam", "tinvest"], default=["finam", "tinvest"]
+    )
+    market_data_parser.add_argument("--daily-window-days", type=int, default=180)
+    market_data_parser.add_argument(
+        "--no-minute-archives",
+        action="store_true",
+        help="Skip T-Invest annual minute archive downloads",
+    )
+    market_data_parser.add_argument("--refresh", action="store_true")
+    market_data_parser.add_argument(
+        "--cache-dir", default="data/raw/market_data/cache"
+    )
+    market_data_parser.set_defaults(func=_market_data_audit_command)
 
     args = parser.parse_args()
     return args.func(args)
