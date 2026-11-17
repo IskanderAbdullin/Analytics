@@ -1,1 +1,1 @@
-observation_id,ipo_id,feature_name,value,unit,event_at,published_at,available_at,retrieved_at,source_id,source_record_url,evidence_type,confidence_grade,notes
+observation_id,ipo_id,feature_name,value,unit,event_at,published_at,available_at,availability_precision,retrieved_at,source_id,source_record_url,evidence_type,confidence_grade,notes

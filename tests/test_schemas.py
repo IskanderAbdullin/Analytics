@@ -3,7 +3,12 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from ipo_forecast.schemas import ConfidenceGrade, EvidenceType, FeatureObservation
+from ipo_forecast.schemas import (
+    AvailabilityPrecision,
+    ConfidenceGrade,
+    EvidenceType,
+    FeatureObservation,
+)
 
 
 def test_optional_timestamps_can_be_null_but_required_times_are_timezone_aware():
@@ -15,6 +20,7 @@ def test_optional_timestamps_can_be_null_but_required_times_are_timezone_aware()
         event_at=None,
         published_at=None,
         available_at=datetime(2026, 1, 1, tzinfo=UTC),
+        availability_precision=AvailabilityPrecision.EXACT_TIMESTAMP,
         retrieved_at=datetime(2026, 1, 2, tzinfo=UTC),
         source_id="sec",
         evidence_type=EvidenceType.OBSERVED,
@@ -31,6 +37,7 @@ def test_naive_availability_timestamp_is_rejected():
             feature_name="revenue_growth_yoy",
             value=0.42,
             available_at=datetime(2026, 1, 1),
+            availability_precision=AvailabilityPrecision.EXACT_TIMESTAMP,
             retrieved_at=datetime(2026, 1, 2, tzinfo=UTC),
             source_id="sec",
             evidence_type=EvidenceType.OBSERVED,

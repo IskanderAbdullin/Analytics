@@ -14,10 +14,13 @@ All timestamps should be stored in UTC with an explicit timezone.
 - event_at: when the measured event occurred (for example, a trade or economic period end).
 - published_at: when the source published the information.
 - available_at: when the information became publicly or operationally available to the model. This is the key point-in-time eligibility timestamp.
+- availability_precision: how precisely the availability time is known. Allowed values: exact_timestamp, date_only, conservative_next_session, estimated.
 - retrieved_at: when our pipeline collected the record.
 - as_of_timestamp: the forecast cut-off. No feature with available_at later than this timestamp may be used.
 - listing_date: local exchange listing date, stored as an ISO date. Keep the exchange timezone separately when deriving intraday timestamps.
 - target_timestamp: timestamp at which the target price was observed.
+
+Do not automatically equate a filing's acceptance timestamp with the moment its contents became publicly available. The SEC says it does not provide a timestamp for when filing content first becomes available on sec.gov. Preserve acceptance metadata separately. If no exact dissemination timestamp can be established, choose a conservative availability boundary (normally the next exchange session) and mark availability_precision as conservative_next_session.
 
 If a source is revised, preserve the original vintage and record the revision as a new observation. Do not overwrite the historical vintage.
 

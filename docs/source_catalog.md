@@ -32,8 +32,8 @@ The OECD methodology for its Asia capital-markets report describes using LSEG, F
 - SEC says public data.sec.gov submissions and XBRL APIs do not require authentication or an API key.
 - APIs are updated as filings are disseminated; bulk archives are rebuilt nightly and are more efficient for large historical downloads.
 - SEC's Webmaster FAQ states a maximum automated access rate of 10 requests per second. The collector should use a lower configurable ceiling, a descriptive User-Agent, caching, retry/backoff, and request logging.
+- SEC's Webmaster FAQ defines acceptance time as Eastern time, but explicitly says there is no timestamp indicating when filing content first becomes available on sec.gov. Do not use acceptance time as an exact public-availability timestamp. For strict intraday backtests, use an independently verified dissemination time or a conservative next-session availability boundary.
 - Filing documents and XBRL facts need separate parsing. For IPO financials, preserve the filing accession number and filing date as the data vintage.
-- A filing date is not necessarily the exact public-availability timestamp; use acceptance/dissemination timestamps where available and retain the original timestamp.
 
 ### India as a promising pilot cohort
 

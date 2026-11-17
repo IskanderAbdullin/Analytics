@@ -31,10 +31,16 @@ The collector caches raw responses under data/raw/sec_edgar/cache. That folder i
 
 Use one shared client per process. Do not run multiple collectors in parallel against SEC without a shared rate limiter. Do not remove throttling to accelerate bulk downloads.
 
+## Filing time versus public availability
+
+SEC's Webmaster FAQ defines the acceptance time as Eastern time, but explicitly says there is no timestamp indicating when filing content first becomes available on sec.gov. Therefore, the accepted timestamp is useful filing metadata, not an exact public-availability timestamp.
+
+For intraday point-in-time backtests, do not make a filing's contents available at the accepted timestamp unless an independent source establishes the dissemination time. Otherwise set available_at conservatively to the next exchange session and mark availability_precision as conservative_next_session. Keep the raw accepted timestamp and its original timezone separately.
+
 ## Important limitations
 
 - S-1/F-1 and 424B4 forms identify filing candidates, not necessarily completed IPOs. Some are withdrawn, postponed, amended, or are not conventional operating-company IPOs.
 - A final prospectus is not a substitute for the first filing. Preserve each filing accession and availability timestamp to reconstruct what was known at each forecast origin.
 - SEC master indexes identify filing documents, but the project still needs to group filings into issuer/deal events, classify IPO vs follow-on/SPAC/other offerings, and identify withdrawals and completed listings.
-- A filing date is not necessarily the exact public-availability timestamp. Use acceptance/dissemination timestamps where available.
+- A filing date is not necessarily the exact public-availability timestamp. Use acceptance metadata as a lower-bound/provenance field, not as proof of dissemination.
 - XBRL company facts are not a complete replacement for parsing prospectus financial statements. Keep units, fiscal periods, tags, filing dates, and source accessions.

@@ -37,6 +37,8 @@ A positive mention is not equivalent to an order or a funded intention to buy. R
 
 For each forecast origin, freeze an information cut-off. Features must be available by that timestamp. Record source vintages and revisions. If an archive cannot establish when a fact became available, mark it as uncertain or exclude it from strict point-in-time backtests.
 
+Do not automatically equate regulatory filing acceptance time with public availability. For SEC filings, the SEC states that it does not provide a timestamp for when filing content first becomes available on sec.gov. Use an independently verified dissemination time or a conservative next-session availability boundary.
+
 Never use final prospectus facts in a preliminary-filing forecast if those facts were not public at that time. Never use first-day volume, closing price, or post-open order-book data in a pre-open forecast.
 
 ## 5. Labels and market data

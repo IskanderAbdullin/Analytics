@@ -26,6 +26,13 @@ class ConfidenceGrade(StrEnum):
     D = "D"
 
 
+class AvailabilityPrecision(StrEnum):
+    EXACT_TIMESTAMP = "exact_timestamp"
+    DATE_ONLY = "date_only"
+    CONSERVATIVE_NEXT_SESSION = "conservative_next_session"
+    ESTIMATED = "estimated"
+
+
 def _require_timezone(value: datetime | None) -> datetime | None:
     if value is None:
         return value
@@ -78,6 +85,7 @@ class FeatureObservation(BaseModel):
     event_at: datetime | None = None
     published_at: datetime | None = None
     available_at: datetime
+    availability_precision: AvailabilityPrecision
     retrieved_at: datetime
     source_id: str = Field(min_length=1)
     source_record_url: str | None = None
