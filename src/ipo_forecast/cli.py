@@ -165,7 +165,7 @@ def _market_data_audit_command(args: argparse.Namespace) -> int:
         args.universe,
         providers,
         daily_window_days=args.daily_window_days,
-        include_minute_archives=not args.no_minute_archives,
+        include_minute_archives=args.minute_archives,
         refresh=args.refresh,
     )
     output_path = Path(args.output)
@@ -265,9 +265,9 @@ def main() -> int:
     )
     market_data_parser.add_argument("--daily-window-days", type=int, default=180)
     market_data_parser.add_argument(
-        "--no-minute-archives",
+        "--minute-archives",
         action="store_true",
-        help="Skip T-Invest annual minute archive downloads",
+        help="Opt in to potentially large T-Invest annual minute archive downloads",
     )
     market_data_parser.add_argument("--refresh", action="store_true")
     market_data_parser.add_argument(

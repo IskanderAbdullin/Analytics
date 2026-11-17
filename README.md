@@ -70,7 +70,7 @@ Run the dual-broker historical coverage pilot:
 
     ipo-forecast market-data-audit
 
-The command writes a CSV detail report and a JSON summary under data/interim/. Use --providers tinvest to run only one adapter, --no-minute-archives to skip annual T-Invest minute ZIP downloads, or --refresh to bypass cached responses. See [market-data adapter documentation](docs/market_data_providers.md).
+The command writes a CSV detail report and a JSON summary under data/interim/. Use --providers tinvest to run only one adapter, --minute-archives to opt into potentially large annual T-Invest minute ZIP downloads, or --refresh to bypass cached responses. See [market-data adapter documentation](docs/market_data_providers.md).
 
 Scan SEC quarterly filing indexes (this downloads four index files per year):
 

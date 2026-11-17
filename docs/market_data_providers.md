@@ -9,7 +9,7 @@ They do not assume that a ticker in a current instrument list proves historical 
 - whether it is archived or currently API-tradable, when the provider exposes that field;
 - the first daily/minute candle dates, when exposed;
 - whether daily candles cover the IPO listing window;
-- whether minute candles or an annual minute archive contain the listing day.
+- whether minute candles or an annual minute archive (when explicitly enabled) contain the listing day.
 
 ## Credentials
 
@@ -31,7 +31,7 @@ From the repository root:
     python -m pip install -e ".[dev]"
     ipo-forecast market-data-audit
 
-The default universe is data/templates/us_ipo_coverage_sample.csv. It contains a mixture of older and recent IPOs, a delisted/acquired control, and Anthropic as a pending case. The sample is for coverage testing only; its rows are not automatically accepted as training labels.
+The default audit excludes annual ZIP downloads. Add --minute-archives to opt into potentially large annual downloads. The default universe is data/templates/us_ipo_coverage_sample.csv. It contains a mixture of older and recent IPOs, a delisted/acquired control, and Anthropic as a pending case. The sample is for coverage testing only; its rows are not automatically accepted as training labels.
 
 Output:
 - data/interim/market_data_coverage.csv — one row per ticker/provider, with instrument and event-window coverage fields.
@@ -41,7 +41,7 @@ Useful options:
 
     ipo-forecast market-data-audit --providers tinvest
     ipo-forecast market-data-audit --providers finam tinvest --daily-window-days 180
-    ipo-forecast market-data-audit --no-minute-archives
+    ipo-forecast market-data-audit --minute-archives
     ipo-forecast market-data-audit --refresh
 
 Raw API responses are cached under data/raw/market_data/cache and ignored by Git. Use --refresh to bypass the cache.

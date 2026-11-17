@@ -61,7 +61,7 @@ class TInvestClient:
             base_url="https://invest-public-api.tbank.ru",
             cache_dir=cache_dir,
             default_headers={"Authorization": f"Bearer {access_token}"},
-            min_interval_seconds=0.15,
+            min_interval_seconds=0.4,
         )
 
     def list_instruments(self) -> list[dict[str, Any]]:

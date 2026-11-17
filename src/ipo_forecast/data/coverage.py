@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from ipo_forecast.data.sources.market_data import Candle, parse_timestamp
+from ipo_forecast.data.venue import candidate_priority, classify_venue
 
 
 def load_coverage_universe(path: str | Path) -> list[dict[str, Any]]:
@@ -120,6 +121,7 @@ def _evaluate_candidate(
         "instrument_symbol": str(candidate.get("symbol") or target["ticker"]),
         "instrument_exchange": candidate.get("exchange"),
         "instrument_name": candidate.get("name"),
+        "venue_verification": classify_venue(target.get("exchange"), candidate),
         "is_archived": candidate.get("is_archived"),
         "api_trade_available": candidate.get("api_trade_available"),
         "first_daily_candle_date": _date_from_metadata(
@@ -131,6 +133,7 @@ def _evaluate_candidate(
         "probe_date": event_date if is_control else None,
         "daily_status": "not_applicable",
         "daily_candle_count": 0,
+        "daily_listing_day_present": False,
         "daily_first_timestamp": None,
         "daily_last_timestamp": None,
         "daily_error": None,
@@ -177,8 +180,14 @@ def _evaluate_candidate(
             daily = sorted(daily, key=lambda candle: candle.timestamp)
             result["daily_candle_count"] = len(daily)
             result["daily_status"] = "available" if daily else "no_candles_returned"
+            result["daily_listing_day_present"] = any(
+                _candle_date(candle) == event_date for candle in daily
+            )
             if daily:
                 result["daily_first_timestamp"] = daily[0].timestamp
+                result["daily_first_candle_delay_days"] = (
+                    _candle_date(daily[0]) - event_date
+                ).days
                 result["daily_last_timestamp"] = daily[-1].timestamp
         except Exception as error:  # Provider errors should not abort the whole audit.
             result["daily_status"] = "request_error"
@@ -299,7 +308,7 @@ def run_coverage_audit(
     providers: dict[str, Any],
     *,
     daily_window_days: int = 180,
-    include_minute_archives: bool = True,
+    include_minute_archives: bool = False,
     refresh: bool = False,
     today: date | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -387,13 +396,14 @@ def run_coverage_audit(
                 for candidate in matches
             ]
             best = max(
-                candidate_results,
-                key=lambda item: (
-                    item.get("daily_candle_count", 0),
-                    item.get("minute_archive_listing_day_count", 0),
-                    item.get("minute_getcandles_count", 0),
+                zip(matches, candidate_results, strict=True),
+                key=lambda pair: (
+                    candidate_priority(target.get("exchange"), pair[0]),
+                    int(bool(pair[1].get("daily_listing_day_present"))),
+                    pair[1].get("minute_archive_listing_day_count", 0),
+                    pair[1].get("daily_candle_count", 0),
                 ),
-            )
+            )[1]
             errors = [
                 value
                 for key, value in best.items()
@@ -431,8 +441,21 @@ def run_coverage_audit(
             "instruments_found": sum(
                 row.get("instrument_status") == "found" for row in provider_rows
             ),
+            "primary_venue_ipo_listing_day_candles": sum(
+                row.get("daily_listing_day_present") is True
+                and row.get("venue_verification") == "primary_venue"
+                for row in ipo_rows
+            ),
             "ipo_daily_windows_with_data": sum(
                 row.get("daily_status") == "available" for row in ipo_rows
+            ),
+            "primary_venue_minute_listing_days_with_data": sum(
+                row.get("venue_verification") == "primary_venue"
+                and (
+                    row.get("minute_archive_status") == "listing_day_available"
+                    or row.get("minute_getcandles_status") == "available"
+                )
+                for row in ipo_rows
             ),
             "ipo_minute_listing_days_with_data": sum(
                 row.get("minute_archive_status") == "listing_day_available"

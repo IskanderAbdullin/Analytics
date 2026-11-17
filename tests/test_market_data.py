@@ -237,3 +237,193 @@ def test_coverage_audit_supports_recent_active_data_control(tmp_path):
     )
     assert rows[0]["probe_date"] == date(2025, 1, 9)
     assert summary["providers"]["finam"]["active_control_daily_smoke_tests_with_data"] == 1
+
+
+def test_venue_classification_and_primary_candidate_preference(tmp_path):
+    from ipo_forecast.data.sources.market_data import Candle
+    from ipo_forecast.data.venue import classify_venue
+
+    assert classify_venue("NASDAQ", {"exchange": "XNAS"}) == "primary_venue"
+    assert classify_venue("NYSE", {"exchange": "XNYS"}) == "primary_venue"
+    assert classify_venue("NASDAQ", {"exchange": "SPB"}) == "alternative_venue"
+    assert classify_venue("NASDAQ", {}) == "unverified_venue"
+
+    path = tmp_path / "universe.csv"
+    path.write_text(
+        "ticker,issuer_name,listing_date,exchange,event_type\n"
+        "TEST,Test Issuer,2025-01-02,NASDAQ,ipo\n",
+        encoding="utf-8",
+    )
+
+    class FakeProvider:
+        def list_instruments(self):
+            return [
+                {"ticker": "TEST", "symbol": "TEST@SPB", "exchange": "SPB"},
+                {"ticker": "TEST", "symbol": "TEST@XNAS", "exchange": "XNAS"},
+            ]
+
+        def get_candles(self, instrument, *, interval, start, end, refresh=False):
+            count = 3 if instrument["exchange"] == "SPB" else 1
+            return [
+                Candle(
+                    timestamp="2025-01-02T15:00:00Z",
+                    open=10.0,
+                    high=11.0,
+                    low=9.0,
+                    close=10.5,
+                    volume=100.0,
+                    volume_unit="shares",
+                    provider="finam",
+                    symbol=instrument["symbol"],
+                    interval=interval,
+                )
+                for _ in range(count)
+            ]
+
+    rows, summary = run_coverage_audit(
+        path, {"finam": FakeProvider()}, today=date(2025, 1, 10)
+    )
+    assert rows[0]["instrument_symbol"] == "TEST@XNAS"
+    assert rows[0]["venue_verification"] == "primary_venue"
+    assert rows[0]["daily_listing_day_present"] is True
+    assert summary["providers"]["finam"]["primary_venue_ipo_listing_day_candles"] == 1
+
+
+def test_http_cache_is_scoped_by_authorization(tmp_path):
+    class FakeResponse:
+        def __init__(self, content):
+            self.content = content
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return self.content
+
+    called = []
+
+    def fake_opener(request, timeout):
+        called.append(request.get_header("Authorization"))
+        return FakeResponse(b'{"ok":true}')
+
+    a = HttpTransport(
+        provider="test",
+        base_url="https://example.test",
+        cache_dir=tmp_path,
+        default_headers={"Authorization": "Bearer first"},
+        opener=fake_opener,
+    )
+    b = HttpTransport(
+        provider="test",
+        base_url="https://example.test",
+        cache_dir=tmp_path,
+        default_headers={"Authorization": "Bearer second"},
+        opener=fake_opener,
+    )
+    a.request_json("POST", "/scope", json_body={})
+    b.request_json("POST", "/scope", json_body={})
+    assert len(called) == 2
+    assert len(list(tmp_path.glob("*.json"))) == 2
+
+
+def test_tinvest_get_candles_does_not_mix_limit_with_candle_source():
+    from datetime import UTC, datetime
+
+    class RecordingTransport:
+        def __init__(self):
+            self.payload = None
+
+        def request_json(self, method, path, **kwargs):
+            self.payload = kwargs.get("json_body")
+            assert method == "POST"
+            assert path.endswith("/MarketDataService/GetCandles")
+            return {"candles": []}
+
+    transport = RecordingTransport()
+    client = TInvestClient(token="test-token", transport=transport)
+    candles = client.get_candles(
+        "fake-uid",
+        interval="1d",
+        start=datetime(2025, 1, 1, tzinfo=UTC),
+        end=datetime(2025, 1, 10, tzinfo=UTC),
+    )
+    assert candles == []
+    assert transport.payload["candleSourceType"] == "CANDLE_SOURCE_EXCHANGE"
+    assert "limit" not in transport.payload
+
+
+def test_finam_pagination_includes_archived_instruments():
+    from ipo_forecast.data.sources.finam import FinamClient
+
+    class FakeTransport:
+        def __init__(self):
+            self.calls = []
+
+        def set_header(self, name, value):
+            assert name == "Authorization"
+            assert value == "example-session"
+
+        def request_json(self, method, path, **kwargs):
+            self.calls.append(kwargs.get("params", {}))
+            if len(self.calls) == 1:
+                return {
+                    "assets": [
+                        {"symbol": "ABC@XNAS", "ticker": "ABC", "isArchived": False}
+                    ],
+                    "nextCursor": 22,
+                }
+            return {
+                "assets": [
+                    {"symbol": "OLD@XNYS", "ticker": "OLD", "isArchived": True}
+                ],
+                "nextCursor": 0,
+            }
+
+    transport = FakeTransport()
+    client = FinamClient(session_token="example-session", transport=transport)
+    instruments = client.list_instruments()
+    assert len(instruments) == 2
+    assert instruments[1]["is_archived"] is True
+    assert transport.calls[1]["cursor"] == 22
+
+
+def test_empty_daily_window_is_not_mistaken_for_ipo_listing_day(tmp_path):
+    from ipo_forecast.data.sources.market_data import Candle
+
+    path = tmp_path / "universe.csv"
+    path.write_text(
+        "ticker,issuer_name,listing_date,exchange,event_type\n"
+        "TEST,Test Issuer,2025-01-02,NASDAQ,ipo\n",
+        encoding="utf-8",
+    )
+
+    class FakeProvider:
+        def list_instruments(self):
+            return [{"ticker": "TEST", "symbol": "TEST@XNAS", "exchange": "XNAS"}]
+
+        def get_candles(self, instrument, *, interval, start, end, refresh=False):
+            return [
+                Candle(
+                    timestamp="2025-01-10T15:00:00Z",
+                    open=10.0,
+                    high=11.0,
+                    low=9.0,
+                    close=10.5,
+                    volume=100.0,
+                    volume_unit="shares",
+                    provider="finam",
+                    symbol=instrument["symbol"],
+                    interval=interval,
+                )
+            ]
+
+    rows, summary = run_coverage_audit(
+        path, {"finam": FakeProvider()}, today=date(2025, 1, 10)
+    )
+    assert rows[0]["daily_status"] == "available"
+    assert rows[0]["daily_listing_day_present"] is False
+    assert rows[0]["daily_first_candle_delay_days"] == 8
+    assert summary["providers"]["finam"]["primary_venue_ipo_listing_day_candles"] == 0

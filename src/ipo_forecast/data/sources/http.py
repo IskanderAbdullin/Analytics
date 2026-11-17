@@ -39,6 +39,7 @@ class HttpTransport:
         base_url: str,
         cache_dir: str | Path,
         default_headers: dict[str, str] | None = None,
+        cache_namespace: str | None = None,
         min_interval_seconds: float = 0.0,
         timeout_seconds: float = 30.0,
         max_retries: int = 3,
@@ -55,6 +56,7 @@ class HttpTransport:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.default_headers = dict(default_headers or {})
+        self.cache_namespace = cache_namespace
         self.min_interval_seconds = min_interval_seconds
         self.timeout_seconds = timeout_seconds
         self.max_retries = max_retries
@@ -82,6 +84,9 @@ class HttpTransport:
         response_kind: str,
     ) -> Path:
         digest = hashlib.sha256()
+        scope = self.cache_namespace or self.default_headers.get("Authorization", "")
+        digest.update(scope.encode("utf-8"))
+        digest.update(b"\n")
         digest.update(method.encode("ascii"))
         digest.update(b"\n")
         digest.update(url.encode("utf-8"))
