@@ -87,6 +87,15 @@ Train one task at a time; do not mix forecast origins or target horizons:
       --features revenue_growth_yoy gross_margin deal_size_usd --model ridge \\
       --embargo-days 0
 
+Train an uncalibrated positive-return probability baseline for the same time-bounded IPO task:
+
+    ipo-forecast train-direction --dataset data/processed/modeling_dataset.parquet \
+      --forecast-origin after_pricing_pre_open --target-horizon day1_close \
+      --features revenue_growth_yoy gross_margin deal_size_usd \
+      --model logistic --embargo-days 0
+
+The output includes Brier score, log loss and ROC AUC where both classes exist, with the training prior as a baseline. These probabilities are **not calibrated**; proper calibration and walk-forward validation require enough observed historical IPOs.
+
 The implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, a cached SEC EDGAR adapter, and broker market-data coverage adapters. Training now also requires a valid target_timestamp so that labels that had not matured before the validation period are excluded. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
 
 ## Data policy

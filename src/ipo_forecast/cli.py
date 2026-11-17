@@ -16,8 +16,9 @@ from ipo_forecast.data.sources.finam import FinamClient
 from ipo_forecast.data.sources.sec_edgar import SecEdgarClient
 from ipo_forecast.data.sources.tinvest import TInvestClient
 from ipo_forecast.data.validate import select_forecast_task
-from ipo_forecast.evaluation.metrics import regression_metrics
+from ipo_forecast.evaluation.metrics import probability_metrics, regression_metrics
 from ipo_forecast.models.baseline import fit_regression_baseline, predict_returns
+from ipo_forecast.models.direction import fit_direction_baseline, predict_positive_probability
 from ipo_forecast.validation.maturity import purge_unmatured_training_labels
 from ipo_forecast.validation.split import chronological_event_split
 
@@ -87,6 +88,67 @@ def _train_command(args: argparse.Namespace) -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, output_dir / "baseline.joblib")
+    (output_dir / "metrics.json").write_text(
+        json.dumps(report, indent=2, allow_nan=False), encoding="utf-8"
+    )
+    print(json.dumps(report, indent=2, allow_nan=False))
+    return 0
+
+
+def _direction_command(args: argparse.Namespace) -> int:
+    frame = select_forecast_task(
+        load_modeling_dataset(args.dataset),
+        forecast_origin=args.forecast_origin,
+        target_horizon=args.target_horizon,
+    )
+    splits = chronological_event_split(
+        frame,
+        train_fraction=args.train_fraction,
+        validation_fraction=args.validation_fraction,
+    )
+    train, maturity_report = purge_unmatured_training_labels(
+        splits["train"], splits["validation"], embargo_days=args.embargo_days
+    )
+    splits["train"] = train
+    classifier = fit_direction_baseline(
+        train,
+        args.features,
+        target_column=args.target,
+        model_kind=args.model,
+        random_state=args.random_state,
+    )
+    baseline_probability = float((train[args.target] > 0).mean())
+    report = {
+        "model": args.model,
+        "target": args.target,
+        "forecast_origin": args.forecast_origin,
+        "target_horizon": args.target_horizon,
+        "features": args.features,
+        "label_maturity": maturity_report,
+        "probability_calibrated": False,
+        "counts": {
+            name: {
+                "rows": int(len(part)),
+                "ipo_events": int(part["ipo_id"].nunique()),
+            }
+            for name, part in splits.items()
+        },
+        "metrics": {},
+        "prior_baseline_metrics": {},
+    }
+    for name in ("validation", "test"):
+        part = splits[name]
+        truth = (part[args.target] > 0).astype(int)
+        probabilities = predict_positive_probability(
+            classifier, part, args.features
+        )
+        report["metrics"][name] = probability_metrics(truth, probabilities)
+        report["prior_baseline_metrics"][name] = probability_metrics(
+            truth, np.full(len(part), baseline_probability)
+        )
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    joblib.dump(classifier, output_dir / "direction.joblib")
     (output_dir / "metrics.json").write_text(
         json.dumps(report, indent=2, allow_nan=False), encoding="utf-8"
     )
@@ -227,6 +289,40 @@ def main() -> int:
     train_parser.add_argument("--random-state", type=int, default=42)
     train_parser.add_argument("--output-dir", default="reports/baseline")
     train_parser.set_defaults(func=_train_command)
+
+    direction_parser = subparsers.add_parser(
+        "train-direction", help="Train a positive-return probability baseline"
+    )
+    direction_parser.add_argument("--dataset", required=True)
+    direction_parser.add_argument("--features", nargs="+", required=True)
+    direction_parser.add_argument(
+        "--forecast-origin",
+        choices=["preliminary_filing", "after_pricing_pre_open", "post_open"],
+        required=True,
+    )
+    direction_parser.add_argument(
+        "--target-horizon",
+        choices=[
+            "first_trade", "day1_close", "day5_close",
+            "day20_close", "day60_close", "day180_close",
+        ],
+        required=True,
+    )
+    direction_parser.add_argument("--target", default="target_return")
+    direction_parser.add_argument(
+        "--model",
+        choices=["prior", "logistic", "random_forest"],
+        default="logistic",
+    )
+    direction_parser.add_argument("--train-fraction", type=float, default=0.70)
+    direction_parser.add_argument("--validation-fraction", type=float, default=0.15)
+    direction_parser.add_argument("--random-state", type=int, default=42)
+    direction_parser.add_argument("--embargo-days", type=int, default=0)
+    direction_parser.add_argument(
+        "--output-dir", default="reports/direction"
+    )
+    direction_parser.set_defaults(func=_direction_command)
+
 
     sec_search_parser = subparsers.add_parser(
         "sec-search", help="Resolve a company name or ticker using SEC's public mapping"

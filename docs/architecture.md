@@ -72,3 +72,9 @@ Forecasting data must distinguish the date an IPO listed from the date its targe
 The `train-baseline` command now requires `target_timestamp` and removes training rows whose outcome timestamp is at or after the first validation forecast cut-off. Optional `--embargo-days N` adds a conservative time gap. The report records the original count, purged count, and cut-off.
 
 This is an initial point-in-time safeguard, not a substitute for nested walk-forward retraining. Full sequential evaluation should retrain at every forecast origin once a sufficiently large historical database exists.
+
+## Positive-return classification baseline
+
+The `train-direction` command uses the same point-in-time, horizon-specific data and purged training split as the return-regression baseline. It fits a logistic classifier, Random Forest classifier, or historical-prior baseline to the binary target `target_return > 0`.
+
+Outputs include Brier score, log loss, and ROC AUC when the evaluation cohort has both classes. The model reports `probability_calibrated=false`; raw classifier probabilities should not be interpreted as calibrated event odds. Probability calibration must be fitted only on separate chronological calibration data, with reliability curves and held-out interval checks.
