@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Callable
 import json
 import time
+from collections.abc import Callable
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
