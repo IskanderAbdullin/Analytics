@@ -2,12 +2,14 @@
 
 import argparse
 import json
+from datetime import date
 from pathlib import Path
 
 import joblib
 import pandas as pd
 
 from ipo_forecast.data.io import load_modeling_dataset
+from ipo_forecast.data.sources.sec_edgar import SecEdgarClient
 from ipo_forecast.evaluation.metrics import regression_metrics
 from ipo_forecast.models.baseline import fit_regression_baseline, predict_returns
 from ipo_forecast.validation.split import chronological_event_split
@@ -63,6 +65,31 @@ def _train_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def _sec_search_command(args: argparse.Namespace) -> int:
+    client = SecEdgarClient(cache_dir=args.cache_dir)
+    matches = client.resolve_company(args.query)
+    print(json.dumps(matches, indent=2))
+    return 0 if matches else 1
+
+
+def _sec_filings_command(args: argparse.Namespace) -> int:
+    client = SecEdgarClient(cache_dir=args.cache_dir)
+    start_date = date.fromisoformat(args.start_date) if args.start_date else None
+    end_date = date.fromisoformat(args.end_date) if args.end_date else None
+    rows = client.list_ipo_filings(
+        args.cik,
+        start_date=start_date,
+        end_date=end_date,
+        include_historical=not args.no_historical,
+        refresh=args.refresh,
+    )
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).to_csv(output_path, index=False)
+    print(f"Saved {len(rows)} SEC IPO-related filing candidates to {output_path}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="ipo-forecast")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -83,6 +110,25 @@ def main() -> int:
     train_parser.add_argument("--random-state", type=int, default=42)
     train_parser.add_argument("--output-dir", default="reports/baseline")
     train_parser.set_defaults(func=_train_command)
+
+    sec_search_parser = subparsers.add_parser(
+        "sec-search", help="Resolve a company name or ticker using SEC's public mapping"
+    )
+    sec_search_parser.add_argument("--query", required=True)
+    sec_search_parser.add_argument("--cache-dir", default="data/raw/sec_edgar/cache")
+    sec_search_parser.set_defaults(func=_sec_search_command)
+
+    sec_filings_parser = subparsers.add_parser(
+        "sec-filings", help="Collect a company's SEC IPO-related filing candidates"
+    )
+    sec_filings_parser.add_argument("--cik", required=True)
+    sec_filings_parser.add_argument("--start-date")
+    sec_filings_parser.add_argument("--end-date")
+    sec_filings_parser.add_argument("--no-historical", action="store_true")
+    sec_filings_parser.add_argument("--refresh", action="store_true")
+    sec_filings_parser.add_argument("--cache-dir", default="data/raw/sec_edgar/cache")
+    sec_filings_parser.add_argument("--output", default="data/interim/sec_ipo_filings.csv")
+    sec_filings_parser.set_defaults(func=_sec_filings_command)
 
     args = parser.parse_args()
     return args.func(args)
