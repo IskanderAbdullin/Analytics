@@ -26,7 +26,9 @@ class ConfidenceGrade(str, Enum):
     D = "D"
 
 
-def _require_timezone(value: datetime) -> datetime:
+def _require_timezone(value: datetime | None) -> datetime | None:
+    if value is None:
+        return value
     if value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("Timestamp must include a timezone")
     return value
@@ -71,7 +73,7 @@ class FeatureObservation(BaseModel):
     observation_id: str = Field(min_length=1)
     ipo_id: str = Field(min_length=1)
     feature_name: str = Field(min_length=1)
-    value: str | float | int | bool | None
+    value: float | int | bool | str | None
     unit: str | None = None
     event_at: datetime | None = None
     published_at: datetime | None = None

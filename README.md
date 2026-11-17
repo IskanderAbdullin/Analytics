@@ -4,7 +4,7 @@ A reproducible research and machine-learning platform for forecasting IPO price 
 
 The first research case is the Anthropic IPO, but the system is designed to generalise to other issuers, exchanges, and market regimes. It combines point-in-time fundamentals, deal structure, market conditions, comparable IPOs, news and community sentiment, and post-listing market microstructure.
 
-> **Research integrity:** no observation is considered factual without a source, timestamp, and provenance. Estimates, analyst opinions, synthetic test fixtures, and verified observations must remain distinguishable. Historical features must reflect only information available at the forecast cut-off. The project does not contain a pre-filled Anthropic dataset; facts discussed in external research must be independently verified before ingestion.
+> **Research integrity:** no observation is considered factual without a source, timestamp, and provenance. Estimates, analyst opinions, synthetic test fixtures, and verified observations must remain distinguishable. Historical features must reflect only information available at the forecast cut-off. The project does not contain a pre-filled Anthropic dataset; claims discussed in external research must be independently verified before ingestion.
 
 ## Objectives
 
@@ -20,54 +20,60 @@ The first research case is the Anthropic IPO, but the system is designed to gene
 
 Forecast origins are separate tasks and must not be mixed:
 
-- `preliminary_filing`: after an initial registration statement, before final pricing.
-- `after_pricing_pre_open`: after the offer price is announced, before the first exchange trade.
-- `post_open`: after the first trade / during the first session. This task may use live market microstructure features.
+- preliminary_filing: after an initial registration statement, before final pricing.
+- after_pricing_pre_open: after the offer price is announced, before the first exchange trade.
+- post_open: after the first trade. This task may use live market microstructure features.
 
 Initial target horizons (trading sessions): first trade, day 1 close, day 5, day 20, day 60, and day 180. Targets are defined in [the data dictionary](docs/data_dictionary.md). Each task/horizon is evaluated separately.
 
 ## Repository layout
 
-```text
-config/                 Model and project configuration
-data/
-  templates/            Empty CSV templates; no fabricated observations
-  raw/                  Immutable source snapshots (local, git-ignored)
-  interim/              Normalised intermediate data (git-ignored)
-  processed/             Model-ready datasets (git-ignored)
-  source_registry.csv   Source and provenance catalogue
-docs/                   Architecture, methodology, and data dictionary
-reports/                Generated evaluation reports (git-ignored)
-src/ipo_forecast/
-  data/                 Loading and validation
-  features/             Point-in-time feature construction
-  models/               Baselines and model interfaces
-  validation/            Leakage-safe chronological splits
-  evaluation/            Metrics and calibration
-tests/                  Unit and regression tests
-```
+    config/                 Model and project configuration
+    data/
+      templates/            Empty CSV templates; no fabricated observations
+      raw/                  Immutable source snapshots (local, git-ignored)
+      interim/              Normalised intermediate data (git-ignored)
+      processed/            Model-ready datasets (git-ignored)
+      source_registry.csv   Source and provenance catalogue
+    docs/                   Architecture, methodology, and data dictionary
+    reports/                Generated evaluation reports (git-ignored)
+    src/ipo_forecast/
+      data/                 Loading and validation
+      features/             Point-in-time feature construction
+      models/               Baselines and model interfaces
+      validation/            Leakage-safe chronological splits
+      evaluation/            Metrics and calibration
+    tests/                  Unit and regression tests
 
 ## Quick start
 
 Python 3.11 or newer is required.
 
-```bash
-python -m venv .venv
-# Windows PowerShell:
-.venv\\Scripts\\Activate.ps1
-# macOS / Linux:
-source .venv/bin/activate
+    python -m venv .venv
+    # Windows PowerShell:
+    .venv\Scripts\Activate.ps1
+    # macOS / Linux:
+    source .venv/bin/activate
 
-python -m pip install --upgrade pip
-pip install -e ".[dev]"
-pytest
-```
+    python -m pip install --upgrade pip
+    pip install -e ".[dev]"
+    pytest
 
-The initial milestone establishes schemas, validation, point-in-time feature rules, chronological splits, metrics, and a baseline training interface. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
+Validate a prepared dataset:
+
+    ipo-forecast validate --dataset data/processed/modeling_dataset.parquet
+
+Train a baseline (features must be explicitly selected):
+
+    ipo-forecast train-baseline --dataset data/processed/modeling_dataset.parquet \
+      --features revenue_growth_yoy gross_margin deal_size_usd \
+      --model ridge --target target_return
+
+The current implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, and evaluation metrics. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
 
 ## Data policy
 
-- Keep source payloads immutable under `data/raw/<source>/<YYYY-MM-DD>/`.
+- Keep source payloads immutable under data/raw/<source>/<YYYY-MM-DD>/.
 - Store source URL, publisher, publication time, retrieval time, licence/access notes, and a confidence grade.
 - Record both event time and knowledge/availability time. A later correction must not silently rewrite what was knowable historically.
 - Never use a value published after the forecast cut-off as a feature.
@@ -99,6 +105,6 @@ Complex NLP and deep learning are later additions. They must demonstrate out-of-
 
 ## Status
 
-**Milestone 0 — project foundation:** in progress.
+**Milestone 1 — foundation committed.** Historical data collection, source connectors, probabilistic calibration, and model comparison remain pending.
 
 No forecasts should be interpreted as investment advice. The system is a research and decision-support tool; model outputs are uncertain and can fail under regime changes.
