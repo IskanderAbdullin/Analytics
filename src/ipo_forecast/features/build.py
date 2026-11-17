@@ -76,8 +76,19 @@ def assemble_modeling_dataset(
         raise ValueError("Outcomes must contain at most one row per forecast_id")
 
     features = build_point_in_time_features(forecast_origins, observations)
+    outcome_fields = [
+        field
+        for field in (
+            "forecast_id",
+            "target_return",
+            "target_timestamp",
+            "target_price",
+            "outcome_source_id",
+        )
+        if field in outcomes.columns
+    ]
     return features.merge(
-        outcomes[["forecast_id", "target_return"]],
+        outcomes[outcome_fields],
         on="forecast_id",
         how="inner",
         validate="one_to_one",

@@ -84,9 +84,10 @@ Train one task at a time; do not mix forecast origins or target horizons:
 
     ipo-forecast train-baseline --dataset data/processed/modeling_dataset.parquet \
       --forecast-origin after_pricing_pre_open --target-horizon day1_close \
-      --features revenue_growth_yoy gross_margin deal_size_usd --model ridge
+      --features revenue_growth_yoy gross_margin deal_size_usd --model ridge \\
+      --embargo-days 0
 
-The implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, a cached SEC EDGAR adapter, and broker market-data coverage adapters. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
+The implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, a cached SEC EDGAR adapter, and broker market-data coverage adapters. Training now also requires a valid target_timestamp so that labels that had not matured before the validation period are excluded. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
 
 ## Data policy
 

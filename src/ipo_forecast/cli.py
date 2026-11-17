@@ -18,6 +18,7 @@ from ipo_forecast.data.sources.tinvest import TInvestClient
 from ipo_forecast.data.validate import select_forecast_task
 from ipo_forecast.evaluation.metrics import regression_metrics
 from ipo_forecast.models.baseline import fit_regression_baseline, predict_returns
+from ipo_forecast.validation.maturity import purge_unmatured_training_labels
 from ipo_forecast.validation.split import chronological_event_split
 
 
@@ -39,6 +40,12 @@ def _train_command(args: argparse.Namespace) -> int:
         train_fraction=args.train_fraction,
         validation_fraction=args.validation_fraction,
     )
+    purged_train, maturity_report = purge_unmatured_training_labels(
+        splits["train"],
+        splits["validation"],
+        embargo_days=args.embargo_days,
+    )
+    splits["train"] = purged_train
     model = fit_regression_baseline(
         splits["train"],
         args.features,
@@ -54,6 +61,7 @@ def _train_command(args: argparse.Namespace) -> int:
         "forecast_origin": args.forecast_origin,
         "target_horizon": args.target_horizon,
         "features": args.features,
+        "label_maturity": maturity_report,
         "counts": {
             name: {
                 "rows": int(len(part)),
@@ -210,6 +218,7 @@ def main() -> int:
         required=True,
     )
     train_parser.add_argument("--target", default="target_return")
+    train_parser.add_argument("--embargo-days", type=int, default=0)
     train_parser.add_argument(
         "--model", choices=["median", "ridge", "random_forest"], default="ridge"
     )

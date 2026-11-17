@@ -64,3 +64,11 @@ All transformations that learn from data must be fit on training data only. Repo
 ## Initial implementation boundary
 
 Milestone 1 provides schemas, CSV/Parquet loading, source registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, tests, and CI. External ingestion connectors, large-scale NLP, live feeds, and calibrated probabilistic models follow only after the historical dataset has been assembled and audited.
+
+## Label maturation and temporal embargo
+
+Forecasting data must distinguish the date an IPO listed from the date its target return became knowable. For a 180-day outcome, the price is only observable after that session has concluded. A model trained as of an earlier validation forecast must **not** use that unrealised outcome.
+
+The `train-baseline` command now requires `target_timestamp` and removes training rows whose outcome timestamp is at or after the first validation forecast cut-off. Optional `--embargo-days N` adds a conservative time gap. The report records the original count, purged count, and cut-off.
+
+This is an initial point-in-time safeguard, not a substitute for nested walk-forward retraining. Full sequential evaluation should retrain at every forecast origin once a sufficiently large historical database exists.
