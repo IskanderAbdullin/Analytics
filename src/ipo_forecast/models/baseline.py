@@ -39,7 +39,10 @@ def fit_regression_baseline(
         or column.startswith(("target_", "actual_", "realized_", "outcome_"))
     }
     if forbidden:
-        raise ValueError(f"Target, outcome, and identifier columns are not permitted: {sorted(forbidden)}")
+        raise ValueError(
+            "Target, outcome, and identifier columns are not permitted: "
+            f"{sorted(forbidden)}"
+        )
 
     missing = set(feature_columns + [target_column]).difference(train.columns)
     if missing:

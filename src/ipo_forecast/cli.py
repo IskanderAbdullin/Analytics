@@ -143,7 +143,14 @@ def main() -> int:
     )
     train_parser.add_argument(
         "--target-horizon",
-        choices=["first_trade", "day1_close", "day5_close", "day20_close", "day60_close", "day180_close"],
+        choices=[
+            "first_trade",
+            "day1_close",
+            "day5_close",
+            "day20_close",
+            "day60_close",
+            "day180_close",
+        ],
         required=True,
     )
     train_parser.add_argument("--target", default="target_return")
