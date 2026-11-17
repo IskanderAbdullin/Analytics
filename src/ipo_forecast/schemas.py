@@ -1,25 +1,25 @@
 """Validated domain schemas for IPO events and point-in-time observations."""
 
 from datetime import date, datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class EvidenceType(str, Enum):
+class EvidenceType(StrEnum):
     OBSERVED = "observed"
     ESTIMATED = "estimated"
     ANALYST_OPINION = "analyst_opinion"
     SYNTHETIC = "synthetic"
 
 
-class ForecastOrigin(str, Enum):
+class ForecastOrigin(StrEnum):
     PRELIMINARY_FILING = "preliminary_filing"
     AFTER_PRICING_PRE_OPEN = "after_pricing_pre_open"
     POST_OPEN = "post_open"
 
 
-class ConfidenceGrade(str, Enum):
+class ConfidenceGrade(StrEnum):
     A = "A"
     B = "B"
     C = "C"
