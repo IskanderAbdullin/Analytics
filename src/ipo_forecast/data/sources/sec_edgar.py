@@ -51,6 +51,45 @@ def _in_date_range(
     )
 
 
+def parse_master_index(
+    payload: str,
+    *,
+    start_date: date | None = None,
+    end_date: date | None = None,
+) -> list[dict[str, Any]]:
+    """Parse a SEC quarterly master.idx file into IPO-related filing candidates."""
+    lines = payload.splitlines()
+    header = "CIK|Company Name|Form Type|Date Filed|Filename"
+    try:
+        header_index = lines.index(header)
+    except ValueError as error:
+        raise ValueError("SEC master index header was not found") from error
+
+    rows = []
+    for line in lines[header_index + 1 :]:
+        if not line or line.startswith("-"):
+            continue
+        parts = line.split("|", maxsplit=4)
+        if len(parts) != 5:
+            continue
+        cik, company_name, form, filing_date, filename = parts
+        if form not in IPO_FORMS or not _in_date_range(filing_date, start_date, end_date):
+            continue
+        accession = filename.rstrip("/").split("/")[-2] if "/" in filename else None
+        rows.append(
+            {
+                "cik": str(int(cik)),
+                "company_name": company_name,
+                "form": form,
+                "filing_date": filing_date,
+                "accession_number": accession,
+                "filename": filename,
+                "document_url": f"https://www.sec.gov/Archives/{filename}",
+            }
+        )
+    return rows
+
+
 def extract_ipo_filings(
     cik: int | str,
     filing_tables: list[dict[str, Any]],
@@ -254,4 +293,35 @@ class SecEdgarClient:
 
         return extract_ipo_filings(
             cik, tables, start_date=start_date, end_date=end_date
+        )
+
+    def list_ipo_filing_index(
+        self,
+        start_year: int,
+        end_year: int,
+        *,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        refresh: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Discover IPO-related SEC filing candidates from quarterly master indexes."""
+        if start_year < 1993 or end_year < start_year:
+            raise ValueError("Years must satisfy 1993 <= start_year <= end_year")
+
+        rows = []
+        for year in range(start_year, end_year + 1):
+            for quarter in range(1, 5):
+                url = (
+                    f"https://www.sec.gov/Archives/edgar/full-index/"
+                    f"{year}/QTR{quarter}/master.idx"
+                )
+                payload = self._get_bytes(url, refresh=refresh).decode("latin-1")
+                rows.extend(
+                    parse_master_index(
+                        payload, start_date=start_date, end_date=end_date
+                    )
+                )
+        return sorted(
+            rows,
+            key=lambda row: (row["filing_date"], row["cik"], row["accession_number"] or ""),
         )

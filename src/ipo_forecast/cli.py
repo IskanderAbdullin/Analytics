@@ -90,6 +90,24 @@ def _sec_filings_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def _sec_index_command(args: argparse.Namespace) -> int:
+    client = SecEdgarClient(cache_dir=args.cache_dir)
+    start_date = date.fromisoformat(args.start_date) if args.start_date else None
+    end_date = date.fromisoformat(args.end_date) if args.end_date else None
+    rows = client.list_ipo_filing_index(
+        args.start_year,
+        args.end_year,
+        start_date=start_date,
+        end_date=end_date,
+        refresh=args.refresh,
+    )
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).to_csv(output_path, index=False)
+    print(f"Saved {len(rows)} SEC filing candidates to {output_path}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="ipo-forecast")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -129,6 +147,18 @@ def main() -> int:
     sec_filings_parser.add_argument("--cache-dir", default="data/raw/sec_edgar/cache")
     sec_filings_parser.add_argument("--output", default="data/interim/sec_ipo_filings.csv")
     sec_filings_parser.set_defaults(func=_sec_filings_command)
+
+    sec_index_parser = subparsers.add_parser(
+        "sec-index", help="Scan SEC quarterly master indexes for IPO-related filing candidates"
+    )
+    sec_index_parser.add_argument("--start-year", type=int, default=2000)
+    sec_index_parser.add_argument("--end-year", type=int, default=date.today().year)
+    sec_index_parser.add_argument("--start-date")
+    sec_index_parser.add_argument("--end-date")
+    sec_index_parser.add_argument("--refresh", action="store_true")
+    sec_index_parser.add_argument("--cache-dir", default="data/raw/sec_edgar/cache")
+    sec_index_parser.add_argument("--output", default="data/interim/sec_ipo_filing_index.csv")
+    sec_index_parser.set_defaults(func=_sec_index_command)
 
     args = parser.parse_args()
     return args.func(args)
