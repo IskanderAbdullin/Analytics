@@ -1,0 +1,98 @@
+name: Broker IPO market-data coverage audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: "Which broker data source to audit"
+        required: true
+        type: choice
+        options:
+          - both
+          - finam
+          - tinvest
+        default: both
+      include_minute_archives:
+        description: "Download potentially large annual T-Invest minute archives"
+        required: true
+        type: boolean
+        default: false
+      daily_window_days:
+        description: "Days after the IPO date to inspect"
+        required: true
+        type: choice
+        options:
+          - "30"
+          - "90"
+          - "180"
+        default: "180"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FINAM_API_SECRET: ${{ secrets.FINAM_API_SECRET }}
+      FINAM_SOURCE_APP_ID: ${{ secrets.FINAM_SOURCE_APP_ID }}
+      TINVEST_TOKEN: ${{ secrets.TINVEST_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Validate that required broker credentials exist
+        shell: bash
+        env:
+          BROKERS: ${{ inputs.providers }}
+        run: |
+          if [[ "$BROKERS" == "finam" || "$BROKERS" == "both" ]]; then
+            if [[ -z "${FINAM_API_SECRET}" ]]; then
+              echo "::error::Set FINAM_API_SECRET in repository Actions secrets before starting this audit."
+              exit 1
+            fi
+          fi
+          if [[ "$BROKERS" == "tinvest" || "$BROKERS" == "both" ]]; then
+            if [[ -z "${TINVEST_TOKEN}" ]]; then
+              echo "::error::Set TINVEST_TOKEN in repository Actions secrets before starting this audit."
+              exit 1
+            fi
+          fi
+      - name: Run read-only broker audit
+        shell: bash
+        env:
+          BROKERS: ${{ inputs.providers }}
+          INCLUDE_MINUTE_ARCHIVES: ${{ inputs.include_minute_archives }}
+          DAILY_WINDOW_DAYS: ${{ inputs.daily_window_days }}
+        run: |
+          set -euo pipefail
+          brokers=(finam tinvest)
+          if [[ "$BROKERS" != "both" ]]; then
+            brokers=("$BROKERS")
+          fi
+          extra=()
+          if [[ "$INCLUDE_MINUTE_ARCHIVES" == "true" ]]; then
+            extra=(--minute-archives)
+          fi
+          ipo-forecast market-data-audit \
+            --universe data/templates/us_ipo_coverage_sample.csv \
+            --providers "${brokers[@]}" \
+            --daily-window-days "$DAILY_WINDOW_DAYS" \
+            "${extra[@]}"
+      - name: Upload coverage report (no tokens or raw quotes)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: broker-ipo-coverage-${{ github.run_id }}
+          path: |
+            data/interim/market_data_coverage.csv
+            data/interim/market_data_coverage.summary.json
+          if-no-files-found: warn
+          retention-days: 7

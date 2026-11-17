@@ -100,6 +100,10 @@ The implementation provides schemas, CSV/Parquet loading, source-registry valida
 
 See [research protocol](docs/research_protocol.md), [data dictionary](docs/data_dictionary.md), [source catalogue](docs/source_catalog.md), [SEC EDGAR connector](docs/sec_edgar.md), and [broker market-data adapters](docs/market_data_providers.md).
 
+## Optional manual GitHub Actions audit
+
+An opt-in **Broker IPO market-data coverage audit** workflow is available under GitHub Actions. It performs read-only queries and uploads the resulting CSV/JSON coverage report as a short-retention artifact. Configure the selected broker token as a GitHub Actions repository secret first; see [the setup guide](docs/broker_audit_github_actions.md).
+
 ## Initial model strategy
 
 Start with:
