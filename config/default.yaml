@@ -1,0 +1,28 @@
+project:
+  name: ipo-analytics
+  timezone: UTC
+  random_state: 42
+
+data:
+  observations: data/templates/feature_observations.csv
+  forecast_origins: data/templates/forecast_origins.csv
+  outcomes: data/templates/outcomes.csv
+  source_registry: data/source_registry.csv
+  processed_dataset: data/processed/modeling_dataset.parquet
+
+forecast:
+  origins: [preliminary_filing, after_pricing_pre_open, post_open]
+  horizons: [first_trade, day1_close, day5_close, day20_close, day60_close, day180_close]
+  target: target_return
+
+validation:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  group_column: ipo_id
+  date_column: listing_date
+
+model:
+  regression_baseline: ridge
+  ridge_alpha: 10.0
+  random_forest_estimators: 400
+  random_forest_min_samples_leaf: 3
