@@ -6,10 +6,12 @@ from datetime import date
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
 
 from ipo_forecast.data.io import load_modeling_dataset
 from ipo_forecast.data.sources.sec_edgar import SecEdgarClient
+from ipo_forecast.data.validate import select_forecast_task
 from ipo_forecast.evaluation.metrics import regression_metrics
 from ipo_forecast.models.baseline import fit_regression_baseline, predict_returns
 from ipo_forecast.validation.split import chronological_event_split
@@ -23,6 +25,11 @@ def _validate_command(args: argparse.Namespace) -> int:
 
 def _train_command(args: argparse.Namespace) -> int:
     frame = load_modeling_dataset(args.dataset)
+    frame = select_forecast_task(
+        frame,
+        forecast_origin=args.forecast_origin,
+        target_horizon=args.target_horizon,
+    )
     splits = chronological_event_split(
         frame,
         train_fraction=args.train_fraction,
@@ -35,10 +42,13 @@ def _train_command(args: argparse.Namespace) -> int:
         model_kind=args.model,
         random_state=args.random_state,
     )
+    train_median = float(pd.to_numeric(splits["train"][args.target]).median())
 
     report = {
         "model": args.model,
         "target": args.target,
+        "forecast_origin": args.forecast_origin,
+        "target_horizon": args.target_horizon,
         "features": args.features,
         "counts": {
             name: {
@@ -48,12 +58,19 @@ def _train_command(args: argparse.Namespace) -> int:
             for name, part in splits.items()
         },
         "metrics": {},
+        "baseline_metrics": {},
     }
     for name in ("validation", "test"):
         part = splits[name]
         actual = pd.to_numeric(part[args.target], errors="coerce")
         predicted = predict_returns(model, part, args.features)
         report["metrics"][name] = regression_metrics(actual, predicted)
+        report["baseline_metrics"][name] = {
+            "zero_return": regression_metrics(actual, np.zeros(len(part))),
+            "train_median": regression_metrics(
+                actual, np.full(len(part), train_median)
+            ),
+        }
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -116,9 +133,19 @@ def main() -> int:
     validate_parser.add_argument("--dataset", required=True)
     validate_parser.set_defaults(func=_validate_command)
 
-    train_parser = subparsers.add_parser("train-baseline", help="Train a regression baseline")
+    train_parser = subparsers.add_parser("train-baseline", help="Train one IPO forecast task")
     train_parser.add_argument("--dataset", required=True)
     train_parser.add_argument("--features", nargs="+", required=True)
+    train_parser.add_argument(
+        "--forecast-origin",
+        choices=["preliminary_filing", "after_pricing_pre_open", "post_open"],
+        required=True,
+    )
+    train_parser.add_argument(
+        "--target-horizon",
+        choices=["first_trade", "day1_close", "day5_close", "day20_close", "day60_close", "day180_close"],
+        required=True,
+    )
     train_parser.add_argument("--target", default="target_return")
     train_parser.add_argument(
         "--model", choices=["median", "ridge", "random_forest"], default="ridge"

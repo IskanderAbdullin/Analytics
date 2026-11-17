@@ -4,7 +4,7 @@ A reproducible research and machine-learning platform for forecasting IPO price 
 
 The first research case is the Anthropic IPO, but the system is designed to generalise to other issuers, exchanges, and market regimes. It combines point-in-time fundamentals, deal structure, market conditions, comparable IPOs, news and community sentiment, and post-listing market microstructure.
 
-> **Research integrity:** no observation is considered factual without a source, timestamp, and provenance. Estimates, analyst opinions, synthetic test fixtures, and verified observations must remain distinguishable. Historical features must reflect only information available at the forecast cut-off. The project does not contain a pre-filled Anthropic dataset; claims discussed in external research must be independently verified before ingestion.
+> **Research integrity:** no observation is considered factual without a source, timestamp, and provenance. Estimates, analyst opinions, synthetic test fixtures, and verified observations must remain distinguishable. Historical features must reflect only information available at the forecast cut-off. The project does not contain a pre-filled Anthropic modelling dataset; material claims must be independently verified before ingestion.
 
 ## Objectives
 
@@ -31,18 +31,14 @@ Initial target horizons (trading sessions): first trade, day 1 close, day 5, day
     config/                 Model and project configuration
     data/
       templates/            Empty CSV templates; no fabricated observations
+      cases/anthropic/      Verified SEC filing manifest for the first case
       raw/                  Immutable source snapshots (local, git-ignored)
       interim/              Normalised intermediate data (git-ignored)
       processed/            Model-ready datasets (git-ignored)
       source_registry.csv   Source and provenance catalogue
     docs/                   Architecture, methodology, and data dictionary
     reports/                Generated evaluation reports (git-ignored)
-    src/ipo_forecast/
-      data/                 Loading and validation
-      features/             Point-in-time feature construction
-      models/               Baselines and model interfaces
-      validation/            Leakage-safe chronological splits
-      evaluation/            Metrics and calibration
+    src/ipo_forecast/       Python package
     tests/                  Unit and regression tests
 
 ## Quick start
@@ -59,17 +55,27 @@ Python 3.11 or newer is required.
     pip install -e ".[dev]"
     pytest
 
+Set SEC_USER_AGENT to an application name and contact email before using EDGAR:
+
+    $env:SEC_USER_AGENT = "IPOAnalytics contact@example.com"
+    ipo-forecast sec-search --query "Anthropic"
+    ipo-forecast sec-filings --cik 2130357 --start-date 2026-01-01
+
+Scan SEC quarterly filing indexes (this downloads four index files per year):
+
+    ipo-forecast sec-index --start-year 2000 --end-year 2026
+
 Validate a prepared dataset:
 
     ipo-forecast validate --dataset data/processed/modeling_dataset.parquet
 
-Train a baseline (features must be explicitly selected):
+Train one task at a time; do not mix forecast origins or target horizons:
 
     ipo-forecast train-baseline --dataset data/processed/modeling_dataset.parquet \
-      --features revenue_growth_yoy gross_margin deal_size_usd \
-      --model ridge --target target_return
+      --forecast-origin after_pricing_pre_open --target-horizon day1_close \
+      --features revenue_growth_yoy gross_margin deal_size_usd --model ridge
 
-The current implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, and evaluation metrics. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
+The implementation provides schemas, CSV/Parquet loading, source-registry validation, point-in-time feature assembly, chronological event splits, regression baselines, metrics, and a cached SEC EDGAR adapter. A real model is not trainable until verified historical IPO observations and outcome labels have been collected.
 
 ## Data policy
 
@@ -81,7 +87,7 @@ The current implementation provides schemas, CSV/Parquet loading, source-registr
 - Do not scrape private communities or bypass access controls. Respect platform terms, robots policies, rate limits, and applicable law.
 - Do not commit credentials, paid datasets, personal data, or raw data whose licence does not permit redistribution.
 
-See [research protocol](docs/research_protocol.md) and [data dictionary](docs/data_dictionary.md).
+See [research protocol](docs/research_protocol.md), [data dictionary](docs/data_dictionary.md), [source catalogue](docs/source_catalog.md), and [SEC EDGAR connector](docs/sec_edgar.md).
 
 ## Initial model strategy
 
@@ -105,6 +111,6 @@ Complex NLP and deep learning are later additions. They must demonstrate out-of-
 
 ## Status
 
-**Milestone 1 — foundation committed.** Historical data collection, source connectors, probabilistic calibration, and model comparison remain pending.
+**Milestone 1 — foundation committed.** SEC filing discovery and an Anthropic filing manifest are now in place. Historical outcome data, cross-market coverage, sentiment connectors, probability calibration, and model comparison remain pending.
 
 No forecasts should be interpreted as investment advice. The system is a research and decision-support tool; model outputs are uncertain and can fail under regime changes.

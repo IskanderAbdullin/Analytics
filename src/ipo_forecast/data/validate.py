@@ -1,4 +1,4 @@
-"""Validation for the assembled, one-row-per-forecast modelling table."""
+"""Validation and task selection for the assembled modelling table."""
 
 import numpy as np
 import pandas as pd
@@ -50,3 +50,22 @@ def validate_modeling_frame(frame: pd.DataFrame) -> pd.DataFrame:
     result["target_return"] = target.astype(float)
 
     return result
+
+
+def select_forecast_task(
+    frame: pd.DataFrame,
+    *,
+    forecast_origin: str,
+    target_horizon: str,
+) -> pd.DataFrame:
+    """Select exactly one forecast origin and target horizon."""
+    selected = frame.loc[
+        (frame["forecast_origin"] == forecast_origin)
+        & (frame["target_horizon"] == target_horizon)
+    ].copy()
+    if selected.empty:
+        raise ValueError(
+            f"No rows for forecast_origin={forecast_origin!r}, "
+            f"target_horizon={target_horizon!r}"
+        )
+    return selected

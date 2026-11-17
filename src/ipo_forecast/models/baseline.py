@@ -8,6 +8,17 @@ from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+FORBIDDEN_FEATURE_NAMES = {
+    "forecast_id",
+    "ipo_id",
+    "listing_date",
+    "as_of_timestamp",
+    "forecast_origin",
+    "target_horizon",
+    "target_timestamp",
+    "target_price",
+}
+
 
 def fit_regression_baseline(
     train: pd.DataFrame,
@@ -20,6 +31,16 @@ def fit_regression_baseline(
     """Fit a median, Ridge, or Random Forest baseline on numeric features."""
     if not feature_columns:
         raise ValueError("At least one feature column must be specified")
+    forbidden = {
+        column
+        for column in feature_columns
+        if column in FORBIDDEN_FEATURE_NAMES
+        or column == target_column
+        or column.startswith(("target_", "actual_", "realized_", "outcome_"))
+    }
+    if forbidden:
+        raise ValueError(f"Target, outcome, and identifier columns are not permitted: {sorted(forbidden)}")
+
     missing = set(feature_columns + [target_column]).difference(train.columns)
     if missing:
         raise ValueError(f"Training frame is missing columns: {sorted(missing)}")
