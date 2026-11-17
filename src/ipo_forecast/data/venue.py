@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 PRIMARY_VENUE_ALIASES = {
     "NASDAQ": {"NASDAQ", "XNAS"},
     "NYSE": {"NYSE", "XNYS"},

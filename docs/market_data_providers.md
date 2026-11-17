@@ -85,3 +85,12 @@ Documented GetCandles request windows vary by interval: 1-minute requests are li
 - Daily bars are not sufficient to reconstruct the exact first trade or intraday opening auction. Use minute bars where available and preserve the vendor's session/time conventions.
 - The coverage audit is an empirical broker test, not a licence to redistribute raw data. Check each provider's terms before using or publishing collected records.
 - Do not treat the sample universe's dates as final training labels. Verify IPO type, exchange, listing date, and any direct-listing/SPAC classification against primary sources before promoting records to the canonical dataset.
+
+## Operational safeguards
+
+- Finam JWT sessions are renewed once on HTTP 401 if a Finam API secret is available. Authentication errors are never retried indefinitely.
+- T-Invest GetCandles specifies the exchange candle source but omits `limit`, because T-Invest release 1.36 does not allow both parameters in one request.
+- The HTTP cache namespaces responses by authorization context without writing credentials or bearer tokens in filenames. When the Finam API secret is configured it is also used as a stable cache namespace across JWT renewals.
+- Annual T-Invest minute ZIP downloads are opt-in via `--minute-archives` to avoid unexpectedly downloading large archives.
+- IPO-day data from alternative or unverifiable trading venues must not automatically be treated as the IPO's primary-exchange execution price. The audit reports venue_verification and separate primary-venue listing-day coverage.
+- A nonempty 180-day candle window is **not** proof that the listing-day candle is available. Verify daily_listing_day_present and daily_first_candle_delay_days.

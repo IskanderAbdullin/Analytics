@@ -427,3 +427,52 @@ def test_empty_daily_window_is_not_mistaken_for_ipo_listing_day(tmp_path):
     assert rows[0]["daily_listing_day_present"] is False
     assert rows[0]["daily_first_candle_delay_days"] == 8
     assert summary["providers"]["finam"]["primary_venue_ipo_listing_day_candles"] == 0
+
+
+def test_finam_renews_session_on_unauthorized_once():
+    from ipo_forecast.data.sources.finam import FinamClient
+
+    class FakeTransport:
+        def __init__(self):
+            self.token = None
+            self.auth_count = 0
+            self.assets_count = 0
+
+        def set_header(self, name, value):
+            assert name == "Authorization"
+            self.token = value
+
+        def request_json(self, method, path, **kwargs):
+            if path == "/v1/sessions":
+                self.auth_count += 1
+                assert kwargs["cache"] is False
+                return {"token": f"session-{self.auth_count}"}
+            if path == "/v1/assets/all":
+                self.assets_count += 1
+                if self.assets_count == 1:
+                    raise MarketDataApiError("finam", "expired", status_code=401)
+                return {"assets": [], "nextCursor": 0}
+            raise AssertionError(f"Unexpected request: {path}")
+
+    transport = FakeTransport()
+    client = FinamClient(api_secret="testing-secret", transport=transport)
+    assert client.list_instruments() == []
+    assert transport.auth_count == 2
+    assert transport.assets_count == 2
+    assert transport.token == "session-2"
+
+
+def test_finam_cannot_renew_without_secret():
+    from ipo_forecast.data.sources.finam import FinamClient
+
+    class FakeTransport:
+        def set_header(self, name, value):
+            pass
+
+        def request_json(self, method, path, **kwargs):
+            raise MarketDataApiError("finam", "expired", status_code=401)
+
+    client = FinamClient(session_token="test-session", transport=FakeTransport())
+    with pytest.raises(MarketDataApiError) as error:
+        client.list_instruments()
+    assert error.value.status_code == 401

@@ -59,43 +59,55 @@ class FinamClient:
         cache_dir: str | Path = "data/raw/market_data/cache/finam",
         transport: HttpTransport | None = None,
     ) -> None:
+        self._secret = api_secret or os.getenv("FINAM_API_SECRET") or os.getenv(
+            "FINAM_TOKEN"
+        )
+        self._source_app_id = source_app_id or os.getenv("FINAM_SOURCE_APP_ID")
         self.transport = transport or HttpTransport(
             provider=self.provider_name,
             base_url="https://api.finam.ru",
             cache_dir=cache_dir,
             min_interval_seconds=0.31,
+            cache_namespace=self._secret or session_token,
         )
         if session_token is None:
-            secret = api_secret or os.getenv("FINAM_API_SECRET") or os.getenv("FINAM_TOKEN")
-            if not secret:
+            if not self._secret:
                 raise ValueError(
                     "Set FINAM_API_SECRET to the Finam Trade API secret; "
                     "do not paste credentials into the repository"
                 )
-            body: dict[str, Any] = {"secret": secret}
-            app_id = source_app_id or os.getenv("FINAM_SOURCE_APP_ID")
-            if app_id:
-                body["source_app_id"] = app_id
-            session = self.transport.request_json(
-                "POST",
-                "/v1/sessions",
-                json_body=body,
-                cache=False,
-            )
-            session_token = next(
-                (
-                    str(session[key])
-                    for key in ("token", "accessToken", "access_token", "sessionToken")
-                    if session.get(key)
-                ),
-                None,
-            )
-            if not session_token:
-                raise MarketDataApiError(
-                    self.provider_name,
-                    "session response did not contain a JWT token",
-                )
+            session_token = self._authenticate()
         self.transport.set_header("Authorization", session_token)
+
+    def _authenticate(self) -> str:
+        if not self._secret:
+            raise MarketDataApiError(self.provider_name, "cannot renew without API secret")
+        body: dict[str, Any] = {"secret": self._secret}
+        if self._source_app_id:
+            body["source_app_id"] = self._source_app_id
+        session = self.transport.request_json(
+            "POST",
+            "/v1/sessions",
+            json_body=body,
+            cache=False,
+        )
+        token = session.get("token")
+        if not isinstance(token, str) or not token:
+            raise MarketDataApiError(
+                self.provider_name, "session response did not contain a JWT token"
+            )
+        return token
+
+    def _request_json(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        try:
+            return self.transport.request_json(method, path, **kwargs)
+        except MarketDataApiError as error:
+            if error.status_code != 401 or not self._secret:
+                raise
+            self.transport.set_header("Authorization", self._authenticate())
+            # Avoid using a stale cached response after re-authentication.
+            kwargs["refresh"] = True
+            return self.transport.request_json(method, path, **kwargs)
 
     @staticmethod
     def max_history_days(interval: str) -> int:
@@ -110,7 +122,7 @@ class FinamClient:
         seen_cursors: set[int] = set()
 
         for _ in range(10000):
-            page = self.transport.request_json(
+            page = self._request_json(
                 "GET",
                 "/v1/assets/all",
                 params={
@@ -176,7 +188,7 @@ class FinamClient:
             raise ValueError("Finam instrument must include symbol")
 
         encoded_symbol = quote(symbol, safe="@._-")
-        response = self.transport.request_json(
+        response = self._request_json(
             "GET",
             f"/v1/instruments/{encoded_symbol}/bars",
             params={
