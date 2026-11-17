@@ -34,10 +34,6 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    env:
-      FINAM_API_SECRET: ${{ secrets.FINAM_API_SECRET }}
-      FINAM_SOURCE_APP_ID: ${{ secrets.FINAM_SOURCE_APP_ID }}
-      TINVEST_TOKEN: ${{ secrets.TINVEST_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -52,6 +48,8 @@ jobs:
         shell: bash
         env:
           BROKERS: ${{ inputs.providers }}
+          FINAM_API_SECRET: ${{ secrets.FINAM_API_SECRET }}
+          TINVEST_TOKEN: ${{ secrets.TINVEST_TOKEN }}
         run: |
           if [[ "$BROKERS" == "finam" || "$BROKERS" == "both" ]]; then
             if [[ -z "${FINAM_API_SECRET}" ]]; then
@@ -71,6 +69,9 @@ jobs:
           BROKERS: ${{ inputs.providers }}
           INCLUDE_MINUTE_ARCHIVES: ${{ inputs.include_minute_archives }}
           DAILY_WINDOW_DAYS: ${{ inputs.daily_window_days }}
+          FINAM_API_SECRET: ${{ secrets.FINAM_API_SECRET }}
+          FINAM_SOURCE_APP_ID: ${{ secrets.FINAM_SOURCE_APP_ID }}
+          TINVEST_TOKEN: ${{ secrets.TINVEST_TOKEN }}
         run: |
           set -euo pipefail
           brokers=(finam tinvest)
