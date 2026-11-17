@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -14,8 +14,8 @@ def test_optional_timestamps_can_be_null_but_required_times_are_timezone_aware()
         value=0.42,
         event_at=None,
         published_at=None,
-        available_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
-        retrieved_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+        available_at=datetime(2026, 1, 1, tzinfo=UTC),
+        retrieved_at=datetime(2026, 1, 2, tzinfo=UTC),
         source_id="sec",
         evidence_type=EvidenceType.OBSERVED,
         confidence_grade=ConfidenceGrade.A,
@@ -31,7 +31,7 @@ def test_naive_availability_timestamp_is_rejected():
             feature_name="revenue_growth_yoy",
             value=0.42,
             available_at=datetime(2026, 1, 1),
-            retrieved_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+            retrieved_at=datetime(2026, 1, 2, tzinfo=UTC),
             source_id="sec",
             evidence_type=EvidenceType.OBSERVED,
             confidence_grade=ConfidenceGrade.A,
