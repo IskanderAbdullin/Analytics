@@ -45,6 +45,8 @@ jobs:
           if [[ $rc -ne 0 ]]; then
             echo "BLOCKED_BY_DATA: public archive did not download or format mismatched"
             sed -n '1,12p' /tmp/robot-fetch.log
+            echo "TLS_DIAGNOSTICS (public host, no credentials):"
+            timeout 20 curl -vIsS --connect-timeout 8 --max-time 15 https://invest-public-api.tbank.ru 2>&1 | tail -n 24 || true
             exit 0
           fi
           echo "ARCHIVE_DOWNLOADED"
