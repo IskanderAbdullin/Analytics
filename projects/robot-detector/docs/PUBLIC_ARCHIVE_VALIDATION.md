@@ -50,3 +50,14 @@ Historical read-only test does not make Stage 3 (real-time MarketDataStream) com
 A successful one-day import proves the parser/endpoint can exchange **this file on this date**, nothing more. External market-data feed completeness, side semantics, other instruments/boards, real-time gRPC streaming and the false-discovery rate of 195 candidates still require separate measurements.
 
 Next: Stage-2 negative controls / matched nulls on real session data and date-separated walk-forward evaluation, followed by stream adapter. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
+
+
+### Repeat run after dense-group split (2026-11-18)
+
+- GitHub Actions: https://github.com/IskanderAbdullin/Analytics/actions/runs/44278450117 .
+- Same real archive hash `0af872b1c9c861e7af40a1c40e5bbdf565f9161dd997337c08da584c4dafc782`, **121,920** trades, **0** rejected.
+- Historical candidate *episodes* increased from **195 to 209** following implementation of **disjoint bounded splitting** of the 6,221-print dense SELL/3 lots group. Log flag `SPLIT_DENSE_GROUP` replaces `SKIPPED_DENSE_GROUP`. This is a software-version-dependent count, **not evidence that 209 owners/robots exist**.
+- Distinct patterns spanning adjacent UTC/event-count windows are NOT yet reconciled globally. No event is double-assigned among accepted hypotheses. FDR, separate trader identities, and observed feed completeness remain unknown.
+- Updated offline CI: https://github.com/IskanderAbdullin/Analytics/actions/runs/44278450065 (success). GZip, ZIP, dense group, synthetic and chronological checks included. Status: **18 selftests** passed in prior compressed-archive verification; CI step success repeated with new code.
+
+**Current method**: small disjoint chunks protect processing complexity and avoid silently dropping an oversized hour, but can split a continuous algorithm into several candidate episodes. There is no single correct physical bot count to compare with the sum of these candidates.
