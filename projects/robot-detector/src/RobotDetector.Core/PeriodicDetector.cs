@@ -21,7 +21,7 @@ public static class PeriodicDetector
             "COVERAGE_UNVERIFIED: gaps, auctions and missing prints can affect all estimates.",
             "DIRECTION_IS_PROVIDER_REPORTED: not necessarily the side of a passive limit order."
         };
-        if (imported.RejectedRows.Count > 0) warnings.Add("REJECTED_ROWS: see diagnostics; do not infer a complete feed.");
+        if (imported.RejectedRowTotal > 0) warnings.Add("REJECTED_ROWS: see diagnostics; do not infer a complete feed.");
         if (imported.Trades.Count == 0) warnings.Add("EMPTY_INPUT: no events to analyse.");
         if (imported.Trades.Any(t => t.ReportedDirection == "UNKNOWN"))
             warnings.Add("UNKNOWN_TRADE_SIDE: events with unknown direction are not attributable to BUY/SELL.");
@@ -85,7 +85,7 @@ public static class PeriodicDetector
         var kinds = imported.Trades.Select(t => t.DataKind).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         string kind = kinds.Count == 1 ? kinds[0] : "MIXED";
         return new DetectionReport("1.0", "0.1.0-screen", kind, imported.FileSha256,
-            imported.Trades.Count, imported.RejectedRows.Count, imported.HasVerifiedFeedCoverage,
+            imported.Trades.Count, imported.RejectedRowTotal, imported.HasVerifiedFeedCoverage,
             chosen.Count, false, chosen, warnings.Distinct().ToList());
     }
 
