@@ -93,3 +93,16 @@ OsEngine adapter: отдельный потребитель, который по
 ## 8. Отдельные коммиты
 
 \`01-stream-adapter\` → \`02-ingestion-watermarks\` → \`03-state-machine\` → \`04-service-api\` → \`05-ui\` → \`06-osengine-client\` → \`07-reconnect-stress\` → \`08-pilot-and-ops-runbook\`.
+
+
+## 9. Дополнение: детектор смены режима + правильная временная шкала (18.11.2026)
+
+**Научный источник:** [Tsaknaki–Lillo–Mazzarisi, BOCPD](https://arxiv.org/abs/2307.02375) (публикация Quantitative Finance 2025); [пример Rust online engine](https://github.com/OctopusTakopi/bocpd), MIT. См. [расширенный обзор](RESEARCH_EXPANSION_2026-11-18.md).
+
+Сделать отдельный \`RegimeChangeDetector\` как optional read-only эксперимент, сравнивающий \`EWMA\`, \`CUSUM\`, \`Bayesian Online Change Point Detection\`. Вход: \`signed_trade_count\`, \`signed_volume\`, \`event_rate\`, текущий поток \`data_quality\`; выход \`change_point_probability\` (калибровать) или uncalibrated \`score\`, \`regime_start\`, \`latest_state\`. Нельзя напрямую выводить count bots из number_of_regime_changes.
+
+Live-проверки: 500ms baseline bins, более длинные окна для 60s TWAP; относительная латентность ClockTimeBinSeries; транзакционное сохранение FFT state; backfill без создания фальшивых циклов; reset только affected symbol. Во время \`degraded\` или неполного event-time coverage posterior/состояние гипотез временно фиксируется или помечается invalid, а не объявляет «робот остановился».
+
+Отдельная UI строка: **«Режим рыночной активности изменился»** и **«Различимый регулярный поток подтверждён»**, чтобы пользователь не спутал общий burst со стороной исполнения конкретного алгоритма. Smoke-тест переключения режима без единого истинного робота не должен породить новый confirmed pattern.
+
+Acceptance: одинаковая история в offline replay и online stream даёт сопоставимые posterior change points после согласования watermark; BOCPD имеет реальный out-of-sample прирост над EWMA/CUSUM или остаётся выключенным.
