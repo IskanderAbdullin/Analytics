@@ -25,4 +25,31 @@ There is no required minimum candidate count and no success threshold. The secon
 - Delete temporary archive and CA on job completion, never upload artifacts containing the raw trade data.
 - **Never** turn a candidate count into a claimed number of actual independent bots or an automated trading signal.
 
-**Results:** only to be appended after GitHub Actions reports observed values.
+## Observed results — 2026-11-18
+
+**CI:** [GitHub Actions run 44306984217](https://github.com/IskanderAbdullin/Analytics/actions/runs/44306984217), completed successfully. **50/50** offline .NET self-tests passed; raw public tape and CA deleted.
+
+- Actual public anonymized prints: **26,960** on **MOEX_TQBR, 2026-11-02**.
+- Raw compressed source SHA-256: `dc3cc890e1605d0bceeb5b20474032c088b039fa807322b65b9b3806d6e64a74`.
+- Variable-size cadence candidates: **1** with **8** uniquely attributed prints.
+- **2** dense source/side/hour windows skipped because source density exceeded the predeclared 2,500 print cap. The candidate screen is **coverage-limited** on this day.
+- Uniform-minute null, 24 candidate counts: `0,0,1,0,0,0,0,1,2,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0`; mean **0.2917**, observed-or-higher controls **6/24**, descriptive additive-one tail **7/25 = 0.28**.
+- Minute-rotation null, 24 candidate counts: **all 0**, mean **0.0**, observed-or-higher controls **0/24**, descriptive additive-one tail **1/25=0.04**.
+- Every print timestamp changed in each control trial; the source instrument, side, mode, minute counts and clip sizes remained within the intended null constraints.
+- Actual independently identified robot programs: **UNKNOWN**. Statistical significance established: **FALSE**.
+
+### Interpretation and decision
+
+**No consistent result across null families:** the original 1 candidate is **not unusual** under the uniform-minute control (global descriptive frequency 0.28); it exceeds all rotation-only controls (minimum descriptive 0.04) but those controls preserve a different set of arrival-time correlations and can underrepresent common exchange-phase structure. Neither is a validated microstructure null, and the two dense windows were not examined. **Do not claim p=0.04 as a formal statistical significance level.**
+
+Compared with the earlier 2026-11-03 MOEX developmental pilot (19,086 prints; 7 candidates; no skipped dense windows), the same model produced substantially fewer observable candidate sequences on this second date. This is not proof of model instability or absence of bots by itself: activity, liquidity and source coverage differ, while 2 dense windows were excluded. It does show **insufficient independent repeatability for a validated trading robot counter.**
+
+### Next engineering versus research actions
+
+1. **Engineering:** replace arbitrary dense-window skips with bounded disjoint subwindows, while recording source coverage gaps and possible duplicate/split episodes. This changes the model's observational coverage; after changing it, previous counts are no longer directly comparable and the 2026-11-02 result cannot be reused as an untouched validation.
+2. **Research:** develop nulls preserving real exchange round-second clock and clustered/Hawkes-type arrivals, rather than relying only on uniform/rotation controls.
+3. **Known-agent validation:** blind ABIDES/NASDAQ-like simulator truth to public prints, estimate recoverable patterns and false positives rather than physical bot count.
+4. **Release safety:** no confidence, automated alerts, trading signal, or physical owner/bot count until the full Stage 2 scientific gate passes.
+
+**Decision:** technical archive processing and independent repeated evaluation **PASSED**; identification and prediction quality **NOT VALIDATED**.
+
