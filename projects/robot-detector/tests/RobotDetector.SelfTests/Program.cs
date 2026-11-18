@@ -29,6 +29,7 @@ internal static class Program
         Check("config rejects impossible thresholds", BadConfig);
         Check("synthetic benchmark reproducible with hidden truth", BenchmarkReproducible);
         Check("walk-forward prediction never reads its future", WalkForwardPrediction);
+        Check("FFT uses UTC bins and yields candidate periods", SpectrumTemporalBins);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -222,6 +223,18 @@ internal static class Program
         Assert(report.ForecastsIssued == 1 && report.Hits == 1, "25s event should confirm prediction");
         Assert(report.Checks.Single().FutureMatchedEventId == "SYN006", "future event id");
         Assert(!report.Calibrated && !report.CoverageVerified, "not a probability claim");
+    }
+
+
+    private static void SpectrumTemporalBins()
+    {
+        var source = CsvTradeReader.Read(Fixture("synthetic_twap_5s.csv"));
+        var report = SpectralCandidates.Analyse(source, binMs: 500, thresholdSigma: 0);
+        Assert(report.AnalysedGroups == 1, "must analyse the q100 and q40 series together");
+        Assert(report.Peaks.All(x => x.CandidatePeriodMs >= 1000), "Nyquist limit at 500 ms bins");
+        Assert(report.Peaks.All(x => x.Feature is "trade_count" or "lots"), "feature labels");
+        Assert(report.Warnings.Any(x => x.StartsWith("SPECTRAL_PEAK_IS_NOT_BOT")),
+            "must label spectral peaks as candidates only");
     }
 
     private static void BadConfig()
