@@ -103,3 +103,36 @@ A1: variable TWAP scenarios и null common rhythm; A2: POV/VWAP out-of-sample vs
 7. документ лицензии/доступности данных, реплей и commit SHA.
 
 **Definition of Done:** никакой категории не выдаётся \`confirmed\` по одним графическим совпадениям; все классы прошли реплей и контроль ложных срабатываний; отсутствие MBO не маскируется, сервис остаётся read-only, интеграция с OsEngine не открывает торговых команд.
+
+
+## 10. Новые практические алгоритмы из открытого кода (18.11.2026)
+
+Подробности и ссылки на конкретные файлы в [обзоре](RESEARCH_EXPANSION_2026-11-18.md).
+
+### A. L2+prints replenishment по Flowdepth
+
+В [\`flowdepth/data/src/orderflow/iceberg.rs\`](https://github.com/Niketion/flowdepth/blob/develop/data/src/orderflow/iceberg.rs) реализовано отслеживание visible qty, pending aggressor executed qty, refill/cancel, rolling baseline и state machine на каждом уровне цены. Наш **собственный** референс:
+
+\`\`\`text
+expected_after = max(previous_visible - pending_executed, 0)
+replenished = max(current_visible - expected_after, 0)
+cancelled = max(previous_visible - min(previous_visible, pending_executed) - current_visible, 0)
+\`\`\`
+
+Тест: visible 100, executed 60, visible снова 100 → replenished=60 (если есть непрерывность book и правильный aggressor sign). Это **не доказательство** скрытого заказа. Потеря глубины между двумя снапшотами или плохое соответствие сделок уровню → \`INSUFFICIENT_L2_CONTINUITY\`, а не уверенный iceberg.
+
+Параметры **оригинального** Flowdepth: \`min_refills=3\`, \`ratio_executed/displayed=2.5\`, \`refill_ratio>=0.5\`, \`score>=70\`, \`reorder_ms=150\`, \`idle=5s\`. Эти значения — **не наши дефолты** и не калиброванная вероятность; на MOEX/СПБ должны проверяться отдельно.
+
+### B. Synthetic ML benchmarking
+
+[apexfund/iceberg-detection](https://github.com/apexfund/iceberg-detection) моделирует iceberg with labeled truth и сравнивает L2-CNN с richer events CNN; автор приводит ROC-AUC 0.8285 vs 0.890 **только на собственном симуляторе**. Наши модели должны проходить L2-sampling degradation и сравнение с правиловой replenishment baseline на одной выборке. Не публиковать чужой AUC как ожидаемый результат T-Invest.
+
+### C. Сегментация metaorders и смены режима
+
+Использовать как исходные подходы: [FlowForge](https://github.com/jialuechen/flowforge) и [BOCPD paper](https://arxiv.org/abs/2307.02375), [bocpd Rust](https://github.com/OctopusTakopi/bocpd). Pipeline: \`signed trade run\` → \`CUSUM/BOCPD segmentation\` → \`holding/impact/participation tests\` → \`synthetic known truth\` → \`held-out prediction\`. FlowForge random trader mapping годится для **null**, не для восстановления идентичности клиента.
+
+### D. Вывод и данные о направлении
+
+[Lee–Ready (1991)](https://doi.org/10.1111/j.1540-6261.1991.tb02683.x) — альтернативное определение направления агрессора при отсутствующей метке. Из-за рассинхронизации quotes/trades и inside-spread сделок хранить \`direction_source=provider|quote_test|tick_test|unknown\`, \`direction_quality\`, \`inference_lag\`. Не обучать классификатор истинности робота на предположительной пассивной стороне.
+
+**Acceptance supplement:** минимум три L2 scenarios (true simulated iceberg, independent refills, missed updates); путаница между ними снижает уверенность вместо ложного «true positive». Metaorder/change-point test должен продемонстрировать увеличение прогнозной точности сверх простого детектора или оставаться экспериментальным и выключенным по умолчанию.
