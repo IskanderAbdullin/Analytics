@@ -28,7 +28,8 @@ public sealed record TradeImportResult(
     IReadOnlyList<BadRow> RejectedRows,
     string FileName,
     string FileSha256,
-    bool HasVerifiedFeedCoverage
+    bool HasVerifiedFeedCoverage,
+    int RejectedRowTotal = 0
 );
 
 public sealed class DetectorConfig
