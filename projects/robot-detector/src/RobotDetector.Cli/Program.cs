@@ -45,6 +45,8 @@ internal static class Program
                     return Fusion(options);
                 case "rolling-forecast":
                     return RollingForecastCommand(options);
+                case "diagnose-forecast":
+                    return DiagnoseForecastCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -169,6 +171,36 @@ internal static class Program
 
 
 
+
+
+    private static int DiagnoseForecastCommand(Dictionary<string, string> options)
+    {
+        var source = CsvTradeReader.Read(Required(options, "input"));
+        var config = new DetectorConfig
+        {
+            MinMatches = Integer(options, "min-matches", 6),
+            AnalysisWindowMinutes = Integer(options, "window-minutes", 60),
+            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000)
+        };
+        int warmup = Integer(options, "warmup-minutes", 60);
+        int stride = Integer(options, "stride-minutes", 30);
+        int maxCutoffs = Integer(options, "max-cutoffs", 12);
+        var rolling = RollingForecast.Evaluate(source, config, warmup, stride, maxCutoffs);
+        var report = ForecastFailureDiagnostics.Analyse(source, rolling, config);
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out string? output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Post-hoc forecast diagnostic report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine(
+            $"Forecasts={report.ForecastsEvaluated}; misses={report.Misses}; " +
+            $"staleHistoryMisses={report.MissesWithStaleTrainingPattern}; " +
+            "descriptive-only; no confirmed bot count");
+        return source.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int RollingForecastCommand(Dictionary<string, string> options)
     {
@@ -396,6 +428,7 @@ internal static class Program
         Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60] [--mode permute|rotate]");
         Console.WriteLine("fusion --input file.csv [--max-gap-cycles 12] [--output grouped.json]");
         Console.WriteLine("rolling-forecast --input file.csv [--warmup-minutes 20] [--stride-minutes 15] [--max-cutoffs 24]");
+        Console.WriteLine("diagnose-forecast --input file.csv [--min-matches 6] [--warmup-minutes 60] [--stride-minutes 30] [--max-cutoffs 12]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
