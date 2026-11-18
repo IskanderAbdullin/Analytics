@@ -33,6 +33,8 @@ internal static class Program
                     return await FetchAsync(options);
                 case "quote":
                     return Quote(options);
+                case "benchmark":
+                    return Benchmark(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -151,6 +153,24 @@ internal static class Program
         return 0;
     }
 
+
+    private static int Benchmark(Dictionary<string, string> options)
+    {
+        int seeds = Integer(options, "seeds", 20);
+        int noise = Integer(options, "noise-trades", 200);
+        var report = SyntheticBenchmark.Run(seeds, new DetectorConfig(), noise);
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Synthetic benchmark saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine("WARNING: simulator metrics are not calibrated estimates for MOEX/SPB.");
+        return 0;
+    }
+
     private static int Quote(Dictionary<string, string> options)
     {
         string path = Required(options, "input");
@@ -226,6 +246,7 @@ internal static class Program
         Console.WriteLine("       [--min-period-ms 200] [--max-period-ms 600000] [--min-coverage 0.55]");
         Console.WriteLine("fetch --date YYYY-MM-DD --instrument-id SBER_TQBR --output data/raw/file.csv|zip");
         Console.WriteLine("quote --input fixtures/synthetic_quote_oscillation.csv");
+        Console.WriteLine("benchmark [--seeds 20] [--noise-trades 200] [--output synthetic_report.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
