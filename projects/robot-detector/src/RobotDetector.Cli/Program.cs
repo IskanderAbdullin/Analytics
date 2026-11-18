@@ -185,7 +185,9 @@ internal static class Program
         int warmup = Integer(options, "warmup-minutes", 60);
         int stride = Integer(options, "stride-minutes", 30);
         int maxCutoffs = Integer(options, "max-cutoffs", 12);
-        var rolling = RollingForecast.Evaluate(source, config, warmup, stride, maxCutoffs);
+        var rolling = RollingForecast.Evaluate(source, config, warmup, stride, maxCutoffs,
+            maximumTrainingAgeCycles: options.TryGetValue("max-training-age-cycles", out var diagnosticAge)
+                ? int.Parse(diagnosticAge, CultureInfo.InvariantCulture) : null);
         var report = ForecastFailureDiagnostics.Analyse(source, rolling, config);
         string json = JsonSerializer.Serialize(report, JsonOptions);
         if (options.TryGetValue("output", out string? output))
@@ -214,7 +216,9 @@ internal static class Program
         var report = RollingForecast.Evaluate(source, config,
             warmupMinutes: Integer(options, "warmup-minutes", 20),
             strideMinutes: Integer(options, "stride-minutes", 15),
-            maximumCutoffsPerSession: Integer(options, "max-cutoffs", 24));
+            maximumCutoffsPerSession: Integer(options, "max-cutoffs", 24),
+            maximumTrainingAgeCycles: options.TryGetValue("max-training-age-cycles", out var maxAge)
+                ? int.Parse(maxAge, CultureInfo.InvariantCulture) : null);
         string json = JsonSerializer.Serialize(report, JsonOptions);
         if (options.TryGetValue("output", out string? output))
         {
@@ -427,8 +431,8 @@ internal static class Program
         Console.WriteLine("spectrum --input file.csv [--bin-ms 500] [--top 8] [--output spectrum.json]");
         Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60] [--mode permute|rotate]");
         Console.WriteLine("fusion --input file.csv [--max-gap-cycles 12] [--output grouped.json]");
-        Console.WriteLine("rolling-forecast --input file.csv [--warmup-minutes 20] [--stride-minutes 15] [--max-cutoffs 24]");
-        Console.WriteLine("diagnose-forecast --input file.csv [--min-matches 6] [--warmup-minutes 60] [--stride-minutes 30] [--max-cutoffs 12]");
+        Console.WriteLine("rolling-forecast --input file.csv [--warmup-minutes 20] [--stride-minutes 15] [--max-cutoffs 24] [--max-training-age-cycles 2]");
+        Console.WriteLine("diagnose-forecast --input file.csv [--min-matches 6] [--warmup-minutes 60] [--stride-minutes 30] [--max-cutoffs 12] [--max-training-age-cycles 2]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
