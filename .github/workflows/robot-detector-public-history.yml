@@ -28,6 +28,22 @@ jobs:
           set -euo pipefail
           mkdir -p data/raw data/results
           echo "One public read-only archive, 2026-11-17, SBER_TQBR; no token or order API"
+          echo "Obtaining official Russian Trusted Root CA over normal verified HTTPS (gu-st.ru)"
+          if curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt; then
+            openssl x509 -in /tmp/russian_trusted_root_ca.crt \
+              -noout -subject -issuer -fingerprint -sha256
+            if ! openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject |
+                grep -q 'Russian Trusted Root CA'; then
+              echo "BLOCKED_UNVERIFIED_CA: unexpected CA identity"
+              exit 0
+            fi
+            echo "Using process-scoped SSL_CERT_FILE for one public archive test"
+            export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          else
+            echo "BLOCKED_UNAVAILABLE_CA: using system trust only"
+          fi
           set +e
           timeout 180 dotnet run --project src/RobotDetector.Cli -c Release -- \
             fetch --date 2026-11-17 --instrument-id SBER_TQBR \
