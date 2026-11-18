@@ -1,0 +1,35 @@
+name: TInvest Analytics C# CI
+on:
+  push:
+    paths:
+      - "projects/tinvest-trade-analytics/**"
+      - ".github/workflows/tinvest-analytics-ci.yml"
+  pull_request:
+    paths:
+      - "projects/tinvest-trade-analytics/**"
+      - ".github/workflows/tinvest-analytics-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/tinvest-trade-analytics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Restore
+        run: dotnet restore tests/TInvestAnalytics.SmokeTests/TInvestAnalytics.SmokeTests.csproj
+      - name: Build with warnings as errors
+        run: dotnet build tests/TInvestAnalytics.SmokeTests/TInvestAnalytics.SmokeTests.csproj --no-restore --configuration Release
+      - name: Offline deterministic smoke tests
+        run: dotnet run --project tests/TInvestAnalytics.SmokeTests/TInvestAnalytics.SmokeTests.csproj --configuration Release --no-build
+      - name: CLI help
+        run: dotnet run --project src/TInvestAnalytics.Cli/TInvestAnalytics.Cli.csproj --configuration Release --no-build -- help

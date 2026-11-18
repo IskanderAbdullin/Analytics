@@ -1,0 +1,208 @@
+using System.Globalization;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using TInvestAnalytics;
+
+var passed = 0;
+void Check(string name, Action test)
+{
+    test();
+    Console.WriteLine("PASS " + name);
+    passed++;
+}
+void Equal<T>(T a, T b, string message)
+{
+    if (!EqualityComparer<T>.Default.Equals(a, b))
+        throw new Exception(message + " expected=" + b + " actual=" + a);
+}
+DateTimeOffset day = DateTimeOffset.Parse("2026-11-10T12:00:00Z", CultureInfo.InvariantCulture);
+DateTimeOffset from = day.AddDays(-2), to = day.AddDays(5);
+string JsonOp(string id, string type, decimal price, decimal qty, decimal payment,
+    string uid = "UID1", DateTimeOffset? date = null, string currency = "RUB")
+{
+    return JsonSerializer.Serialize(new
+    {
+        id, type, state = "OPERATION_STATE_EXECUTED", date = (date ?? day).ToString("O"),
+        instrumentUid = uid, quantity = qty,
+        price = new { units = price.ToString(CultureInfo.InvariantCulture), nano = 0 },
+        payment = new { units = payment.ToString(CultureInfo.InvariantCulture), nano = 0,
+            currency },
+        trades = Array.Empty<object>()
+    });
+}
+BrokerOperation Op(string id, string type, decimal price, decimal qty, decimal pay,
+    string uid = "UID1", DateTimeOffset? dt = null)
+{
+    using var doc = JsonDocument.Parse(JsonOp(id, type, price, qty, pay, uid, dt));
+    return OperationParser.Parse("TEST", doc.RootElement);
+}
+decimal Sum(PnlReport report, string name) =>
+    report.Components.Where(x => x.Name == name).Sum(x => x.Amount);
+var securities = new Dictionary<string, string> { ["UID1"] = "stock" };
+
+Check("money nano precision and signed amounts", () =>
+{
+    using var doc = JsonDocument.Parse("""{"currency":"RUB","units":"-3","nano":-500000000}""");
+    Equal(Money.FromJson(doc.RootElement).Amount, -3.5m, "negative money");
+    Equal(new Money(3.000000001m, "RUB").Add(new Money(2m, "RUB")).Amount,
+        5.000000001m, "decimal precision");
+    bool fails = false;
+    try { _ = new Money(1, "RUB").Add(new Money(1, "USD")); }
+    catch (InvalidOperationException) { fails = true; }
+    Equal(fails, true, "different currencies must fail");
+});
+
+Check("FIFO 100x100 + 100x110 -> sell 100x120 gives 2000", () =>
+{
+    var ops = new[] {
+        Op("1","OPERATION_TYPE_BUY",100,100,-10000,dt:day.AddHours(-2)),
+        Op("2","OPERATION_TYPE_BUY",110,100,-11000,dt:day.AddHours(-1)),
+        Op("3","OPERATION_TYPE_SELL",120,100,12000)
+    };
+    var x = PnlCalculator.Calculate("TEST", ops, securities, from, to);
+    Equal(Sum(x,"SECURITY_REALIZED_GROSS"),2000m,"FIFO gross");
+    Equal(x.Status,"partial","not independently verified");
+});
+
+Check("short 10@120 then buy 15@100 gives 200 and new long", () =>
+{
+    var ops = new[] {
+        Op("1","OPERATION_TYPE_SELL",120,10,1200,dt:day.AddHours(-2)),
+        Op("2","OPERATION_TYPE_BUY",100,15,-1500,dt:day.AddHours(-1)),
+        Op("3","OPERATION_TYPE_SELL",105,5,525)
+    };
+    var x=PnlCalculator.Calculate("TEST",ops,securities,from,to);
+    Equal(Sum(x,"SECURITY_REALIZED_GROSS"),225m,"short profit 200 + long profit 25");
+});
+
+Check("partial fill operation: individual execution prices", () =>
+{
+    var obj = JsonSerializer.Serialize(new {
+        id="C",type="OPERATION_TYPE_BUY",state="OPERATION_STATE_EXECUTED",
+        date=day.ToString("O"), instrumentUid="UID1",quantity=3,
+        payment=new {currency="RUB",units="-302",nano=0},
+        trades=new object[]{
+            new {tradeId="A",quantity=1,dateTime=day.AddMinutes(-1).ToString("O"),
+                 price=new {units="100",nano=0}},
+            new {tradeId="B",quantity=2,dateTime=day.ToString("O"),
+                 price=new {units="101",nano=0}}
+        }
+    });
+    using var doc=JsonDocument.Parse(obj);
+    var trade=OperationParser.Parse("TEST",doc.RootElement);
+    Equal(trade.Executions.Count,2,"two executions");
+    Equal(trade.Executions.Sum(x=>x.Quantity*x.Price),302m,"notional sum");
+});
+
+Check("VM fees income vs tax/external deposits/funding", () =>
+{
+    var ops = new[] {
+        Op("A","OPERATION_TYPE_ACCRUING_VARMARGIN",0,0,150,"FUT"),
+        Op("B","OPERATION_TYPE_WRITING_OFF_VARMARGIN",0,0,-50,"FUT",day.AddMinutes(1)),
+        Op("C","OPERATION_TYPE_BROKER_FEE",0,0,-4,"FUT",day.AddMinutes(2)),
+        Op("D","OPERATION_TYPE_DIVIDEND",0,0,5,"DIV",day.AddMinutes(3)),
+        Op("E","OPERATION_TYPE_INPUT",0,0,1000,"",day.AddMinutes(4)),
+        Op("F","OPERATION_TYPE_TAX",0,0,-1,"",day.AddMinutes(5)),
+        Op("G","OPERATION_TYPE_FUNDING",0,0,-3,"FUT",day.AddMinutes(6))
+    };
+    var report=PnlCalculator.Calculate("TEST",ops,null,from,to);
+    Equal(Sum(report,"FUTURES_VM_SETTLED"),100m,"VM");
+    Equal(Sum(report,"BROKER_FEES"),-4m,"fee");
+    Equal(Sum(report,"FUNDING_UNVERIFIED_NOT_INCLUDED"),-3m,"funding separately");
+    Equal(Sum(report,"EXTERNAL_FLOW_NOT_PNL"),1000m,"external cash separate");
+    Equal(report.TotalsByCurrency["RUB"],101m,"no funding/tax/deposit in headline subtotal");
+    Equal(report.Warnings.Any(x=>x.StartsWith("FUNDING_OVERLAP_UNVERIFIED")),true,
+        "funding not double counted");
+});
+
+Check("unknown instrument is not treated as an ordinary share", () =>
+{
+    var x=PnlCalculator.Calculate("TEST",new[]{
+        Op("1","OPERATION_TYPE_BUY",100,1,-100),
+        Op("2","OPERATION_TYPE_SELL",120,1,120)
+    }, null, from, to);
+    Equal(x.Components.Any(p=>p.Name=="SECURITY_REALIZED_GROSS"),false,"no guessed P&L");
+    Equal(x.Warnings.Any(w=>w.StartsWith("UNCLASSIFIED_TRADE")),true,"flag quality");
+});
+
+Check("possible renamed IDs are flagged rather than silently combined", () =>
+{
+    var ops=new[]{
+        Op("old","OPERATION_TYPE_BROKER_FEE",0,0,-1),
+        Op("new","OPERATION_TYPE_BROKER_FEE",0,0,-1)
+    };
+    var p=PnlCalculator.Calculate("TEST",ops,null,from,to);
+    Equal(p.Warnings.Any(x=>x.StartsWith("POSSIBLE_DUPLICATE")),true,"ambiguous duplicate");
+});
+
+Check("SQLite persistence, resume, idempotent import, revision", () =>
+{
+    var path=Path.Combine(Path.GetTempPath(),"tia_test_"+Guid.NewGuid().ToString("N")+".db");
+    try
+    {
+        var store=new EvidenceStore(path);
+        store.Initialize();
+        string p1="{\"items\":["+JsonOp("a","OPERATION_TYPE_BROKER_FEE",0,0,-1)+
+            "],\"hasNext\":false}";
+        var k=store.GetCheckpoint("TEST",from,to);
+        Equal(k.Complete,false,"new window incomplete");
+        Equal(store.ImportPage("TEST",from,to,null,null,false,p1),1,"one");
+        Equal(store.ImportPage("TEST",from,to,null,null,false,p1),1,"repeat page");
+        var s=store.Stats();
+        Equal(s.Pages,1L,"duplicate raw page not copied");
+        Equal(s.Revisions,1L,"same op id and JSON no new revision");
+        Equal(s.CurrentOperations,1L,"same id");
+        Equal(store.GetCheckpoint("TEST",from,to).Complete,true,"window complete");
+        Equal(store.LoadOperations("TEST",from,to).Count,1,"operation read");
+
+        string p2="{\"items\":["+JsonOp("a","OPERATION_TYPE_BROKER_FEE",0,0,-2)+
+            "],\"hasNext\":false}";
+        store.ImportPage("TEST",from,to,null,null,false,p2);
+        Equal(store.Stats().Revisions,2L,"changed source retained");
+        Equal(store.LoadOperations("TEST",from,to)[0].Payment!.Value.Amount,-2m,"latest view updated");
+        bool rejected=false;
+        try { store.ImportPage("TEST",from,to,"c","c",true,p1); }
+        catch (InvalidDataException) { rejected=true; }
+        Equal(rejected,true,"cursor cycle rejected");
+    }
+    finally
+    {
+        foreach(var suffix in new[]{"","-wal","-shm"})
+        { try { File.Delete(path+suffix); } catch (IOException) { /* test temp cleanup best effort */ } }
+    }
+});
+
+Check("read-only HTTP endpoint and schema contract", () =>
+{
+    using var handler=new FakeHandler();
+    using var client=new TInvestClient("SYNTHETIC_TOKEN",handler:handler);
+    var a=client.GetAccountsAsync().GetAwaiter().GetResult();
+    Equal(TInvestClient.ParseAccounts(a).Count,1,"accounts response");
+    Equal(handler.LastPath!.EndsWith("/UsersService/GetAccounts",StringComparison.Ordinal),
+        true,"read-only accounts route");
+    var page=client.GetOperationsPageAsync("TEST",from,to,null).GetAwaiter().GetResult();
+    Equal(TInvestClient.ParsePageCursor(page).HasNext,false,"parsed page");
+    Equal(handler.LastPath!.EndsWith("/OperationsService/GetOperationsByCursor",StringComparison.Ordinal),
+        true,"read-only operations route");
+    Equal(handler.AuthorizationScheme,"Bearer","authorization scheme");
+});
+
+Console.WriteLine($"All {passed} deterministic smoke tests passed.");
+
+internal sealed class FakeHandler : HttpMessageHandler
+{
+    public string? LastPath {get;private set;}
+    public string? AuthorizationScheme {get;private set;}
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        LastPath=request.RequestUri?.AbsolutePath;
+        AuthorizationScheme=request.Headers.Authorization?.Scheme;
+        string response=LastPath?.EndsWith("GetAccounts",StringComparison.Ordinal)==true
+            ? """{"accounts":[{"id":"SYNTHETIC","name":"Sample","type":"ACCOUNT_TYPE_TINKOFF","status":"ACCOUNT_STATUS_OPEN"}]}"""
+            : """{"items":[],"hasNext":false,"nextCursor":""}""";
+        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){
+            Content=new StringContent(response,Encoding.UTF8,"application/json")
+        });
+    }
+}

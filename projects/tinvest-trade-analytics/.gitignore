@@ -1,0 +1,15 @@
+.vs/
+bin/
+obj/
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+data/
+secrets/
+*.local.json
+.env
+.env.*
+!.env.example
+test-results/
+artifacts/private/
