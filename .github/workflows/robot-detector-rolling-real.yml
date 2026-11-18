@@ -1,0 +1,95 @@
+name: Robot Detector real rolling forecast pilot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/robot-detector-rolling-real.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sber-rolling-two-days:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build and run all offline regressions
+        run: |
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
+          dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
+      - name: Download only two anonymous historical sessions and evaluate frozen forecasts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          echo "STAGE2_ROLLING_READ_ONLY: frozen cutoffs and half-period placebo, not an owner classifier"
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt
+          openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject |
+            grep -q 'Russian Trusted Root CA'
+          pinned='D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31'
+          actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+          if [[ "$actual" != "$pinned" ]]; then
+            echo "BLOCKED_UNVERIFIED_CA: pinned CA mismatch; refusing TLS bypass"
+            exit 1
+          fi
+          export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          for day in 2026-11-12 2026-11-13; do
+            echo "FETCHING_PUBLIC_DAY $day"
+            raw="data/raw/sber_$day.csv"
+            if ! dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              fetch --date "$day" --instrument-id SBER_TQBR --output "$raw" \
+              > /tmp/rd-fetch.log 2>&1; then
+              echo "BLOCKED_BY_DATA: $day historical source unavailable"
+              sed -n '1,8p' /tmp/rd-fetch.log
+              exit 1
+            fi
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              rolling-forecast --input "$raw" \
+              --min-matches 6 --window-minutes 60 --max-group-events 5000 \
+              --warmup-minutes 60 --stride-minutes 30 --max-cutoffs 12 \
+              --output "data/results/rolling_$day.json"
+            DAY="$day" python3 - <<'PY'
+          import json,os,pathlib
+          day=os.environ["DAY"]
+          r=json.loads((pathlib.Path("data/results")/f"rolling_{day}.json").read_text())
+          assert r["sourcePrintCount"] > 0
+          assert r["calibrated"] is False
+          assert r["actualBotCountKnown"] is False
+          assert r["forecastsEvaluated"] >= r["observedHits"] >= 0
+          assert r["forecastsEvaluated"] >= r["placeboHits"] >= 0
+          assert r["dataCoverageVerified"] is False
+          print("STAGE2_ROLLING_DAY_OBSERVED",json.dumps({
+            "day":day,
+            "sourcePrintCount":r["sourcePrintCount"],
+            "sourceSha256":r["sourceSha256"],
+            "sessionSourceGroups":r["sessionSourceGroups"],
+            "cutoffsExamined":r["cutoffsExamined"],
+            "forecastsEvaluated":r["forecastsEvaluated"],
+            "observedHits":r["observedHits"],
+            "placeboHits":r["placeboHits"],
+            "observedHitRate":r["observedHitRate"],
+            "placeboHitRate":r["placeboHitRate"],
+            "coverageVerified":r["dataCoverageVerified"],
+            "calibrated":r["calibrated"],
+            "actualBotCountKnown":r["actualBotCountKnown"]
+          },ensure_ascii=False))
+          PY
+          done
+          echo 'ROLLING_PILOT_FINISHED: descriptive forward replay only, no confirmed robots'
+      - name: Remove source trade tape and temporary root certificate
+        if: always()
+        shell: bash
+        run: |
+          rm -rf data/raw data/results
+          rm -f /tmp/russian_trusted_root_ca.crt /tmp/rd-fetch.log
