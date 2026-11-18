@@ -47,6 +47,22 @@ jobs:
           assert q["confidenceCalibrated"] is None, q
           assert p["physicalBotCountKnown"] is False, p
           PY
+      - name: Conservative multi-window fusion smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- fusion \
+            --input fixtures/synthetic_cross_hour_5s.csv \
+            --output /tmp/robot-fusion.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-fusion.json",encoding="utf-8"))
+          assert r["candidateEpisodeCount"] == 2, r
+          assert r["conservativelyLinkedGroupCount"] == 1, r
+          assert r["linkedEpisodeCount"] == 1, r
+          assert r["uniqueAttributedPrintCount"] == 13, r
+          assert r["uniqueAttributedLots"] == 1300, r
+          assert r["actualBotCountKnown"] is False, r
+          assert r["groups"][0]["confidenceCalibrated"] is None, r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
