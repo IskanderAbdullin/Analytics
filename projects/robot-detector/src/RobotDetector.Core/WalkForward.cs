@@ -16,7 +16,11 @@ public sealed record ForecastCheck(
     string? FutureMatchedEventId,
     bool Hit,
     int PeriodMs,
-    long ExpectedQuantityLots
+    long ExpectedQuantityLots,
+    string InstrumentUid = "",
+    string TradeSource = "",
+    string ReportedDirection = "",
+    string SessionId = ""
 );
 
 public sealed record WalkForwardReport(
@@ -75,7 +79,8 @@ public static class WalkForward
             checks.Add(new ForecastCheck(pattern.PatternId, cutoffUtc.ToString("O"),
                 target.ToString("O"), windowStart.ToString("O"), windowEnd.ToString("O"),
                 match?.EventId, match is not null, pattern.PeriodMilliseconds,
-                pattern.TypicalQuantityLots));
+                pattern.TypicalQuantityLots, pattern.InstrumentUid, pattern.TradeSource,
+                pattern.ReportedDirection, pattern.SessionId));
         }
         return new WalkForwardReport("0.1-prospective-evaluation", cutoffUtc.ToString("O"),
             training.Count, future.Count, candidates.CandidatePatternCount,

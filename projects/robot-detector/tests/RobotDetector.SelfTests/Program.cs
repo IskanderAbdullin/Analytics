@@ -44,6 +44,10 @@ internal static class Program
         Check("rotation null preserves local size runs and timestamps", RotationPreservesRuns);
         Check("null report includes conservative grouped comparison", NullReportIncludesGroups);
         Check("invalid null variant fails closed", InvalidNullVariant);
+        Check("rolling forecast predicts later synthetic prints", RollingForecastHasHits);
+        Check("rolling forecast placebo is shifted and does not look ahead", RollingForecastPlaceboAndTime);
+        Check("rolling replay isolates venue/source groups", RollingForecastSourceIsolation);
+        Check("rolling report rejects unverified confidence claims", RollingForecastUnverifiedCoverage);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -479,6 +483,67 @@ internal static class Program
             seed: 7, localWindowSeconds: 60, nullMode: "unsupported"); }
         catch (ArgumentException) { threw = true; }
         Assert(threw, "unknown null variant should be rejected");
+    }
+
+
+    private static MarketTrade[] LongCadence(string prefix, string source = "EXCHANGE")
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        return Enumerable.Range(0, 13).Select(i =>
+            new MarketTrade($"{prefix}-{i}", start.AddMinutes(i * 5),
+                "SYNTH-LONG", "LONG", source, "SELL", 100m, 100,
+                "TQBR", "SESSION-1", "SYNTHETIC", i)).ToArray();
+    }
+
+    private static void RollingForecastHasHits()
+    {
+        var result = RollingForecast.Evaluate(From(LongCadence("LONG")),
+            new DetectorConfig { MinMatches = 4 }, warmupMinutes: 20,
+            strideMinutes: 10, maximumCutoffsPerSession: 4);
+        Assert(result.CutoffsExamined == 4, "must evaluate four prospectively chosen cutoffs");
+        Assert(result.ForecastsEvaluated >= 1, "must issue at least one scorable forecast");
+        Assert(result.ObservedHits >= 1, "known synthetic periodic prints should be hit");
+        Assert(result.ObservedHitRate > 0, "measured hit rate");
+        Assert(!result.Calibrated && !result.ActualBotCountKnown,
+            "forecast success cannot identify actual bots");
+        Assert(result.Observations.All(o => DateTimeOffset.Parse(o.TargetUtc) >
+            DateTimeOffset.Parse(o.CutoffUtc)), "targets must be strictly later than cutoff");
+    }
+
+    private static void RollingForecastPlaceboAndTime()
+    {
+        var result = RollingForecast.Evaluate(From(LongCadence("PHASE")),
+            new DetectorConfig { MinMatches = 4 }, warmupMinutes: 20,
+            strideMinutes: 10, maximumCutoffsPerSession: 4);
+        Assert(result.PlaceboHits == 0, "half-period phase shift should miss clean 5min synthetic stream");
+        Assert(result.Observations.All(o =>
+            (DateTimeOffset.Parse(o.PhaseShiftPlaceboUtc) -
+             DateTimeOffset.Parse(o.TargetUtc)).TotalMilliseconds ==
+            o.PeriodMilliseconds / 2.0), "placebo phase must be a fixed half-period shift");
+    }
+
+    private static void RollingForecastSourceIsolation()
+    {
+        var source = From(LongCadence("EX", "EXCHANGE")
+            .Concat(LongCadence("DEAL", "DEALER")).ToArray());
+        var result = RollingForecast.Evaluate(source, new DetectorConfig { MinMatches = 4 },
+            warmupMinutes: 20, strideMinutes: 10, maximumCutoffsPerSession: 4);
+        Assert(result.SessionSourceGroups == 2, "trade sources must be analysed independently");
+        Assert(result.Observations.Select(o => o.TradeSource).Distinct().Count() == 2,
+            "both EXCHANGE and DEALER forecast checks must be present");
+        Assert(result.Observations.Where(o => o.Hit).All(o =>
+            o.MatchedEventId is not null), "hits must have actual future evidence ID");
+    }
+
+    private static void RollingForecastUnverifiedCoverage()
+    {
+        var source = From(LongCadence("UNKNOWN")) with { HasVerifiedFeedCoverage = false };
+        var report = RollingForecast.Evaluate(source, new DetectorConfig { MinMatches = 4 },
+            warmupMinutes: 20, strideMinutes: 10, maximumCutoffsPerSession: 4);
+        Assert(!report.DataCoverageVerified, "read-only file cannot prove complete feed");
+        Assert(!report.ActualBotCountKnown && !report.Calibrated, "never invent owner or probability");
+        Assert(report.Warnings.Any(w => w.Contains("INCOMPLETE_FEED_CAVEAT")),
+            "must explicitly mention missing coverage");
     }
 
     private static void BadConfig()
