@@ -19,7 +19,8 @@ public static class PeriodicDetector
             "SCREENER_ONLY: detected streams are unvalidated statistical candidates, not identified trading programs.",
             "NO_OWNER_IDENTIFIERS: physical bot count is unknown.",
             "COVERAGE_UNVERIFIED: gaps, auctions and missing prints can affect all estimates.",
-            "DIRECTION_IS_PROVIDER_REPORTED: not necessarily the side of a passive limit order."
+            "DIRECTION_IS_PROVIDER_REPORTED: not necessarily the side of a passive limit order.",
+            "WINDOWED_EPISODES: candidates in different analysis windows can belong to one algorithm; count is not distinct owners."
         };
         if (imported.RejectedRowTotal > 0) warnings.Add("REJECTED_ROWS: see diagnostics; do not infer a complete feed.");
         if (imported.Trades.Count == 0) warnings.Add("EMPTY_INPUT: no events to analyse.");
@@ -40,22 +41,32 @@ public static class PeriodicDetector
 
         foreach (var group in groups)
         {
-            var list = group.OrderBy(x => x.ExchangeTimeUtc).ThenBy(x => x.ArrivalSequence).ToList();
-            if (list.Count < config.MinMatches) continue;
-            if (list.Count > config.MaximumEventsPerGroup)
+
+            var ordered = group.OrderBy(x => x.ExchangeTimeUtc)
+                .ThenBy(x => x.ArrivalSequence).ToList();
+            long windowMs = config.AnalysisWindowMinutes * 60_000L;
+            var windows = ordered.GroupBy(x => x.ExchangeTimeUtc.ToUnixTimeMilliseconds() / windowMs)
+                .OrderBy(w => w.Key);
+            foreach (var window in windows)
             {
-                warnings.Add($"SKIPPED_DENSE_GROUP: uid={group.Key.InstrumentUid}, q={group.Key.QuantityLots}," +
-                             $" side={group.Key.ReportedDirection}, count={list.Count}; increase limit or split by session/window.");
-                continue;
-            }
-            var candidates = GeneratePeriods(list, config);
-            foreach (int periodMs in candidates)
-            {
-                int anchors = Math.Min(list.Count, config.AnchorLimit);
-                for (int anchor = 0; anchor < anchors; anchor++)
+                var list = window.ToList();
+                if (list.Count < config.MinMatches) continue;
+                if (list.Count > config.MaximumEventsPerGroup)
                 {
-                    var candidate = Evaluate(list, anchor, periodMs, config);
-                    if (candidate is not null) allCandidates.Add(candidate);
+                    warnings.Add($"SKIPPED_DENSE_GROUP: uid={group.Key.InstrumentUid}, q={group.Key.QuantityLots}," +
+                                 $" side={group.Key.ReportedDirection}, utc_window={window.Key}," +
+                                 $" count={list.Count}; raise limit or shorten analysis window.");
+                    continue;
+                }
+                var candidates = GeneratePeriods(list, config);
+                foreach (int periodMs in candidates)
+                {
+                    int anchors = Math.Min(list.Count, config.AnchorLimit);
+                    for (int anchor = 0; anchor < anchors; anchor++)
+                    {
+                        var candidate = Evaluate(list, anchor, periodMs, config);
+                        if (candidate is not null) allCandidates.Add(candidate);
+                    }
                 }
             }
         }
