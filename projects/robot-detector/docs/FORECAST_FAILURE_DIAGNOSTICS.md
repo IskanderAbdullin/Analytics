@@ -58,3 +58,40 @@ Never describe the output as calibrated probability or exact cause. Selecting a 
 Even if a large fraction of misses shows changed size or stale history, **do not** rewrite the original held-out 12/13 November results. They remain 14/983 against 14/983 placebo (no detected advantage).
 
 Next legitimate research step: design new candidate-lifecycle/trade-burst models using the development sample; compare against well-defined nulls and ABIDES known-agent truth; freeze parameters and validate on untouched data. No online trade signals may be released without those gates.
+
+## Measured development results — 2026-11-18
+
+[GitHub Actions run 44303630656](https://github.com/IskanderAbdullin/Analytics/actions/runs/44303630656): all steps passed, **38/38** .NET offline tests. Real data archives were discarded after processing.
+
+| Metric | 2026-11-09 | 2026-11-10 | Combined |
+|---|---:|---:|---:|
+| Future forecast windows | 187 | 119 | **306** |
+| Predicted exact hits | 4 | 5 | **9** |
+| Phase-shift placebo hits | 3 | 5 | **8** |
+| Misses | 183 | 114 | **297** |
+| Misses where last evidence was >8 periods old | 182 | 109 | **291** |
+| Forecasts based on >8-period-old history | 184 | 109 | **293** |
+| Misses with same-q outside strict timing tolerance | 20 | 27 | 47 |
+| Misses with alternative q inside strict tolerance | 7 | 13 | 20 |
+| Misses with alternative q within wider nearby window | 60 | 58 | 118 |
+| Misses with opposite side at exact target | 7 | 16 | 23 |
+| Misses with no same-side print in wider window | 52 | 3 | 55 |
+| Misses with incomplete nearby audit window | 68 | 50 | 118 |
+
+**Historical age bucket counts:**
+
+| Bucket | Forecast windows | Exact hits | Placebo hits |
+|---|---:|---:|---:|
+| Fresh (<=2 periods old) | 9 | 6 | 3 |
+| Aging (2–8 periods old) | 4 | 1 | 0 |
+| Stale (>8 periods old) | 293 | 2 | 5 |
+
+SHA-256 of compressed public archives:
+- 2026-11-09: `8e4ea994b10a0398f2cd08fe80ba67ecf082c14edc062ac154507fb769cd5a8a`
+- 2026-11-10: `95b62c78e2fee6a310426ecd1a42732c19a019d7ba77d5c4cf4fc1415a32befd`
+
+**Interpretation:** 291/297 observed misses (98.0%) occurred for candidates whose last supporting print was over eight predicted cycles old. This suggests candidate *staleness* is a major practical deficiency. Fresh-bucket hit rate (6/9) looks much higher but comprises **only nine forecasts**, was observed on development data, and cannot be cited as independent evidence of a real predictive edge. Even apparent exact hits do not prove participant continuity.
+
+Other diagnostic flags are **not mutually exclusive** and apply to different audit window completeness subsets; summing them into a cause distribution is invalid. The full live exchange feed and order identity are not available. For 118 misses the broad nearby audit window could not be fully observed within the same source/session sequence; this is not a declaration of missing exchange prints.
+
+**Next predeclared development-driven change:** create an optional `maxTrainingAgeCycles=2` *historical-evidence recency gate*. It must filter candidate forecasts **before accessing future print outcomes**, keep the original unrestricted baseline unchanged, and be compared on a fresh untouched pair of SBER dates (proposed 2026-11-05/06) with the same 60-minute warmup, 30-minute stride, 12 cutoffs and T/2 phase-shift placebo. A gate may dramatically reduce the sample size; report the absolute number of eligible forecasts as well as rates. Do not retune threshold on those two dates, and do not reinterpret the old sealed 12/13 November replay.
