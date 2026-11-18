@@ -79,6 +79,10 @@ public static class Program
                 case "equity-pnl":
                     EquityPnl(args, store);
                     break;
+                case "serve":
+                    await DashboardServer.RunAsync(store, Arg(args, "--asset-map"),
+                        int.Parse(Arg(args, "--port") ?? "8765", CultureInfo.InvariantCulture));
+                    break;
                 case "stats":
                     var st = store.Stats();
                     Console.WriteLine($"Raw pages: {st.Pages}, revisions: {st.Revisions}, " +
@@ -364,6 +368,7 @@ public static class Program
               snapshot --account-index 0 [--db PATH] [--sandbox]
               snapshots --account ID [--db PATH]
               equity-pnl --account ID --start-id N --end-id N [--db PATH]
+              serve [--port 8765] [--asset-map class-map.json] [--db PATH]
               stats [--db PATH]
 
             Authentication: set TINVEST_TOKEN as a read-only token in the process environment.

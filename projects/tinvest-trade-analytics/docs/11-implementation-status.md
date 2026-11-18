@@ -1,10 +1,11 @@
-# 11. Реализация и журнал проверки — v0.5
+# 11. Реализация и журнал проверки — v0.6
 
 Дата начала: 18.11.2026. Цель документа — отделить **реализовано**, **протестировано** и **планируется**. Здесь нет утверждений, что real T-Invest live sync прошёл.
 
 ## Что реализовано (M0 и часть M1/M2/M4)
 
 - `src/TInvestAnalytics.Cli/`: .NET 10 CLI, официальный T-Invest REST POST read-only allowlist. Токен только из env `TINVEST_TOKEN`, не сохраняется в Git или SQLite.
+- `serve --port 8765` — локальный HTML dashboard на `http://127.0.0.1:8765/`, без CDN и браузерных внешних сервисов. Читает только локальную БД, есть график по UTC дням, суммы по инструментам, таблица, снимки, предупреждения. API `/api/accounts`, `/api/daily`, `/api/snapshots` исключительно GET. Это не готовая замена полноценному desktop UI.
 - `doctor`, `accounts`, `sync` по выбранному счёту и диапазону, `sync --refresh` для повторного сканирования и ревизий, `import-json` для офлайн page, `report` и `daily-report` с необязательным `--asset-map`, `stats`.
 - HTTP bounded retries for 429/408/502/503/504, conservative per-process pacing. Внешняя/межпроцессная координация квот ещё не реализована.
 - Immutable `raw_pages`, `operation_revisions`, latest `current_operations`, local `sync_windows` cursors/checkpoint, SQLite WAL; transactionally commit page+checkpoint. Semantically identical multiple ID records flagged but **not silently de-duplicated**.
@@ -47,6 +48,7 @@ dotnet run --project src/TInvestAnalytics.Cli -- import-bot --file bot-events.js
 dotnet run --project src/TInvestAnalytics.Cli -- bot-stats --bot BabidDemo --from 2026-11-09 --to 2026-11-16
 dotnet run --project src/TInvestAnalytics.Cli -- broker-report-request --account-index 0 --from 2026-11-01 --to 2026-11-18
 dotnet run --project src/TInvestAnalytics.Cli -- broker-report-fetch --task YOUR_TASK_ID
+dotnet run --project src/TInvestAnalytics.Cli -- serve --port 8765 --asset-map path/to/class-map.json
 ```
 
 **Защита:** не коммитить токен или реальные raw operations. БД по умолчанию в `%LOCALAPPDATA%/TInvestAnalytics/analytics.db`. Не передавать брокерские данные в CI. Команда sync не должна использоваться на живом аккаунте до ручного проверки прав токена/лимитов; роботы и API могут делить квоты.
@@ -78,7 +80,7 @@ dotnet run --project src/TInvestAnalytics.Cli -- broker-report-fetch --task YOUR
 - **BROKER_VALIDATED:** воспроизведены реальные операции на read-only аккаунте, сверено с брокерским отчётом.
 - **PRODUCTION_READY:** проверены recovery, безопасность, performance, полные специальные случаи.
 
-Начальная версия v0.1 прошла GitHub Actions CI на коммите `cf45482fc300205fda1ef1ed37ef35d3684a6783`. Изменения v0.2 со снимками и v0.3 с дневным отчётом прошли GitHub Actions CI; модуль bot telemetry v0.4 прошёл GitHub Actions; модуль broker report v0.5 требует нового прогона. Ни `BROKER_VALIDATED`, ни `PRODUCTION_READY` не подтверждены.
+Начальная версия v0.1 прошла GitHub Actions CI на коммите `cf45482fc300205fda1ef1ed37ef35d3684a6783`. Изменения v0.2 со снимками и v0.3 с дневным отчётом прошли GitHub Actions CI; модуль bot telemetry v0.4 прошёл GitHub Actions; модуль broker report v0.5 прошёл GitHub Actions; dashboard v0.6 требует нового прогона. Ни `BROKER_VALIDATED`, ни `PRODUCTION_READY` не подтверждены.
 
 
 ### Актуальные первоисточники для отчётов
@@ -86,3 +88,11 @@ dotnet run --project src/TInvestAnalytics.Cli -- broker-report-fetch --task YOUR
 - [Официальный GetBrokerReport, async generate/fetch](https://developer.tbank.ru/invest/api/operations-service-get-broker-report)
 - [Официальный подробный контракт broker report](https://developer.tbank.ru/invest/services/operations/methods)
 - Документация допускает разные интерпретации нумерации страниц `page/pagesCount`; поэтому импорт не заявляет completion без сверки `itemsCount`, а реальный отчёт требует отдельного контрактного теста.
+
+
+### Local UI threat model
+
+- Server binds **127.0.0.1 only** and exposes no mutable operations, raw broker responses or tokens.
+- No third-party CDNs. CSP + no-store + no-frame, no CORS headers. Local processes may still have access to loopback; for multi-user workstations a per-session authorization layer is required before calling this production-ready.
+- Browser view presents only the already-calculated partial realized/settled data; does not call T-Invest API or trade.
+- Dates in UI are explicitly UTC; Moscow trading session/clearing day will follow in calendar module.

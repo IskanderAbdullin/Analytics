@@ -188,6 +188,7 @@ Check("SQLite persistence, resume, idempotent import, revision", () =>
         store.RestartWindow("TEST",from,to);
         Equal(store.GetCheckpoint("TEST",from,to).Complete,false,"explicit refresh resets cursor but keeps raw evidence");
         Equal(store.LoadOperations("TEST",from,to).Count,1,"operation read");
+        Equal(store.LocalAccounts().Contains("TEST"),true,"account discovered from local DB");
 
         string p2="{\"items\":["+JsonOp("a","OPERATION_TYPE_BROKER_FEE",0,0,-2)+
             "],\"hasNext\":false}";
@@ -322,6 +323,19 @@ Check("broker report async task and page evidence, commission summary", () =>
     }
     finally
     {foreach(var suffix in new[]{"","-wal","-shm"}){try{File.Delete(root+suffix);}catch(IOException){}}}
+});
+
+
+Check("local dashboard serves only static embedded assets and no remote CDN", () =>
+{
+    Equal(DashboardServer.Html.Contains("<canvas id=\"chart\"",StringComparison.Ordinal),
+        true,"chart canvas present");
+    Equal(DashboardServer.Html.Contains("api/daily",StringComparison.Ordinal),
+        true,"dashboard daily data route");
+    Equal(DashboardServer.Html.Contains("<script src=",StringComparison.Ordinal),
+        false,"no third-party script sources");
+    Equal(DashboardServer.Html.Contains("https://",StringComparison.Ordinal),
+        false,"no third-party remote dependencies");
 });
 
 Console.WriteLine($"All {passed} deterministic smoke tests passed.");
