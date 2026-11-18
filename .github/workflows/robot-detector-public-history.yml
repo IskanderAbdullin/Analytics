@@ -81,6 +81,24 @@ jobs:
           if [[ $result -ne 0 && $result -ne 3 ]]; then
             echo "BLOCKED_BY_DATA_OR_COVERAGE: unable to parse or screen this day"
             sed -n '1,12p' /tmp/robot-detect.log
+            file -b "$input" || true
+            python3 - "$input" <<'PY'
+          import json, pathlib, sys
+          data=pathlib.Path(sys.argv[1]).read_bytes()
+          firstline=data.split(b"\n")[0][:1024].decode("utf-8", errors="replace")
+          print("DIAGNOSTIC_BYTES",len(data))
+          print("HAS_TRADE_TS", "TRADE_TS" in firstline)
+          print("HAS_PRICE_QUANTITY", "PRICE" in firstline and "QUANTITY" in firstline)
+          if any(x in firstline.upper() for x in ["TRADE_TS", "INSTRUMENT_UID", "PRICE,QUANTITY"]):
+              print("PUBLIC_HEADER_SCHEMA",firstline[:250])
+          if data[:1]==b"{":
+              try:
+                  obj=json.loads(data.decode("utf-8"))
+                  print("RESPONSE_JSON_KEYS",list(obj)[:16] if isinstance(obj,dict) else "list")
+              except (UnicodeError,ValueError): pass
+          if b"<html" in data[:500].lower() or b"<!doctype html" in data[:500].lower():
+              print("RESPONSE_LOOKS_LIKE_HTML")
+          PY
             exit 0
           fi
           python3 - <<'PY'
