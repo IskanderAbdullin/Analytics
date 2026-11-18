@@ -1,13 +1,14 @@
-# 11. Реализация и журнал проверки — v0.2
+# 11. Реализация и журнал проверки — v0.3
 
 Дата начала: 18.11.2026. Цель документа — отделить **реализовано**, **протестировано** и **планируется**. Здесь нет утверждений, что real T-Invest live sync прошёл.
 
 ## Что реализовано (M0 и часть M1/M2/M4)
 
 - `src/TInvestAnalytics.Cli/`: .NET 10 CLI, официальный T-Invest REST POST read-only allowlist. Токен только из env `TINVEST_TOKEN`, не сохраняется в Git или SQLite.
-- `doctor`, `accounts`, `sync` по выбранному счёту и диапазону, `import-json` для офлайн page, `report` с необязательным локальным `--asset-map`, `stats`.
+- `doctor`, `accounts`, `sync` по выбранному счёту и диапазону, `sync --refresh` для повторного сканирования и ревизий, `import-json` для офлайн page, `report` и `daily-report` с необязательным `--asset-map`, `stats`.
 - HTTP bounded retries for 429/408/502/503/504, conservative per-process pacing. Внешняя/межпроцессная координация квот ещё не реализована.
 - Immutable `raw_pages`, `operation_revisions`, latest `current_operations`, local `sync_windows` cursors/checkpoint, SQLite WAL; transactionally commit page+checkpoint. Semantically identical multiple ID records flagged but **not silently de-duplicated**.
+- `daily-report` сохраняет исторические FIFO lots до начала выбранного периода и позволяет `--exclude-days YYYY-MM-DD` (непрерывная доходность портфеля при исключении дней не подменяется суммой дневных прибылей).
 - Money precision via decimal (T-Invest units + nano), operation parser with optional fills, FIFO for explicitly classified stock/fund/currency; long/short/partial closure and reversal.
 - Cash classification for settled VM, fees, borrow/overnight, distributions, taxes, deposits, separate funding status. Market-to-market, futures tick value/clearing reconstruction, broker verification **NOT** implemented; reported subtotal isn't total equity performance.
 - Локальные исторические снимки `GetPortfolio` + `GetPositions` с полной сохранённой исходной парой ответов. Команды `snapshot`, `snapshots`, `equity-pnl`; изменение общей стоимости счёта между двумя сохранёнными оценками с учётом пополнений/выводов.
@@ -39,6 +40,7 @@ dotnet run --project src/TInvestAnalytics.Cli -- report --account YOUR_ACCOUNT_I
 dotnet run --project src/TInvestAnalytics.Cli -- snapshot --account-index 0
 dotnet run --project src/TInvestAnalytics.Cli -- snapshots --account YOUR_ACCOUNT_ID
 dotnet run --project src/TInvestAnalytics.Cli -- equity-pnl --account YOUR_ACCOUNT_ID --start-id 1 --end-id 2
+dotnet run --project src/TInvestAnalytics.Cli -- daily-report --account YOUR_ACCOUNT_ID --from 2026-11-09 --to 2026-11-16 --exclude-days 2026-11-14
 ```
 
 **Защита:** не коммитить токен или реальные raw operations. БД по умолчанию в `%LOCALAPPDATA%/TInvestAnalytics/analytics.db`. Не передавать брокерские данные в CI. Команда sync не должна использоваться на живом аккаунте до ручного проверки прав токена/лимитов; роботы и API могут делить квоты.

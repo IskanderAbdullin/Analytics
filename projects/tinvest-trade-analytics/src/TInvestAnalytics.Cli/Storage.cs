@@ -103,6 +103,19 @@ public sealed partial class EvidenceStore
             reader.GetInt64(1) == 1, reader.GetInt64(2), reader.GetInt64(3));
     }
 
+
+    /// <summary>Explicit re-read of a completed historical window; never deletes raw evidence.</summary>
+    public void RestartWindow(string accountId, DateTimeOffset from, DateTimeOffset to)
+    {
+        var id = WindowId(accountId, from, to);
+        using var c = Open();
+        using var q = Command(c, null, """
+            UPDATE sync_windows SET cursor_next=NULL,complete=0,pages=0,items=0,
+                updated_utc=$now WHERE window_id=$w
+            """, ("$now", DateTimeOffset.UtcNow.ToString("O")), ("$w", id));
+        q.ExecuteNonQuery();
+    }
+
     public int ImportPage(string accountId, DateTimeOffset from, DateTimeOffset to,
         string? cursorIn, string? cursorNext, bool hasNext, string pageJson)
     {

@@ -35,13 +35,15 @@ internal sealed class PositionLot
 public static class SecurityLotMatcher
 {
     public static IReadOnlyList<PnlComponent> Match(IReadOnlyList<BrokerOperation> operations,
-        IReadOnlyDictionary<string, string> instrumentTypes, List<string> warnings)
+        IReadOnlyDictionary<string, string> instrumentTypes, List<string> warnings,
+        DateTimeOffset reportStart, DateTimeOffset reportEnd)
     {
         // Not cross-account: a security subledger is keyed by account+instrument+currency.
         var pools = new Dictionary<(string Account, string Instrument, string Currency), Queue<PositionLot>>();
         var pnl = new Dictionary<(string Instrument, string Currency), decimal>();
         var matched = new Dictionary<(string Instrument, string Currency), int>();
-        foreach (var op in operations.OrderBy(x => x.DateUtc).ThenBy(x => x.ExternalId, StringComparer.Ordinal))
+        foreach (var op in operations.Where(x => x.DateUtc < reportEnd)
+            .OrderBy(x => x.DateUtc).ThenBy(x => x.ExternalId, StringComparer.Ordinal))
         {
             if (!op.IsTrade || !op.IsExecuted) continue;
             var key = op.InstrumentKey;
@@ -87,8 +89,11 @@ public static class SecurityLotMatcher
                     decimal realized = lot.Sign == 1
                         ? (fill.Price - lot.EntryPrice) * qty
                         : (lot.EntryPrice - fill.Price) * qty;
-                    pnl[reportKey] = pnl.GetValueOrDefault(reportKey) + realized;
-                    matched[reportKey] = matched.GetValueOrDefault(reportKey) + 1;
+                    if (op.DateUtc >= reportStart)
+                    {
+                        pnl[reportKey] = pnl.GetValueOrDefault(reportKey) + realized;
+                        matched[reportKey] = matched.GetValueOrDefault(reportKey) + 1;
+                    }
                     lot.Quantity -= qty;
                     remaining -= qty;
                     if (lot.Quantity == 0) open.Dequeue();
@@ -163,16 +168,17 @@ public static class PnlCalculator
         var warnings = new List<string>();
         var known = instrumentTypes ?? new Dictionary<string, string>();
         var components = new List<PnlComponent>();
-        var settled = operations.Where(x => x.IsExecuted).ToList();
+        var period = operations.Where(x => x.DateUtc >= from && x.DateUtc < to).ToList();
+        var settled = operations.Where(x => x.IsExecuted && x.DateUtc < to).ToList();
         // Don't auto-deduplicate colliding fingerprints: two same-time trades might be distinct.
-        var dup = settled.GroupBy(x => x.SemanticFingerprint).Where(g => g.Count() > 1).ToList();
+        var dup = period.Where(x => x.IsExecuted).GroupBy(x => x.SemanticFingerprint).Where(g => g.Count() > 1).ToList();
         foreach (var d in dup)
             warnings.Add("POSSIBLE_DUPLICATE_SEMANTIC_EVENT: " + d.Key[..12] +
                 " count=" + d.Count().ToString(CultureInfo.InvariantCulture));
-        components.AddRange(SecurityLotMatcher.Match(settled, known, warnings));
+        components.AddRange(SecurityLotMatcher.Match(settled, known, warnings, from, to));
         var aggregate = new Dictionary<(string Name, string Currency, string Scope), (decimal Amount, int Count)>();
         int unknown = 0;
-        foreach (var op in operations)
+        foreach (var op in period)
         {
             if (!op.IsExecuted)
             {
@@ -216,13 +222,13 @@ public static class PnlCalculator
             components.Add(new PnlComponent(kv.Key.Name, kv.Key.Currency, kv.Value.Amount,
                 kv.Key.Scope, kv.Key.Name is "EXTERNAL_FLOW_NOT_PNL" ? "observed" : "provisional",
                 kv.Value.Count));
-        if (known.Count == 0 && settled.Any(x => x.IsTrade))
+        if (known.Count == 0 && period.Any(x => x.IsTrade))
             warnings.Add("Instrument types not configured: no realized security P&L is asserted.");
         warnings.Add("This is a PARTIAL realized-and-settled report, not total equity P&L; " +
             "no current open-position valuation or independent broker reconciliation.");
         return new PnlReport(Mask(accountId), from, to, "partial",
             components.OrderBy(x => x.Currency).ThenBy(x => x.Name).ThenBy(x => x.Scope).ToList(),
-            warnings.Distinct().ToList(), operations.Count, unknown);
+            warnings.Distinct().ToList(), period.Count, unknown);
     }
 
     public static string Mask(string? account)

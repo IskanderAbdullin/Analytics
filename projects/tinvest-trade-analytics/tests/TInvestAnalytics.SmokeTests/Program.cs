@@ -116,6 +116,37 @@ Check("VM fees income vs tax/external deposits/funding", () =>
         "funding not double counted");
 });
 
+
+Check("FIFO carries prior inventory into a later reporting period", () =>
+{
+    var start = DateTimeOffset.Parse("2026-11-10T00:00:00Z", CultureInfo.InvariantCulture);
+    var prior = Op("BUY-OLD","OPERATION_TYPE_BUY",100,4,-400,dt:start.AddDays(-1));
+    var later = Op("SELL-TODAY","OPERATION_TYPE_SELL",125,4,500,dt:start.AddHours(12));
+    var report = PnlCalculator.Calculate("TEST",new[]{prior,later},securities,start,start.AddDays(1));
+    Equal(Sum(report,"SECURITY_REALIZED_GROSS"),100m,"prior purchase cost basis included");
+    Equal(report.SourceOperationCount,1,"only current-period operation count");
+});
+
+Check("noncontiguous daily aggregation excludes selected date", () =>
+{
+    var start=DateTimeOffset.Parse("2026-11-10T00:00:00Z", CultureInfo.InvariantCulture);
+    var ops=new[]{
+        Op("B1","OPERATION_TYPE_BUY",100,4,-400,dt:start.AddDays(-1)),
+        Op("S1","OPERATION_TYPE_SELL",125,4,500,dt:start.AddHours(12)),
+        Op("B2","OPERATION_TYPE_BUY",100,3,-300,dt:start.AddDays(1).AddHours(9)),
+        Op("S2","OPERATION_TYPE_SELL",110,3,330,dt:start.AddDays(1).AddHours(11))
+    };
+    var excluded=new HashSet<DateOnly>{new DateOnly(2026,11,11)};
+    var report=DailyReporting.Calculate("TEST",ops,securities,start,start.AddDays(2),excluded);
+    Equal(report.Days.Count,2,"two daily rows");
+    Equal(report.Days[0].Included,true,"first day included");
+    Equal(report.Days[1].Included,false,"second day excluded");
+    Equal(report.SelectedSubtotalByCurrency["RUB"],100m,"only first-day profit");
+    Equal(Sum(new PnlReport("TEST",start,start.AddDays(2),"partial",
+        report.Days[1].Components,Array.Empty<string>(),0,0),"SECURITY_REALIZED_GROSS"),
+        30m,"later day still independently computed");
+});
+
 Check("unknown instrument is not treated as an ordinary share", () =>
 {
     var x=PnlCalculator.Calculate("TEST",new[]{
@@ -154,6 +185,8 @@ Check("SQLite persistence, resume, idempotent import, revision", () =>
         Equal(s.Revisions,1L,"same op id and JSON no new revision");
         Equal(s.CurrentOperations,1L,"same id");
         Equal(store.GetCheckpoint("TEST",from,to).Complete,true,"window complete");
+        store.RestartWindow("TEST",from,to);
+        Equal(store.GetCheckpoint("TEST",from,to).Complete,false,"explicit refresh resets cursor but keeps raw evidence");
         Equal(store.LoadOperations("TEST",from,to).Count,1,"operation read");
 
         string p2="{\"items\":["+JsonOp("a","OPERATION_TYPE_BROKER_FEE",0,0,-2)+

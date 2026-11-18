@@ -52,6 +52,9 @@ public static class Program
                 case "report":
                     Report(args, store);
                     break;
+                case "daily-report":
+                    DailyReport(args, store);
+                    break;
                 case "snapshot":
                     await CaptureSnapshot(args, store);
                     break;
@@ -131,11 +134,11 @@ public static class Program
                 throw new ArgumentOutOfRangeException(nameof(idx), "Account index is out of range.");
             accountId = accounts[idx].Id;
         }
+        if (Flag(args, "--refresh")) store.RestartWindow(accountId, from, to);
         var checkpoint = store.GetCheckpoint(accountId, from, to);
         if (checkpoint.Complete)
         {
-            Console.WriteLine("Window previously completed. To re-read use a changed time window; " +
-                "future versions will implement rolling revisions.");
+            Console.WriteLine("Window previously completed. Use --refresh to compare revisions.");
             return;
         }
         string? cursor = checkpoint.Cursor;
@@ -212,6 +215,27 @@ public static class Program
         int n = store.ImportPage(account, from, to, null, null, false, json);
         Console.WriteLine($"Imported {n} raw observations. No broker authenticity verification.");
     }
+
+    private static void DailyReport(string[] args, EvidenceStore store)
+    {
+        var (from, to) = Period(args);
+        var account = Require(args, "--account");
+        var classes = new Dictionary<string, string>(StringComparer.Ordinal);
+        var classFile = Arg(args, "--asset-map");
+        if (classFile is not null)
+            foreach (var (uid, value) in JsonSerializer.Deserialize<Dictionary<string, string>>(
+                File.ReadAllText(classFile)) ?? new Dictionary<string, string>())
+                classes[uid] = value.ToLowerInvariant();
+        var excluded = new HashSet<DateOnly>();
+        var rawExclusion = Arg(args, "--exclude-days");
+        if (rawExclusion is not null)
+            foreach (var day in rawExclusion.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                excluded.Add(DateOnly.ParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture));
+        var ops = store.LoadOperations(account, DateTimeOffset.MinValue, to);
+        var report = DailyReporting.Calculate(account, ops, classes, from, to, excluded);
+        Console.WriteLine(JsonSerializer.Serialize(report, JsonOptions()));
+    }
+
     private static void Report(string[] args, EvidenceStore store)
     {
         var (from, to) = Period(args);
@@ -224,7 +248,8 @@ public static class Program
                 throw new FormatException("Empty asset type map.");
             classMap = map.ToDictionary(x => x.Key, x => x.Value.ToLowerInvariant(), StringComparer.Ordinal);
         }
-        var operations = store.LoadOperations(account, from, to);
+        // FIFO needs inventory established before the selected period; load all available history.
+        var operations = store.LoadOperations(account, DateTimeOffset.MinValue, to);
         var output = PnlCalculator.Calculate(account, operations, classMap, from, to);
         Console.WriteLine(JsonSerializer.Serialize(output, JsonOptions()));
     }
@@ -241,9 +266,10 @@ public static class Program
               doctor [--db PATH]
               accounts [--sandbox]
               sync --account-index 0 --from 2026-11-01 --to 2026-11-18 [--db PATH] [--sandbox]
-              sync --account ID --from ... --to ... [--db PATH]
+              sync --account ID --from ... --to ... [--db PATH] [--refresh]
               import-json --account TEST --file sample.json --from ... --to ...
               report --account ID --from ... --to ... [--asset-map class-map.json] [--db PATH]
+              daily-report --account ID --from ... --to ... [--exclude-days 2026-11-14] [--asset-map class-map.json]
               snapshot --account-index 0 [--db PATH] [--sandbox]
               snapshots --account ID [--db PATH]
               equity-pnl --account ID --start-id N --end-id N [--db PATH]
