@@ -46,7 +46,7 @@ Compared with the earlier 2026-11-03 MOEX developmental pilot (19,086 prints; 7 
 
 ### Next engineering versus research actions
 
-1. **Engineering:** replace arbitrary dense-window skips with bounded disjoint subwindows, while recording source coverage gaps and possible duplicate/split episodes. This changes the model's observational coverage; after changing it, previous counts are no longer directly comparable and the 2026-11-02 result cannot be reused as an untouched validation.
+1. **Engineering:** model version 0.2 introduces bounded disjoint event-count chunks for dense UTC windows. It replaces old version 0.1 skips but may split a single observable flow at a chunk boundary. The historical 2026-11-02 result is **no longer untouched validation** for any changes prompted by it; a repeated engineering comparison must be explicitly labelled diagnostic, not a new independent test.
 2. **Research:** develop nulls preserving real exchange round-second clock and clustered/Hawkes-type arrivals, rather than relying only on uniform/rotation controls.
 3. **Known-agent validation:** blind ABIDES/NASDAQ-like simulator truth to public prints, estimate recoverable patterns and false positives rather than physical bot count.
 4. **Release safety:** no confidence, automated alerts, trading signal, or physical owner/bot count until the full Stage 2 scientific gate passes.
