@@ -20,7 +20,9 @@ public sealed record ForecastCheck(
     string InstrumentUid = "",
     string TradeSource = "",
     string ReportedDirection = "",
-    string SessionId = ""
+    string SessionId = "",
+    string LastTrainingEvidenceUtc = "",
+    int TrainingMatchedCount = 0
 );
 
 public sealed record WalkForwardReport(
@@ -45,6 +47,8 @@ public static class WalkForward
             input.FileName, input.FileSha256, input.HasVerifiedFeedCoverage, input.RejectedRowTotal);
         var candidates = PeriodicDetector.Detect(trainingImport, config);
         var checks = new List<ForecastCheck>();
+        var trainingEvidenceById = training.GroupBy(t => t.EventId, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Max(t => t.ExchangeTimeUtc), StringComparer.Ordinal);
         var assignedFuture = new HashSet<string>(StringComparer.Ordinal);
         foreach (var pattern in candidates.Patterns)
         {
@@ -76,11 +80,16 @@ public static class WalkForward
                 .ThenBy(t => t.ArrivalSequence)
                 .FirstOrDefault();
             if (match is not null) assignedFuture.Add(match.EventId);
+            var lastEvidence = pattern.EvidenceEventIds.Select(id =>
+                trainingEvidenceById.TryGetValue(id, out var timestamp) ? timestamp :
+                    throw new InvalidDataException("Candidate evidence not present in historical training prefix.")).Max();
             checks.Add(new ForecastCheck(pattern.PatternId, cutoffUtc.ToString("O"),
                 target.ToString("O"), windowStart.ToString("O"), windowEnd.ToString("O"),
                 match?.EventId, match is not null, pattern.PeriodMilliseconds,
                 pattern.TypicalQuantityLots, pattern.InstrumentUid, pattern.TradeSource,
-                pattern.ReportedDirection, pattern.SessionId));
+                pattern.ReportedDirection, pattern.SessionId,
+                lastEvidence.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture),
+                pattern.MatchedCount));
         }
         return new WalkForwardReport("0.1-prospective-evaluation", cutoffUtc.ToString("O"),
             training.Count, future.Count, candidates.CandidatePatternCount,
