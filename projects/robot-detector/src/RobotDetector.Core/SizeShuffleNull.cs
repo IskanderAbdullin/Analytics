@@ -7,7 +7,8 @@ namespace RobotDetector.Core;
 /// This null is NOT calibrated significance or evidence of an actual owner.
 /// </summary>
 public sealed record SizeShuffleTrial(int Seed, int ShuffledTradeCount,
-    int NullCandidateEpisodes, int UniqueEvidencePrints);
+    int NullCandidateEpisodes, int UniqueEvidencePrints,
+    int ConservativelyLinkedGroupCount);
 
 public sealed record SizeShuffleReport(
     string SchemaVersion,
@@ -21,7 +22,9 @@ public sealed record SizeShuffleReport(
     double NullMaximumCandidateEpisodes,
     double? EmpiricalGlobalTailProbability,
     IReadOnlyList<SizeShuffleTrial> Trials,
-    IReadOnlyList<string> Limitations
+    IReadOnlyList<string> Limitations,
+    int OriginalConservativelyLinkedGroupCount,
+    double MeanNullConservativelyLinkedGroupCount
 );
 
 public static class SizeShuffleNull
@@ -38,6 +41,7 @@ public static class SizeShuffleNull
             throw new ArgumentException("For larger inputs, explicitly split by instrument/date.");
 
         var observed = PeriodicDetector.Detect(original, config);
+        int observedLinked = EpisodeFusion.Group(original, observed, config).ConservativelyLinkedGroupCount;
         var nullResults = new List<SizeShuffleTrial>();
         for (int trial = 0; trial < trials; trial++)
         {
@@ -46,8 +50,10 @@ public static class SizeShuffleNull
             var report = PeriodicDetector.Detect(shuffled.Tape, config);
             int count = report.Patterns.SelectMany(p => p.EvidenceEventIds)
                 .Distinct(StringComparer.Ordinal).Count();
+            int linkedCount = EpisodeFusion.Group(shuffled.Tape, report, config)
+                .ConservativelyLinkedGroupCount;
             nullResults.Add(new SizeShuffleTrial(effectiveSeed, shuffled.ChangedTradeCount,
-                report.CandidatePatternCount, count));
+                report.CandidatePatternCount, count, linkedCount));
         }
 
         double mean = nullResults.Average(x => x.NullCandidateEpisodes);
@@ -65,6 +71,7 @@ public static class SizeShuffleNull
             "EXPLORATORY_ONLY: this is a conditional size-label shuffle, not calibrated bot-detection significance.",
             "Preserves timestamps and the total size distribution of each local block, but not size autocorrelation or individual order splitting.",
             "The original pattern count and shuffled pattern counts are dependent on detector version, episode boundaries and configuration.",
+            "Conservatively linked episode groups remain unvalidated behavioural continuities, NOT the number of participants.",
             "A global candidate-count tail frequency does NOT estimate per-pattern false discovery rates, real number of bots, or investor identities.",
             "A small number of null trials has poor p-value resolution and should not be used as an investment signal.",
             "The source completeness, market session mapping, and direction semantics remain unverified unless independently established."
@@ -74,7 +81,8 @@ public static class SizeShuffleNull
         return new SizeShuffleReport("0.1-exploratory", "local_trade_quantity_shuffle",
             original.FileSha256, original.Trades.Count,
             observed.CandidatePatternCount, localWindowSeconds, trials,
-            mean, maximum, tail, nullResults, limitations);
+            mean, maximum, tail, nullResults, limitations,
+            observedLinked, nullResults.Average(x => x.ConservativelyLinkedGroupCount));
     }
 
     public static (TradeImportResult Tape, int ChangedTradeCount) Shuffle(
