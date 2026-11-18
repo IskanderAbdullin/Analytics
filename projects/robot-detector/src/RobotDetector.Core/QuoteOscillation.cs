@@ -12,7 +12,7 @@ public sealed record QuoteOscillationResult(
     int Observations, decimal AskCarry, decimal AskNetMove,
     decimal BidCarry, decimal BidNetMove, decimal AskNormalized,
     decimal BidNormalized, int AskReversals, int BidReversals,
-    string Classification, bool PhysicalBotCountKnown
+    string Classification, bool CoverageVerified, bool PhysicalBotCountKnown
 );
 public static class QuoteOscillation
 {
@@ -54,11 +54,10 @@ public static class QuoteOscillation
         decimal bidNet = Math.Abs(quotes[^1].Bid - quotes[0].Bid);
         decimal askNorm = askCarry / Math.Max(tick, askNet);
         decimal bidNorm = bidCarry / Math.Max(tick, bidNet);
-        string kind = !coverageVerified ? "observed_unverified_coverage" :
-            askReversals >= 2 && bidReversals >= 2 ? "both_quote_oscillation_observed" :
+        string kind = askReversals >= 2 && bidReversals >= 2 ? "both_quote_oscillation_observed" :
             askReversals >= 2 ? "ask_only_quote_oscillation_observed" :
             bidReversals >= 2 ? "bid_only_quote_oscillation_observed" : "no_repeated_reversal";
         return new QuoteOscillationResult(quotes.Count, askCarry, askNet, bidCarry, bidNet,
-            askNorm, bidNorm, askReversals, bidReversals, kind, false);
+            askNorm, bidNorm, askReversals, bidReversals, kind, coverageVerified, false);
     }
 }
