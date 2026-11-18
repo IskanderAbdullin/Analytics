@@ -34,4 +34,31 @@ The raw exchange tape is deleted from the CI runner and never committed or publi
 
 If fresh windows are too scarce, prefer longer independent development windows and known-agent synthetic ABIDES validation. A valid future release needs separate execution-plan clustering, stationarity tests, better control for common clock triggers, unseen instruments and reliability calibration.
 
-**Observed results:** intentionally not filled until GitHub Actions reports actual metrics.
+## Observed independent evaluation — 2026-11-18
+
+**Completed successfully** in [GitHub Actions run 44304617194](https://github.com/IskanderAbdullin/Analytics/actions/runs/44304617194). All CI steps passed, including the same frozen settings used for the unfiltered baseline, 42/42 offline tests and full cleanup of raw exchange files.
+
+| Metric | November 5 | November 6 | Combined |
+|---|---:|---:|---:|
+| Public trade prints | 92,943 | 91,275 | **184,218** |
+| Cutoffs per mode | 12 | 12 | 24 |
+| Unrestricted forecast windows | 105 | 62 | **167** |
+| Unrestricted exact hits | 3 | 1 | **4** |
+| Unrestricted T/2 placebo hits | 4 | 0 | **4** |
+| Age <= 2-cycle eligible forecasts | 2 | 0 | **2** |
+| Age-gated exact hits | 0 | 0 | **0** |
+| Age-gated T/2 placebo hits | 0 | 0 | **0** |
+| Release-level evidence of predictive value | No | No | **No** |
+
+Compressed archive SHA-256:
+- Nov 5: `eb4d66775ba7b29588196c70568ce18ed157aa76c9063d2f716c368adc29765c`
+- Nov 6: `34a72c1f93eb2e08037d7d3bd2c44eff9a2ba9f3fedd82eddf9c1cc703aff4f1`
+
+Age gate removes **165 of 167** proposed forecasts (98.8% fewer candidate opportunities). The two remaining eligible forecasts give **zero** observed hits. On November 6 no eligible future forecast remains, so `observedHitRate` and `placeboHitRate` are **null**, not zero performance estimates.
+
+**Decision: INSUFFICIENT_SAMPLE — NO FORECASTING EDGE DEMONSTRATED.** The development-derived recency condition successfully excludes stale historical evidence, but is too restrictive to produce a useful number of predictions in this untouched-date comparison. Unrestricted baseline again failed to exceed the simple placebo in aggregate (4 vs 4). We do not loosen `maxTrainingAgeCycles` using these two holdout dates: that would be selection on test outcomes.
+
+This does not disprove all algorithm detection. The fixed-q model does not represent variable child sizes, partial fills or execution-time drift. Follow-up work should be an **independently specified research-only variable-size periodic screen**, with synthetic controls and stronger time-dependent nulls before it is evaluated on new unseen dates or offered as a signal. The software retains the read-only, no-owner, no-trading restrictions.
+
+**Final status:** working diagnostic and age-gate code, verified on public files; predictive release gate remains **NOT PASSED**.
+
