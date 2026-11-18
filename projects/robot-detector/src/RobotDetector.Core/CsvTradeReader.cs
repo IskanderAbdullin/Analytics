@@ -23,11 +23,28 @@ public static class CsvTradeReader
         if (source.Length > 1_000_000_000)
             throw new InvalidDataException("Input exceeds 1 GB safety bound.");
 
+        // Public history endpoint may serve a GZip-compressed CSV even if the
+        // downloaded file has a .csv extension. Decide by magic bytes, never
+        // only by the extension or HTTP Content-Type.
+        Span<byte> magic = stackalloc byte[4];
+        int prefixBytes = source.Read(magic);
+        source.Position = 0;
+        bool gzip = prefixBytes >= 2 && magic[0] == 0x1f && magic[1] == 0x8b;
+        bool zip = prefixBytes >= 2 && magic[0] == 0x50 && magic[1] == 0x4b;
+        if (path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) && !zip)
+            throw new InvalidDataException("File extension .zip but file has no ZIP signature.");
+
         Stream data = source;
+        Stream? decoder = null;
         ZipArchive? archive = null;
         try
         {
-            if (path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            if (gzip)
+            {
+                decoder = new GZipStream(source, CompressionMode.Decompress, leaveOpen: true);
+                data = decoder;
+            }
+            else if (zip)
             {
                 archive = new ZipArchive(source, ZipArchiveMode.Read, leaveOpen: true);
                 var entries = archive.Entries.Where(e => e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -35,7 +52,8 @@ public static class CsvTradeReader
                     throw new InvalidDataException("Expected exactly one CSV entry in archive.");
                 if (entries[0].Length > 1_000_000_000)
                     throw new InvalidDataException("Uncompressed CSV exceeds 1 GB bound.");
-                data = entries[0].Open();
+                decoder = entries[0].Open();
+                data = decoder;
             }
             using var reader = new StreamReader(data, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
             var header = reader.ReadLine() ?? throw new InvalidDataException("Missing CSV header.");
@@ -129,6 +147,7 @@ public static class CsvTradeReader
         }
         finally
         {
+            decoder?.Dispose();
             archive?.Dispose();
         }
     }
