@@ -89,3 +89,25 @@
 Собрать fixed \`seeds.json\`, golden fixture и сценарий скрытой разметки; CI проводит быстрый subset, nightly/full benchmark — отдельно. В отчёт включать commit SHA, OS, runtime, CPU, источник данных, версии календарей, config hash, seed, exact train/test boundaries, число просканированных T/q/phi и число проведённых проверок. Повторение одной и той же команды должно давать идентичный результат.
 
 **Definition of Done:** все сценарии S00–S17 реализованы; отчёты и automated gates; независимая проверка на held-out; откалиброванные или явно \`null\` вероятности; отсутствуют завышенные claims; следующий этап разрешён только по итогам открытого scorecard.
+
+
+## 9. Дополнительная матрица научных контрпримеров (18.11.2026)
+
+Основание и исходники — [расширенный обзор](RESEARCH_EXPANSION_2026-11-18.md).
+
+| ID | Новый тест | Pass criterion |
+|---|---|---|
+| P1 | Общерыночные prints каждую 1 секунду без единого последовательного владельца | FFT может найти период; \`confirmed_pattern_count\` только при уникальном out-of-sample event assignment, не равен 1 по FFT |
+| P2 | Два независимых q/T/phase с несмежными наборами prints | Detected patterns отделены без повторного учёта принтов |
+| P3 | 100 prints в ±80мс целой секунды без стабильной фазы минуты | Фильтр Crypto Lake не производит ложное \`minute_twap confirmed\` |
+| P4 | Время округлено до секунды, истинный T=250ms | \`INSUFFICIENT_TIME_RESOLUTION\`, нельзя выдавать 250ms как проверенный |
+| P5 | FFT при \`bin_ms=500\`, T=400ms | \`NYQUIST_VIOLATION\` или честный alias warning |
+| P6 | FFT окно 256s, T=60s, недостаточно циклов | \`INSUFFICIENT_CYCLES\` до дополнительного окна, не подделывать confidence |
+| P7 | Hawkes-clustered backgrounds из [HFT Simulator](https://github.com/sohaibelkarmi/High-Frequency-Trading-Simulator) и [hawkes-order-flow](https://github.com/MaherHarp/hawkes-order-flow), matched Poisson baseline | Раздельные false alarm rates; clustered null обязательно сильнее/равен по требованиям, а не автоматически эквивалентен Poisson |
+| P8 | Одинаковая публичная лента для 1 vs 2 совпадающих синтетических «владельцев» | Система не может правильно угадать физическое число по одинаковым observations; показывать unidentifiable |
+| P9 | Поток с 1s/1min common-clock periodicity по [Muravyev](https://doi.org/10.1111/fima.12405) и [Chen et al.](https://doi.org/10.1111/jfir.12280) | Controlled FDR при обоих clocks, не только 1s |
+| P10 | Один refill между двумя невидимыми L2 updates, gap/resync | Нельзя утверждать true iceberg или calibrated probability |
+
+**Обязательный benchmark:** составить detection PR curve по каждого из \`B0 simple time filter\`, \`B1 fixed q/phase\`, \`B2 clock FFT+match\`, \`B3 Hawkes-adjusted\`; измерить на одинаковых synthetic truth и той же holdout sample. Сравнить event-rate per bin и \`notional\` из Rust. Не переносить заявленные внешними проектами AUC или 3-sigma thresholds на MOEX.
+
+**Дополнительно:** random shift test фаз относительно минут и секунд при сохранении сезонности; train/test split по инструменту/дню; отдельно оценивать качество Lee–Ready/tick-rule side inference, когда брокер не отдаёт authoritative aggressor sign. Для каждого conditional null публиковать чувствительность к временной точности, окну и ликвидности.
