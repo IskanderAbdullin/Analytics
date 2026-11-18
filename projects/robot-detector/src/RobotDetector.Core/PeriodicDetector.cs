@@ -20,7 +20,7 @@ public static class PeriodicDetector
             "NO_OWNER_IDENTIFIERS: physical bot count is unknown.",
             "COVERAGE_UNVERIFIED: gaps, auctions and missing prints can affect all estimates.",
             "DIRECTION_IS_PROVIDER_REPORTED: not necessarily the side of a passive limit order.",
-            "WINDOWED_EPISODES: candidates in different analysis windows can belong to one algorithm; count is not distinct owners."
+            "WINDOWED_EPISODES: candidates in different UTC/event-count windows can belong to one algorithm; count is not distinct owners."
         };
         if (imported.RejectedRowTotal > 0) warnings.Add("REJECTED_ROWS: see diagnostics; do not infer a complete feed.");
         if (imported.Trades.Count == 0) warnings.Add("EMPTY_INPUT: no events to analyse.");
@@ -53,19 +53,24 @@ public static class PeriodicDetector
                 if (list.Count < config.MinMatches) continue;
                 if (list.Count > config.MaximumEventsPerGroup)
                 {
-                    warnings.Add($"SKIPPED_DENSE_GROUP: uid={group.Key.InstrumentUid}, q={group.Key.QuantityLots}," +
+                    warnings.Add($"SPLIT_DENSE_GROUP: uid={group.Key.InstrumentUid}, q={group.Key.QuantityLots}," +
                                  $" side={group.Key.ReportedDirection}, utc_window={window.Key}," +
-                                 $" count={list.Count}; raise limit or shorten analysis window.");
-                    continue;
+                                 $" count={list.Count}; split into contiguous no-overlap event chunks.");
                 }
-                var candidates = GeneratePeriods(list, config);
-                foreach (int periodMs in candidates)
+                for (int offset = 0; offset < list.Count; offset += config.MaximumEventsPerGroup)
                 {
-                    int anchors = Math.Min(list.Count, config.AnchorLimit);
-                    for (int anchor = 0; anchor < anchors; anchor++)
+                    int chunkCount = Math.Min(config.MaximumEventsPerGroup, list.Count - offset);
+                    if (chunkCount < config.MinMatches) break;
+                    var chunk = list.GetRange(offset, chunkCount);
+                    var candidates = GeneratePeriods(chunk, config);
+                    foreach (int periodMs in candidates)
                     {
-                        var candidate = Evaluate(list, anchor, periodMs, config);
-                        if (candidate is not null) allCandidates.Add(candidate);
+                        int anchors = Math.Min(chunk.Count, config.AnchorLimit);
+                        for (int anchor = 0; anchor < anchors; anchor++)
+                        {
+                            var candidate = Evaluate(chunk, anchor, periodMs, config);
+                            if (candidate is not null) allCandidates.Add(candidate);
+                        }
                     }
                 }
             }

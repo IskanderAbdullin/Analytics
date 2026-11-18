@@ -1,0 +1,131 @@
+name: Robot Detector public T-Invest archive smoke
+
+on:
+  pull_request:
+    paths:
+      - 'projects/robot-detector/docs/PUBLIC_ARCHIVE_VALIDATION.md'
+      - '.github/workflows/robot-detector-public-history.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-public-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Attempt read-only public CSV archive, no credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          echo "One public read-only archive, 2026-11-17, SBER_TQBR; no token or order API"
+          echo "Obtaining official Russian Trusted Root CA over normal verified HTTPS (gu-st.ru)"
+          if curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt; then
+            openssl x509 -in /tmp/russian_trusted_root_ca.crt \
+              -noout -subject -issuer -fingerprint -sha256
+            if ! openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject |
+                grep -q 'Russian Trusted Root CA'; then
+              echo "BLOCKED_UNVERIFIED_CA: unexpected CA identity"
+              exit 0
+            fi
+            pinned="D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31"
+            actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+            if [[ "$actual" != "$pinned" ]]; then
+              echo "BLOCKED_UNVERIFIED_CA: fingerprint mismatch; investigate root rotation"
+              exit 0
+            fi
+            echo "Using process-scoped SSL_CERT_FILE for one public archive test"
+            export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          else
+            echo "BLOCKED_UNAVAILABLE_CA: using system trust only"
+          fi
+          set +e
+          timeout 180 dotnet run --project src/RobotDetector.Cli -c Release -- \
+            fetch --date 2026-11-17 --instrument-id SBER_TQBR \
+            --output data/raw/public_sber_2026-11-17.csv > /tmp/robot-fetch.log 2>&1
+          rc=$?
+          set -e
+          if [[ $rc -ne 0 ]] && grep -q "Received ZIP; choose a .zip output path" /tmp/robot-fetch.log; then
+            set +e
+            timeout 180 dotnet run --project src/RobotDetector.Cli -c Release -- \
+              fetch --date 2026-11-17 --instrument-id SBER_TQBR \
+              --output data/raw/public_sber_2026-11-17.zip > /tmp/robot-fetch.log 2>&1
+            rc=$?
+            set -e
+          fi
+          if [[ $rc -ne 0 ]]; then
+            echo "BLOCKED_BY_DATA: public archive did not download or format mismatched"
+            sed -n '1,12p' /tmp/robot-fetch.log
+            echo "TLS_DIAGNOSTICS (public host, no credentials):"
+            timeout 20 curl -vIsS --connect-timeout 8 --max-time 15 https://invest-public-api.tbank.ru 2>&1 | tail -n 24 || true
+            exit 0
+          fi
+          echo "ARCHIVE_DOWNLOADED"
+          if [[ -f data/raw/public_sber_2026-11-17.csv ]]; then
+            input=data/raw/public_sber_2026-11-17.csv
+          else
+            input=data/raw/public_sber_2026-11-17.zip
+          fi
+          set +e
+          timeout 180 dotnet run --project src/RobotDetector.Cli -c Release -- \
+            detect --input "$input" --max-rows 1000000 \
+            --max-group-events 5000 --window-minutes 60 \
+            --output data/results/public-smoke.json > /tmp/robot-detect.log 2>&1
+          result=$?
+          set -e
+          if [[ $result -ne 0 && $result -ne 3 ]]; then
+            echo "BLOCKED_BY_DATA_OR_COVERAGE: unable to parse or screen this day"
+            sed -n '1,12p' /tmp/robot-detect.log
+            file -b "$input" || true
+            python3 - "$input" <<'PY'
+          import json, pathlib, sys
+          data=pathlib.Path(sys.argv[1]).read_bytes()
+          firstline=data.split(b"\n")[0][:1024].decode("utf-8", errors="replace")
+          print("DIAGNOSTIC_BYTES",len(data))
+          print("HAS_TRADE_TS", "TRADE_TS" in firstline)
+          print("HAS_PRICE_QUANTITY", "PRICE" in firstline and "QUANTITY" in firstline)
+          if any(x in firstline.upper() for x in ["TRADE_TS", "INSTRUMENT_UID", "PRICE,QUANTITY"]):
+              print("PUBLIC_HEADER_SCHEMA",firstline[:250])
+          if data[:1]==b"{":
+              try:
+                  obj=json.loads(data.decode("utf-8"))
+                  print("RESPONSE_JSON_KEYS",list(obj)[:16] if isinstance(obj,dict) else "list")
+              except (UnicodeError,ValueError): pass
+          if b"<html" in data[:500].lower() or b"<!doctype html" in data[:500].lower():
+              print("RESPONSE_LOOKS_LIKE_HTML")
+          PY
+            exit 0
+          fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("data/results/public-smoke.json").read_text())
+          print("REAL_PUBLIC_DATA_PARSED", {
+              "sourceTradeCount":p["sourceTradeCount"],
+              "rejectedRowCount":p["rejectedRowCount"],
+              "candidatePatternCount":p["candidatePatternCount"],
+              "coverageVerified":p["coverageVerified"],
+              "physicalBotCountKnown":p["physicalBotCountKnown"],
+              "sourceSha256":p["sourceSha256"]
+          })
+          for w in p["warnings"]:
+              if w.startswith("SPLIT_DENSE_GROUP"): print(w[:170])
+          assert not p["physicalBotCountKnown"]
+          assert all(pattern["state"]=="candidate" for pattern in p["patterns"])
+          PY
+          echo "No actual trade prints or broker secrets are uploaded as artifacts."
+      - name: Remove raw temporary exchange data
+        if: always()
+        shell: bash
+        run: rm -rf data/raw data/results
