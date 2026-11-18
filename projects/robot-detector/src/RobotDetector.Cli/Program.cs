@@ -82,9 +82,9 @@ internal static class Program
             File.WriteAllText(rejects, JsonSerializer.Serialize(imported.RejectedRows, JsonOptions));
         }
 
-        Console.Error.WriteLine($"Trades={report.SourceTradeCount}; rejected_sample={report.RejectedRowCount};" +
+        Console.Error.WriteLine($"Trades={report.SourceTradeCount}; rejected_total={report.RejectedRowCount};" +
                                 $" candidates={report.CandidatePatternCount}; physical_bot_count=UNKNOWN");
-        return imported.RejectedRows.Count > 0 ? 3 : 0;
+        return imported.RejectedRowTotal > 0 ? 3 : 0;
     }
 
     private static async Task<int> FetchAsync(Dictionary<string, string> options)
