@@ -39,6 +39,8 @@ internal static class Program
                     return Walkforward(options);
                 case "spectrum":
                     return Spectrum(options);
+                case "null-shuffle":
+                    return NullShuffle(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -160,6 +162,33 @@ internal static class Program
 
 
 
+
+
+    private static int NullShuffle(Dictionary<string, string> options)
+    {
+        string input = Required(options, "input");
+        var imported = CsvTradeReader.Read(input);
+        var config = new DetectorConfig
+        {
+            MinMatches = Integer(options, "min-matches", 6),
+            AnalysisWindowMinutes = Integer(options, "window-minutes", 60),
+            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000)
+        };
+        var report = SizeShuffleNull.Compare(imported, config,
+            trials: Integer(options, "trials", 10),
+            seed: Integer(options, "seed", 42),
+            localWindowSeconds: Integer(options, "block-seconds", 60));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Uncalibrated negative-control report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine("WARNING: local size-shuffle is exploratory; tail frequency does not validate any individual robot.");
+        return 0;
+    }
 
     private static int Spectrum(Dictionary<string, string> options)
     {
@@ -301,6 +330,7 @@ internal static class Program
         Console.WriteLine("benchmark [--seeds 20] [--noise-trades 200] [--output synthetic_report.json]");
         Console.WriteLine("walkforward --input file.csv --cutoff YYYY-MM-DDTHH:MM:SSZ [--min-matches 4]");
         Console.WriteLine("spectrum --input file.csv [--bin-ms 500] [--top 8] [--output spectrum.json]");
+        Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
