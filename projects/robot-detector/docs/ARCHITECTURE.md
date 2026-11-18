@@ -163,3 +163,19 @@ Read-only по дизайну: никаких методов выставлен�
 ## 9. Границы этапов
 
 Этап 1 — только history/CLI; этап 2 — только научная проверка и quality gates; этап 3 — live/UI/API; этап 4 — L2/научная разработка. Изменения архитектуры оформлять ADR с аргументами и миграцией контрактов.
+
+
+## 10. Новые научно обоснованные компоненты (дополнение 18.11.2026)
+
+См. [подробный анализ с конкретными ссылками и кодом](RESEARCH_EXPANSION_2026-11-18.md).
+
+Предусмотреть **несколько независимых сигналов**, не меняющих базовый контракт \`PatternHypothesis\`:
+- \`ClockTimeBinner\`: формирует временную шкалу по **реальным UTC timestamps** и нулям только в известных здоровых рыночных интервалах; event count, lot volume, notional — разные ряды.
+- \`FftPeriodCandidateGenerator\`: detrend/Hann/FFT/PSD/top peaks, возвращает только \`period candidate\` и спектральную неопределённость; **не физическое число роботов**.
+- \`MinutePhaseBaseline\`: сравнивает \`timestamp modulo 60s\` и общий секундный ритм, демонстрирует пользу/ошибку тривиальных фильтров.
+- \`PhaseAndQuantityMatcher\`: event-level реконструкция разных q/T/phase с one-to-one matching; единственный модуль может продвинуть кандидата в confirmed после stage-2 validation.
+- \`NullMarketRhythmModel\`: естественная активность на границах секунды/минуты и Hawkes clustered control.
+- \`ChangePointComparator\` (этап 3/4): EWMA/CUSUM/BOCPD на честной истории, режимный сигнал **отдельно** от регистрации робота.
+- \`L2ReplenishmentDetector\` (этап 4): состояние bid/ask по цене с подтверждением сделок, инвалидация на gaps/resync.
+
+Зафиксировать \`bin_ms\`, \`window_s\`, \`effective_nyquist_hz\`, \`cycles_in_window\`, \`source_precision_ms\` в конфиге и результатах. Версии сторонних репозиториев указывать как provenance/референс, **не скрытые production dependencies**. Все optional-модули реализовать в собственном .NET core или отдельной research-утилите, без внесения Python в C# runtime.
