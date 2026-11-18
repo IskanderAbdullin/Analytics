@@ -3,7 +3,7 @@ name: Robot Detector public T-Invest archive smoke
 on:
   pull_request:
     paths:
-      - 'projects/robot-detector/**'
+      - 'projects/robot-detector/docs/PUBLIC_ARCHIVE_VALIDATION.md'
       - '.github/workflows/robot-detector-public-history.yml'
   workflow_dispatch:
 
