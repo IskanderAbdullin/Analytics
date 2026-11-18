@@ -1,0 +1,14 @@
+{
+  "description": "Research-only fixed-volume periodicity screen; provisional parameters requiring calibration",
+  "minMatches": 6,
+  "minCoverage": 0.55,
+  "minimumPeriodMilliseconds": 200,
+  "maximumPeriodMilliseconds": 600000,
+  "periodGridMilliseconds": 50,
+  "relativeTimeTolerance": 0.02,
+  "maximumTimeToleranceMilliseconds": 200,
+  "maximumEventsPerGroup": 5000,
+  "sourceCompleteness": "unverified",
+  "calibratedConfidence": null,
+  "brokerOrderPermissionsRequired": false
+}
