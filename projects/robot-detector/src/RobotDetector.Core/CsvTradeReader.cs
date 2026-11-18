@@ -125,7 +125,7 @@ public static class CsvTradeReader
             });
 
             // Archive completeness is not known from successful file parsing alone.
-            return new TradeImportResult(trades, badRows, Path.GetFileName(path), fileSha256, false);
+            return new TradeImportResult(trades, badRows, Path.GetFileName(path), fileSha256, false, badCount);
         }
         finally
         {
