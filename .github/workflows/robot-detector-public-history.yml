@@ -125,6 +125,32 @@ jobs:
           assert all(pattern["state"]=="candidate" for pattern in p["patterns"])
           PY
           echo "No actual trade prints or broker secrets are uploaded as artifacts."
+          echo "Running 4 local size-label shuffle negative controls (exploratory, not statistical calibration)"
+          set +e
+          timeout 240 dotnet run --project src/RobotDetector.Cli -c Release -- \
+            null-shuffle --input "$input" --trials 4 --seed 31415 \
+            --block-seconds 60 --output data/results/null-4.json > /tmp/null-shuffle.log 2>&1
+          null_rc=$?
+          set -e
+          if [[ $null_rc -ne 0 ]]; then
+            echo "NULL_CONTROL_BLOCKED, exit_code=$null_rc"
+            tail -n 8 /tmp/null-shuffle.log
+          else
+            python3 - <<'PY'
+          import json
+          p=json.load(open("data/results/null-4.json",encoding="utf-8"))
+          print("SIZE_SHUFFLE_NULL_RESULT", {
+              "originalPrints":p["originalPrintCount"],
+              "observedCandidateEpisodes":p["originalCandidateEpisodes"],
+              "nullCounts":[x["nullCandidateEpisodes"] for x in p["trials"]],
+              "shuffledEventCounts":[x["shuffledTradeCount"] for x in p["trials"]],
+              "meanNull":p["nullMeanCandidateEpisodes"],
+              "globalExploratoryTail":p["empiricalGlobalTailProbability"]
+          })
+          assert len(p["trials"])==4
+          assert p["originalPrintCount"]==121920
+          PY
+          fi
       - name: Remove raw temporary exchange data
         if: always()
         shell: bash
