@@ -30,13 +30,15 @@ public sealed record SizeShuffleReport(
 public static class SizeShuffleNull
 {
     public static SizeShuffleReport Compare(TradeImportResult original, DetectorConfig config,
-        int trials = 10, int seed = 42, int localWindowSeconds = 60)
+        int trials = 10, int seed = 42, int localWindowSeconds = 60,
+        string nullMode = "permute")
     {
         config.Validate();
         if (trials is < 1 or > 100)
             throw new ArgumentOutOfRangeException(nameof(trials), "Use 1..100 shuffles.");
         if (localWindowSeconds is < 1 or > 3600)
             throw new ArgumentOutOfRangeException(nameof(localWindowSeconds));
+        ValidateMode(nullMode);
         if (original.Trades.Count > 250_000)
             throw new ArgumentException("For larger inputs, explicitly split by instrument/date.");
 
@@ -46,7 +48,7 @@ public static class SizeShuffleNull
         for (int trial = 0; trial < trials; trial++)
         {
             int effectiveSeed = unchecked(seed + trial * 1009);
-            var shuffled = Shuffle(original, effectiveSeed, localWindowSeconds);
+            var shuffled = Shuffle(original, effectiveSeed, localWindowSeconds, nullMode);
             var report = PeriodicDetector.Detect(shuffled.Tape, config);
             int count = report.Patterns.SelectMany(p => p.EvidenceEventIds)
                 .Distinct(StringComparer.Ordinal).Count();
@@ -71,6 +73,7 @@ public static class SizeShuffleNull
             "EXPLORATORY_ONLY: this is a conditional size-label shuffle, not calibrated bot-detection significance.",
             "Preserves timestamps and the total size distribution of each local block, but not size autocorrelation or individual order splitting.",
             "The original pattern count and shuffled pattern counts are dependent on detector version, episode boundaries and configuration.",
+            "Permute breaks serial size runs; rotate largely preserves within-block sequence order but shifts clock alignment. Neither is a verified exchange process.",
             "Conservatively linked episode groups remain unvalidated behavioural continuities, NOT the number of participants.",
             "A global candidate-count tail frequency does NOT estimate per-pattern false discovery rates, real number of bots, or investor identities.",
             "A small number of null trials has poor p-value resolution and should not be used as an investment signal.",
@@ -78,7 +81,7 @@ public static class SizeShuffleNull
         };
         if (nullResults.Any(x => x.ShuffledTradeCount == 0))
             limitations.Add("UNINFORMATIVE_NULL: one or more shuffles moved no size labels; no tail estimate is produced.");
-        return new SizeShuffleReport("0.1-exploratory", "local_trade_quantity_shuffle",
+        return new SizeShuffleReport("0.2-exploratory", "local_trade_quantity_" + nullMode,
             original.FileSha256, original.Trades.Count,
             observed.CandidatePatternCount, localWindowSeconds, trials,
             mean, maximum, tail, nullResults, limitations,
@@ -86,8 +89,10 @@ public static class SizeShuffleNull
     }
 
     public static (TradeImportResult Tape, int ChangedTradeCount) Shuffle(
-        TradeImportResult original, int seed, int localWindowSeconds)
+        TradeImportResult original, int seed, int localWindowSeconds,
+        string nullMode = "permute")
     {
+        ValidateMode(nullMode);
         if (localWindowSeconds < 1) throw new ArgumentOutOfRangeException(nameof(localWindowSeconds));
         var random = new Random(seed);
         var events = original.Trades.ToArray();
@@ -109,10 +114,22 @@ public static class SizeShuffleNull
             var idx = g.Select(x => x.index).ToArray();
             if (idx.Length < 2) continue;
             var amounts = idx.Select(i => events[i].QuantityLots).ToArray();
-            for (int i = amounts.Length - 1; i > 0; i--)
+            if (nullMode == "rotate")
             {
-                int j = random.Next(i + 1);
-                (amounts[i], amounts[j]) = (amounts[j], amounts[i]);
+                // A non-zero circular shift preserves almost the entire run
+                // structure of the local quantity sequence, unlike permutation.
+                int shift = random.Next(1, amounts.Length);
+                var originalAmounts = amounts.ToArray();
+                for (int i = 0; i < amounts.Length; i++)
+                    amounts[i] = originalAmounts[(i + shift) % amounts.Length];
+            }
+            else
+            {
+                for (int i = amounts.Length - 1; i > 0; i--)
+                {
+                    int j = random.Next(i + 1);
+                    (amounts[i], amounts[j]) = (amounts[j], amounts[i]);
+                }
             }
             for (int i = 0; i < idx.Length; i++)
             {
@@ -127,4 +144,11 @@ public static class SizeShuffleNull
             original.HasVerifiedFeedCoverage, original.RejectedRowTotal);
         return (tape, changed);
     }
+
+    private static void ValidateMode(string mode)
+    {
+        if (mode != "permute" && mode != "rotate")
+            throw new ArgumentException("Null mode must be 'permute' or 'rotate'.", nameof(mode));
+    }
+
 }
