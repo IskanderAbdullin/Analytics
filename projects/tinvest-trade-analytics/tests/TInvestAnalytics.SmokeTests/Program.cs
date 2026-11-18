@@ -179,11 +179,11 @@ Check("read-only HTTP endpoint and schema contract", () =>
     using var client=new TInvestClient("SYNTHETIC_TOKEN",handler:handler);
     var a=client.GetAccountsAsync().GetAwaiter().GetResult();
     Equal(TInvestClient.ParseAccounts(a).Count,1,"accounts response");
-    Equal(handler.LastPath!.EndsWith("/UsersService/GetAccounts",StringComparison.Ordinal),
+    Equal(handler.LastPath!.EndsWith("UsersService/GetAccounts",StringComparison.Ordinal),
         true,"read-only accounts route");
     var page=client.GetOperationsPageAsync("TEST",from,to,null).GetAwaiter().GetResult();
     Equal(TInvestClient.ParsePageCursor(page).HasNext,false,"parsed page");
-    Equal(handler.LastPath!.EndsWith("/OperationsService/GetOperationsByCursor",StringComparison.Ordinal),
+    Equal(handler.LastPath!.EndsWith("OperationsService/GetOperationsByCursor",StringComparison.Ordinal),
         true,"read-only operations route");
     Equal(handler.AuthorizationScheme,"Bearer","authorization scheme");
 });
