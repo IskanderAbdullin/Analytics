@@ -42,7 +42,8 @@ public sealed record RollingForecastReport(
     bool Calibrated,
     bool ActualBotCountKnown,
     IReadOnlyList<RollingForecastObservation> Observations,
-    IReadOnlyList<string> Warnings
+    IReadOnlyList<string> Warnings,
+    int? MaximumTrainingAgeCycles = null
 );
 
 public static class RollingForecast
@@ -52,9 +53,12 @@ public static class RollingForecast
         DetectorConfig config,
         int warmupMinutes = 20,
         int strideMinutes = 15,
-        int maximumCutoffsPerSession = 24)
+        int maximumCutoffsPerSession = 24,
+        int? maximumTrainingAgeCycles = null)
     {
         config.Validate();
+        if (maximumTrainingAgeCycles is < 1 or > 1000)
+            throw new ArgumentException("Maximum training age must be 1..1000 cycles.");
         if (warmupMinutes is < 1 or > 1440 || strideMinutes is < 1 or > 1440 ||
             maximumCutoffsPerSession is < 1 or > 100)
             throw new ArgumentException("Invalid chronological replay settings.");
@@ -93,7 +97,7 @@ public static class RollingForecast
             {
                 totalCutoffs++;
                 cutoffsThisSession++;
-                var report = WalkForward.Evaluate(groupInput, cutoff, config);
+                var report = WalkForward.Evaluate(groupInput, cutoff, config, maximumTrainingAgeCycles);
                 foreach (var check in report.Checks)
                 {
                     var target = DateTimeOffset.Parse(check.PredictedTargetUtc,
@@ -155,7 +159,7 @@ public static class RollingForecast
         int hits = observations.Count(x => x.Hit);
         int placeboHits = observations.Count(x => x.PlaceboHit);
         return new RollingForecastReport(
-            "0.2-exploratory-chronological", source.FileSha256,
+            "0.3-exploratory-chronological", source.FileSha256,
             source.Trades.Count, sessionGroups, totalCutoffs,
             observations.Count, hits, placeboHits,
             observations.Count == 0 ? null : (double)hits / observations.Count,
@@ -168,7 +172,10 @@ public static class RollingForecast
                 "NO_OWNER_INFERENCE: a matching future print is not evidence of the same owner or bot.",
                 "SESSION_ISOLATED: instrument/source/mode/session groups never share evidence.",
                 "INCOMPLETE_FEED_CAVEAT: observed misses cannot prove an algo stopped when feed completeness is unknown.",
-                "MULTIPLE_TESTING_CAVEAT: numerous candidate periods/cutoffs can yield accidental matches; no calibrated confidence."
-            });
+                "MULTIPLE_TESTING_CAVEAT: numerous candidate periods/cutoffs can yield accidental matches; no calibrated confidence.",
+                maximumTrainingAgeCycles.HasValue
+                    ? "DEVELOPMENT_POLICY: historical-only recency gate applied, but not validated on independent instruments."
+                    : "UNRESTRICTED_BASELINE: includes old candidate streams without an age exclusion."
+            }, maximumTrainingAgeCycles);
     }
 }
