@@ -19,7 +19,7 @@ Date: 2026-11-18. Branch: `main`. Milestone: experimental `0.1`.
 
 ## Exact current validation status
 
-**GitHub Actions compilation and offline regression SUCCEEDED on 2026-11-18.** Confirmed run: https://github.com/IskanderAbdullin/Analytics/actions/runs/44276050349 — build of Core, CLI and SelfTests: success; 18/18 offline self-tests: success; CLI golden fixture: success; read-only order API sentinel: success. The separate existing IPO CI also succeeded in PR #2. The available local execution container itself lacks `dotnet`; GitHub hosted runner provided the verified build. This is **not** a live-market accuracy validation.
+**GitHub Actions compilation and offline regression SUCCEEDED on 2026-11-18.** Confirmed run: https://github.com/IskanderAbdullin/Analytics/actions/runs/44276050349 — build of Core, CLI and SelfTests: success; 32/32 offline self-tests: success; CLI golden fixture: success; read-only order API sentinel: success. The separate existing IPO CI also succeeded in PR #2. The available local execution container itself lacks `dotnet`; GitHub hosted runner provided the verified build. This is **not** a live-market accuracy validation.
 
 Real public T-Invest archive `SBER_TQBR` for `2026-11-17` was downloaded and parsed via an isolated GitHub Actions runner: **121,920 prints, zero invalid records**. The fixed-volume screen found **209 preliminary candidate episodes**, not 209 verified bots. Data SHA-256 `0af872b1c9c861e7af40a1c40e5bbdf565f9161dd997337c08da584c4dafc782`; log https://github.com/IskanderAbdullin/Analytics/actions/runs/44278450117 . The GZip format and TLS additional Russian Trusted Root CA were verified. Completeness, side semantics, and actual bot identity are still unknown. No live gRPC T-Invest stream connection has been tested or implemented.
 
@@ -46,7 +46,7 @@ Real public T-Invest archive `SBER_TQBR` for `2026-11-17` was downloaded and par
 
 ## Next tasks, in order
 
-1. **DONE (initial build):** GitHub Actions compiled all .NET projects and passed 18 self-tests. Continue adding CI as code grows.
+1. **DONE (initial build):** GitHub Actions compiled all .NET projects and passed 32 self-tests. Continue adding CI as code grows.
 2. **DONE (data parsing only):** verified one real T-Invest SBER archive, file hash, 121,920 prints, 0 rejected; actual bot detection quality and coverage remain unverified.
 3. Add sliding windows, phase harmonics/dedup, session-aware calendar, and single-source attribution tests.
 4. Add null controls, walk-forward scoring across days, ABIDES realistic truth and blind calibration.
@@ -63,3 +63,13 @@ Official stream API: https://developer.tbank.ru/invest/api/market-data-stream-se
 ## Real-data verification log
 
 See [PUBLIC_ARCHIVE_VALIDATION.md](PUBLIC_ARCHIVE_VALIDATION.md) for exact GitHub Actions evidence, GZip detection, pinned CA and one-day SBER result (209 *candidate episodes*). No market data or credentials were checked into Git. Current read-only code does not access private trading accounts. The single-day result is **not a statistically validated number of bots**.
+
+## Stage 2 evidence and live-release gate — updated 2026-11-18
+
+- Dual-null real-data experiment for SBER 16/17 November: 265,849 prints, 126/209 candidate episodes, 120/206 conservatively linked groups. Full conditional-size permutation and circular-shift nulls (12 each per day) returned smaller aggregate counts; their minimum possible Monte Carlo global tail estimate is 0.0769 per null/date and cannot confirm actual bots. Evidence: [MULTIDAY_NULL_PROTOCOL.md](MULTIDAY_NULL_PROTOCOL.md).
+- **32/32 self-tests passed** on the rolling-forecast branch, plus CLI goldens and independent original IPO CI. [CI run 44297948977](https://github.com/IskanderAbdullin/Analytics/actions/runs/44297948977).
+- Frozen chronological forecast evaluation on **unseen Nov 12/13**: 245,727 public prints, 983 forward-only target windows, **14 hits versus 14 at the T/2-shifted placebo**, both 1.424%. Detailed [ROLLING_REAL_PILOT.md](ROLLING_REAL_PILOT.md), [CI run 44298537864](https://github.com/IskanderAbdullin/Analytics/actions/runs/44298537864).
+- **Stage 2 forecasting gate NOT PASSED:** no observed predictive edge with current fixed-volume screen under this test; do not promote candidates to `confirmed`, do not assign owner identities and do not use as automated trading signals. Source feed completeness and session calendars also remain unverified.
+- Core module `RollingForecast.cs` and CLI command `rolling-forecast` remain read-only research interfaces. They never execute trades.
+- Next work: diagnose phase drift/size changes and common market-clock artifacts on a *separate development set*, calibrate stronger nulls/ABIDES-truth, then evaluate untouched instruments/dates before considering live alerts.
+
