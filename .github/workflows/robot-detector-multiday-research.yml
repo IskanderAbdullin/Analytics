@@ -1,0 +1,116 @@
+name: Robot Detector Stage 2 multi-day research
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/robot-detector-multiday-research.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sber-two-day-observational-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build and run offline checks before any public downloads
+        run: |
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
+          dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
+      - name: Compare two public historical sessions with two null families
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          echo "Read-only scientific pilot: SBER_TQBR 2026-11-16 and 2026-11-17, no broker token"
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt
+          openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject |
+            grep -q 'Russian Trusted Root CA'
+          pinned='D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31'
+          actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+          if [[ "$actual" != "$pinned" ]]; then
+            echo "BLOCKED_UNVERIFIED_CA: pinned CA fingerprint differs; no TLS bypass"
+            exit 1
+          fi
+          export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          for day in 2026-11-16 2026-11-17; do
+            raw="data/raw/sber_${day}.csv"
+            echo "FETCHING_PUBLIC_DAY ${day}"
+            if ! dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              fetch --date "$day" --instrument-id SBER_TQBR --output "$raw" \
+              > /tmp/rd-fetch.log 2>&1; then
+              echo "BLOCKED_BY_DATA: ${day} public archive unavailable"
+              sed -n '1,8p' /tmp/rd-fetch.log
+              exit 1
+            fi
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              detect --input "$raw" --output "data/results/detect_${day}.json" \
+              --window-minutes 60 --max-group-events 5000
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              fusion --input "$raw" --output "data/results/fusion_${day}.json" \
+              --max-gap-cycles 12 --window-minutes 60 --max-group-events 5000
+            for mode in permute rotate; do
+              dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+                null-shuffle --input "$raw" \
+                --trials 12 --seed 9001 --block-seconds 60 --mode "$mode" \
+                --output "data/results/null_${mode}_${day}.json"
+            done
+            DAY="$day" python3 - <<'PY'
+          import json,os,pathlib
+          day=os.environ["DAY"]
+          base=pathlib.Path("data/results")
+          detection=json.loads((base/f"detect_{day}.json").read_text())
+          fusion=json.loads((base/f"fusion_{day}.json").read_text())
+          nulls={}
+          for mode in ("permute","rotate"):
+              result=json.loads((base/f"null_{mode}_{day}.json").read_text())
+              assert result["originalPrintCount"] == detection["sourceTradeCount"]
+              assert result["originalCandidateEpisodes"] == detection["candidatePatternCount"]
+              assert result["originalConservativelyLinkedGroupCount"] == fusion["conservativelyLinkedGroupCount"]
+              assert len(result["trials"]) == 12
+              nulls[mode]={
+                "episodeCounts":[r["nullCandidateEpisodes"] for r in result["trials"]],
+                "groupCounts":[r["conservativelyLinkedGroupCount"] for r in result["trials"]],
+                "meanEpisodes":result["nullMeanCandidateEpisodes"],
+                "meanGroups":result["meanNullConservativelyLinkedGroupCount"],
+                "allChangedSizes":all(r["shuffledTradeCount"]>0 for r in result["trials"]),
+                "globalEpisodeTailDescriptive":result["empiricalGlobalTailProbability"]
+              }
+          assert detection["sourceTradeCount"]>0
+          assert detection["rejectedRowCount"]==0
+          assert detection["physicalBotCountKnown"] is False
+          assert fusion["actualBotCountKnown"] is False
+          assert fusion["candidateEpisodeCount"] == detection["candidatePatternCount"]
+          assert fusion["conservativelyLinkedGroupCount"] <= fusion["candidateEpisodeCount"]
+          assert fusion["uniqueAttributedPrintCount"] <= detection["sourceTradeCount"]
+          assert all(p["state"]=="candidate" for p in detection["patterns"])
+          print("STAGE2_DAY_OBSERVED",json.dumps({
+            "day":day,"tradeCount":detection["sourceTradeCount"],
+            "archiveSha256":detection["sourceSha256"],
+            "candidateEpisodes":detection["candidatePatternCount"],
+            "conservativelyLinkedGroups":fusion["conservativelyLinkedGroupCount"],
+            "linkedEpisodeCount":fusion["linkedEpisodeCount"],
+            "uniqueAttributedPrints":fusion["uniqueAttributedPrintCount"],
+            "coverageVerified":detection["coverageVerified"],
+            "actualBotCountKnown":False,"nulls":nulls
+          },ensure_ascii=False))
+          PY
+          done
+          echo 'STAGE2_PILOT_FINISHED: descriptive comparisons only, no statistical validation of bots'
+      - name: Remove downloaded raw exchange data and temporary CA
+        if: always()
+        shell: bash
+        run: |
+          rm -rf data/raw data/results
+          rm -f /tmp/russian_trusted_root_ca.crt /tmp/rd-fetch.log
