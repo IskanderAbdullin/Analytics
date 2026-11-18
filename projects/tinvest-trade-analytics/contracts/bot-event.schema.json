@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tinvestanalytics:bot-event:v1",
+  "title": "TInvestAnalytics robot telemetry event v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "event_id",
+    "kind",
+    "observed_utc",
+    "bot_id",
+    "bot_version",
+    "run_id",
+    "account_ref",
+    "instrument_uid"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bot-event/v1"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "run_start",
+        "run_stop",
+        "heartbeat",
+        "market_observation",
+        "strategy_decision",
+        "order_submit",
+        "order_ack",
+        "order_modify_requested",
+        "order_cancel_requested",
+        "order_cancel_ack",
+        "partial_fill",
+        "full_fill",
+        "order_reject",
+        "order_expired",
+        "position_update",
+        "risk_limit",
+        "error"
+      ]
+    },
+    "observed_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "exchange_event_utc": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "monotonic_ns": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "bot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bot_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "strategy_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "account_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instrument_uid": {
+      "type": "string",
+      "minLength": 1
+    },
+    "client_order_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "broker_order_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decision_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "side": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "BUY",
+        "SELL",
+        null
+      ]
+    },
+    "qty_units": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "limit_price": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fill_price": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "position_qty": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "target_level": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "paper",
+        "live",
+        "backtest",
+        null
+      ]
+    },
+    "config_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reason_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "market_data_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "correlation_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dropped_event_count": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "order_submit"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "client_order_id",
+          "side",
+          "qty_units",
+          "limit_price"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "partial_fill",
+              "full_fill"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "side",
+          "qty_units",
+          "fill_price"
+        ]
+      }
+    }
+  ]
+}

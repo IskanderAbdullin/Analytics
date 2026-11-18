@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tinvestanalytics:pnl-report:v1",
+  "title": "TInvestAnalytics explainable PnL report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "calculation_run_id",
+    "policy_hash",
+    "data_snapshot_id",
+    "period_from_utc",
+    "period_to_utc",
+    "base_currency",
+    "day_basis",
+    "quality_status",
+    "components",
+    "coverage"
+  ],
+  "properties": {
+    "schema": {
+      "const": "pnl-report/v1"
+    },
+    "calculation_run_id": {
+      "type": "string"
+    },
+    "policy_hash": {
+      "type": "string"
+    },
+    "data_snapshot_id": {
+      "type": "string"
+    },
+    "period_from_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "period_to_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "as_of_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "base_currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "day_basis": {
+      "type": "string",
+      "enum": [
+        "UTC_CALENDAR",
+        "MOSCOW_CALENDAR",
+        "EXCHANGE_SESSION",
+        "CLEARING_DAY"
+      ]
+    },
+    "metric_definition_id": {
+      "type": "string"
+    },
+    "quality_status": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "reconciled",
+        "provisional",
+        "partial",
+        "unreconciled",
+        "unsupported"
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "operations",
+        "market_marks",
+        "attribution"
+      ],
+      "additionalProperties": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "currency",
+          "amount",
+          "quality_status"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+          },
+          "quality_status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "reconciled",
+              "provisional",
+              "partial",
+              "unreconciled",
+              "unsupported"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
