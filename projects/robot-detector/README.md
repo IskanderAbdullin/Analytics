@@ -22,6 +22,9 @@ dotnet run --project src/RobotDetector.Cli -- benchmark --seeds 20 --noise-trade
 
 # Проверка одного прогноза на будущих событиях, не использованных при поиске
 dotnet run --project src/RobotDetector.Cli -- walkforward --input fixtures/synthetic_twap_5s.csv --cutoff 2026-11-18T07:00:20.020Z --min-matches 4
+
+# Второй независимый алгоритм — частотные кандидаты (FFT по UTC)
+dotnet run --project src/RobotDetector.Cli -- spectrum --input fixtures/synthetic_twap_5s.csv --bin-ms 500
 ```
 
 Чтобы скачать **публичный архив** с реальными обезличенными сделками, сначала проверьте нужный UID/тикер с кодом режима и день в официальном [T-Invest archive browser](https://developer.tbank.ru/invest/services/history-md/head-history-md). Команда скачивает **ровно один** файл, не запрашивает токен и не выставляет заявок:
@@ -32,9 +35,9 @@ dotnet run --project src/RobotDetector.Cli -- fetch --date 2026-11-17 --instrume
 
 Укажите реальную дату/инструмент с доступным архивом. Если сервер отдал CSV вместо ZIP, повторите с именем `.csv` (не переименовывайте ZIP в CSV). Запись идёт в новую папку `data/raw/`, которая игнорируется Git. Ограничение провайдера: **не более 30 файлов в минуту с IP**; не запускайте массовые параллельные загрузки. Данные могут быть неполны/недоступны. Одна скачанная история не доказывает полноту потока и может не раскрывать сторону пассивной заявки.
 
-**Семантика первых результатов:** поле `candidatePatternCount` — количество *кандидатов на различимые повторяющиеся потоки* в наблюдениях; `physicalBotCountKnown=false`, `confidenceCalibrated=null` и `state=candidate` должны сохраняться, пока нет проверенной калибровки. На высокочастотных инструментах начальный прототип может пропускать плотные группы вместо неконтролируемой обработки; предупреждение `SKIPPED_DENSE_GROUP` обязательно учитывать.
+**Семантика первых результатов:** поле `candidatePatternCount` — количество *кандидатов на различимые повторяющиеся потоки* в наблюдениях; `physicalBotCountKnown=false`, `confidenceCalibrated=null` и `state=candidate` должны сохраняться, пока нет проверенной калибровки. Анализ выполняется независимо в часовых UTC-окнах (параметр `--window-minutes`), поэтому один и тот же алгоритм в двух окнах может учитываться дважды как *эпизод*, а не как уникальная программа. Слишком плотные отдельные окна пропускаются с `SKIPPED_DENSE_GROUP`; это нужно учитывать.
 
-См. [текущий статус реализации и ограничения](docs/IMPLEMENTATION_STATUS.md). GitHub Actions workflow [robot-detector-ci.yml](../../.github/workflows/robot-detector-ci.yml) компилирует и запускает синтетические регрессии без токенов брокера. **Наличие workflow не означает, что конкретный запуск уже завершился успешно.**
+См. [текущий статус реализации и ограничения](docs/IMPLEMENTATION_STATUS.md). GitHub Actions workflow [robot-detector-ci.yml](../../.github/workflows/robot-detector-ci.yml) компилирует и запускает синтетические регрессии без токенов брокера. **Первый отдельный прогон подтверждён:** [GitHub Actions 44276050349](https://github.com/IskanderAbdullin/Analytics/actions/runs/44276050349) — сборка 3/3, SelfTests 16/16, CLI smoke успешны. Это офлайн-тестирование, не проверка качества на реальных торгах.
 
 ## Назначение
 
