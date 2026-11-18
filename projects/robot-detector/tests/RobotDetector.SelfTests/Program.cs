@@ -28,6 +28,7 @@ internal static class Program
         Check("missing coverage is not proof", MissingCoverage);
         Check("config rejects impossible thresholds", BadConfig);
         Check("synthetic benchmark reproducible with hidden truth", BenchmarkReproducible);
+        Check("walk-forward prediction never reads its future", WalkForwardPrediction);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -208,6 +209,19 @@ internal static class Program
         Assert(a.Trials.All(x => !x.PhysicalCountInferred), "must not infer real identities");
         Assert(a.Trials.Where(x => x.TrueGeneratorCount == 1).All(x => x.TotalInjectedEvents == 12),
             "internal ground truth count");
+    }
+
+
+    private static void WalkForwardPrediction()
+    {
+        var file = CsvTradeReader.Read(Fixture("synthetic_twap_5s.csv"));
+        var cutoff = new DateTimeOffset(2026, 11, 18, 7, 0, 20, TimeSpan.Zero)
+            .AddMilliseconds(20);
+        var report = WalkForward.Evaluate(file, cutoff, new DetectorConfig { MinMatches = 4 });
+        Assert(report.TrainingPrints == 5 && report.FuturePrints == 2, "time split");
+        Assert(report.ForecastsIssued == 1 && report.Hits == 1, "25s event should confirm prediction");
+        Assert(report.Checks.Single().FutureMatchedEventId == "SYN006", "future event id");
+        Assert(!report.Calibrated && !report.CoverageVerified, "not a probability claim");
     }
 
     private static void BadConfig()
