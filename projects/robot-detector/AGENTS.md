@@ -1,10 +1,10 @@
 # Agent engineering contract — Market Robot Detector
 
-Этот файл относится **только** к \`projects/robot-detector/\`. Проект независим от IPO Analytics.
+Этот файл относится **только** к `projects/robot-detector/`. Проект независим от IPO Analytics.
 
 ## Строгие ограничения
 
-1. НЕ менять \`src/ipo_forecast/\`, существующие Python модели/CLI IPO, \`pyproject.toml\` корневого IPO проекта и текущие источники данных IPO, если отдельного явного запроса нет.
+1. НЕ менять `src/ipo_forecast/`, существующие Python модели/CLI IPO, `pyproject.toml` корневого IPO проекта и текущие источники данных IPO, если отдельного явного запроса нет.
 2. НЕ внедрять торговую функциональность. Работать только с обезличенными публичными рыночными данными, read-only потоками, локальным replay и экспортом аналитики. Не запрашивать доступ к счетам, портфелю или заявкам.
 3. НЕ выводить «N настоящих роботов/владельцев»: только различимые алгоритмические паттерны с неопределённостью и исследовательским объяснением. Не приписывать стороне пассивной заявки направление потока без проверки семантики провайдера.
 4. НЕ помещать в коммиты токены, сырые рыночные архивы с сомнительной лицензией, реальные торговые персональные данные. В .gitignore проекта исключить data/raw, data/normalized, data/results, .env, traces и build artifacts.
@@ -30,4 +30,10 @@
 3. Stage 3: robust T-Invest stream, UI, API and optional OsEngine adapter.
 4. Stage 4: variable TWAP, book heuristics, model comparison, metaorder experiments.
 
-Если source capability недоказана, помечать \`BLOCKED_BY_DATA\`, описывать альтернативы и продолжать независимые synthetic tests; не объявлять работу завершённой без проверок.
+Если source capability недоказана, помечать `BLOCKED_BY_DATA`, описывать альтернативы и продолжать независимые synthetic tests; не объявлять работу завершённой без проверок.
+
+## Новые обязательные проверки перед реализацией (18.11.2026)
+
+Прочитать [Research Part 2](docs/RESEARCH_EXPANSION_2026-11-18_PART2.md) перед сравнением TWAP/VWAP/POV или L2. На stage 2 сделать отдельную blinded ABIDES-NG проверку с internal truth и T-Invest-like public projection. Нельзя обучать или настраивать детектор на privileged agent ID и затем объявлять out-of-sample качество. При разработке `QuoteOscillationDetector` исключать заявления об идентификации владельца/манипуляции по одной котировочной осцилляции.
+
+В любых release notes отдельно показывать: `source_observation`, `hypothesis`, `validated_pattern`, `physical_owner_count_unknown`. Отсутствие данных или пропуск book updates — блокер для подтверждения, а не отсутствие активности.
