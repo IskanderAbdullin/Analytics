@@ -89,3 +89,24 @@ t(s)     q(lots)     side
 ## F. Порядок работ / коммиты
 
 \`01-schema-and-fixtures\` → \`02-tinvest-history-adapter\` → \`03-normalization-and-quality\` → \`04-period-candidates\` → \`05-phase-matching-dedup\` → \`06-cli-reports\` → \`07-integration-smoke-and-benchmark\`. После каждого коммита — тест и отчёт о SHA.
+
+
+## G. Дополнительные требования по реальным open-source реализациям (18.11.2026)
+
+**Первичные исходники:** [Crypto Lake notebook](https://github.com/crypto-lake/analysis-sharing/blob/main/twap_detection.ipynb) и [binance_l3_est TWAP Rust](https://github.com/OctopusTakopi/binance_l3_est/blob/main/src/engine/twap.rs). Подробный разбор в [дополнительном исследовании](RESEARCH_EXPANSION_2026-11-18.md).
+
+G1. Два раздельных экспериментальных baseline:
+- \`B0 MinuteBoundary\`: селектор близости к границе целой секунды \`[-50,+80]ms\` по примеру Crypto Lake, **но сам по себе не объявляет минутный TWAP**. Обязательный дополнительный тест на \`t modulo 60s\` и сравнение с такой же фоновой активностью рынка.
+- \`B2 FFT\`: \`ClockTimeBinner\` строит равномерную ось UTC; \`sum(count)\`, \`sum(quantity_lots)\`, \`sum(notional)\` независимо; линейный detrend, Hann, FFT, one-sided PSD, периоды \`T=1/f\`, кандидаты top N по threshold и последующий stage-1 event-level matching по фазе/q. Кол-во peak frequencies **не** равно числу алгоритмов.
+
+G2. Проверенные параметры другого проекта \`bin_ms=500\`, \`window_bins=512\`, \`threshold_sigma=3\` — только контрольный benchmark, не настройки по умолчанию для нашей среды. Тесты \`bin_ms\` в {100,250,500,1000}, окна 5–60 минут, дополнительное окно для T>=60s. \`cycles_in_window\` и \`nyquist_ok\` выводить явно: \`f_Nyquist=1/(2*bin_seconds)\`. Если T неразрешим, не выдавать гипотезу.
+
+G3. Не повторять возможную ошибку notebook: \`signal.periodogram(trades.quantity,fs=1e6)\` на **нерегулярных событиях** без временного бининга даёт частоты по номеру события, не физическому времени. Написать unit/property тест: при независимом изменении плотности фоновых prints, но одинаковой UTC периодичности целевого алгоритма, оценка T остаётся устойчивой на допустимой нагрузке; при \`fs\` ошибочно принятой за частоту поступления сделок — тест должен падать.
+
+G4. Каждому спектральному кандидату записать \`feature_type=count|lots|notional\`, \`bin_ms\`, \`window_s\`, \`candidate_T\`, \`peak_power\`, \`phase_match_score\`, \`number_of_cycles\`, \`null_baseline_version\`, \`holdout_status\`. Калибровка вероятности — только этап 2.
+
+G5. Synthetic test: каждая секунда занята разными участниками, но только один \`T=60s,phase=5s,q=100\` во всём потоке; \`B0\` поднимает фоновый кандидат, \`B2\` находит период, \`PhaseAndQuantityMatcher\` выделяет q=100 в 6+ последовательных минутных циклах, не принимая все секундные trades.
+
+G6. Отдельные типы ошибки \`INSUFFICIENT_CYCLES\`, \`NYQUIST_VIOLATION\`, \`BAD_TIME_PRECISION\`, \`MARKET_WIDE_PHASE\`, \`NO_UNIQUE_EVENT_ATTRIBUTION\`. Не маскировать «нет доказуемого алгоритма» под «нет роботов».
+
+G7. **Acceptance supplement:** deterministic comparison \`B0\` vs \`B1 fixed-q\` vs \`B2 FFT-candidates\`; performance/precision на одной synthetic fixture, обязательный контроль круглой секунды/минуты. В каждой релизной заметке указать, почему portable алгоритм отличается от описанного Rust и notebook, и почему нельзя заявить count.
