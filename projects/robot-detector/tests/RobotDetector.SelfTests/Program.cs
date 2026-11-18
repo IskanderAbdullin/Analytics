@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Globalization;
 using System.Text;
 using RobotDetector.Core;
@@ -24,6 +25,8 @@ internal static class Program
         Check("dense groups refuse silent downsampling", DenseGroup);
         Check("bounded windows prevent cross-hour evidence reuse", BoundedWindows);
         Check("strict parser quarantines invalid row", InvalidRow);
+        Check("gzip archive auto-detected even with .csv extension", GzipCsv);
+        Check("single-entry ZIP archive correctly parsed", ZipCsv);
         Check("source hash and ordered reading are repeatable", Determinism);
         Check("quote oscillation observable without any trades", QuoteWithoutTrades);
         Check("missing coverage is not proof", MissingCoverage);
@@ -251,6 +254,43 @@ internal static class Program
             "event attribution must be disjoint");
         Assert(report.Warnings.Any(x => x.StartsWith("WINDOWED_EPISODES")),
             "must not confuse episodes with distinct physical bots");
+    }
+
+
+    private static void GzipCsv()
+    {
+        string temp = Path.Combine(Path.GetTempPath(), "rd-gzip-" + Guid.NewGuid() + ".csv");
+        try
+        {
+            using (var file = File.Create(temp))
+            using (var gzip = new GZipStream(file, CompressionMode.Compress))
+            {
+                byte[] bytes = File.ReadAllBytes(Fixture("synthetic_twap_5s.csv"));
+                gzip.Write(bytes);
+            }
+            var result = CsvTradeReader.Read(temp);
+            Assert(result.Trades.Count == 7, "gzip stream should decompress into 7 prints");
+            Assert(result.RejectedRowTotal == 0, "valid gzip should not be quarantined");
+        }
+        finally { File.Delete(temp); }
+    }
+
+    private static void ZipCsv()
+    {
+        string temp = Path.Combine(Path.GetTempPath(), "rd-zip-" + Guid.NewGuid() + ".zip");
+        try
+        {
+            using (var file = File.Create(temp))
+            using (var zip = new ZipArchive(file, ZipArchiveMode.Create))
+            {
+                var item = zip.CreateEntry("trades.csv");
+                using var target = item.Open();
+                target.Write(File.ReadAllBytes(Fixture("synthetic_twap_5s.csv")));
+            }
+            var result = CsvTradeReader.Read(temp);
+            Assert(result.Trades.Count == 7, "zip stream should extract 7 prints");
+        }
+        finally { File.Delete(temp); }
     }
 
     private static void BadConfig()
