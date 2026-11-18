@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "fixture_kind": "SYNTHETIC",
+  "description": "One identifiable cadence stream plus one unrelated trade; not proof of one physical robot.",
+  "instrument_uid": "SYNTH-1",
+  "trade_source": "EXCHANGE",
+  "hypothesis": {
+    "reported_direction": "SELL",
+    "quantity_lots": 100,
+    "period_ms_approx": 5000,
+    "expected_phase_utc": "2026-11-18T07:00:00Z",
+    "matched_event_ids": ["SYN001", "SYN002", "SYN003", "SYN005", "SYN006", "SYN007"],
+    "unmatched_event_ids": ["SYN004"],
+    "matched_count": 6,
+    "missed_expected_cycles": 1,
+    "missing_cycle_time_utc": "2026-11-18T07:00:15Z",
+    "observed_lots": 600,
+    "confidence_calibrated": null
+  }
+}
