@@ -34,6 +34,9 @@ internal static class Program
         Check("synthetic benchmark reproducible with hidden truth", BenchmarkReproducible);
         Check("walk-forward prediction never reads its future", WalkForwardPrediction);
         Check("FFT uses UTC bins and yields candidate periods", SpectrumTemporalBins);
+        Check("size-shuffle preserves timestamps and per-block lot totals", SizeShufflePreservesMarketStructure);
+        Check("size-shuffle results are deterministic and evidence-only", SizeShuffleDeterminism);
+        Check("unchangeable size labels mark null as uninformative", SizeShuffleDegenerate);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -293,6 +296,44 @@ internal static class Program
             Assert(result.Trades.Count == 7, "zip stream should extract 7 prints");
         }
         finally { File.Delete(temp); }
+    }
+
+
+    private static void SizeShufflePreservesMarketStructure()
+    {
+        var source = CsvTradeReader.Read(Fixture("synthetic_twap_5s.csv"));
+        var (tape, changed) = SizeShuffleNull.Shuffle(source, seed: 51, localWindowSeconds: 60);
+        Assert(tape.Trades.Count == source.Trades.Count, "all prints must remain");
+        Assert(tape.Trades.Select(t => t.EventId).SequenceEqual(source.Trades.Select(t => t.EventId)),
+            "must preserve source identities");
+        Assert(tape.Trades.Select(t => t.ExchangeTimeUtc).SequenceEqual(source.Trades.Select(t => t.ExchangeTimeUtc)),
+            "must preserve true timestamps");
+        Assert(tape.Trades.Sum(t => t.QuantityLots) == source.Trades.Sum(t => t.QuantityLots),
+            "must preserve lot totals");
+        Assert(tape.Trades.All(t => t.TradeSource == "EXCHANGE" && t.ReportedDirection == "SELL"),
+            "must preserve source and side");
+        Assert(changed >= 0, "changed count cannot be negative");
+    }
+
+    private static void SizeShuffleDeterminism()
+    {
+        var source = CsvTradeReader.Read(Fixture("synthetic_twap_5s.csv"));
+        var first = SizeShuffleNull.Compare(source, new DetectorConfig(), 5, 7, 60);
+        var again = SizeShuffleNull.Compare(source, new DetectorConfig(), 5, 7, 60);
+        Assert(first.Trials.SequenceEqual(again.Trials), "same seed should give same null trials");
+        Assert(first.OriginalCandidateEpisodes == 1, "original synthetic stream expected");
+        Assert(first.Trials.All(t => t.NullCandidateEpisodes >= 0), "counts not probabilities");
+        Assert(first.Limitations.Any(s => s.Contains("EXPLORATORY_ONLY")),
+            "must label source of uncertainty");
+    }
+
+    private static void SizeShuffleDegenerate()
+    {
+        var constant = From(CreateSequence("ALL", "EXCHANGE", "SELL", 100, 5000, 7));
+        var result = SizeShuffleNull.Compare(constant, new DetectorConfig(), 3, 9, 60);
+        Assert(result.Trials.All(t => t.ShuffledTradeCount == 0), "all sizes identical");
+        Assert(result.EmpiricalGlobalTailProbability is null,
+            "no useful shuffle means no comparable empirical tail");
     }
 
     private static void BadConfig()
