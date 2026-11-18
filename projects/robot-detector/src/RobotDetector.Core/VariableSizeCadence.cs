@@ -78,7 +78,9 @@ public sealed record VariableCadenceReport(
     bool PhysicalBotCountKnown,
     bool StatisticalSignificanceEstablished,
     IReadOnlyList<VariableCadenceHypothesis> Candidates,
-    IReadOnlyList<string> Warnings
+    IReadOnlyList<string> Warnings,
+    int SplitDenseWindowCount = 0,
+    int SkippedTinyRemainderCount = 0
 );
 
 public static class VariableSizeCadence
@@ -94,10 +96,11 @@ public static class VariableSizeCadence
             "NO_OWNER_ORDER_IDS: publicly observed prints do not identify parents, algorithms or physical traders.",
             "NO_CONFIDENCE_CALIBRATION: candidate periods must be tested against burst/clock-dependent nulls and future data.",
             "WINDOW_EPISODES: source/window segmentation can split a single hidden execution algorithm into multiple candidates.",
-            "SIDE_IS_REPORTED: do not infer a passive-order owner's side from the reported trade direction."
+            "SIDE_IS_REPORTED: do not infer a passive-order owner's side from the reported trade direction.",
+            "CHUNKED_DENSE_WINDOWS: one program spanning two capped chunks may become two observed sequences."
         };
         var all = new List<Candidate>();
-        int skipped = 0;
+        int skipped = 0, split = 0, tinyRemainders = 0;
         long windowMs = config.AnalysisWindowMinutes * 60_000L;
         var groups = source.Trades
             .Where(t => t.ReportedDirection is "BUY" or "SELL")
@@ -117,20 +120,33 @@ public static class VariableSizeCadence
             if (events.Length < config.MinMatches) continue;
             if (events.Length > config.MaxEventsPerWindow)
             {
-                skipped++;
-                warnings.Add($"DENSE_WINDOW_NOT_EVALUATED: uid={group.Key.InstrumentUid}, " +
+                split++;
+                warnings.Add($"DENSE_WINDOW_SPLIT: uid={group.Key.InstrumentUid}, " +
                     $"source={group.Key.TradeSource}, mode={group.Key.TradingMode}, " +
-                    $"window={group.Key.Window}, count={events.Length}, max={config.MaxEventsPerWindow}");
-                continue;
+                    $"window={group.Key.Window}, count={events.Length}, maxChunk={config.MaxEventsPerWindow}; " +
+                    "time/evidence continuity across chunks is not evaluated.");
             }
-            var periods = ProposePeriods(events, config);
-            foreach (int period in periods)
+            for (int offset = 0; offset < events.Length; offset += config.MaxEventsPerWindow)
             {
-                int n = Math.Min(events.Length, config.AnchorLimit);
-                for (int i = 0; i < n; i++)
+                int chunkCount = Math.Min(config.MaxEventsPerWindow, events.Length - offset);
+                if (chunkCount < config.MinMatches)
                 {
-                    var candidate = Evaluate(events, i, period, config);
-                    if (candidate is not null) all.Add(candidate);
+                    tinyRemainders++;
+                    warnings.Add($"TINY_CHUNK_NOT_EVALUATED: uid={group.Key.InstrumentUid}, " +
+                        $"window={group.Key.Window}, trailingPrints={chunkCount}");
+                    break;
+                }
+                var chunk = new MarketTrade[chunkCount];
+                Array.Copy(events, offset, chunk, 0, chunkCount);
+                var periods = ProposePeriods(chunk, config);
+                foreach (int period in periods)
+                {
+                    int n = Math.Min(chunk.Length, config.AnchorLimit);
+                    for (int i = 0; i < n; i++)
+                    {
+                        var candidate = Evaluate(chunk, i, period, config);
+                        if (candidate is not null) all.Add(candidate);
+                    }
                 }
             }
         }
@@ -155,8 +171,9 @@ public static class VariableSizeCadence
             .ToList();
 
         return new VariableCadenceReport(
-            "0.1-experimental", source.FileSha256, source.Trades.Count,
-            chosen.Count, skipped, ids.Count, false, false, chosen, warnings);
+            "0.2-experimental", source.FileSha256, source.Trades.Count,
+            chosen.Count, skipped, ids.Count, false, false, chosen, warnings,
+            split, tinyRemainders);
     }
 
     private static IReadOnlyList<int> ProposePeriods(
