@@ -31,3 +31,15 @@
 4. Только затем включить live, book и ML.
 
 Нельзя подменять \`UNVERIFIED\` правдоподобным предположением. Если требуется секрет, оператор задаёт его локально, не передавая ни через UI, ни через git.
+
+
+## Новые проверки из open-source исследований (18.11.2026)
+
+- D15 / UNVERIFIED — может ли timestamp resolution реального T-Invest позволить 100/250/500ms time bins? Проверить распределение подмс меток, aliasing и частоту пропусков.
+- D16 / UNVERIFIED — как по MOEX/СПБ соотносятся пики в начале секунды и минуты (Chen/Chan/Chang 2022, Muravyev 2022)? Оценить \`phase modulo 1s/60s\` по инструментам/режимам и random-shift null.
+- D17 / UNVERIFIED — превосходит ли \`FFT+phase matcher\` обычный fixed-volume detector на нескольких реальных режимах ликвидности? Полноценный blinded stage-2 test.
+- D18 / UNVERIFIED — насколько плох аггрегированный L2 для детекции пополнения на отдельных тиках при реальном уровне quote sampling T-Invest? Синтетический high-frequency L3→downsample→L2 test.
+- D19 / UNVERIFIED — сможет ли BOCPD отличить начало нового направленного режима от краткого общего биржевого всплеска лучше EWMA/CUSUM? False positives per instrument-day.
+- D20 / UNVERIFIED — право повторно использовать код сторонних репозиториев (MIT/BSD GPL/absent), notebook outputs, licenses datasets? File-level license audit и version pin.
+
+Новый [разбор исходного кода и статей](RESEARCH_EXPANSION_2026-11-18.md); все пункты остаются UNVERIFIED до отдельного эксперимента.
