@@ -47,6 +47,10 @@ internal static class Program
                     return RollingForecastCommand(options);
                 case "diagnose-forecast":
                     return DiagnoseForecastCommand(options);
+                case "variable-cadence":
+                    return VariableCadenceCommand(options);
+                case "variable-temporal-null":
+                    return VariableTemporalNullCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -172,6 +176,54 @@ internal static class Program
 
 
 
+
+
+    private static VariableCadenceConfig VariableCadenceOptions(Dictionary<string, string> options) => new()
+    {
+        MinMatches = Integer(options, "min-matches", 8),
+        MinDistinctQuantities = Integer(options, "min-distinct-sizes", 3),
+        AnalysisWindowMinutes = Integer(options, "window-minutes", 60),
+        MaxEventsPerWindow = Integer(options, "max-window-events", 2500)
+    };
+
+    private static int VariableCadenceCommand(Dictionary<string, string> options)
+    {
+        var imported = CsvTradeReader.Read(Required(options, "input"));
+        var config = VariableCadenceOptions(options);
+        var result = VariableSizeCadence.Detect(imported, config);
+        string json = JsonSerializer.Serialize(result, JsonOptions);
+        if (options.TryGetValue("output", out var output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Unvalidated variable-clip cadence report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine($"Variable-size candidates={result.CandidateSequenceCount}; " +
+            $"not-analysed dense windows={result.SkippedDenseWindowCount}; actual bot count UNKNOWN");
+        return imported.RejectedRowTotal > 0 ? 3 : 0;
+    }
+
+    private static int VariableTemporalNullCommand(Dictionary<string, string> options)
+    {
+        var imported = CsvTradeReader.Read(Required(options, "input"));
+        var config = VariableCadenceOptions(options);
+        var result = TemporalCadenceNull.Compare(imported, config,
+            mode: options.GetValueOrDefault("mode", "uniform"),
+            trials: Integer(options, "trials", 6),
+            seed: Integer(options, "seed", 1701),
+            blockSeconds: Integer(options, "block-seconds", 60));
+        string json = JsonSerializer.Serialize(result, JsonOptions);
+        if (options.TryGetValue("output", out var output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Experimental temporal-null report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine("WARNING: this null is not calibrated; do not infer independent robots or trading signals.");
+        return imported.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int DiagnoseForecastCommand(Dictionary<string, string> options)
     {
@@ -433,6 +485,8 @@ internal static class Program
         Console.WriteLine("fusion --input file.csv [--max-gap-cycles 12] [--output grouped.json]");
         Console.WriteLine("rolling-forecast --input file.csv [--warmup-minutes 20] [--stride-minutes 15] [--max-cutoffs 24] [--max-training-age-cycles 2]");
         Console.WriteLine("diagnose-forecast --input file.csv [--min-matches 6] [--warmup-minutes 60] [--stride-minutes 30] [--max-cutoffs 12] [--max-training-age-cycles 2]");
+        Console.WriteLine("variable-cadence --input file.csv [--min-matches 8] [--min-distinct-sizes 3] [--output candidates.json]");
+        Console.WriteLine("variable-temporal-null --input file.csv [--mode uniform|rotate] [--trials 6] [--block-seconds 60]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

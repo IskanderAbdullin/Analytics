@@ -112,6 +112,27 @@ jobs:
           assert r["calibrated"] is False, r
           assert r["actualBotCountKnown"] is False, r
           PY
+      - name: Experimental variable-clip cadence and temporal controls smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- variable-cadence \
+            --input fixtures/synthetic_variable_clip_5s.csv \
+            --output /tmp/robot-variable.json
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- variable-temporal-null \
+            --input fixtures/synthetic_variable_clip_5s.csv \
+            --mode uniform --trials 3 --output /tmp/robot-variable-null.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-variable.json",encoding="utf-8"))
+          assert r["candidateSequenceCount"] == 1, r
+          assert r["candidates"][0]["periodMs"] == 5000, r
+          assert r["candidates"][0]["distinctQuantities"] == 4, r
+          assert r["candidates"][0]["matchedPrints"] == 12, r
+          assert r["physicalBotCountKnown"] is False, r
+          assert r["statisticalSignificanceEstablished"] is False, r
+          n=json.load(open("/tmp/robot-variable-null.json",encoding="utf-8"))
+          assert n["trialsRun"] == 3 and n["originalCandidateSequences"] == 1, n
+          assert n["actualBotCountKnown"] is False and n["significanceCalibrated"] is False, n
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then

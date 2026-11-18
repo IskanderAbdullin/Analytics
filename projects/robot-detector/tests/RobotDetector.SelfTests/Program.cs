@@ -58,6 +58,14 @@ internal static class Program
         Check("recency gate retains fresh synthetic cadence", RecencyGateKeepsFresh);
         Check("recency selection independent of whether future trade fills", RecencyGateIndependentOfOutcome);
         Check("invalid recency gate values are rejected", RecencyGateRejectsInvalid);
+        Check("variable-size fixed-clock candidate is detected", VariableCadenceSynthetic);
+        Check("variable-size scanner ignores fixed clip size", VariableCadenceRejectsConstantQuantity);
+        Check("variable-size screen isolates EXCHANGE and DEALER", VariableCadenceSourceIsolation);
+        Check("variable-size dense windows are explicitly not evaluated", VariableCadenceDenseWindow);
+        Check("temporal null preserves trade counts, sizes and session", TemporalNullPreservation);
+        Check("temporal rotation preserves within-block relative phase", TemporalNullRotation);
+        Check("temporal negative-control summary is deterministic and uncalibrated", TemporalNullComparison);
+        Check("invalid variable-size configuration or temporal null mode fails closed", VariableCadenceInvalidConfiguration);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -743,6 +751,128 @@ internal static class Program
             new DetectorConfig { MinMatches = 4 }, maximumTrainingAgeCycles: -1); }
         catch (ArgumentException) { threw = true; }
         Assert(threw, "negative cycles must be invalid");
+    }
+
+
+    private static MarketTrade[] VariableCadenceFixture(
+        string prefix, string source = "EXCHANGE", string direction = "SELL", int count = 12)
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        long[] q = { 10, 20, 30, 40 };
+        return Enumerable.Range(0, count).Select(i =>
+            new MarketTrade($"{prefix}-{i}", start.AddSeconds(i * 5),
+                "SYNTH-VARIABLE", "VAR", source, direction, 100m,
+                q[i % q.Length], "TQBR", "SESSION-1", "SYNTHETIC", i)).ToArray();
+    }
+
+    private static void VariableCadenceSynthetic()
+    {
+        var source = CsvTradeReader.Read(Fixture("synthetic_variable_clip_5s.csv"));
+        Assert(source.Trades.Count == 12, "synthetic clip fixture must contain 12 prints");
+        var report = VariableSizeCadence.Detect(source, new VariableCadenceConfig());
+        Assert(report.CandidateSequenceCount == 1,
+            "12 regular variable-size prints should produce one observable candidate");
+        var p = report.Candidates.Single();
+        Assert(p.PeriodMs == 5000 && p.MatchedPrints == 12 && p.DistinctQuantities == 4,
+            "known synthetic 5s, four clip sizes");
+        Assert(p.CoverageRatio == 1 && p.ObservedLots == 300,
+            "all 12 synthetic clips must be attributed once");
+        Assert(p.State == "candidate" && !p.OwnerKnown && p.ConfidenceCalibrated is null,
+            "cannot claim a physical robot identity or calibrated confidence");
+        Assert(!report.PhysicalBotCountKnown && !report.StatisticalSignificanceEstablished,
+            "research-only model status");
+    }
+
+    private static void VariableCadenceRejectsConstantQuantity()
+    {
+        var original = VariableCadenceFixture("CONSTANT");
+        var fixedLots = original.Select(x => x with { QuantityLots = 100 }).ToArray();
+        Assert(VariableSizeCadence.Detect(From(fixedLots), new VariableCadenceConfig())
+               .CandidateSequenceCount == 0,
+            "variable-clip experimental screen deliberately excludes one clip size");
+    }
+
+    private static void VariableCadenceSourceIsolation()
+    {
+        var a = VariableCadenceFixture("EX", "EXCHANGE");
+        var b = VariableCadenceFixture("DL", "DEALER");
+        var source = From(a.Concat(b).ToArray());
+        var result = VariableSizeCadence.Detect(source, new VariableCadenceConfig());
+        Assert(result.CandidateSequenceCount == 2, "sources must be analysed independently");
+        Assert(result.Candidates.Select(p => p.TradeSource).Distinct().Count() == 2,
+            "must not blend an exchange stream with a dealer stream");
+        Assert(result.Candidates.SelectMany(p => p.EvidenceEventIds).Distinct().Count() == 24,
+            "no double attribution of synthetic prints");
+    }
+
+    private static void VariableCadenceDenseWindow()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        var dense = Enumerable.Range(0, 2510).Select(i => new MarketTrade(
+            $"DENSEVAR-{i}", start.AddMilliseconds(i * 100), "SYNTH-DENSE", "DENSE",
+            "EXCHANGE", "SELL", 100m, (i % 4 + 1) * 10L,
+            "TQBR", "SESSION-1", "SYNTHETIC", i)).ToArray();
+        var report = VariableSizeCadence.Detect(From(dense), new VariableCadenceConfig());
+        Assert(report.CandidateSequenceCount == 0 && report.SkippedDenseWindowCount == 1,
+            "dense source must be explicitly skipped, not silently downsampled");
+        Assert(report.Warnings.Any(w => w.StartsWith("DENSE_WINDOW_NOT_EVALUATED")),
+            "show exclusion in report");
+    }
+
+    private static void TemporalNullPreservation()
+    {
+        var source = From(VariableCadenceFixture("TEMP"));
+        var (resampled, changed) = TemporalCadenceNull.Resample(source, "uniform", 101, 60);
+        Assert(changed > 0 && resampled.Trades.Count == source.Trades.Count,
+            "all synthetic prints remain but timestamps move");
+        Assert(resampled.Trades.Select(t => t.EventId).OrderBy(x => x).SequenceEqual(
+            source.Trades.Select(t => t.EventId).OrderBy(x => x)),
+            "event IDs and cardinality must remain identical");
+        Assert(resampled.Trades.Sum(t => t.QuantityLots) == source.Trades.Sum(t => t.QuantityLots),
+            "total lots are preserved");
+        Assert(resampled.Trades.All(t => t.ExchangeTimeUtc.Minute == 0 &&
+                    t.TradingMode == "TQBR" && t.TradeSource == "EXCHANGE"),
+            "uniform resampling stays inside same calendar-minute/source/mode bucket");
+    }
+
+    private static void TemporalNullRotation()
+    {
+        var source = From(VariableCadenceFixture("ROTATE"));
+        var (resampled, changed) = TemporalCadenceNull.Resample(source, "rotate", 10, 60);
+        var byId = resampled.Trades.ToDictionary(t => t.EventId, StringComparer.Ordinal);
+        long interval = TimeSpan.TicksPerMinute;
+        var shifts = source.Trades.Select(t =>
+            (byId[t.EventId].ExchangeTimeUtc.Ticks - t.ExchangeTimeUtc.Ticks + interval) % interval)
+            .Distinct().ToArray();
+        Assert(changed == source.Trades.Count && shifts.Length == 1 && shifts[0] > 0,
+            "circular rotation must preserve one within-minute phase offset for every trade");
+    }
+
+    private static void TemporalNullComparison()
+    {
+        var source = From(VariableCadenceFixture("NULL"));
+        var cfg = new VariableCadenceConfig();
+        var first = TemporalCadenceNull.Compare(source, cfg, "uniform", 3, 17, 60);
+        var second = TemporalCadenceNull.Compare(source, cfg, "uniform", 3, 17, 60);
+        Assert(first.Trials.SequenceEqual(second.Trials), "null metrics reproducible by seed");
+        Assert(first.OriginalCandidateSequences == 1 && first.TrialsRun == 3,
+            "control must use same detector on original data and three shuffled tapes");
+        Assert(first.Trials.All(t => t.CandidateSequences >= 0),
+            "candidate count is nonnegative");
+        Assert(!first.ActualBotCountKnown && !first.SignificanceCalibrated,
+            "descriptive null cannot imply a probability or number of actual robots");
+    }
+
+    private static void VariableCadenceInvalidConfiguration()
+    {
+        bool rejected = false;
+        try { new VariableCadenceConfig { MinDistinctQuantities = 1 }.Validate(); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "must reject trivial one-size variation");
+        rejected = false;
+        try { TemporalCadenceNull.Resample(From(VariableCadenceFixture("BAD")), "unknown", 5); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "unknown clock-null model must fail closed");
     }
 
     private static void BadConfig()
