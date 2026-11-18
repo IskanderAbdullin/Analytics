@@ -64,7 +64,8 @@ internal static class Program
             MinCoverage = Double(options, "min-coverage", 0.55),
             MinimumPeriodMilliseconds = Integer(options, "min-period-ms", 200),
             MaximumPeriodMilliseconds = Integer(options, "max-period-ms", 600000),
-            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000)
+            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000),
+            AnalysisWindowMinutes = Integer(options, "window-minutes", 60)
         };
         var report = PeriodicDetector.Detect(imported, config);
         string json = JsonSerializer.Serialize(report, JsonOptions);
@@ -294,6 +295,7 @@ internal static class Program
         Console.WriteLine("Robot Detector 0.1 — research-only market trade pattern screener");
         Console.WriteLine("detect --input file.csv|zip [--output report.json] [--rejects errors.json] [--min-matches 6]");
         Console.WriteLine("       [--min-period-ms 200] [--max-period-ms 600000] [--min-coverage 0.55]");
+        Console.WriteLine("       [--window-minutes 60] [--max-group-events 5000]");
         Console.WriteLine("fetch --date YYYY-MM-DD --instrument-id SBER_TQBR --output data/raw/file.csv|zip");
         Console.WriteLine("quote --input fixtures/synthetic_quote_oscillation.csv");
         Console.WriteLine("benchmark [--seeds 20] [--noise-trades 200] [--output synthetic_report.json]");
