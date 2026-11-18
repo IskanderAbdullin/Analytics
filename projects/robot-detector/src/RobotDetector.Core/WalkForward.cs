@@ -38,7 +38,7 @@ public static class WalkForward
         var future = input.Trades.Where(t => t.ExchangeTimeUtc > cutoffUtc).ToList();
 
         var trainingImport = new TradeImportResult(training, input.RejectedRows,
-            input.FileName, input.FileSha256, input.HasVerifiedFeedCoverage);
+            input.FileName, input.FileSha256, input.HasVerifiedFeedCoverage, input.RejectedRowTotal);
         var candidates = PeriodicDetector.Detect(trainingImport, config);
         var checks = new List<ForecastCheck>();
         var assignedFuture = new HashSet<string>(StringComparer.Ordinal);
