@@ -120,7 +120,7 @@ jobs:
               "sourceSha256":p["sourceSha256"]
           })
           for w in p["warnings"]:
-              if w.startswith("SKIPPED_DENSE_GROUP"): print(w[:170])
+              if w.startswith("SPLIT_DENSE_GROUP"): print(w[:170])
           assert not p["physicalBotCountKnown"]
           assert all(pattern["state"]=="candidate" for pattern in p["patterns"])
           PY
