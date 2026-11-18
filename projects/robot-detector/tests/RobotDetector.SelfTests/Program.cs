@@ -37,6 +37,10 @@ internal static class Program
         Check("size-shuffle preserves timestamps and per-block lot totals", SizeShufflePreservesMarketStructure);
         Check("size-shuffle results are deterministic and evidence-only", SizeShuffleDeterminism);
         Check("unchangeable size labels mark null as uninformative", SizeShuffleDegenerate);
+        Check("fusion links one cadence crossing an hour boundary", FusionAcrossHour);
+        Check("fusion refuses large time gaps and phase changes", FusionRejectsBadContinuation);
+        Check("fusion does not cross trade source/mode boundaries", FusionSeparatesSourceMode);
+        Check("fusion validates source hashes and exclusive evidence", FusionRejectsInvalidEvidence);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -334,6 +338,96 @@ internal static class Program
         Assert(result.Trials.All(t => t.ShuffledTradeCount == 0), "all sizes identical");
         Assert(result.EmpiricalGlobalTailProbability is null,
             "no useful shuffle means no comparable empirical tail");
+    }
+
+
+    private static MarketTrade[] SequenceAt(DateTimeOffset start, string idPrefix,
+        int count, int periodMs = 5000, int phaseOffsetMs = 0,
+        string source = "EXCHANGE", string mode = "TQBR")
+    {
+        return Enumerable.Range(0, count).Select(i =>
+            new MarketTrade($"{idPrefix}{i}", start.AddMilliseconds(phaseOffsetMs + i * periodMs),
+                "SYNTH-FUSION", "SYNTH", source, "SELL", 100m, 100,
+                mode, "SESSION-1", "SYNTHETIC", i)).ToArray();
+    }
+
+    private static void FusionAcrossHour()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 59, 30, TimeSpan.Zero);
+        var source = From(SequenceAt(start, "CROSS", 13));
+        var screen = PeriodicDetector.Detect(source, new DetectorConfig());
+        Assert(screen.CandidatePatternCount == 2, "expected 6+7 prints across UTC hours");
+        var fused = EpisodeFusion.Group(source, screen, new DetectorConfig());
+        Assert(fused.CandidateEpisodeCount == 2, "two original candidate episodes");
+        Assert(fused.ConservativelyLinkedGroupCount == 1, "one cautious observable cadence group");
+        Assert(fused.LinkedEpisodeCount == 1, "one adjacency merge");
+        Assert(fused.UniqueAttributedPrintCount == 13 && fused.UniqueAttributedLots == 1300,
+            "no double count after fusion");
+        Assert(fused.Groups.Single().EpisodeCount == 2, "one group contains two episodes");
+        Assert(!fused.ActualBotCountKnown && fused.Groups.Single().ConfidenceCalibrated is null,
+            "group is not proof of one actual robot");
+        Assert(EpisodeFusion.Group(source, screen, new DetectorConfig()).Groups.Single().GroupId ==
+            fused.Groups.Single().GroupId, "deterministic group identity");
+    }
+
+    private static void FusionRejectsBadContinuation()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 59, 30, TimeSpan.Zero);
+        var left = SequenceAt(start, "FIRST", 6);
+        var right = SequenceAt(start.AddMinutes(30), "FAR", 7);
+        var farSource = From(left.Concat(right).ToArray());
+        var farScreen = PeriodicDetector.Detect(farSource, new DetectorConfig());
+        Assert(farScreen.CandidatePatternCount == 2, "two independent candidate episodes");
+        Assert(EpisodeFusion.Group(farSource, farScreen, new DetectorConfig()).ConservativelyLinkedGroupCount == 2,
+            "no link across a 30-minute inactivity gap");
+
+        var phaseRight = SequenceAt(new DateTimeOffset(2026, 11, 18, 8, 0, 2, TimeSpan.Zero),
+            "OTHER", 7);
+        var source = From(left.Concat(phaseRight).ToArray());
+        var screen = PeriodicDetector.Detect(source, new DetectorConfig());
+        Assert(screen.CandidatePatternCount == 2, "phase-changing sequence remains two episodes");
+        var result = EpisodeFusion.Group(source, screen, new DetectorConfig());
+        Assert(result.ConservativelyLinkedGroupCount == 2, "phase-incompatible episodes never link");
+    }
+
+    private static void FusionSeparatesSourceMode()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 59, 30, TimeSpan.Zero);
+        var exchange = SequenceAt(start, "EX", 13);
+        var dealer = SequenceAt(start, "DEAL", 13, source: "DEALER");
+        var otherMode = SequenceAt(start, "MODE", 13, mode: "OTHER_MODE");
+        var source = From(exchange.Concat(dealer).Concat(otherMode).ToArray());
+        var screen = PeriodicDetector.Detect(source, new DetectorConfig());
+        var fused = EpisodeFusion.Group(source, screen, new DetectorConfig());
+        Assert(screen.CandidatePatternCount == 6 && fused.ConservativelyLinkedGroupCount == 3,
+            "source and trading mode partition the observed streams");
+        Assert(fused.UniqueAttributedPrintCount == 39, "all print IDs preserved");
+    }
+
+    private static void FusionRejectsInvalidEvidence()
+    {
+        var input = From(SequenceAt(new DateTimeOffset(2026, 11, 18, 7, 59, 30, TimeSpan.Zero),
+            "BAD", 13));
+        var report = PeriodicDetector.Detect(input, new DetectorConfig());
+        bool mismatchRejected = false;
+        try
+        {
+            EpisodeFusion.Group(input with { FileSha256 = "changed" }, report, new DetectorConfig());
+        }
+        catch (ArgumentException) { mismatchRejected = true; }
+        Assert(mismatchRejected, "must validate input report hash");
+
+        bool doubleAttributionRejected = false;
+        var repeatedPattern = report.Patterns[0];
+        try
+        {
+            EpisodeFusion.Group(input, report with
+            {
+                Patterns = report.Patterns.Concat(new[] { repeatedPattern }).ToArray()
+            }, new DetectorConfig());
+        }
+        catch (InvalidDataException) { doubleAttributionRejected = true; }
+        Assert(doubleAttributionRejected, "must reject reused trade print IDs");
     }
 
     private static void BadConfig()
