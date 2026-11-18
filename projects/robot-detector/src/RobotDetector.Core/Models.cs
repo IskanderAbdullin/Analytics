@@ -44,6 +44,7 @@ public sealed class DetectorConfig
     public double RelativeTimeTolerance { get; init; } = 0.02;
     public int MaximumCycleGap { get; init; } = 8;
     public int MaximumEventsPerGroup { get; init; } = 5000;
+    public int AnalysisWindowMinutes { get; init; } = 60;
     public int CandidateLag { get; init; } = 24;
     public int CandidateLimit { get; init; } = 128;
     public int AnchorLimit { get; init; } = 32;
@@ -56,6 +57,7 @@ public sealed class DetectorConfig
             MaximumTimeToleranceMilliseconds < MinimumTimeToleranceMilliseconds ||
             RelativeTimeTolerance < 0 || RelativeTimeTolerance > 1 ||
             MaximumCycleGap < 1 || MaximumEventsPerGroup < MinMatches ||
+            AnalysisWindowMinutes < 1 || AnalysisWindowMinutes > 1440 ||
             CandidateLag < 1 || CandidateLimit < 1 || AnchorLimit < 1)
             throw new ArgumentException("Invalid detector configuration.");
     }
