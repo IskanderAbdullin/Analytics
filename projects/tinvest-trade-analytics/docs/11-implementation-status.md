@@ -1,8 +1,8 @@
-# 11. Реализация и журнал проверки — v0.1
+# 11. Реализация и журнал проверки — v0.2
 
 Дата начала: 18.11.2026. Цель документа — отделить **реализовано**, **протестировано** и **планируется**. Здесь нет утверждений, что real T-Invest live sync прошёл.
 
-## Что реализовано (M0 и часть M1/M2)
+## Что реализовано (M0 и часть M1/M2/M4)
 
 - `src/TInvestAnalytics.Cli/`: .NET 10 CLI, официальный T-Invest REST POST read-only allowlist. Токен только из env `TINVEST_TOKEN`, не сохраняется в Git или SQLite.
 - `doctor`, `accounts`, `sync` по выбранному счёту и диапазону, `import-json` для офлайн page, `report` с необязательным локальным `--asset-map`, `stats`.
@@ -10,6 +10,8 @@
 - Immutable `raw_pages`, `operation_revisions`, latest `current_operations`, local `sync_windows` cursors/checkpoint, SQLite WAL; transactionally commit page+checkpoint. Semantically identical multiple ID records flagged but **not silently de-duplicated**.
 - Money precision via decimal (T-Invest units + nano), operation parser with optional fills, FIFO for explicitly classified stock/fund/currency; long/short/partial closure and reversal.
 - Cash classification for settled VM, fees, borrow/overnight, distributions, taxes, deposits, separate funding status. Market-to-market, futures tick value/clearing reconstruction, broker verification **NOT** implemented; reported subtotal isn't total equity performance.
+- Локальные исторические снимки `GetPortfolio` + `GetPositions` с полной сохранённой исходной парой ответов. Команды `snapshot`, `snapshots`, `equity-pnl`; изменение общей стоимости счёта между двумя сохранёнными оценками с учётом пополнений/выводов.
+- `equity-pnl` требует интервала полноты операций; если его нет, результат `partial`. При наличии — всё равно `provisional`: разные as-of брокерских котировок и несверенные документы.
 - Offline synthetic smoke tests for FIFO, flips, VM/funding exclusion, deposit vs P&L, stale IDs, SQLite idempotency, read-only fake HTTP adapter.
 - Dedicated GitHub Actions `tinvest-analytics-ci.yml` (build and deterministic tests).
 - The domain model, CLI + SQLite are provisional architecture, not final validated securities/tax accounting.
@@ -34,6 +36,9 @@ $env:TINVEST_TOKEN = "your-read-only-token"
 dotnet run --project src/TInvestAnalytics.Cli -- accounts
 dotnet run --project src/TInvestAnalytics.Cli -- sync --account-index 0 --from 2026-11-01 --to 2026-11-18
 dotnet run --project src/TInvestAnalytics.Cli -- report --account YOUR_ACCOUNT_ID --from 2026-11-01 --to 2026-11-18
+dotnet run --project src/TInvestAnalytics.Cli -- snapshot --account-index 0
+dotnet run --project src/TInvestAnalytics.Cli -- snapshots --account YOUR_ACCOUNT_ID
+dotnet run --project src/TInvestAnalytics.Cli -- equity-pnl --account YOUR_ACCOUNT_ID --start-id 1 --end-id 2
 ```
 
 **Защита:** не коммитить токен или реальные raw operations. БД по умолчанию в `%LOCALAPPDATA%/TInvestAnalytics/analytics.db`. Не передавать брокерские данные в CI. Команда sync не должна использоваться на живом аккаунте до ручного проверки прав токена/лимитов; роботы и API могут делить квоты.
@@ -46,7 +51,7 @@ dotnet run --project src/TInvestAnalytics.Cli -- report --account YOUR_ACCOUNT_I
 ```
 Передать `--asset-map path/to/map.json` в `report`. **Это временная мера**: ID инструмента и свойства должны в дальнейшем подтягиваться через InstrumentsService, а ручная классификация не делает историческую торговую сумму достоверной.
 
-## Ближайший следующий этап (M1/M2)
+## Ближайший следующий этап (M1/M2/M4)
 
 1. Ввести synchronizer rolling rescan / refresh window и semantic identity aliases без ложной дедупликации.
 2. Загружать broker report и независимые snapshots portfolio/positions; сопоставлять по UTC и settlement day.
@@ -65,4 +70,4 @@ dotnet run --project src/TInvestAnalytics.Cli -- report --account YOUR_ACCOUNT_I
 - **BROKER_VALIDATED:** воспроизведены реальные операции на read-only аккаунте, сверено с брокерским отчётом.
 - **PRODUCTION_READY:** проверены recovery, безопасность, performance, полные специальные случаи.
 
-До получения CI result в этом документе подтверждаем только `CODED`; ни `BROKER_VALIDATED`, ни `PRODUCTION_READY` не подтверждены.
+Начальная версия v0.1 прошла GitHub Actions CI на коммите `cf45482fc300205fda1ef1ed37ef35d3684a6783`. Изменения v0.2 со снимками требуют отдельного прогона CI. Ни `BROKER_VALIDATED`, ни `PRODUCTION_READY` не подтверждены.

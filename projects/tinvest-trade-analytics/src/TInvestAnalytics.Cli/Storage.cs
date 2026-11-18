@@ -6,7 +6,7 @@ namespace TInvestAnalytics;
 public sealed record SyncCheckpoint(string WindowId, string? Cursor, bool Complete, long Pages, long Items);
 
 /// <summary>Local-only SQLite evidence store. Raw pages and observations are append-only.</summary>
-public sealed class EvidenceStore
+public sealed partial class EvidenceStore
 {
     private readonly string _dbPath;
     public EvidenceStore(string dbPath)
@@ -82,6 +82,7 @@ public sealed class EvidenceStore
             CREATE INDEX IF NOT EXISTS ix_window_account ON sync_windows(account_id,from_utc,to_utc);
             """);
         q.ExecuteNonQuery();
+        InitializePortfolio();
     }
 
     public static string WindowId(string accountId, DateTimeOffset from, DateTimeOffset to)

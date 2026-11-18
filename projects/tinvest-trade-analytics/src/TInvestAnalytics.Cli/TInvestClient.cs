@@ -81,7 +81,7 @@ public sealed class TInvestClient : IDisposable
     public Task<string> GetTariffAsync(CancellationToken ct = default) =>
         PostAsync("UsersService/GetUserTariff", new { }, ct);
     public Task<string> GetPortfolioAsync(string accountId, CancellationToken ct = default) =>
-        PostAsync("OperationsService/GetPortfolio", new { accountId }, ct);
+        PostAsync("OperationsService/GetPortfolio", new { accountId, currency = "RUB" }, ct);
     public Task<string> GetPositionsAsync(string accountId, CancellationToken ct = default) =>
         PostAsync("OperationsService/GetPositions", new { accountId }, ct);
 

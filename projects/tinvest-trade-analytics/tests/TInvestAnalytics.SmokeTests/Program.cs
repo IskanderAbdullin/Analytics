@@ -165,6 +165,22 @@ Check("SQLite persistence, resume, idempotent import, revision", () =>
         try { store.ImportPage("TEST",from,to,"c","c",true,p1); }
         catch (InvalidDataException) { rejected=true; }
         Equal(rejected,true,"cursor cycle rejected");
+
+        var raw1000 = """{"totalAmountPortfolio":{"units":"1000","nano":0,"currency":"RUB"}}""";
+        var raw1400 = """{"totalAmountPortfolio":{"units":"1400","nano":0,"currency":"RUB"}}""";
+        var snap1=store.SavePortfolio("TEST",day.AddHours(-1),raw1000,"{}");
+        var snap2=store.SavePortfolio("TEST",day.AddHours(1),raw1400,"{}");
+        Equal(store.GetSnapshots("TEST").Count,2,"two snapshots persisted");
+        Equal(store.HasCompleteOperationsWindow("TEST",snap1.ObservedAtUtc,snap2.ObservedAtUtc),
+            true,"complete ingestion window covers snapshot range");
+        var flow=Op("deposit","OPERATION_TYPE_INPUT",0,0,500,dt:day);
+        var equity=PortfolioMath.Calculate(snap1,snap2,new[]{flow},true);
+        Equal(equity.NetExternalFlows,500m,"deposit exclusion");
+        Equal(equity.AbsoluteEquityPnl,-100m,"equity change minus deposit");
+        Equal(equity.Quality,"provisional","not independently broker verified");
+        var incomplete=PortfolioMath.Calculate(snap1,snap2,new[]{flow},false);
+        Equal(incomplete.Quality,"partial","missing coverage reported");
+
     }
     finally
     {

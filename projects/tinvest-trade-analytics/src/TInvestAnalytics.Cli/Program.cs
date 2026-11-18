@@ -52,6 +52,15 @@ public static class Program
                 case "report":
                     Report(args, store);
                     break;
+                case "snapshot":
+                    await CaptureSnapshot(args, store);
+                    break;
+                case "snapshots":
+                    ShowSnapshots(args, store);
+                    break;
+                case "equity-pnl":
+                    EquityPnl(args, store);
+                    break;
                 case "stats":
                     var st = store.Stats();
                     Console.WriteLine($"Raw pages: {st.Pages}, revisions: {st.Revisions}, " +
@@ -151,6 +160,45 @@ public static class Program
         }
         throw new InvalidDataException("Excessive pagination; window remains incomplete.");
     }
+
+    private static async Task CaptureSnapshot(string[] args, EvidenceStore store)
+    {
+        using var client = Client(args);
+        string? account = Arg(args, "--account");
+        if (account is null)
+        {
+            int idx = int.Parse(Require(args, "--account-index"), CultureInfo.InvariantCulture);
+            var accounts = TInvestClient.ParseAccounts(await client.GetAccountsAsync());
+            if (idx < 0 || idx >= accounts.Count)
+                throw new ArgumentOutOfRangeException(nameof(idx), "Account index out of range.");
+            account = accounts[idx].Id;
+        }
+        string portfolio = await client.GetPortfolioAsync(account);
+        string positions = await client.GetPositionsAsync(account);
+        var observed = DateTimeOffset.UtcNow;
+        var snapshot = store.SavePortfolio(account, observed, portfolio, positions);
+        Console.WriteLine($"Snapshot #{snapshot.Id} of {PnlCalculator.Mask(account)}: " +
+            $"equity={snapshot.Equity}, observed={observed:O}. Quality: provisional.");
+    }
+    private static void ShowSnapshots(string[] args, EvidenceStore store)
+    {
+        var account = Require(args, "--account");
+        foreach (var x in store.GetSnapshots(account))
+            Console.WriteLine($"#{x.Id} {x.ObservedAtUtc:O} {x.Equity} hash={x.PortfolioSha256[..12]}");
+    }
+    private static void EquityPnl(string[] args, EvidenceStore store)
+    {
+        var account = Require(args, "--account");
+        var snapshots = store.GetSnapshots(account);
+        long firstId = long.Parse(Require(args, "--start-id"), CultureInfo.InvariantCulture);
+        long lastId = long.Parse(Require(args, "--end-id"), CultureInfo.InvariantCulture);
+        var first = snapshots.Single(x => x.Id == firstId);
+        var last = snapshots.Single(x => x.Id == lastId);
+        bool covered = store.HasCompleteOperationsWindow(account, first.ObservedAtUtc, last.ObservedAtUtc);
+        var ops = store.LoadOperations(account, first.ObservedAtUtc, last.ObservedAtUtc);
+        var report = PortfolioMath.Calculate(first, last, ops, covered);
+        Console.WriteLine(JsonSerializer.Serialize(report, JsonOptions()));
+    }
     private static void ImportJson(string[] args, EvidenceStore store)
     {
         var (from, to) = Period(args);
@@ -196,6 +244,9 @@ public static class Program
               sync --account ID --from ... --to ... [--db PATH]
               import-json --account TEST --file sample.json --from ... --to ...
               report --account ID --from ... --to ... [--asset-map class-map.json] [--db PATH]
+              snapshot --account-index 0 [--db PATH] [--sandbox]
+              snapshots --account ID [--db PATH]
+              equity-pnl --account ID --start-id N --end-id N [--db PATH]
               stats [--db PATH]
 
             Authentication: set TINVEST_TOKEN as a read-only token in the process environment.
