@@ -1,0 +1,13 @@
+bin/
+obj/
+*.user
+.vs/
+.env
+.env.*
+data/raw/
+data/normalized/
+data/results/
+reports/
+artifacts/
+*.part
+*.tmp
