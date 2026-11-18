@@ -54,6 +54,10 @@ internal static class Program
         Check("post-hoc audit detects stale candidate history", DiagnosticStaleCandidate);
         Check("post-hoc audit does not borrow other venue prints", DiagnosticSourceIsolation);
         Check("post-hoc audit rejects invalid source hashes", DiagnosticIntegrity);
+        Check("recency gate suppresses stale forecast before future outcome inspection", RecencyGateSuppressesStale);
+        Check("recency gate retains fresh synthetic cadence", RecencyGateKeepsFresh);
+        Check("recency selection independent of whether future trade fills", RecencyGateIndependentOfOutcome);
+        Check("invalid recency gate values are rejected", RecencyGateRejectsInvalid);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -663,6 +667,82 @@ internal static class Program
         try { ForecastFailureDiagnostics.Analyse(source, forged, config); }
         catch (InvalidDataException) { leakageRejected = true; }
         Assert(leakageRejected, "must refuse training evidence timestamped after cutoff");
+    }
+
+
+    private static TradeImportResult StaleForecastFixture()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        var stale = Enumerable.Range(0, 6).Select(i => new MarketTrade(
+            $"STALE-{i}", start.AddMinutes(i * 5), "SYNTH-LONG", "LONG",
+            "EXCHANGE", "SELL", 100m, 100, "TQBR", "SESSION-1", "SYNTHETIC", i));
+        var after = new MarketTrade("UNRELATED_AFTER", start.AddMinutes(130),
+            "SYNTH-LONG", "LONG", "EXCHANGE", "SELL", 100m, 25,
+            "TQBR", "SESSION-1", "SYNTHETIC", 100);
+        return From(stale.Append(after).ToArray());
+    }
+
+    private static void RecencyGateSuppressesStale()
+    {
+        var source = StaleForecastFixture();
+        var cfg = new DetectorConfig { MinMatches = 4 };
+        var old = RollingForecast.Evaluate(source, cfg, 80, 30, 1);
+        var gated = RollingForecast.Evaluate(source, cfg, 80, 30, 1,
+            maximumTrainingAgeCycles: 2);
+        Assert(old.ForecastsEvaluated >= 1, "baseline must contain stale forecasts");
+        Assert(gated.ForecastsEvaluated == 0 && gated.MaximumTrainingAgeCycles == 2,
+            "historical-only filter should suppress old forecast stream");
+        Assert(!gated.Calibrated && !gated.ActualBotCountKnown, "not a confirmed trading signal");
+        Assert(gated.Warnings.Any(x => x.StartsWith("DEVELOPMENT_POLICY")),
+            "make intervention visible in report");
+    }
+
+    private static void RecencyGateKeepsFresh()
+    {
+        var source = From(LongCadence("FRESH"));
+        var cfg = new DetectorConfig { MinMatches = 4 };
+        var original = RollingForecast.Evaluate(source, cfg, 20, 10, 4);
+        var gated = RollingForecast.Evaluate(source, cfg, 20, 10, 4,
+            maximumTrainingAgeCycles: 2);
+        Assert(gated.ForecastsEvaluated == original.ForecastsEvaluated &&
+               gated.ObservedHits == original.ObservedHits &&
+               gated.PlaceboHits == original.PlaceboHits,
+               "all recent 5-minute print hypotheses should be unchanged");
+        Assert(gated.MaximumTrainingAgeCycles == 2, "report the exact gate policy");
+    }
+
+    private static void RecencyGateIndependentOfOutcome()
+    {
+        var baseline = LongCadence("OUT");
+        var changedFuture = LongCadence("OUT");
+        changedFuture[5] = changedFuture[5] with { QuantityLots = 200 };
+        var config = new DetectorConfig { MinMatches = 4 };
+        var baselineReport = RollingForecast.Evaluate(From(baseline), config,
+            20, 30, 1, maximumTrainingAgeCycles: 2);
+        var changedReport = RollingForecast.Evaluate(From(changedFuture), config,
+            20, 30, 1, maximumTrainingAgeCycles: 2);
+        Assert(baselineReport.ForecastsEvaluated == 1 && changedReport.ForecastsEvaluated == 1,
+            "same prefix must have same eligible prediction regardless of future volume");
+        Assert(baselineReport.ObservedHits == 1 && changedReport.ObservedHits == 0,
+            "only outcome differs; eligibility is frozen at the cutoff");
+        Assert(baselineReport.Observations.Single().LastTrainingEvidenceUtc ==
+               changedReport.Observations.Single().LastTrainingEvidenceUtc,
+            "same historical last evidence");
+    }
+
+    private static void RecencyGateRejectsInvalid()
+    {
+        var input = From(LongCadence("PARAM"));
+        bool threw = false;
+        try { RollingForecast.Evaluate(input, new DetectorConfig { MinMatches = 4 },
+            20, 10, 1, maximumTrainingAgeCycles: 0); }
+        catch (ArgumentException) { threw = true; }
+        Assert(threw, "zero cycles must be invalid");
+        threw = false;
+        try { WalkForward.Evaluate(input, new DateTimeOffset(2026, 11, 18, 7, 20, 0, TimeSpan.Zero),
+            new DetectorConfig { MinMatches = 4 }, maximumTrainingAgeCycles: -1); }
+        catch (ArgumentException) { threw = true; }
+        Assert(threw, "negative cycles must be invalid");
     }
 
     private static void BadConfig()

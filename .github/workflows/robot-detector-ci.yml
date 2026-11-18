@@ -95,6 +95,23 @@ jobs:
           assert r["actualBotCountKnown"] is False, r
           assert r["statisticalSignificanceEstablished"] is False, r
           PY
+      - name: Recency-gated next-print forecast smoke (no future leakage)
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- rolling-forecast \
+            --input fixtures/synthetic_long_cadence_5min.csv \
+            --min-matches 4 --warmup-minutes 20 --stride-minutes 10 \
+            --max-cutoffs 4 --max-training-age-cycles 2 \
+            --output /tmp/robot-fresh.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-fresh.json",encoding="utf-8"))
+          assert r["maximumTrainingAgeCycles"] == 2, r
+          assert r["forecastsEvaluated"] == 4, r
+          assert r["observedHits"] == 4, r
+          assert r["placeboHits"] == 0, r
+          assert r["calibrated"] is False, r
+          assert r["actualBotCountKnown"] is False, r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then

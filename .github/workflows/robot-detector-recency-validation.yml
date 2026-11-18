@@ -1,0 +1,106 @@
+name: Robot Detector untouched-date recency validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/robot-detector-recency-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-age-gate-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Compile and verify no-future-leakage synthetic regressions first
+        run: |
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
+          dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
+      - name: Compare baseline and frozen <=2 cycle gate on untouched 2026-11-05 and 2026-11-06
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          echo "HOLDOUt_RECENCY_GATE: SBER_TQBR Nov 5 and Nov 6, frozen age<=2 rule, no trading account access"
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt
+          openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject | grep -q 'Russian Trusted Root CA'
+          pinned='D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31'
+          actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+          if [[ "$actual" != "$pinned" ]]; then
+            echo "BLOCKED_UNVERIFIED_CA: unexpected official CA fingerprint, no TLS bypass"
+            exit 1
+          fi
+          export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          for day in 2026-11-05 2026-11-06; do
+            raw="data/raw/sber_$day.csv"
+            if ! dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              fetch --date "$day" --instrument-id SBER_TQBR --output "$raw" \
+              > /tmp/rd-fetch.log 2>&1; then
+              echo "BLOCKED_BY_DATA: $day"
+              sed -n '1,8p' /tmp/rd-fetch.log
+              exit 1
+            fi
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              rolling-forecast --input "$raw" --min-matches 6 \
+              --window-minutes 60 --max-group-events 5000 \
+              --warmup-minutes 60 --stride-minutes 30 --max-cutoffs 12 \
+              --output "data/results/baseline_$day.json"
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              rolling-forecast --input "$raw" --min-matches 6 \
+              --window-minutes 60 --max-group-events 5000 \
+              --warmup-minutes 60 --stride-minutes 30 --max-cutoffs 12 \
+              --max-training-age-cycles 2 \
+              --output "data/results/gated_$day.json"
+            DAY="$day" python3 - <<'PY'
+          import os,json,pathlib
+          day=os.environ["DAY"]
+          p=pathlib.Path("data/results")
+          b=json.loads((p/f"baseline_{day}.json").read_text())
+          g=json.loads((p/f"gated_{day}.json").read_text())
+          assert b["sourceSha256"]==g["sourceSha256"]
+          assert b["sourcePrintCount"]==g["sourcePrintCount"]
+          assert b["maximumTrainingAgeCycles"] is None
+          assert g["maximumTrainingAgeCycles"]==2
+          assert g["cutoffsExamined"]==b["cutoffsExamined"]
+          assert g["forecastsEvaluated"]<=b["forecastsEvaluated"]
+          for x in (b,g):
+              assert x["forecastsEvaluated"]>=x["observedHits"]>=0
+              assert x["forecastsEvaluated"]>=x["placeboHits"]>=0
+              assert not x["actualBotCountKnown"] and not x["calibrated"]
+              assert not x["dataCoverageVerified"]
+          print("RECENCY_GATE_HOLDOUT",json.dumps({
+            "day":day,"sourceSha256":b["sourceSha256"],
+            "printCount":b["sourcePrintCount"],
+            "cutoffs":b["cutoffsExamined"],
+            "unrestricted":{"forecasts":b["forecastsEvaluated"],
+                            "hits":b["observedHits"],"placebo":b["placeboHits"],
+                            "hitRate":b["observedHitRate"],
+                            "placeboRate":b["placeboHitRate"]},
+            "max2cycles":{"forecasts":g["forecastsEvaluated"],
+                          "hits":g["observedHits"],"placebo":g["placeboHits"],
+                          "hitRate":g["observedHitRate"],
+                          "placeboRate":g["placeboHitRate"]},
+            "sampleWarning":"INSUFFICIENT_SAMPLE" if g["forecastsEvaluated"]<30 else "NOT_CALIBRATED",
+            "actualBotCountKnown":False
+          },ensure_ascii=False))
+          PY
+          done
+          echo "RECENCY_HOLDOUT_COMPLETE: report both modes unconditionally; no optimizer, no claims of physical bots"
+      - name: Remove source tapes, results and temporary certificate
+        if: always()
+        shell: bash
+        run: |
+          rm -rf data/raw data/results
+          rm -f /tmp/rd-fetch.log /tmp/russian_trusted_root_ca.crt
