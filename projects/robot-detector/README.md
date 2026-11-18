@@ -39,6 +39,21 @@ dotnet run --project src/RobotDetector.Cli -- fetch --date 2026-11-17 --instrume
 
 См. [текущий статус реализации и ограничения](docs/IMPLEMENTATION_STATUS.md). GitHub Actions workflow [robot-detector-ci.yml](../../.github/workflows/robot-detector-ci.yml) компилирует и запускает синтетические регрессии без токенов брокера. **Сборка подтверждена:** [CI 44278450065](https://github.com/IskanderAbdullin/Analytics/actions/runs/44278450065) — .NET сборка, офлайн-тесты (18 проверок), CLI smoke успешно. [Реальный архив 44278450117](https://github.com/IskanderAbdullin/Analytics/actions/runs/44278450117): 121 920 сделок, 0 ошибок импорта, 209 предварительных кандидатов-эпизодов, без утверждения о числе физических роботов. [Методика и TLS](docs/PUBLIC_ARCHIVE_VALIDATION.md).
 
+## Стадия исследования после двухдневной проверки (18 ноября 2026)
+
+**Обновление:** самостоятельный .NET 10 проект собирается в GitHub Actions; 28 офлайн-тестов пройдены. [Проверенный двухдневный протокол](docs/MULTIDAY_NULL_PROTOCOL.md): SBER 16.11.2026 (143 929 сделок, 126 отдельных эпизодов, 120 консервативно сгруппированных потоков) и 17.11.2026 (121 920 сделок, 209 эпизодов, 206 групп). Исходные наблюдаемые кандидаты превышают результаты 12 перестановок объёмов и 12 циклических сдвигов на каждой дате; это только предварительное, **не откалиброванное** наблюдение, не число независимых торговых роботов.
+
+Реализован [консервативный алгоритм группировки эпизодов](docs/EPISODE_FUSION.md), не смешивающий источники, стороны и торговые режимы. Две различные контрольные модели доступны через CLI. Целая лента сделок не сохраняется в репозитории; отчёты по реальной истории содержат только агрегированные данные и SHA-256.
+
+```powershell
+# Дополнительные команды к основному историческому экрану:
+dotnet run --project src/RobotDetector.Cli -- fusion --input data/raw/sber.csv --max-gap-cycles 12 --output data/results/fusion.json
+dotnet run --project src/RobotDetector.Cli -- null-shuffle --input data/raw/sber.csv --mode permute --trials 12 --output data/results/null-permute.json
+dotnet run --project src/RobotDetector.Cli -- null-shuffle --input data/raw/sber.csv --mode rotate --trials 12 --output data/results/null-rotate.json
+```
+
+Последняя самостоятельная проверка на данных двух торговых дней: [GitHub Actions #44295820963](https://github.com/IskanderAbdullin/Analytics/actions/runs/44295820963). До полноценного релиза остаются более реалистичные контрольные модели, оценка прогноза на будущих данных, живой T-Invest MarketDataStream и UI/OsEngine read-only adapter. Никакие торговые команды программа не посылает.
+
 ## Назначение
 
 Бесплатно выявлять по доступным публичным биржевым данным повторяющиеся алгоритмические торговые **паттерны** в инструментах MOEX/СПБ. Первый сценарий: одинаковые или сходные объёмы покупок/продаж через регулярные интервалы. Дальше — переменный TWAP, зависимость от рыночного объёма, повторное пополнение стакана, сетки, вероятные маркет-мейкеры и скрытые крупные поручения (*metaorders*).
