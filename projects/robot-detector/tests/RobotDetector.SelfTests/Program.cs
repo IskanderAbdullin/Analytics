@@ -22,6 +22,7 @@ internal static class Program
         Check("too few observations not labelled", TooFew);
         Check("source separation", SeparateSources);
         Check("dense groups refuse silent downsampling", DenseGroup);
+        Check("bounded windows prevent cross-hour evidence reuse", BoundedWindows);
         Check("strict parser quarantines invalid row", InvalidRow);
         Check("source hash and ordered reading are repeatable", Determinism);
         Check("quote oscillation observable without any trades", QuoteWithoutTrades);
@@ -235,6 +236,21 @@ internal static class Program
         Assert(report.Peaks.All(x => x.Feature is "trade_count" or "lots"), "feature labels");
         Assert(report.Warnings.Any(x => x.StartsWith("SPECTRAL_PEAK_IS_NOT_BOT")),
             "must label spectral peaks as candidates only");
+    }
+
+
+    private static void BoundedWindows()
+    {
+        var first = CreateSequence("W1", "EXCHANGE", "SELL", 100, 5000, 7);
+        var second = CreateSequence("W2", "EXCHANGE", "SELL", 100, 5000, 7)
+            .Select(t => t with { ExchangeTimeUtc = t.ExchangeTimeUtc.AddHours(1) }).ToArray();
+        var report = PeriodicDetector.Detect(From(first.Concat(second).ToArray()),
+            new DetectorConfig { AnalysisWindowMinutes = 60 });
+        Assert(report.CandidatePatternCount == 2, "two disjoint analysis episodes expected");
+        Assert(report.Patterns.SelectMany(p => p.EvidenceEventIds).Distinct().Count() == 14,
+            "event attribution must be disjoint");
+        Assert(report.Warnings.Any(x => x.StartsWith("WINDOWED_EPISODES")),
+            "must not confuse episodes with distinct physical bots");
     }
 
     private static void BadConfig()
