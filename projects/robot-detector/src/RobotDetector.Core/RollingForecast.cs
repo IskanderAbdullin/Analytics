@@ -21,7 +21,10 @@ public sealed record RollingForecastObservation(
     string? MatchedEventId,
     string? PlaceboMatchedEventId,
     bool Hit,
-    bool PlaceboHit
+    bool PlaceboHit,
+    string TradingMode = "",
+    string LastTrainingEvidenceUtc = "",
+    int TrainingMatchedCount = 0
 );
 
 public sealed record RollingForecastReport(
@@ -141,7 +144,9 @@ public static class RollingForecast
                         target.ToUniversalTime().ToString("O"),
                         placeboTarget.ToUniversalTime().ToString("O"),
                         hitId, placeboMatch?.EventId,
-                        hitId is not null, placeboMatch is not null));
+                        hitId is not null, placeboMatch is not null,
+                        group.Key.TradingMode, check.LastTrainingEvidenceUtc,
+                        check.TrainingMatchedCount));
                 }
                 cutoff = cutoff.AddMinutes(strideMinutes);
             }
@@ -150,7 +155,7 @@ public static class RollingForecast
         int hits = observations.Count(x => x.Hit);
         int placeboHits = observations.Count(x => x.PlaceboHit);
         return new RollingForecastReport(
-            "0.1-exploratory-chronological", source.FileSha256,
+            "0.2-exploratory-chronological", source.FileSha256,
             source.Trades.Count, sessionGroups, totalCutoffs,
             observations.Count, hits, placeboHits,
             observations.Count == 0 ? null : (double)hits / observations.Count,

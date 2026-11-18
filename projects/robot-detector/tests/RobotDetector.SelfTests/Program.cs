@@ -48,6 +48,12 @@ internal static class Program
         Check("rolling forecast placebo is shifted and does not look ahead", RollingForecastPlaceboAndTime);
         Check("rolling replay isolates venue/source groups", RollingForecastSourceIsolation);
         Check("rolling report rejects unverified confidence claims", RollingForecastUnverifiedCoverage);
+        Check("post-hoc audit is empty of failure flags for exact clean cadence", DiagnosticCleanCadence);
+        Check("post-hoc audit detects same-time size change", DiagnosticDifferentQuantity);
+        Check("post-hoc audit detects same-size phase shift", DiagnosticTimingShift);
+        Check("post-hoc audit detects stale candidate history", DiagnosticStaleCandidate);
+        Check("post-hoc audit does not borrow other venue prints", DiagnosticSourceIsolation);
+        Check("post-hoc audit rejects invalid source hashes", DiagnosticIntegrity);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -544,6 +550,119 @@ internal static class Program
         Assert(!report.ActualBotCountKnown && !report.Calibrated, "never invent owner or probability");
         Assert(report.Warnings.Any(w => w.Contains("INCOMPLETE_FEED_CAVEAT")),
             "must explicitly mention missing coverage");
+    }
+
+
+    private static (RollingForecastReport Rolling, ForecastFailureDiagnosticReport Diagnostic)
+        RunDiagnostic(MarketTrade[] trades, int warmupMinutes = 20)
+    {
+        var source = From(trades);
+        var cfg = new DetectorConfig { MinMatches = 4 };
+        var rolling = RollingForecast.Evaluate(source, cfg,
+            warmupMinutes: warmupMinutes, strideMinutes: 30, maximumCutoffsPerSession: 1);
+        var diagnostic = ForecastFailureDiagnostics.Analyse(source, rolling, cfg);
+        return (rolling, diagnostic);
+    }
+
+    private static void DiagnosticCleanCadence()
+    {
+        var (rolling, diagnostics) = RunDiagnostic(LongCadence("CLEAN"));
+        Assert(rolling.ForecastsEvaluated >= 1, "expected a target from clean development tape");
+        Assert(diagnostics.ForecastsEvaluated == rolling.ForecastsEvaluated, "same frozen sample");
+        Assert(diagnostics.Misses == 0 && diagnostics.ExactHits == rolling.ForecastsEvaluated,
+            "clean cadence must not be labelled as a miss");
+        Assert(diagnostics.HistoricalAgeBuckets.Sum(b => b.EvaluatedForecasts) ==
+               rolling.ForecastsEvaluated, "each forecast belongs to exactly one age group");
+        Assert(!diagnostics.StatisticalSignificanceEstablished && !diagnostics.ActualBotCountKnown,
+            "do not invent statistical validation or owner IDs");
+    }
+
+    private static void DiagnosticDifferentQuantity()
+    {
+        var trades = LongCadence("CHANGE");
+        trades[5] = trades[5] with { QuantityLots = 200 };
+        var (rolling, d) = RunDiagnostic(trades);
+        Assert(rolling.ForecastsEvaluated == 1 && d.Misses == 1,
+            "known changed quantity at next print must miss original exact q");
+        Assert(d.MissesWithDifferentSizeInsideExactWindow == 1,
+            "same time but changed quantity is an observable hypothesis");
+        Assert(d.MissesWithSameSizeOutsideExactWindow == 0,
+            "do not invent nearby unchanged clip at a different time");
+    }
+
+    private static void DiagnosticTimingShift()
+    {
+        var trades = LongCadence("DRIFT");
+        trades[5] = trades[5] with
+        {
+            ExchangeTimeUtc = trades[5].ExchangeTimeUtc.AddSeconds(5)
+        };
+        var (rolling, d) = RunDiagnostic(trades);
+        Assert(rolling.ForecastsEvaluated == 1 && d.Misses == 1,
+            "5 sec late print should be outside fixed 200ms cap");
+        Assert(d.MissesWithSameSizeOutsideExactWindow == 1,
+            "matching q but shifted time is a plausible descriptive finding");
+        Assert(d.MissesWithDifferentSizeInsideExactWindow == 0,
+            "no phantom quantity changes");
+    }
+
+    private static void DiagnosticStaleCandidate()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        var oldPrints = Enumerable.Range(0, 6).Select(i => new MarketTrade(
+            $"OLD-{i}", start.AddMinutes(i * 5), "SYNTH-LONG", "LONG",
+            "EXCHANGE", "SELL", 100m, 100, "TQBR", "SESSION-1", "SYNTHETIC", i));
+        var laterPrint = new MarketTrade("UNRELATED", start.AddMinutes(130),
+            "SYNTH-LONG", "LONG", "EXCHANGE", "SELL", 100m, 25,
+            "TQBR", "SESSION-1", "SYNTHETIC", 100);
+        var (rolling, d) = RunDiagnostic(oldPrints.Append(laterPrint).ToArray(), warmupMinutes: 80);
+        Assert(rolling.ForecastsEvaluated >= 1, "stale hypothesis must still be scorable");
+        Assert(d.MissesWithStaleTrainingPattern >= 1, "stale training evidence 11 periods old");
+        Assert(d.HistoricalAgeBuckets.Single(b => b.Name == "stale_over_8_cycles")
+            .EvaluatedForecasts >= 1, "stale bucket must reflect the cutoff-time age");
+    }
+
+    private static void DiagnosticSourceIsolation()
+    {
+        var trades = LongCadence("EX");
+        trades[5] = trades[5] with { TradeSource = "DEALER" };
+        var (rolling, d) = RunDiagnostic(trades);
+        Assert(rolling.ForecastsEvaluated == 1 && d.Misses == 1,
+            "dealer print must not confirm the exchange-only forecast");
+        Assert(d.MissesWithDifferentSizeInsideExactWindow == 0 &&
+               d.MissesWithSameSizeOutsideExactWindow == 0 &&
+               d.MissesWithOppositeDirectionInsideExactWindow == 0,
+            "dealer observations must not masquerade as exchange evidence");
+        Assert(d.MissesWithNoSameSidePrintNearTarget == 1,
+            "no relevant exchange print near target");
+    }
+
+    private static void DiagnosticIntegrity()
+    {
+        var trades = LongCadence("HASH");
+        var source = From(trades);
+        var config = new DetectorConfig { MinMatches = 4 };
+        var rolling = RollingForecast.Evaluate(source, config, 20, 30, 1);
+        bool mismatchRejected = false;
+        try
+        {
+            ForecastFailureDiagnostics.Analyse(source, rolling with
+            {
+                SourceSha256 = "fake-history"
+            }, config);
+        }
+        catch (ArgumentException) { mismatchRejected = true; }
+        Assert(mismatchRejected, "must refuse comparisons against another file's forecasts");
+
+        bool leakageRejected = false;
+        var forged = rolling with
+        {
+            Observations = rolling.Observations.Select(o =>
+                o with { LastTrainingEvidenceUtc = o.TargetUtc }).ToArray()
+        };
+        try { ForecastFailureDiagnostics.Analyse(source, forged, config); }
+        catch (InvalidDataException) { leakageRejected = true; }
+        Assert(leakageRejected, "must refuse training evidence timestamped after cutoff");
     }
 
     private static void BadConfig()
