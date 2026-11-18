@@ -8,23 +8,24 @@ Date: 2026-11-18. Branch: `main`. Milestone: experimental `0.1`.
 |---|---|---|
 | Core contracts | `src/RobotDetector.Core/Models.cs` | MarketTrade, rejected rows, configuration, hypotheses, evidence IDs, report |
 | Historical CSV/ZIP importer | `src/RobotDetector.Core/CsvTradeReader.cs` | Strict T-Invest-shaped headers, invariant decimal/lot parsing, deterministic sorting, source SHA-256, rejected rows |
-| Periodic screen | `src/RobotDetector.Core/PeriodicDetector.cs` | Same quantity/side/source/session grouping; candidate T and phase; missed cycles; no double attribution |
+| Periodic screen | `src/RobotDetector.Core/PeriodicDetector.cs` | Same quantity/side/source/session grouping; bounded UTC analysis windows; candidate T and phase; missed cycles; no double attribution |
 | Quote diagnostic | `src/RobotDetector.Core/QuoteOscillation.cs` | Best bid/ask quote travel, reversals, tick-normalized oscillation; not an owner detector |
+| Spectral analysis | `src/RobotDetector.Core/SpectralCandidates.cs` | Clock-time UTC binning, detrend, Hann, radix-2 FFT, heuristic spectrum peaks (not bot IDs) |
 | Synthetic evaluation | `src/RobotDetector.Core/SyntheticBenchmark.cs` | Seeded synthetic public tape, private injected-event truth, null versus injected screening metrics |
 | Chronological check | `src/RobotDetector.Core/WalkForward.cs` | Discover candidate from history at or before cutoff, test only a future event |
-| CLI | `src/RobotDetector.Cli/Program.cs` | Commands: `detect`, `fetch`, `quote`, `benchmark`, `walkforward` |
+| CLI | `src/RobotDetector.Cli/Program.cs` | Commands: `detect`, `fetch`, `quote`, `benchmark`, `walkforward`, `spectrum` |
 | Offline tests | `tests/RobotDetector.SelfTests/Program.cs` | Deterministic checks without NuGet test packages |
 | CI | `.github/workflows/robot-detector-ci.yml` | Isolated .NET 10 compile + offline regressions, no broker secrets |
 
 ## Exact current validation status
 
-**Source files have been committed to GitHub. Compilation/runtime execution has NOT been verified in this authoring session.** The available execution container has no `dotnet` SDK and cannot download it, so no passing local build/test run is claimed. GitHub CI is configured; the current workflow conclusion has not been independently retrieved. Treat the code as an initial implementation requiring first-build verification.
+**GitHub Actions compilation and offline regression SUCCEEDED on 2026-11-18.** Confirmed run: https://github.com/IskanderAbdullin/Analytics/actions/runs/44276050349 — build of Core, CLI and SelfTests: success; 16/16 offline self-tests: success; CLI golden fixture: success; read-only order API sentinel: success. The separate existing IPO CI also succeeded in PR #2. The available local execution container itself lacks `dotnet`; GitHub hosted runner provided the verified build. This is **not** a live-market accuracy validation.
 
 No real T-Invest archive has been fetched using this implementation in the session. `fetch` uses the documented public read-only endpoint; broker availability, source completeness, data-use permissions, and field semantics require instrument-specific smoke testing. No live gRPC T-Invest stream connection has been tested or implemented.
 
 ## What's done versus remaining stage gates
 
-- **Stage 1, partial:** data contract, ZIP/CSV import, T-Invest public one-day downloader, explainable fixed-volume candidate detector, synthetic golden fixture, CLI. **Remaining:** real archive smoke, high-volume sliding window instead of `SKIPPED_DENSE_GROUP`, robust burst assembly, exchange session calendars, full performance metrics, more complicated candidates/FFT.
+- **Stage 1, partial:** data contract, ZIP/CSV import, T-Invest public one-day downloader, explainable fixed-volume candidate detector, windowed processing, independent UTC FFT peaks, synthetic golden fixture, CLI. **Remaining:** real archive smoke, high-volume sliding window instead of `SKIPPED_DENSE_GROUP`, robust burst assembly, exchange session calendars, full performance metrics, more complicated candidates/FFT.
 - **Stage 2, initial:** synthetic injected/null trials with hidden IDs, reproducibility regressions, one-step chronological matching. **Remaining:** ABIDES-NG controlled truth, realistic Hawkes/common-clock null, statistical multiple-testing corrections, held-out calibration, quantitative research report, blind parameters.
 - **Stage 3, not yet operational:** no actual `MarketDataStream` subscription, no persistent live state, no UI/service. Historical endpoint is **not** a substitute for real-time book/trade streaming.
 - **Stage 4, experimental only:** one top-of-book quote oscillation **diagnostic** implemented; no proven iceberg, VWAP/POV, MM, motif, metaorder, or ML detector.
@@ -32,7 +33,7 @@ No real T-Invest archive has been fetched using this implementation in the sessi
 
 ## Known limitations needing action
 
-1. At most `MaximumEventsPerGroup` events per instrument/side/quantity/session in historical detector; above the limit it explicitly **skips** dense group and warns rather than silently downsampling. Must be replaced with scalable windowed processing.
+1. Detector processes **independent bounded UTC time windows** (default 60 minutes); if any individual window exceeds `MaximumEventsPerGroup` (default 5000 events with the same q/source/side), it explicitly skips that window. Counts across windows are **episodes**, not deduplicated unique participants across a day; future work should merge persistent hypotheses and support denser streams.
 2. A period whose timestamp bins alias, source rounding, market-wide clock synchronicity, and harmonics can cause false candidates. No p-values, confidence or FDR control yet.
 3. Quote snapshots do not establish feed continuity; quote movement classifier is an observed feature and is **not** an iceberg/spoofing claim.
 4. Direction is provider-reported and not identified as passive-order owner. `UNKNOWN` excluded from directional classifications.
@@ -45,7 +46,7 @@ No real T-Invest archive has been fetched using this implementation in the sessi
 
 ## Next tasks, in order
 
-1. Run `dotnet build` and synthetic self-tests in GitHub Actions or a local .NET SDK; resolve any compiler/runtime failures.
+1. **DONE (initial build):** GitHub Actions compiled all .NET projects and passed 16 self-tests. Continue adding CI as code grows.
 2. Verify fixed-volume baseline on one authentic T-Invest trade archive; register data SHA and limitations.
 3. Add sliding windows, phase harmonics/dedup, session-aware calendar, and single-source attribution tests.
 4. Add null controls, walk-forward scoring across days, ABIDES realistic truth and blind calibration.
