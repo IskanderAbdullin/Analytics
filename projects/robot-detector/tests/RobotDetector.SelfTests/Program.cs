@@ -41,6 +41,9 @@ internal static class Program
         Check("fusion refuses large time gaps and phase changes", FusionRejectsBadContinuation);
         Check("fusion does not cross trade source/mode boundaries", FusionSeparatesSourceMode);
         Check("fusion validates source hashes and exclusive evidence", FusionRejectsInvalidEvidence);
+        Check("rotation null preserves local size runs and timestamps", RotationPreservesRuns);
+        Check("null report includes conservative grouped comparison", NullReportIncludesGroups);
+        Check("invalid null variant fails closed", InvalidNullVariant);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -428,6 +431,54 @@ internal static class Program
         }
         catch (InvalidDataException) { doubleAttributionRejected = true; }
         Assert(doubleAttributionRejected, "must reject reused trade print IDs");
+    }
+
+
+    private static void RotationPreservesRuns()
+    {
+        var quantities = new long[] { 10, 10, 20, 20, 30, 30, 40, 40 };
+        var trades = CreateSequence("ROT", "EXCHANGE", "SELL", 10, 1000, quantities.Length)
+            .Select((t, i) => t with { QuantityLots = quantities[i] }).ToArray();
+        var input = From(trades);
+        var (shifted, moved) = SizeShuffleNull.Shuffle(input, 739, 60, "rotate");
+        Assert(moved > 0, "non-uniform sizes should rotate to a different phase");
+        Assert(trades.Select(t => t.ExchangeTimeUtc).SequenceEqual(
+            shifted.Trades.Select(t => t.ExchangeTimeUtc)), "timestamps must stay unchanged");
+        Assert(trades.Select(t => t.QuantityLots).OrderBy(x => x).SequenceEqual(
+            shifted.Trades.Select(t => t.QuantityLots).OrderBy(x => x)),
+            "local size multiset must be identical");
+        int Transitions(IEnumerable<long> xs)
+        {
+            long[] a = xs.ToArray();
+            return Enumerable.Range(1, a.Length - 1).Count(i => a[i] != a[i - 1]);
+        }
+        Assert(Transitions(shifted.Trades.Select(t => t.QuantityLots)) <=
+            Transitions(quantities) + 1,
+            "single circular seam can add at most one size transition");
+    }
+
+    private static void NullReportIncludesGroups()
+    {
+        var source = CsvTradeReader.Read(Fixture("synthetic_twap_5s.csv"));
+        var original = PeriodicDetector.Detect(source, new DetectorConfig());
+        var groups = EpisodeFusion.Group(source, original, new DetectorConfig());
+        var report = SizeShuffleNull.Compare(source, new DetectorConfig(), 3, 42, 60, "rotate");
+        Assert(report.OriginalConservativelyLinkedGroupCount ==
+            groups.ConservativelyLinkedGroupCount, "real-data episode grouping baseline");
+        Assert(report.Trials.All(t =>
+            t.ConservativelyLinkedGroupCount <= t.NullCandidateEpisodes),
+            "fusion cannot create extra groups");
+        Assert(report.MeanNullConservativelyLinkedGroupCount >= 0, "group count nonnegative");
+        Assert(report.NullFamily == "local_trade_quantity_rotate", "null family provenance");
+    }
+
+    private static void InvalidNullVariant()
+    {
+        bool threw = false;
+        try { SizeShuffleNull.Shuffle(From(CreateSequence("X", "EXCHANGE", "SELL", 100, 5000, 7)),
+            seed: 7, localWindowSeconds: 60, nullMode: "unsupported"); }
+        catch (ArgumentException) { threw = true; }
+        Assert(threw, "unknown null variant should be rejected");
     }
 
     private static void BadConfig()

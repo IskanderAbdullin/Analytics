@@ -208,7 +208,8 @@ internal static class Program
         var report = SizeShuffleNull.Compare(imported, config,
             trials: Integer(options, "trials", 10),
             seed: Integer(options, "seed", 42),
-            localWindowSeconds: Integer(options, "block-seconds", 60));
+            localWindowSeconds: Integer(options, "block-seconds", 60),
+            nullMode: options.GetValueOrDefault("mode", "permute"));
         string json = JsonSerializer.Serialize(report, JsonOptions);
         if (options.TryGetValue("output", out var output))
         {
@@ -361,7 +362,7 @@ internal static class Program
         Console.WriteLine("benchmark [--seeds 20] [--noise-trades 200] [--output synthetic_report.json]");
         Console.WriteLine("walkforward --input file.csv --cutoff YYYY-MM-DDTHH:MM:SSZ [--min-matches 4]");
         Console.WriteLine("spectrum --input file.csv [--bin-ms 500] [--top 8] [--output spectrum.json]");
-        Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60]");
+        Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60] [--mode permute|rotate]");
         Console.WriteLine("fusion --input file.csv [--max-gap-cycles 12] [--output grouped.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
