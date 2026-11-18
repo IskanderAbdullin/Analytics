@@ -79,6 +79,22 @@ jobs:
           assert r["actualBotCountKnown"] is False, r
           assert r["calibrated"] is False, r
           PY
+      - name: Forecast failure diagnostic smoke (synthetic)
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- diagnose-forecast \
+            --input fixtures/synthetic_long_cadence_5min.csv \
+            --min-matches 4 --warmup-minutes 20 --stride-minutes 10 \
+            --max-cutoffs 4 --output /tmp/robot-diagnostic.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-diagnostic.json",encoding="utf-8"))
+          assert r["forecastsEvaluated"] == 4, r
+          assert r["exactHits"] == 4, r
+          assert r["misses"] == 0, r
+          assert sum(x["evaluatedForecasts"] for x in r["historicalAgeBuckets"]) == 4, r
+          assert r["actualBotCountKnown"] is False, r
+          assert r["statisticalSignificanceEstablished"] is False, r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
