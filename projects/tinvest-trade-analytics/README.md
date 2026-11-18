@@ -1,6 +1,6 @@
 # TInvest Trade Analytics — проектное ТЗ
 
-**Статус:** ТЗ v1.1 + начальная реализация v0.4 (18.11.2026). Обязательно смотреть [статус и ограничения реализации](docs/11-implementation-status.md); BROKER_VALIDATED пока нет. **Язык:** русский. **Тип:** отдельный проект в монорепозитории Analytics.
+**Статус:** ТЗ v1.1 + начальная реализация v0.5 (18.11.2026). Обязательно смотреть [статус и ограничения реализации](docs/11-implementation-status.md); BROKER_VALIDATED пока нет. **Язык:** русский. **Тип:** отдельный проект в монорепозитории Analytics.
 
 ## Цель
 
@@ -52,6 +52,6 @@
 
 ## Код
 
-- [CLI на .NET 10](src/TInvestAnalytics.Cli/) — `doctor`, `accounts`, `sync`, `import-json`, `report`, `daily-report`, `snapshot`, `snapshots`, `equity-pnl`, `import-bot`, `bot-stats`, `stats`.
+- [CLI на .NET 10](src/TInvestAnalytics.Cli/) — `doctor`, `accounts`, `sync`, `import-json`, `report`, `daily-report`, `snapshot`, `snapshots`, `equity-pnl`, `import-bot`, `bot-stats`, `broker-report-request`, `broker-report-fetch`, `broker-report-summary`, `stats`.
 - [Синтетические smoke-тесты](tests/TInvestAnalytics.SmokeTests/).
 - [Отдельный GitHub Actions workflow](../../.github/workflows/tinvest-analytics-ci.yml) (путь в репозитории: `.github/workflows/tinvest-analytics-ci.yml`).

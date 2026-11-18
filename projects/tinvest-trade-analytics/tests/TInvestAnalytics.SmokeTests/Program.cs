@@ -287,6 +287,43 @@ Check("bot JSONL import, idempotency, collision guard and operational statistics
     }
 });
 
+
+Check("broker report async task and page evidence, commission summary", () =>
+{
+    string request = """{"generateBrokerReportResponse":{"taskId":"TASK_DEMO"}}""";
+    Equal(BrokerReportParsing.ReadTaskId(request),"TASK_DEMO","generation response");
+    string Row(string commission) => JsonSerializer.Serialize(new {
+        orderId="ORDER",
+        brokerCommission=new {currency="RUB",units=commission,nano=0},
+        exchangeCommission=new {currency="RUB",units="1",nano=0},
+        exchangeClearingCommission=new {currency="RUB",units="0",nano=0}
+    });
+    string Page(int index,string commission) =>
+        "{\"getBrokerReportResponse\":{\"brokerReport\":["+Row(commission)+
+        "],\"itemsCount\":2,\"pagesCount\":2,\"page\":"+index+"}}";
+    var f=BrokerReportParsing.ReadPage(0,Page(0,"2"));
+    Equal(f.ReturnedRows,1,"parsed one broker report row");
+    var root=Path.Combine(Path.GetTempPath(),"tia_br_"+Guid.NewGuid().ToString("N")+".db");
+    try
+    {
+        var store=new EvidenceStore(root);store.Initialize();
+        store.SaveBrokerReportTask(new BrokerReportTask("TASK_DEMO","TEST",from,to,DateTimeOffset.UtcNow));
+        store.SaveBrokerReportPage("TASK_DEMO",f);
+        Equal(store.BrokerReportSummary("TASK_DEMO").Status,"partial","first page incomplete");
+        var next=BrokerReportParsing.ReadPage(1,Page(1,"3"));
+        store.SaveBrokerReportPage("TASK_DEMO",next);
+        store.SaveBrokerReportPage("TASK_DEMO",next);
+        var summary=store.BrokerReportSummary("TASK_DEMO");
+        Equal(summary.PagesStored,2,"two unique pages");
+        Equal(summary.ActualRows,2,"two raw report entries");
+        Equal(summary.ExplicitCommissionsByCurrency["RUB"],7m,
+              "2 + 3 broker and two exchange fees");
+        Equal(summary.Status,"raw_complete_unreconciled","raw pages complete not cash reconciled");
+    }
+    finally
+    {foreach(var suffix in new[]{"","-wal","-shm"}){try{File.Delete(root+suffix);}catch(IOException){}}}
+});
+
 Console.WriteLine($"All {passed} deterministic smoke tests passed.");
 
 internal sealed class FakeHandler : HttpMessageHandler

@@ -55,6 +55,15 @@ public static class Program
                 case "import-bot":
                     ImportBot(args, store);
                     break;
+                case "broker-report-request":
+                    await RequestBrokerReport(args, store);
+                    break;
+                case "broker-report-fetch":
+                    await FetchBrokerReport(args, store);
+                    break;
+                case "broker-report-summary":
+                    ShowBrokerReport(args, store);
+                    break;
                 case "bot-stats":
                     BotStats(args, store);
                     break;
@@ -223,6 +232,59 @@ public static class Program
     }
 
 
+
+    private static async Task RequestBrokerReport(string[] args, EvidenceStore store)
+    {
+        var (from,to) = Period(args);
+        if ((to - from).TotalDays > 31)
+            throw new ArgumentException("Broker report interval exceeds 31 days; split the request.");
+        using var client = Client(args);
+        string? account = Arg(args, "--account");
+        if (account is null)
+        {
+            int idx = int.Parse(Require(args,"--account-index"),CultureInfo.InvariantCulture);
+            var accounts = TInvestClient.ParseAccounts(await client.GetAccountsAsync());
+            if (idx < 0 || idx >= accounts.Count)
+                throw new ArgumentOutOfRangeException(nameof(idx),"Account index is out of range.");
+            account=accounts[idx].Id;
+        }
+        string raw=await client.GenerateBrokerReportAsync(account,from,to);
+        string taskId=BrokerReportParsing.ReadTaskId(raw);
+        store.SaveBrokerReportTask(new BrokerReportTask(taskId,account,from,to,DateTimeOffset.UtcNow));
+        Console.WriteLine($"Broker report task requested: {taskId}. Run broker-report-fetch later using the task ID.");
+    }
+    private static async Task FetchBrokerReport(string[] args, EvidenceStore store)
+    {
+        string taskId = Require(args,"--task");
+        var task = store.GetBrokerReportTask(taskId);
+        int maximum = int.Parse(Arg(args,"--max-pages") ?? "100",CultureInfo.InvariantCulture);
+        if (maximum < 1 || maximum > 1000) throw new ArgumentException("max-pages out of range.");
+        using var client = Client(args);
+        int rows=0;
+        var encountered=new HashSet<int>();
+        for (int pageIndex=0; pageIndex<maximum; pageIndex++)
+        {
+            var raw=await client.GetBrokerReportPageAsync(task.TaskId,pageIndex);
+            var page=BrokerReportParsing.ReadPage(pageIndex,raw);
+            if (!encountered.Add(page.Page))
+                throw new InvalidDataException("Broker report server returned duplicate page index. Incomplete.");
+            store.SaveBrokerReportPage(task.TaskId,page);
+            rows+=page.ReturnedRows;
+            Console.WriteLine($"Stored report page {page.Page}: {page.ReturnedRows} rows (total {rows}).");
+            if (page.ItemsCount == 0 || rows >= page.ItemsCount) break;
+            if (page.ReturnedRows == 0)
+                throw new InvalidDataException("Report has fewer rows than declared; received empty page.");
+            if (pageIndex == maximum-1)
+                throw new InvalidDataException("Broker report page limit reached; result may be incomplete.");
+        }
+        ShowBrokerReport(args,store);
+    }
+    private static void ShowBrokerReport(string[] args,EvidenceStore store)
+    {
+        var taskId=Require(args,"--task");
+        Console.WriteLine(JsonSerializer.Serialize(store.BrokerReportSummary(taskId),JsonOptions()));
+    }
+
     private static void ImportBot(string[] args, EvidenceStore store)
     {
         var file = Require(args, "--file");
@@ -296,6 +358,9 @@ public static class Program
               daily-report --account ID --from ... --to ... [--exclude-days 2026-11-14] [--asset-map class-map.json]
               import-bot --file events.jsonl [--db PATH]
               bot-stats --bot BabidDemo --from ... --to ... [--db PATH]
+              broker-report-request --account-index 0 --from ... --to ...
+              broker-report-fetch --task TASK_ID [--max-pages 100]
+              broker-report-summary --task TASK_ID
               snapshot --account-index 0 [--db PATH] [--sandbox]
               snapshots --account ID [--db PATH]
               equity-pnl --account ID --start-id N --end-id N [--db PATH]

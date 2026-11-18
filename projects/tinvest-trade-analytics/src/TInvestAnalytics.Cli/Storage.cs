@@ -84,6 +84,7 @@ public sealed partial class EvidenceStore
         q.ExecuteNonQuery();
         InitializePortfolio();
         InitializeBotTelemetry();
+        InitializeBrokerReports();
     }
 
     public static string WindowId(string accountId, DateTimeOffset from, DateTimeOffset to)

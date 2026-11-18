@@ -36,7 +36,8 @@ public sealed class TInvestClient : IDisposable
             or "UsersService/GetUserTariff"
             or "OperationsService/GetOperationsByCursor"
             or "OperationsService/GetPortfolio"
-            or "OperationsService/GetPositions"))
+            or "OperationsService/GetPositions"
+            or "OperationsService/GetBrokerReport"))
             throw new InvalidOperationException("Endpoint denied by read-only allowlist.");
 
         var url = Endpoint + allowedServiceMethod;
@@ -84,6 +85,22 @@ public sealed class TInvestClient : IDisposable
         PostAsync("OperationsService/GetPortfolio", new { accountId, currency = "RUB" }, ct);
     public Task<string> GetPositionsAsync(string accountId, CancellationToken ct = default) =>
         PostAsync("OperationsService/GetPositions", new { accountId }, ct);
+
+
+    public Task<string> GenerateBrokerReportAsync(string accountId,
+        DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default) =>
+        PostAsync("OperationsService/GetBrokerReport", new {
+            generateBrokerReportRequest = new {
+                accountId,
+                from = from.ToUniversalTime().ToString("O"),
+                to = to.ToUniversalTime().ToString("O")
+            }
+        }, ct);
+
+    public Task<string> GetBrokerReportPageAsync(string taskId,
+        int page, CancellationToken ct = default) =>
+        PostAsync("OperationsService/GetBrokerReport",
+            new { getBrokerReportRequest = new { taskId, page } }, ct);
 
     public Task<string> GetOperationsPageAsync(string accountId, DateTimeOffset from,
         DateTimeOffset to, string? cursor, CancellationToken ct = default) =>
