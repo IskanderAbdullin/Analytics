@@ -1,0 +1,104 @@
+name: Robot Detector variable-size independent-date check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/robot-detector-variable-independent.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  read-only-variable-size:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build and validate synthetic variable cadence first
+        run: |
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
+          dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
+      - name: Empirical processing of second prespecified MOEX equity archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          echo "READ_ONLY_VARIABLE_SIZE_PILOT: MOEX_TQBR 2026-11-02, no token, no trade endpoints"
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt
+          openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject |
+            grep -q 'Russian Trusted Root CA'
+          pinned='D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31'
+          actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+          if [[ "$actual" != "$pinned" ]]; then
+            echo "BLOCKED_UNVERIFIED_CA: fingerprint mismatch"
+            exit 1
+          fi
+          export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          if ! dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            fetch --date 2026-11-02 --instrument-id MOEX_TQBR \
+            --output data/raw/moex_2026-11-02.csv > /tmp/rd-fetch.log 2>&1; then
+            echo "BLOCKED_BY_DATA: prespecified public archive unavailable or TLS blocked"
+            sed -n '1,8p' /tmp/rd-fetch.log
+            exit 1
+          fi
+          raw=data/raw/moex_2026-11-02.csv
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            variable-cadence --input "$raw" --output data/results/variable.json
+          for mode in uniform rotate; do
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              variable-temporal-null --input "$raw" --mode "$mode" \
+              --trials 24 --seed 90210 --block-seconds 60 \
+              --output "data/results/null_$mode.json"
+          done
+          python3 - <<'PY'
+          import json,pathlib
+          d=pathlib.Path("data/results")
+          p=json.loads((d/"variable.json").read_text())
+          controls={}
+          for mode in ("uniform","rotate"):
+              n=json.loads((d/f"null_{mode}.json").read_text())
+              assert n["trialsRun"]==24
+              assert n["sourceSha256"] == p["sourceSha256"]
+              assert n["sourcePrintCount"]==p["inputPrints"]
+              assert n["originalCandidateSequences"]==p["candidateSequenceCount"]
+              assert not n["actualBotCountKnown"] and not n["significanceCalibrated"]
+              controls[mode]={
+                "candidateCounts":[x["candidateSequences"] for x in n["trials"]],
+                "changedPrints":[x["changedPrintTimestamps"] for x in n["trials"]],
+                "mean":n["meanNullCandidateSequences"],
+                "descriptiveGlobalTail":n["descriptiveGlobalTailFrequency"]
+              }
+          assert p["inputPrints"] > 0
+          assert p["uniqueAttributedPrints"] <= p["inputPrints"]
+          assert not p["physicalBotCountKnown"] and not p["statisticalSignificanceEstablished"]
+          assert all(x["state"]=="candidate" and x["confidenceCalibrated"] is None
+                     and not x["ownerKnown"] for x in p["candidates"])
+          print("VARIABLE_SIZE_INDEPENDENT_DATE",json.dumps({
+            "instrument":"MOEX_TQBR","date":"2026-11-02",
+            "sourceSha256":p["sourceSha256"],
+            "inputPrints":p["inputPrints"],
+            "candidateSequences":p["candidateSequenceCount"],
+            "uniqueAttributedPrints":p["uniqueAttributedPrints"],
+            "denseWindowSkipCount":p["skippedDenseWindowCount"],
+            "controlTrials":controls,
+            "actualBotCountKnown":False,
+            "significanceCalibrated":False
+          },ensure_ascii=False))
+          PY
+          echo "VARIABLE_PILOT_COMPLETED: second-day descriptive result, not confirmed bots"
+      - name: Delete raw market file and temporary root
+        if: always()
+        shell: bash
+        run: |
+          rm -rf data/raw data/results
+          rm -f /tmp/russian_trusted_root_ca.crt /tmp/rd-fetch.log
