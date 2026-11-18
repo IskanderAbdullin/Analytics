@@ -35,9 +35,11 @@ public sealed record WalkForwardReport(
 public static class WalkForward
 {
     public static WalkForwardReport Evaluate(TradeImportResult input, DateTimeOffset cutoffUtc,
-        DetectorConfig config)
+        DetectorConfig config, int? maximumTrainingAgeCycles = null)
     {
         config.Validate();
+        if (maximumTrainingAgeCycles is < 1 or > 1000)
+            throw new ArgumentException("Maximum training age must be 1..1000 cycles.");
         if (cutoffUtc.Offset != TimeSpan.Zero)
             throw new ArgumentException("Use explicit UTC cutoff.");
         var training = input.Trades.Where(t => t.ExchangeTimeUtc <= cutoffUtc).ToList();
@@ -52,6 +54,14 @@ public static class WalkForward
         var assignedFuture = new HashSet<string>(StringComparer.Ordinal);
         foreach (var pattern in candidates.Patterns)
         {
+            var lastEvidence = pattern.EvidenceEventIds.Select(id =>
+                trainingEvidenceById.TryGetValue(id, out var timestamp) ? timestamp :
+                    throw new InvalidDataException("Candidate evidence not present in historical training prefix.")).Max();
+            double trainingAgeCycles = (cutoffUtc - lastEvidence).TotalMilliseconds / pattern.PeriodMilliseconds;
+            // Historical-only eligibility decision: MUST run before reading any
+            // future outcome prints or comparing their timestamps/quantities.
+            if (maximumTrainingAgeCycles.HasValue && trainingAgeCycles > maximumTrainingAgeCycles.Value)
+                continue;
             var anchor = DateTimeOffset.Parse(pattern.PhaseUtc, CultureInfo.InvariantCulture,
                 DateTimeStyles.AdjustToUniversal);
             double cycles = (cutoffUtc - anchor).TotalMilliseconds / pattern.PeriodMilliseconds;
@@ -80,9 +90,6 @@ public static class WalkForward
                 .ThenBy(t => t.ArrivalSequence)
                 .FirstOrDefault();
             if (match is not null) assignedFuture.Add(match.EventId);
-            var lastEvidence = pattern.EvidenceEventIds.Select(id =>
-                trainingEvidenceById.TryGetValue(id, out var timestamp) ? timestamp :
-                    throw new InvalidDataException("Candidate evidence not present in historical training prefix.")).Max();
             checks.Add(new ForecastCheck(pattern.PatternId, cutoffUtc.ToString("O"),
                 target.ToString("O"), windowStart.ToString("O"), windowEnd.ToString("O"),
                 match?.EventId, match is not null, pattern.PeriodMilliseconds,
