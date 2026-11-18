@@ -14,4 +14,23 @@
 
 See [VARIABLE_SIZE_CADENCE_PROTOTYPE.md](VARIABLE_SIZE_CADENCE_PROTOTYPE.md) and [STAGE_02_VALIDATION.md](STAGE_02_VALIDATION.md).
 
-**Observed result:** not filled before a successful test run.
+## Measured real-data pilot — executed 2026-11-18
+
+**Run:** [GitHub Actions 44306311739](https://github.com/IskanderAbdullin/Analytics/actions/runs/44306311739), successfully completed with **50/50** .NET self-tests and all temporary source files removed.
+
+- Prespecified instrument **MOEX_TQBR** (Moscow Exchange equity), date **2026-11-03**.
+- Imported **19,086** public anonymized trade prints. Raw compressed file SHA-256: `de06494756164573dc4e87398b987f9f39bf08e22d4acc4b606b82441fecc143`.
+- Detected **7 variable-clip time-regular candidate sequences**, assigning a total of **374 distinct observed public prints** (no double attribution). **0** densely populated windows were skipped under the 2,500 print limit.
+- In four `uniform-minute` timestamp controls, candidate counts were **1, 1, 1, 1**, mean **1.0**. All 19,086 timestamps changed each time.
+- In four `rotate-minute` timestamp controls, candidate counts were **0, 0, 0, 1**, mean **0.25**. All 19,086 timestamps changed each time.
+- Descriptive global count tail frequency for both controls: `1/(4+1)=0.2`. This is not a formal significance test, calibrated p-value, FDR, or posterior probability that there are 7 robots.
+- **Actual bot/owner count remains unknown.** No identifiable order/participant IDs or verified market-data feed completeness; none of these observations is a validated next-trade prediction.
+
+**Interpretation:** first independent real-world data-access/screening smoke succeeded and identifies **more candidate timed varied-q print sequences** than these weak 4-run time controls. However, this does **not** identify seven bots: several independent traders may create the same rhythm, or one program may create several sequences. The controls alter exchange clustering and market-clock structure; B=4 is too small for any meaningful significance claim.
+
+**Next predeclared study:** freeze all method parameters unchanged, choose a new MOEX archive date (e.g. 2026-11-02) and use at least 24 controls per family (minimum descriptive tail 1/25=0.04, still not valid inference without proper null assumptions). Include event-level future-only forecast performance after full calibration and a controlled known-agent simulation; do not enable live signals based on this pilot.
+
+### Decision
+
+**Data-access and synthetic correctness gate PASSED. Statistical validity/forecasting gate NOT PASSED.** The implementation remains research-only and cannot report a confirmed number of actual robot programs.
+
