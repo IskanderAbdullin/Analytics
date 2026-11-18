@@ -37,6 +37,8 @@ internal static class Program
                     return Benchmark(options);
                 case "walkforward":
                     return Walkforward(options);
+                case "spectrum":
+                    return Spectrum(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -156,6 +158,25 @@ internal static class Program
     }
 
 
+
+
+    private static int Spectrum(Dictionary<string, string> options)
+    {
+        var imported = CsvTradeReader.Read(Required(options, "input"));
+        var report = SpectralCandidates.Analyse(imported,
+            binMs: Integer(options, "bin-ms", 500),
+            topPeaks: Integer(options, "top", 8));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out string? output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Spectral candidate report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine("FFT peaks are hypotheses only, not bot IDs or calibrated probabilities.");
+        return 0;
+    }
 
     private static int Walkforward(Dictionary<string, string> options)
     {
@@ -277,6 +298,7 @@ internal static class Program
         Console.WriteLine("quote --input fixtures/synthetic_quote_oscillation.csv");
         Console.WriteLine("benchmark [--seeds 20] [--noise-trades 200] [--output synthetic_report.json]");
         Console.WriteLine("walkforward --input file.csv --cutoff YYYY-MM-DDTHH:MM:SSZ [--min-matches 4]");
+        Console.WriteLine("spectrum --input file.csv [--bin-ms 500] [--top 8] [--output spectrum.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
