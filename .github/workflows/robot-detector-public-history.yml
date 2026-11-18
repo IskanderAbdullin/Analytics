@@ -39,6 +39,12 @@ jobs:
               echo "BLOCKED_UNVERIFIED_CA: unexpected CA identity"
               exit 0
             fi
+            pinned="D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31"
+            actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+            if [[ "$actual" != "$pinned" ]]; then
+              echo "BLOCKED_UNVERIFIED_CA: fingerprint mismatch; investigate root rotation"
+              exit 0
+            fi
             echo "Using process-scoped SSL_CERT_FILE for one public archive test"
             export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
           else
