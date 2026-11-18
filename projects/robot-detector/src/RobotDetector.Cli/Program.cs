@@ -41,6 +41,8 @@ internal static class Program
                     return Spectrum(options);
                 case "null-shuffle":
                     return NullShuffle(options);
+                case "fusion":
+                    return Fusion(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -163,6 +165,35 @@ internal static class Program
 
 
 
+
+
+    private static int Fusion(Dictionary<string, string> options)
+    {
+        var imported = CsvTradeReader.Read(Required(options, "input"));
+        var config = new DetectorConfig
+        {
+            MinMatches = Integer(options, "min-matches", 6),
+            AnalysisWindowMinutes = Integer(options, "window-minutes", 60),
+            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000)
+        };
+        var candidates = PeriodicDetector.Detect(imported, config);
+        var report = EpisodeFusion.Group(imported, candidates, config,
+            maxGapCycles: Integer(options, "max-gap-cycles", 12));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out string? output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Conservative episode grouping report saved to {output}");
+        }
+        else Console.WriteLine(json);
+
+        Console.Error.WriteLine(
+            $"Candidate episodes={report.CandidateEpisodeCount}; " +
+            $"linked groups={report.ConservativelyLinkedGroupCount}; " +
+            "physical_bot_count=UNKNOWN");
+        return imported.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int NullShuffle(Dictionary<string, string> options)
     {
@@ -331,6 +362,7 @@ internal static class Program
         Console.WriteLine("walkforward --input file.csv --cutoff YYYY-MM-DDTHH:MM:SSZ [--min-matches 4]");
         Console.WriteLine("spectrum --input file.csv [--bin-ms 500] [--top 8] [--output spectrum.json]");
         Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60]");
+        Console.WriteLine("fusion --input file.csv [--max-gap-cycles 12] [--output grouped.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
