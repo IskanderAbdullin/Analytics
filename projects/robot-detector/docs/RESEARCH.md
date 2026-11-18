@@ -145,3 +145,10 @@ for (int i = 0; i < times.Length; i++)
 **Только после доступности L2/проверки покрытия:** OFI, iceberg-like, grid, MM-like.
 
 **Только при доступе к MBO:** прямой воспроизводимый порт ClusterLOB и CME-specific native iceberg features; иначе адаптация с честной маркировкой и совершенно новой валидацией.
+
+
+## 13. Продолжение исследования с разбором конкретного исходного кода (18.11.2026)
+
+См. **[RESEARCH_EXPANSION_2026-11-18.md](RESEARCH_EXPANSION_2026-11-18.md)** — проверенные \`crypto-lake/analysis-sharing/twap_detection.ipynb\`, \`OctopusTakopi/binance_l3_est/src/engine/twap.rs\`, \`Niketion/flowdepth/data/src/orderflow/iceberg.rs\`, Hawkes simulator, FlowForge, BOCPD и новые peer-reviewed papers.
+
+**Важное исправление методики:** периодограмма по \`trades.quantity\`, если ряд индексирован отдельными событиями, не должна интерпретироваться как спектр частот в физическом времени без корректной привязки к timestamps. Для \`FFT\` использовать регулярные bins; спектральные пики только кандидаты. Отдельно учитывать естественную общерыночную активность на границах секунды и минуты. Все новые требования перенесены непосредственно в ТЗ этапов 1–4.
