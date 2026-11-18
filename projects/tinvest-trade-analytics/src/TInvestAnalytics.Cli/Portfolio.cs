@@ -130,7 +130,8 @@ public sealed partial class EvidenceStore
             ("$p", pHash), ("$x", xHash), ("$rawp", rawPortfolio), ("$rawx", rawPositions)))
         {
             q.ExecuteNonQuery();
-            id = c.LastInsertRowId;
+            using var idCommand = Command(c, tx, "SELECT last_insert_rowid();");
+            id = Convert.ToInt64(idCommand.ExecuteScalar(), CultureInfo.InvariantCulture);
         }
         tx.Commit();
         return new PortfolioSnapshot(id, accountId, observedAt, equity, pHash, xHash);
