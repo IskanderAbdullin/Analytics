@@ -27,6 +27,7 @@ internal static class Program
         Check("quote oscillation observable without any trades", QuoteWithoutTrades);
         Check("missing coverage is not proof", MissingCoverage);
         Check("config rejects impossible thresholds", BadConfig);
+        Check("synthetic benchmark reproducible with hidden truth", BenchmarkReproducible);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -193,6 +194,20 @@ internal static class Program
         Assert(!import.HasVerifiedFeedCoverage, "single CSV cannot verify completeness");
         Assert(PeriodicDetector.Detect(import, new DetectorConfig()).Patterns.Single().State == "candidate",
             "must not confirm without holdout");
+    }
+
+
+    private static void BenchmarkReproducible()
+    {
+        var c = new DetectorConfig();
+        var a = SyntheticBenchmark.Run(3, c, noiseTrades: 50);
+        var b = SyntheticBenchmark.Run(3, c, noiseTrades: 50);
+        Assert(a.NumberOfTrials == 6 && a.InjectedTrials == 3 && a.NullTrials == 3,
+            "must compare injected vs null");
+        Assert(a.Trials.SequenceEqual(b.Trials), "same seeds should produce same trial results");
+        Assert(a.Trials.All(x => !x.PhysicalCountInferred), "must not infer real identities");
+        Assert(a.Trials.Where(x => x.TrueGeneratorCount == 1).All(x => x.TotalInjectedEvents == 12),
+            "internal ground truth count");
     }
 
     private static void BadConfig()
