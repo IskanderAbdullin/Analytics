@@ -43,6 +43,8 @@ internal static class Program
                     return NullShuffle(options);
                 case "fusion":
                     return Fusion(options);
+                case "rolling-forecast":
+                    return RollingForecastCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -166,6 +168,35 @@ internal static class Program
 
 
 
+
+
+    private static int RollingForecastCommand(Dictionary<string, string> options)
+    {
+        var source = CsvTradeReader.Read(Required(options, "input"));
+        var config = new DetectorConfig
+        {
+            MinMatches = Integer(options, "min-matches", 6),
+            AnalysisWindowMinutes = Integer(options, "window-minutes", 60),
+            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000)
+        };
+        var report = RollingForecast.Evaluate(source, config,
+            warmupMinutes: Integer(options, "warmup-minutes", 20),
+            strideMinutes: Integer(options, "stride-minutes", 15),
+            maximumCutoffsPerSession: Integer(options, "max-cutoffs", 24));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out string? output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Chronological forecast and placebo report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine(
+            $"Future checks={report.ForecastsEvaluated}; observed hits={report.ObservedHits}; " +
+            $"phase-shift placebo hits={report.PlaceboHits}; " +
+            "uncalibrated and not proof of bot ownership");
+        return source.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int Fusion(Dictionary<string, string> options)
     {
@@ -364,6 +395,7 @@ internal static class Program
         Console.WriteLine("spectrum --input file.csv [--bin-ms 500] [--top 8] [--output spectrum.json]");
         Console.WriteLine("null-shuffle --input file.csv [--trials 10] [--seed 42] [--block-seconds 60] [--mode permute|rotate]");
         Console.WriteLine("fusion --input file.csv [--max-gap-cycles 12] [--output grouped.json]");
+        Console.WriteLine("rolling-forecast --input file.csv [--warmup-minutes 20] [--stride-minutes 15] [--max-cutoffs 24]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
