@@ -160,3 +160,20 @@ cancelled = max(previous_visible - min(previous_visible, pending_executed) - cur
 **Отдельная исследовательская идея (не текущая цель):** оценка параметров Lillo–Mike–Farmer по long-memory trade signs ([Sato–Kanazawa 2023](https://arxiv.org/abs/2301.13505)) только как aggregate market model. Нельзя использовать модельную оценку средних параметров скрытых parent orders как точное число активных физических программ.
 
 **Приёмка:** каждый новый детектор должен доказать дополнительную предсказательную полезность относительно stages 1–3 и false discovery control, либо оставаться выключенным `EXPERIMENTAL`. Вся система продолжает работать при отсутствии L2 и не делает торговых операций.
+
+## 14. Отдельный R&D модуль: Lillo–Mike–Farmer / Sato–Kanazawa aggregate active-splitter estimate
+
+Источник [Sato & Kanazawa, Phys. Rev. Lett. 131, 197401 (2023)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.131.197401) прямо обсуждает **оценку числа order-splitting трейдеров по prefactor** долгосрочной ACF знаков при условиях LMF. Полное обсуждение: [research part 2, §9](RESEARCH_EXPANSION_2026-11-18_PART2.md).
+
+ТЗ на отдельную исследовательскую ветвь `LMFAggregateEstimator`:
+- Input: длительная последовательность **достоверно подписанных** market-order signs (event-time), работающие session/source boundaries, timestamps и `data_coverage`.
+- Phase 1: ACFSampler `C(lag)` с baseline для однородных и correlated null, `fit gamma,c0`, confidence intervals/block bootstrap, held-out stability across days.
+- Phase 2: извлечь и задокументировать точную формулу модельного `N_ST` из исходной статьи и весь набор предположений; нельзя заменять prefactor грубой эвристикой.
+- Phase 3: проверить с truth ABIDES, а затем synthetic LMF-specific генератором, управляя числом splitting agents, Pareto alpha, миксом random/strategic agents и partial-fill aggregation.
+- Output: `model_family="LMF"`, `estimated_order_splitting_traders` с **conditional under assumptions** диапазоном либо `NOT_IDENTIFIABLE`; это **НЕ** число одновременно работающих физических роботов/контрагентов/участников.
+- На публичных данных вывод держать в `research report`; UI/alerts по умолчанию выключены. Если не получено устойчивое подтверждение — `REJECT` как публичный индикатор.
+
+Test LMF-1: при идентичном aggregate sign autocorrelation, но разных identity assignments, модель не должна утверждать фактически проверенное количество счётов.
+Test LMF-2: 20минутный период / нет tail regime → `INSUFFICIENT_HISTORY`.
+Test LMF-3: ошибочная trade-side classification или дилерский режим → `SIGN_UNVERIFIED`.
+Test LMF-4: растущая гетерогенность child-size/agent lengths → показать model sensitivity.
