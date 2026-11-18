@@ -26,7 +26,7 @@ Pre-declared experimental defaults (not chosen on test data):
 | Temporal matching tolerance | max(25 ms, min(250 ms, 1.5% of T)) |
 | Largest allowed missing-cycle gap | 4 |
 | UTC window duration | 60 min |
-| Maximum prints per instrument/source/side/mode/session/window | 2,500; **skip and report** if exceeded |
+| Maximum prints per instrument/source/side/mode/session/chunk | 2,500; **split an oversized UTC window into disjoint chunks, report boundary effects** |
 | Candidate period limit | 48 |
 | Anchors per period | 40 |
 
@@ -34,7 +34,7 @@ The source is separated by instrument UID, EXCHANGE/DEALER source, reported dire
 
 **Crucial:** regular prints across different sizes may come from completely different market participants responding to a common clock or orders; the module outputs `State="candidate"`, `ConfidenceCalibrated=null`, `OwnerKnown=false`, `PhysicalBotCountKnown=false`, `StatisticalSignificanceEstablished=false`. It does not predict future prints or establish profitable strategies.
 
-Dense windows are **not silently downsampled**; the report provides `SkippedDenseWindowCount` and `DENSE_WINDOW_NOT_EVALUATED`. Since a busy instrument may exceed 2,500 prints per side/hour, this intentionally limits real-world coverage until a scalable microstructure-aware model is developed.
+Dense UTC windows are split into disjoint bounded **event-count chunks** instead of skipping the whole hour; `SplitDenseWindowCount` and `DENSE_WINDOW_SPLIT` expose the partitioning. A trailing chunk with fewer than `MinMatches` prints cannot generate a candidate and is reported by `SkippedTinyRemainderCount`/`TINY_CHUNK_NOT_EVALUATED`. A single hidden periodic program can be split into multiple observational episodes at the artificial boundaries. The old independent Nov 2/3 counts were measured with **version 0.1 (skipped dense windows)** and must not be compared numerically with new version 0.2 without adjustment.
 
 ## Time-dependent negative controls
 
