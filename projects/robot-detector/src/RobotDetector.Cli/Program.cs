@@ -103,7 +103,7 @@ internal static class Program
             throw new ArgumentException("Output must end in .csv or .zip.");
         EnsureNewFile(output);
 
-        // T-Invest public archives, not an OrdersService request.
+        // T-Invest public archive endpoint; read-only historical data.
         var uri = new Uri($"https://invest-public-api.tbank.ru/history-trades/{date}" +
                           $"?instrumentId={Uri.EscapeDataString(instrumentId)}");
         using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(3) };
