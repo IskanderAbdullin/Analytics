@@ -264,3 +264,21 @@ Each commit small enough for review. Main branch push permitted only after local
 **Release C / Research laboratory:** M9–M11, PIT data, model experiments, plugins.
 
 Первый live validation corpus должен включать 09–15 ноября 2026 по конкретному срочному инструменту с вариационной маржой и независимым расчётом по каждому дню; настоящее имя инструмента, счёт и суммы не сохраняются в GitHub.
+
+
+## 19. Проверенные открытые реализации и научные эксперименты (дополнение v1.1)
+
+Обязательные дополнительные входы при реализации:
+- [Ревизия GitHub-исходников, конкретные функции, тесты, контрольные примеры](09-open-source-implementation-audit.md): `OSS-01..OSS-10`. Каждый перенос идеи требует самостоятельной unit-test реализации на C#; лицензионные ограничения соблюдаются.
+- [Научные исследования, научная обоснованность, экспериментальные задачи](10-academic-research-and-experiments.md): `SCI-01..SCI-10` и `EXP-01..EXP-06`. Research only after verified ledger and point-in-time data.
+
+### Усиленные контрольные точки:
+
+- **M1:** сравнить resume-on-cursor из Relff и наше атомарное checkpoint; error response не допускает `complete`.
+- **M2:** тесты еJournal FIFO и TTExtension average/reversal как независимые test inspirations, добавить decimal, account/UID, cash movement invariants; `BUY/SELL` не являются внешним cashflow брокерского счёта.
+- **M4:** quantity reconciliation по каждому счёту, инструменту и as-of, с первоисточником и coverage.
+- **M7:** implementation shortfall с явным unfilled opportunity component, cost waterfall и venue-specific `IFillModel`; SPB pro-rata не равен FIFO.
+- **M8:** проверки доходности против альтернативных implementation approaches (TWR/XIRR/Modified Dietz), quality-aware valuation on cashflow dates.
+- **M9/M10:** point-in-time feature availability, survival/right-censoring, purged walk-forward, DSR/PBO и непредвзятые baseline; научный источник не считается подтверждённым на MOEX/SPB без локального OOS.
+
+**DoD:** номер GitHub commit в проекте, зафиксированные версии сторонних источников и licenses, trace code↔tests↔requirements, отдельный `not-validated` статус для непроверенных деривативов и fill models.
