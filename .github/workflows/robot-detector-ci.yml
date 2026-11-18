@@ -1,0 +1,55 @@
+name: Robot Detector .NET CI
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/**'
+      - '.github/workflows/robot-detector-ci.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/**'
+      - '.github/workflows/robot-detector-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standalone-dotnet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build Core, CLI, and tests
+        run: |
+          dotnet build src/RobotDetector.Core/RobotDetector.Core.csproj -c Release --nologo
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
+      - name: Deterministic offline self-tests
+        run: dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
+      - name: CLI fixture smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- detect \
+            --input fixtures/synthetic_twap_5s.csv --output /tmp/robot-detector-report.json
+          python3 - <<'PY'
+          import json
+          p = json.load(open("/tmp/robot-detector-report.json", encoding="utf-8"))
+          assert p["candidatePatternCount"] == 1, p
+          q = p["patterns"][0]
+          assert q["periodMilliseconds"] == 5000, q
+          assert q["matchedCount"] == 6 and q["missedCycles"] == 1, q
+          assert q["confidenceCalibrated"] is None, q
+          assert p["physicalBotCountKnown"] is False, p
+          PY
+      - name: Ensure no trade/order API dependency
+        run: |
+          if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
+            echo "Trading API usage is forbidden in analytics project"
+            exit 1
+          fi
