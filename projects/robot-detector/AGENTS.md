@@ -15,7 +15,7 @@
 
 ## Обязательный порядок при реализации
 
-- Прочитать README и ARCHITECTURE, затем документ текущего этапа и RESEARCH.
+- Прочитать README и ARCHITECTURE, затем документ текущего этапа, RESEARCH и [RESEARCH_EXPANSION_2026-11-18.md](docs/RESEARCH_EXPANSION_2026-11-18.md). В первую очередь изучить код прямых аналогов TWAP (Crypto Lake и binance_l3_est), без копирования ошибок нерегулярной временной шкалы.
 - Создать issue/короткий change-plan: цель, точные файлы, тесты, риски.
 - Делать минимальные осмысленные коммиты по предложенному порядку этапа; перед каждым push прогонять relevant unit tests. Нет force-push.
 - Добавлять synthetic fixture, unit test, negative test, null model и измеримую acceptance criterion для каждого detector feature.
