@@ -35,6 +35,8 @@ internal static class Program
                     return Quote(options);
                 case "benchmark":
                     return Benchmark(options);
+                case "walkforward":
+                    return Walkforward(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -154,6 +156,33 @@ internal static class Program
     }
 
 
+
+    private static int Walkforward(Dictionary<string, string> options)
+    {
+        string input = Required(options, "input");
+        string cutoff = Required(options, "cutoff");
+        if (!(cutoff.EndsWith("Z", StringComparison.OrdinalIgnoreCase) ||
+              (cutoff.Length > 10 && cutoff[10..].Contains('+')) ||
+              (cutoff.Length > 10 && cutoff[10..].Contains('-'))))
+            throw new ArgumentException("Use --cutoff with explicit UTC offset or Z.");
+        var time = DateTimeOffset.Parse(cutoff, CultureInfo.InvariantCulture,
+            DateTimeStyles.AdjustToUniversal);
+        var imported = CsvTradeReader.Read(input);
+        var result = WalkForward.Evaluate(imported, time, new DetectorConfig
+        {
+            MinMatches = Integer(options, "min-matches", 4)
+        });
+        string json = JsonSerializer.Serialize(result, JsonOptions);
+        if (options.TryGetValue("output", out string? output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Walk-forward report saved to {output}");
+        }
+        else Console.WriteLine(json);
+        return 0;
+    }
+
     private static int Benchmark(Dictionary<string, string> options)
     {
         int seeds = Integer(options, "seeds", 20);
@@ -247,6 +276,7 @@ internal static class Program
         Console.WriteLine("fetch --date YYYY-MM-DD --instrument-id SBER_TQBR --output data/raw/file.csv|zip");
         Console.WriteLine("quote --input fixtures/synthetic_quote_oscillation.csv");
         Console.WriteLine("benchmark [--seeds 20] [--noise-trades 200] [--output synthetic_report.json]");
+        Console.WriteLine("walkforward --input file.csv --cutoff YYYY-MM-DDTHH:MM:SSZ [--min-matches 4]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
