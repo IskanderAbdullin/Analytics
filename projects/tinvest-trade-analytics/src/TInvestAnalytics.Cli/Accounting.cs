@@ -19,92 +19,127 @@ public sealed record PnlReport(
     // They are NOT a complete account-equity P&L and must never be presented as such.
 }
 
+public sealed record RealizedTradeMatch(
+    string AccountRef, string InstrumentUid, string Currency,
+    string OpeningOperationId, string ClosingOperationId,
+    string OpeningTradeId, string ClosingTradeId,
+    DateTimeOffset CloseTimeUtc, string ClosedSide, decimal Quantity,
+    decimal OpeningPrice, decimal ClosingPrice, decimal GrossPnl,
+    string Quality = "provisional");
+
 internal sealed class PositionLot
 {
     public int Sign { get; }
     public decimal Quantity { get; set; }
     public decimal EntryPrice { get; }
-    public PositionLot(int sign, decimal qty, decimal price)
+    public string OperationId { get; }
+    public string TradeId { get; }
+    public PositionLot(int sign, decimal qty, decimal price, string operationId, string tradeId)
     {
         Sign = sign;
         Quantity = qty;
         EntryPrice = price;
+        OperationId = operationId;
+        TradeId = tradeId;
     }
 }
 
+internal sealed record SecurityFill(
+    string AccountId, string Instrument, string Currency,
+    string OperationId, string TradeId, int Sign, decimal Quantity,
+    decimal Price, DateTimeOffset UtcTime);
+
 public static class SecurityLotMatcher
 {
-    public static IReadOnlyList<PnlComponent> Match(IReadOnlyList<BrokerOperation> operations,
-        IReadOnlyDictionary<string, string> instrumentTypes, List<string> warnings,
-        DateTimeOffset reportStart, DateTimeOffset reportEnd)
+    /// <summary>
+    /// Replay all known fills before reportEnd; only emit matches closed in [reportStart,reportEnd).
+    /// These are economic security transactions, NOT futures clearing valuation.
+    /// </summary>
+    public static IReadOnlyList<RealizedTradeMatch> MatchDetails(
+        IReadOnlyList<BrokerOperation> operations,
+        IReadOnlyDictionary<string, string> instrumentTypes,
+        List<string> warnings, DateTimeOffset reportStart, DateTimeOffset reportEnd)
     {
-        // Not cross-account: a security subledger is keyed by account+instrument+currency.
-        var pools = new Dictionary<(string Account, string Instrument, string Currency), Queue<PositionLot>>();
-        var pnl = new Dictionary<(string Instrument, string Currency), decimal>();
-        var matched = new Dictionary<(string Instrument, string Currency), int>();
-        foreach (var op in operations.Where(x => x.DateUtc < reportEnd)
-            .OrderBy(x => x.DateUtc).ThenBy(x => x.ExternalId, StringComparer.Ordinal))
+        var fills = new List<SecurityFill>();
+        foreach (var op in operations.Where(x => x.IsTrade && x.IsExecuted && x.DateUtc < reportEnd))
         {
-            if (!op.IsTrade || !op.IsExecuted) continue;
-            var key = op.InstrumentKey;
-            if (!instrumentTypes.TryGetValue(key, out string? assetClass) ||
+            string uid = op.InstrumentKey;
+            if (!instrumentTypes.TryGetValue(uid,out string? assetClass) ||
                 assetClass is not ("stock" or "fund" or "bond" or "currency"))
             {
-                warnings.Add("UNCLASSIFIED_TRADE: " + key + "; excluded from security FIFO.");
+                warnings.Add("UNCLASSIFIED_TRADE: " + uid + "; security P&L unavailable.");
+                continue;
+            }
+            if (assetClass == "bond")
+            {
+                warnings.Add("BOND_QUOTE_UNSUPPORTED: " + uid + "; bond trades not matched.");
                 continue;
             }
             if (op.Payment is null)
             {
-                warnings.Add("MISSING_TRADE_CURRENCY: " + key);
+                warnings.Add("MISSING_TRADE_CURRENCY: " + uid);
                 continue;
             }
-            var currency = op.Payment.Value.Currency;
-            var poolKey = (op.AccountId, key, currency);
-            if (!pools.TryGetValue(poolKey, out var open))
+            if (op.Executions.Count == 0)
+            {
+                warnings.Add("NO_EXECUTIONS: " + uid);
+                continue;
+            }
+            foreach (var ex in op.Executions)
+            {
+                if (ex.Quantity <= 0 || ex.Price <= 0)
+                {
+                    warnings.Add("INVALID_FILL: " + uid);
+                    continue;
+                }
+                fills.Add(new SecurityFill(op.AccountId,uid,op.Payment.Value.Currency,
+                    op.ExternalId,ex.TradeId,op.IsBuy ? 1 : -1,ex.Quantity,ex.Price,ex.TimeUtc));
+            }
+        }
+        var pools = new Dictionary<(string Account, string Instrument, string Currency), Queue<PositionLot>>();
+        var matches = new List<RealizedTradeMatch>();
+        foreach (var f in fills.OrderBy(x => x.UtcTime).ThenBy(x => x.OperationId,StringComparer.Ordinal)
+            .ThenBy(x => x.TradeId,StringComparer.Ordinal))
+        {
+            var key = (f.AccountId,f.Instrument,f.Currency);
+            if (!pools.TryGetValue(key,out var open))
             {
                 open = new Queue<PositionLot>();
-                pools[poolKey] = open;
+                pools[key] = open;
             }
-            var reportKey = (key, currency);
-            foreach (var fill in op.Executions)
+            decimal remaining = f.Quantity;
+            while(remaining > 0 && open.Count > 0 && open.Peek().Sign != f.Sign)
             {
-                if (fill.Quantity <= 0 || fill.Price <= 0)
-                {
-                    warnings.Add("INVALID_FILL: " + key);
-                    continue;
-                }
-                // For bonds, quotation might be percent of nominal. Such instruments require
-                // per-instrument nominal/price conversion; don't assume 1 point = 1 currency unit.
-                if (assetClass == "bond")
-                {
-                    warnings.Add("BOND_QUOTE_UNSUPPORTED: " + key + "; bond trades excluded.");
-                    continue;
-                }
-                int side = op.IsBuy ? 1 : -1;
-                decimal remaining = fill.Quantity;
-                while (remaining > 0 && open.Count > 0 && open.Peek().Sign != side)
-                {
-                    var lot = open.Peek();
-                    decimal qty = Math.Min(remaining, lot.Quantity);
-                    decimal realized = lot.Sign == 1
-                        ? (fill.Price - lot.EntryPrice) * qty
-                        : (lot.EntryPrice - fill.Price) * qty;
-                    if (op.DateUtc >= reportStart)
-                    {
-                        pnl[reportKey] = pnl.GetValueOrDefault(reportKey) + realized;
-                        matched[reportKey] = matched.GetValueOrDefault(reportKey) + 1;
-                    }
-                    lot.Quantity -= qty;
-                    remaining -= qty;
-                    if (lot.Quantity == 0) open.Dequeue();
-                }
-                if (remaining > 0) open.Enqueue(new PositionLot(side, remaining, fill.Price));
+                var lot = open.Peek();
+                var closed = Math.Min(remaining,lot.Quantity);
+                decimal gross = lot.Sign == 1
+                    ? (f.Price - lot.EntryPrice) * closed
+                    : (lot.EntryPrice - f.Price) * closed;
+                if (f.UtcTime >= reportStart && f.UtcTime < reportEnd)
+                    matches.Add(new RealizedTradeMatch(PnlCalculator.Mask(f.AccountId),
+                        f.Instrument,f.Currency,lot.OperationId,f.OperationId,
+                        lot.TradeId,f.TradeId,f.UtcTime,lot.Sign==1?"LONG":"SHORT",
+                        closed,lot.EntryPrice,f.Price,gross));
+                remaining -= closed;
+                lot.Quantity -= closed;
+                if (lot.Quantity == 0) open.Dequeue();
             }
-            if (op.Executions.Count == 0)
-                warnings.Add("NO_EXECUTIONS: " + key + "; cannot match FIFO.");
+            if(remaining > 0)
+                open.Enqueue(new PositionLot(f.Sign,remaining,f.Price,f.OperationId,f.TradeId));
         }
-        return pnl.Select(x => new PnlComponent("SECURITY_REALIZED_GROSS", x.Key.Currency,
-            x.Value, x.Key.Instrument, "provisional", matched[x.Key])).ToList();
+        return matches;
+    }
+
+    public static IReadOnlyList<PnlComponent> Match(
+        IReadOnlyList<BrokerOperation> operations,
+        IReadOnlyDictionary<string, string> instrumentTypes,
+        List<string> warnings, DateTimeOffset reportStart, DateTimeOffset reportEnd)
+    {
+        return MatchDetails(operations,instrumentTypes,warnings,reportStart,reportEnd)
+            .GroupBy(x=>(x.InstrumentUid,x.Currency))
+            .Select(g=>new PnlComponent("SECURITY_REALIZED_GROSS",g.Key.Currency,
+                g.Sum(x=>x.GrossPnl),g.Key.InstrumentUid,"provisional",g.Count()))
+            .ToList();
     }
 }
 

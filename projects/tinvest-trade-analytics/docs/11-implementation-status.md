@@ -1,4 +1,4 @@
-# 11. Реализация и журнал проверки — v0.6
+# 11. Реализация и журнал проверки — v0.7
 
 Дата начала: 18.11.2026. Цель документа — отделить **реализовано**, **протестировано** и **планируется**. Здесь нет утверждений, что real T-Invest live sync прошёл.
 
@@ -11,6 +11,7 @@
 - Immutable `raw_pages`, `operation_revisions`, latest `current_operations`, local `sync_windows` cursors/checkpoint, SQLite WAL; transactionally commit page+checkpoint. Semantically identical multiple ID records flagged but **not silently de-duplicated**.
 - `import-bot --file *.jsonl` принимает проверенные события `bot-event/v1`, сохраняет в SQLite атомарно и не перезаписывает конфликтующий `event_id`; `bot-stats --bot ... --from ... --to ...` считает диагностические события/переустановки/объёмы. Связь с брокерскими trades пока отсутствует и статистика помечается `unreconciled`.
 - `daily-report` сохраняет исторические FIFO lots до начала выбранного периода и позволяет `--exclude-days YYYY-MM-DD` (непрерывная доходность портфеля при исключении дней не подменяется суммой дневных прибылей).
+- `explain-trades --account --asset-map --from --to`: раскрывает реализованный FIFO по каждой закрывающей операции и каждой открывающей партии, с точным quantity/entry/exit/gross amount. Рассчитывает более ранние лоты до начала периода (не путать с брокерской доказанной себестоимостью без полного backfill).
 - Money precision via decimal (T-Invest units + nano), operation parser with optional fills, FIFO for explicitly classified stock/fund/currency; long/short/partial closure and reversal.
 - Cash classification for settled VM, fees, borrow/overnight, distributions, taxes, deposits, separate funding status. Market-to-market, futures tick value/clearing reconstruction, broker verification **NOT** implemented; reported subtotal isn't total equity performance.
 - Read-only broker report workflow `broker-report-request` (асинхронная задача, период до 31 дня), `broker-report-fetch` (страницы с независимым raw evidence), `broker-report-summary` (broker/exchange/clearing комиссии по валютам). Получение суммы брокерских комиссий **не означает** полного reconciliation с операциями.
@@ -49,6 +50,7 @@ dotnet run --project src/TInvestAnalytics.Cli -- bot-stats --bot BabidDemo --fro
 dotnet run --project src/TInvestAnalytics.Cli -- broker-report-request --account-index 0 --from 2026-11-01 --to 2026-11-18
 dotnet run --project src/TInvestAnalytics.Cli -- broker-report-fetch --task YOUR_TASK_ID
 dotnet run --project src/TInvestAnalytics.Cli -- serve --port 8765 --asset-map path/to/class-map.json
+dotnet run --project src/TInvestAnalytics.Cli -- explain-trades --account YOUR_ACCOUNT_ID --asset-map path/to/class-map.json --from 2026-11-09 --to 2026-11-16
 ```
 
 **Защита:** не коммитить токен или реальные raw operations. БД по умолчанию в `%LOCALAPPDATA%/TInvestAnalytics/analytics.db`. Не передавать брокерские данные в CI. Команда sync не должна использоваться на живом аккаунте до ручного проверки прав токена/лимитов; роботы и API могут делить квоты.
@@ -80,7 +82,7 @@ dotnet run --project src/TInvestAnalytics.Cli -- serve --port 8765 --asset-map p
 - **BROKER_VALIDATED:** воспроизведены реальные операции на read-only аккаунте, сверено с брокерским отчётом.
 - **PRODUCTION_READY:** проверены recovery, безопасность, performance, полные специальные случаи.
 
-Начальная версия v0.1 прошла GitHub Actions CI на коммите `cf45482fc300205fda1ef1ed37ef35d3684a6783`. Изменения v0.2 со снимками и v0.3 с дневным отчётом прошли GitHub Actions CI; модуль bot telemetry v0.4 прошёл GitHub Actions; модуль broker report v0.5 прошёл GitHub Actions; dashboard v0.6 требует нового прогона. Ни `BROKER_VALIDATED`, ни `PRODUCTION_READY` не подтверждены.
+Начальная версия v0.1 прошла GitHub Actions CI на коммите `cf45482fc300205fda1ef1ed37ef35d3684a6783`. Изменения v0.2 со снимками и v0.3 с дневным отчётом прошли GitHub Actions CI; модуль bot telemetry v0.4 прошёл GitHub Actions; модуль broker report v0.5 прошёл GitHub Actions; dashboard v0.6 прошёл GitHub Actions; detailed FIFO v0.7 требует нового прогона. Ни `BROKER_VALIDATED`, ни `PRODUCTION_READY` не подтверждены.
 
 
 ### Актуальные первоисточники для отчётов

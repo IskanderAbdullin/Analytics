@@ -67,6 +67,9 @@ public static class Program
                 case "bot-stats":
                     BotStats(args, store);
                     break;
+                case "explain-trades":
+                    ExplainTrades(args, store);
+                    break;
                 case "daily-report":
                     DailyReport(args, store);
                     break;
@@ -306,6 +309,28 @@ public static class Program
         Console.WriteLine(JsonSerializer.Serialize(summary, JsonOptions()));
     }
 
+
+    private static void ExplainTrades(string[] args, EvidenceStore store)
+    {
+        var (from,to) = Period(args);
+        var account=Require(args,"--account");
+        var rawMap=Require(args,"--asset-map");
+        var types=JsonSerializer.Deserialize<Dictionary<string,string>>(File.ReadAllText(rawMap)) ??
+            throw new FormatException("Asset map is empty.");
+        var classes=types.ToDictionary(x=>x.Key,x=>x.Value.ToLowerInvariant(),StringComparer.Ordinal);
+        var ops=store.LoadOperations(account,DateTimeOffset.MinValue,to);
+        var warnings=new List<string>();
+        var matches=SecurityLotMatcher.MatchDetails(ops,classes,warnings,from,to);
+        string? target=Arg(args,"--instrument");
+        if(target is not null)matches=matches.Where(x=>x.InstrumentUid==target).ToList();
+        Console.WriteLine(JsonSerializer.Serialize(new {
+            from_utc=from,to_utc=to,account=PnlCalculator.Mask(account),
+            matches,reported_gross_pnl_by_currency=matches.GroupBy(x=>x.Currency)
+                .ToDictionary(g=>g.Key,g=>g.Sum(x=>x.GrossPnl)),
+            status="provisional",warnings=warnings.Distinct()
+        },JsonOptions()));
+    }
+
     private static void DailyReport(string[] args, EvidenceStore store)
     {
         var (from, to) = Period(args);
@@ -360,6 +385,7 @@ public static class Program
               import-json --account TEST --file sample.json --from ... --to ...
               report --account ID --from ... --to ... [--asset-map class-map.json] [--db PATH]
               daily-report --account ID --from ... --to ... [--exclude-days 2026-11-14] [--asset-map class-map.json]
+              explain-trades --account ID --from ... --to ... --asset-map class-map.json [--instrument UID]
               import-bot --file events.jsonl [--db PATH]
               bot-stats --bot BabidDemo --from ... --to ... [--db PATH]
               broker-report-request --account-index 0 --from ... --to ...

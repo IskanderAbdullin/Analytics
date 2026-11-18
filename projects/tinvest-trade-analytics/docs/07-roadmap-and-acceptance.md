@@ -282,3 +282,21 @@ Each commit small enough for review. Main branch push permitted only after local
 - **M9/M10:** point-in-time feature availability, survival/right-censoring, purged walk-forward, DSR/PBO и непредвзятые baseline; научный источник не считается подтверждённым на MOEX/SPB без локального OOS.
 
 **DoD:** номер GitHub commit в проекте, зафиксированные версии сторонних источников и licenses, trace code↔tests↔requirements, отдельный `not-validated` статус для непроверенных деривативов и fill models.
+
+
+## 20. Дополнительный пересмотр вслед за реальным прототипом (v0.7, 18.11.2026)
+
+Первые реальные исходники в `src/TInvestAnalytics.Cli` показали следующие архитектурные требования, которые становятся обязательными для последующих этапов:
+
+1. **Fee and trade causality:** перед отнесением результатов к роботу/стратегии нужно разложить realized FIFO на пары `open exec → close exec` (`explain-trades`), затем применять только подтверждённую attribution. Учитывать, что брокерский operation ID может меняться.
+2. **Historical cost basis:** отчёт за произвольную неделю не может строить FIFO только из операций этой недели. Matching engine обязан проигрывать более ранние события; если начальная история отсутствует — показывать coverage / unknown opening position.
+3. **Day exclusions:** исключение 14-го числа означает сумму независимо рассчитанных дневных realized/settled facts, а не искусственное объединение NAV конца 13-го и начала 15-го. Для временной доходности это другая операция.
+4. **Two independent planes:** реализованный (компонентный) P&L по событиям и полная оценка NAV по сохранённым portfolio snapshots должны строиться отдельно; несходящиеся суммы не «подгоняются», а проходят reconciliation.
+5. **Source-of-truth versioning:** SQLite raw page и broker report page хранятся версионно, повторные ID/обновления не должны уничтожать первичное свидетельство. `--refresh` запрещено делать destructive.
+6. **Robot telemetry contract:** каждый сигнал и order lifecycle event хранит run ID, bot version SHA, instrument UID и event ID; broker match confidence не может автоматически становиться `exact` из совпавшего ticker.
+7. **Security checks:** установка Microsoft.Data.Sqlite 10.0.0 выявила транзитивную уязвимость `SQLitePCLRaw.lib.e_sqlite3 2.1.11` через NU1903. Для исправления обновлено до 10.0.11. В CI предупреждения безопасности остаются ошибками, suppress запрещён.
+8. **User interface:** loopback-only read-only HTML визуализация допустима как промежуточный клиент, будущий GUI должен использовать те же проверяемые query contracts и не вычислять P&L внутри браузера.
+9. **Scope discipline:** фандинг пока исключён из итогового subtotal до независимой сверки с агрегированными VM postings; не получать формально красивый итог ценой двойного учёта.
+10. **Acceptance progression:** `coded` -> `CI passing` -> `broker-validated` -> `production ready`. Первые два не заменяют последние два.
+
+Дополнительный обязательный тест `M2.PNL-21`: matched-lot сумма `explain-trades` равна realized component в дневном/недельном отчёте при одинаковой policy, включая открывающие операции вне выбранного интервала.

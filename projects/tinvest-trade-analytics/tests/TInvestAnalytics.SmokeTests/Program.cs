@@ -338,6 +338,26 @@ Check("local dashboard serves only static embedded assets and no remote CDN", ()
         false,"no third-party remote dependencies");
 });
 
+
+Check("explainable FIFO lot matches expose original and closing trade identities", () =>
+{
+    var start=DateTimeOffset.Parse("2026-11-10T00:00:00Z",CultureInfo.InvariantCulture);
+    var ops=new[]{
+      Op("BUY-01","OPERATION_TYPE_BUY",10,100,-1000,dt:start.AddDays(-2)),
+      Op("BUY-02","OPERATION_TYPE_BUY",12,50,-600,dt:start.AddDays(-1)),
+      Op("CLOSE-03","OPERATION_TYPE_SELL",15,150,2250,dt:start.AddHours(10))
+    };
+    var warnings=new List<string>();
+    var matches=SecurityLotMatcher.MatchDetails(ops,securities,warnings,start,start.AddDays(1));
+    Equal(matches.Count,2,"two FIFO closing lots");
+    Equal(matches[0].OpeningOperationId,"BUY-01","first lot ID");
+    Equal(matches[1].OpeningOperationId,"BUY-02","second lot ID");
+    Equal(matches[0].ClosingOperationId,"CLOSE-03","closing op ID");
+    Equal(matches.Sum(x=>x.GrossPnl),650m,"matching independent calculation");
+    var report=PnlCalculator.Calculate("TEST",ops,securities,start,start.AddDays(1));
+    Equal(Sum(report,"SECURITY_REALIZED_GROSS"),650m,"report equals detailed matches");
+});
+
 Console.WriteLine($"All {passed} deterministic smoke tests passed.");
 
 internal sealed class FakeHandler : HttpMessageHandler
