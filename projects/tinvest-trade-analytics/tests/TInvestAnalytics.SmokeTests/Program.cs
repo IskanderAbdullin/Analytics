@@ -237,6 +237,56 @@ Check("read-only HTTP endpoint and schema contract", () =>
     Equal(handler.AuthorizationScheme,"Bearer","authorization scheme");
 });
 
+
+Check("bot JSONL import, idempotency, collision guard and operational statistics", () =>
+{
+    var path=Path.Combine(Path.GetTempPath(),"tia_bot_"+Guid.NewGuid().ToString("N")+".db");
+    try
+    {
+        string Row(string id,string kind,DateTimeOffset time)=>
+            JsonSerializer.Serialize(new{
+                schema="bot-event/v1",event_id=id,kind,observed_utc=time.ToString("O"),
+                bot_id="BabidDemo",bot_version="sha:abcdef",run_id="RUN_1",
+                account_ref="DEMO",instrument_uid="UID1",client_order_id="ORDER_"+id,
+                side="BUY",qty_units="2",limit_price="100",fill_price="100"
+            });
+        var lines=string.Join("\n",new[]{
+            Row("e1","order_submit",day),
+            Row("e2","order_cancel_requested",day.AddSeconds(2)),
+            Row("e3","order_submit",day.AddSeconds(3)),
+            Row("e4","partial_fill",day.AddSeconds(4)),
+            Row("e5","full_fill",day.AddSeconds(5)),
+            Row("e6","error",day.AddSeconds(6))
+        });
+        var events=BotEventParser.ParseJsonLines(lines);
+        Equal(events.Count,6,"six synthetic bot events");
+        var store=new EvidenceStore(path);store.Initialize();
+        Equal(store.ImportBotEvents(events),6,"first import");
+        Equal(store.ImportBotEvents(events),0,"repeat import");
+        bool collided=false;
+        try { store.ImportBotEvents(new[]{BotEventParser.Parse(
+            Row("e1","order_reject",day.AddSeconds(8)))}); }
+        catch (InvalidDataException) { collided=true; }
+        Equal(collided,true,"mutated event must not overwrite original");
+        var loaded=store.LoadBotEvents("BabidDemo",from,to);
+        Equal(loaded.Count,6,"original preserved");
+        var summary=BotTelemetryAnalysis.Analyze("BabidDemo",loaded,from,to);
+        Equal(summary.SubmittedOrders,2,"submit count");
+        Equal(summary.CancelRequests,1,"cancel request");
+        Equal(summary.PartialFillEvents,1,"partial fill event");
+        Equal(summary.FullFillEvents,1,"full fill event");
+        Equal(summary.RapidCancelRepostCandidates,1,"rapid repost");
+        Equal(summary.ReportedRequestedUnits,4m,"requested volume");
+        Equal(summary.ReportedFillDeltaUnits,4m,"reported incremental fills");
+        Equal(summary.Quality,"unreconciled","no false P&L attribution");
+    }
+    finally
+    {
+        foreach(var suffix in new[]{"","-wal","-shm"})
+        {try{File.Delete(path+suffix);}catch(IOException){}}
+    }
+});
+
 Console.WriteLine($"All {passed} deterministic smoke tests passed.");
 
 internal sealed class FakeHandler : HttpMessageHandler

@@ -52,6 +52,12 @@ public static class Program
                 case "report":
                     Report(args, store);
                     break;
+                case "import-bot":
+                    ImportBot(args, store);
+                    break;
+                case "bot-stats":
+                    BotStats(args, store);
+                    break;
                 case "daily-report":
                     DailyReport(args, store);
                     break;
@@ -216,6 +222,24 @@ public static class Program
         Console.WriteLine($"Imported {n} raw observations. No broker authenticity verification.");
     }
 
+
+    private static void ImportBot(string[] args, EvidenceStore store)
+    {
+        var file = Require(args, "--file");
+        var events = BotEventParser.ParseJsonLines(File.ReadAllText(file));
+        int count = store.ImportBotEvents(events);
+        Console.WriteLine($"Imported {count} new bot telemetry events, {events.Count - count} exact repeats.");
+        Console.WriteLine("Events are not automatically attributed to broker P&L.");
+    }
+    private static void BotStats(string[] args, EvidenceStore store)
+    {
+        var (from, to) = Period(args);
+        string bot = Require(args, "--bot");
+        var events = store.LoadBotEvents(bot, from, to);
+        var summary = BotTelemetryAnalysis.Analyze(bot, events, from, to);
+        Console.WriteLine(JsonSerializer.Serialize(summary, JsonOptions()));
+    }
+
     private static void DailyReport(string[] args, EvidenceStore store)
     {
         var (from, to) = Period(args);
@@ -270,6 +294,8 @@ public static class Program
               import-json --account TEST --file sample.json --from ... --to ...
               report --account ID --from ... --to ... [--asset-map class-map.json] [--db PATH]
               daily-report --account ID --from ... --to ... [--exclude-days 2026-11-14] [--asset-map class-map.json]
+              import-bot --file events.jsonl [--db PATH]
+              bot-stats --bot BabidDemo --from ... --to ... [--db PATH]
               snapshot --account-index 0 [--db PATH] [--sandbox]
               snapshots --account ID [--db PATH]
               equity-pnl --account ID --start-id N --end-id N [--db PATH]
