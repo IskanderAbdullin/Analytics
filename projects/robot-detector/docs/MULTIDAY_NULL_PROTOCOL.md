@@ -51,4 +51,52 @@ An excess of candidates over a full permutation can reflect ordinary serial depe
 - [Episode fusion explanation](EPISODE_FUSION.md).
 - [Primary T-Invest archive documentation](https://developer.tbank.ru/invest/services/history-md/head-history-md).
 
-**Results table:** to be filled ONLY after observed GitHub Actions logs; no numbers are inferred in advance.
+## Results — executed 2026-11-18
+
+**Source:** [GitHub Actions run 44295820963](https://github.com/IskanderAbdullin/Analytics/actions/runs/44295820963). All steps completed successfully. .NET 10 build and **28 of 28** self-tests succeeded; existing IPO CI was unaffected. Downloaded tapes and the temporary CA were deleted at the end; only aggregate stats were logged.
+
+| Metric | 2026-11-16 | 2026-11-17 |
+|---|---:|---:|
+| Parsed public prints | **143,929** | **121,920** |
+| Rejected rows | **0** | **0** |
+| Original candidate episodes | **126** | **209** |
+| Conservative linked groups | **120** | **206** |
+| Episode boundaries linked | 6 | 3 |
+| Uniquely attributed prints (candidate evidence) | 1,298 | 3,097 |
+| Permutation-null episode mean (B=12) | **65.75** | **133.83** |
+| Permutation-null group mean | 65.75 | 133.83 |
+| Rotation-null episode mean (B=12) | **59.42** | **128.58** |
+| Rotation-null group mean | 59.42 | 128.58 |
+| Min possible global-count tail frequency per null family | **1/13 ≈ 0.0769** | **1/13 ≈ 0.0769** |
+| Public feed completeness verified | No | No |
+| Actual number of independent bots identified | **Unknown** | **Unknown** |
+
+SHA-256 of the **raw compressed archive**:
+- 2026-11-16: b5003063e3695660af90523ca60e2e3b76fdf21bf37a909e9a8f39ecfdf95562
+- 2026-11-17: 0af872b1c9c861e7af40a1c40e5bbdf565f9161dd997337c08da584c4dafc782
+
+Exact null candidate episode counts, in seed order (seed=9001+trial*1009):
+
+- November 16, **permute**: 70,64,66,67,67,57,69,68,62,60,66,73 (min 57, max 73).
+- November 16, **rotate**: 56,57,53,59,58,68,54,55,62,64,65,62 (min 53, max 68).
+- November 17, **permute**: 136,122,135,123,134,141,127,135,147,148,123,135 (min 122, max 148).
+- November 17, **rotate**: 130,123,120,118,141,134,141,129,119,134,127,127 (min 118, max 141).
+
+For this run, *both* null families' conservative group counts happened to equal their episode counts in all 12 trials on both dates. This is an empirical outcome, not a general guarantee.
+
+### Interpretation
+
+The original number of candidate episodes exceeded every one of the 12 controls in each null family on **both dates**, so a simple clock-plus-size-multiset null does not explain the observed screening count. However, even if these nulls were fully valid and prespecified, the additive-one Monte Carlo global-count tail estimate cannot be smaller than 0.0769 with B=12. This does **not** reach conventional 0.05 and is **not** a per-candidate FDR. Two dates from the same instrument also do not constitute broad cross-instrument validation; neither do they disclose actual market participants or a verified complete trade feed.
+
+Observed candidate groups (120 and 206) are **observable linked cadence episodes**, not proof that there were 120/206 independent programs. A genuinely single program may produce multiple behaviours, and multiple programs may share a pattern. The number of linked boundaries (6 and 3) suggests this conservative fusion reduces only a few overcounts from window boundaries; more aggressive merging could create harmful false links.
+
+### Follow-up gates
+
+1. Freeze detector configuration; run >=99 trials on a **new held-out trading date** for each of two nulls before any conventional tail comparison.
+2. Add clustered/Hawkes and common 1-second/60-second clock nulls preserving more structure.
+3. Prospective within-session walk-forward tests and an independent model for no-future-leakage scoring.
+4. ABIDES-NG synthetic known-agent blind projection to quantify event attribution and non-identifiability.
+5. External comparison across multiple liquid/illiquid MOEX instruments and, if data proven, SPB source.
+
+**No new confidence or confirmed bot state is authorized by this pilot.**
+
