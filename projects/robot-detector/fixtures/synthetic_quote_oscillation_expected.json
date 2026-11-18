@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "fixture_type": "SYNTHETIC",
+  "observations": 5,
+  "instrument_uid": "SYNTH-QV",
+  "ask": {
+    "carry_price": 0.04,
+    "net_price_change": 0.0,
+    "tick_size": 0.01,
+    "normalized_oscillation": 4.0,
+    "reversal_count": 3
+  },
+  "bid": {
+    "carry_price": 0.0,
+    "net_price_change": 0.0,
+    "normalized_oscillation": 0.0
+  },
+  "trades_in_fixture": 0,
+  "expected_behavior": "ask_only_quote_oscillation_observed",
+  "physical_bot_count": null,
+  "confidence_calibrated": null,
+  "note": "Illustrates observed changes, not proof of an algorithm or illegal quote activity."
+}
