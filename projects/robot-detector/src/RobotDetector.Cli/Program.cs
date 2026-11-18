@@ -200,7 +200,8 @@ internal static class Program
         }
         else Console.WriteLine(json);
         Console.Error.WriteLine($"Variable-size candidates={result.CandidateSequenceCount}; " +
-            $"not-analysed dense windows={result.SkippedDenseWindowCount}; actual bot count UNKNOWN");
+            $"split dense windows={result.SplitDenseWindowCount}; " +
+            $"tiny trailing chunks={result.SkippedTinyRemainderCount}; actual bot count UNKNOWN");
         return imported.RejectedRowTotal > 0 ? 3 : 0;
     }
 
