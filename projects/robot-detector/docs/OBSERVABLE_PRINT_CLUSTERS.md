@@ -54,4 +54,36 @@ Total public lots remain **700**. This **does not** mean one robot was identifie
 6. Real-data smoke for **SBER_TQBR and MOEX_TQBR, 2026-11-18** on the already inspected public files, using the same read-only historical adapter. This is reused development data, NOT a fresh held-out statistical validation. Record only counts/hashes, source-vs-derived candidate count, total lots and uncertainty flags.
 7. Real UI/live trading and confirmation of physical bot programs remain blocked until stronger nulls, known-agent simulated ground truth and independent forward prediction tests pass.
 
-**Results:** append only after the CI run has succeeded. No raw market tape or evidence mapping is uploaded as a GitHub artifact.
+## Empirical SBER/MOEX result — 2026-11-19
+
+**Completed successfully:** [GitHub Actions run 44554682105](https://github.com/IskanderAbdullin/Analytics/actions/runs/44554682105). All **83/83** .NET self-tests and the separate `cluster-compare` CLI smoke passed. Data are anonymous public T-Invest trade archives for **2026-11-18**, already used in earlier clock/timestamp development diagnostics; **this is NOT an independent held-out validation of the cluster hypothesis**. Source files and temporary CA were deleted after the CI run.
+
+| Observable measure | SBER_TQBR | MOEX_TQBR |
+|---|---:|---:|
+| Original public prints | **83,515** | **10,584** |
+| Derived exact-time/price/side clusters | **63,513** | **7,756** |
+| Public prints belonging to multi-print clusters | **27,914** | **4,442** |
+| Source total public lots | **13,249,676** | **263,685** |
+| Derived total public lots | **13,249,676** | **263,685** |
+| Original raw fixed-volume cadence candidate episodes | **57** | **6** |
+| Derived-cluster fixed-volume cadence candidate episodes | **64** | **6** |
+| Verified unique parent-order IDs or actual bot owners | None available | None available |
+| Statistical significance/predictive edge established | No | No |
+
+Compressed archive SHA-256, identical to the prior timestamp-quality run:
+- SBER_TQBR: `a6f96c173d904060203e5a840020647b3dbb30681eaa1d688d8f244d01dc4e25`
+- MOEX_TQBR: `c1faf47cfcb68de3b28aca65cec346a9931ae6a328f8750aa09166fecad629d6`
+
+The derived representation uses **fewer rows** without dropping any public print's contribution to total volume. The observable candidate count changed from 57 to 64 in SBER, while MOEX remained at 6. These are **different observation units**, and it would be wrong to describe 64 as more accurately counted independent robots or an improvement in predictive performance. A common timestamp/price/side could arise from multiple unrelated market participants.
+
+A synthetic split-clip scenario additionally confirms that 14 public prints with 14 distinct individual quantities can form seven 100-lot derived clusters with a repeating 5-second rhythm: raw fixed-size screen 0 candidates, derived screen 1 candidate. The artificial truth is only evidence of software behavior, not of inference quality on actual markets.
+
+### Decision and next actions
+
+- **Engineering correctness PASSED:** every public EventId remains traceable, source/derived lots match exactly, EXCHANGE/DEALER and session/mode/side/price never cross, 83 tests pass.
+- **Research identification gate NOT PASSED:** unknown parent-order and bot ownership, absent robust clustered-null and independent prospective performance.
+- Next research: validate derived cluster cadence against **known-agent synthetic data**, and test both raw and derived observation units with clock-conditioned nulls on an untouched date. Avoid choosing the better-looking candidate count post hoc.
+- Future online service/UI must show an explicit **observation unit selector**, allow reverting to original raw prints, and keep source count, parent-order ambiguity and coverage warnings visible.
+
+**Raw archive remains canonical. The clustering view is optional, derived and never represents an identified trader.**
+
