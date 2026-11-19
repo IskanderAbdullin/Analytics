@@ -12,12 +12,14 @@ public sealed class ReplayAuditConfig
     public int AllowedLatenessMilliseconds { get; init; } = 500;
     public int MaximumPendingEvents { get; init; } = 10_000;
     public int WindowMinutes { get; init; } = 5;
+    public string ReceiptOrdering { get; init; } = "archive_row";
 
     public void Validate()
     {
         if (AllowedLatenessMilliseconds is < 0 or > 600_000 ||
             MaximumPendingEvents is < 16 or > 1_000_000 ||
-            WindowMinutes is < 1 or > 1440)
+            WindowMinutes is < 1 or > 1440 ||
+            ReceiptOrdering is not ("archive_row" or "exchange_time_ideal"))
             throw new ArgumentException("Replay lateness, pending queue or window parameters invalid.");
     }
 }
@@ -57,7 +59,8 @@ public sealed record ReplayAuditReport(
     bool AnyPrintsDropped,
     bool ActualBotCountKnown,
     IReadOnlyList<ReplayObservedWindow> Windows,
-    IReadOnlyList<string> Warnings
+    IReadOnlyList<string> Warnings,
+    string ReceiptOrdering = "archive_row"
 );
 
 public static class BoundedEventReplay
@@ -142,7 +145,12 @@ public static class BoundedEventReplay
         // The *original row sequence* is retained by the importer as
         // ArrivalSequence; its Sorted Trades property may have been reordered
         // into exchange-time order for historical analysis.
-        foreach (var t in input.Trades.OrderBy(t => t.ArrivalSequence))
+        var orderedInput = config.ReceiptOrdering == "archive_row"
+            ? input.Trades.OrderBy(t => t.ArrivalSequence)
+                .ThenBy(t => t.EventId, StringComparer.Ordinal)
+            : input.Trades.OrderBy(t => t.ExchangeTimeUtc)
+                .ThenBy(t => t.ArrivalSequence);
+        foreach (var t in orderedInput)
         {
             long ticks = t.ExchangeTimeUtc.ToUniversalTime().Ticks;
             long precedingWatermark = maximumObservedTicks.HasValue
@@ -200,7 +208,9 @@ public static class BoundedEventReplay
 
         var warnings = new List<string>
         {
-            "OFFLINE_RECEIPT_ORDER: file ArrivalSequence is not actual network receipt latency.",
+            config.ReceiptOrdering == "archive_row"
+                ? "ARCHIVE_ROW_ORDER: source row order is NOT actual network delivery time; late counts reflect file ordering artifacts."
+                : "EXCHANGE_TIME_IDEAL: artificially sorted by market timestamps; zero late events here are not evidence of a fast live feed.",
             "EVENT_TIME_WATERMARK: records older than max-event-time minus lateness are flagged, not silently dropped.",
             "FORCED_FLUSH_WARNING: queue pressure may emit events before watermark; counts still correct but ordering guarantees are reduced.",
             "COVERAGE_NOT_PROVEN: neither sorted receipt order nor an error-free archive proves full market delivery.",
@@ -217,6 +227,6 @@ public static class BoundedEventReplay
             replayed, lots, outOfOrder, tooLate, forced, maxPending,
             config.MaximumPendingEvents, windows.Length, config.WindowMinutes,
             config.AllowedLatenessMilliseconds, input.HasVerifiedFeedCoverage,
-            false, false, false, windows, warnings);
+            false, false, false, windows, warnings, config.ReceiptOrdering);
     }
 }
