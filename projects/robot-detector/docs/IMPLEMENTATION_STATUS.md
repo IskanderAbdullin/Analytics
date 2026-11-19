@@ -96,3 +96,13 @@ See [PUBLIC_ARCHIVE_VALIDATION.md](PUBLIC_ARCHIVE_VALIDATION.md) for exact GitHu
 
 See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVENT_REPLAY.md](BOUNDED_EVENT_REPLAY.md), [MULTI_ARCHIVE_RESEARCH_COMPARISON.md](MULTI_ARCHIVE_RESEARCH_COMPARISON.md) and [LOCAL_READ_ONLY_API.md](LOCAL_READ_ONLY_API.md).
 
+
+## Stage 2 blind generator evaluation — executed 2026-11-19
+
+- [PR #26](https://github.com/IskanderAbdullin/Analytics/pull/26): no-NuGet `BlindExecutionBenchmark` with four stylized scenarios, opaque public event identifiers, hidden producer truth excluded from both detectors, exact event-level TP/FP and controlled partial fills.
+- [GitHub Actions #44577833225](https://github.com/IskanderAbdullin/Analytics/actions/runs/44577833225): **116/116 deterministic tests**, .NET server/Core/CLI compiled and all integration smokes green; separate legacy IPO CI also passed.
+- Small **2 seeds/scenario and 35 background prints/case**: fixed-q TWAP yields 24/24 synthetic controlled prints for fixed-q detector versus 0/24 for variable-clip; variable-q TWAP yields 0/24 for fixed versus 24/24 for variable; split two-print child fills yield 32/48 for fixed versus 24/48 for variable. No TP on clustered null, but zero false positives on two easy toy null seeds **does not** establish real market precision. Details: [BLIND_EXECUTION_BENCHMARK.md](BLIND_EXECUTION_BENCHMARK.md).
+- Same public tape was evaluated with 1 vs 2 different hidden controlled producer assignments and detector outputs remained identical. **Number of actual independent physical robot programs is not generally identifiable from anonymous prints.**
+- **Scientific Stage-2 release gate remains CLOSED.** The benchmark is not ABIDES matching/queue simulation and has no market-calibrated null, per-pattern p-values, real future edge, identified owners or trading recommendations.
+- Next priority: genuine controlled ABIDES-NG public projection with independently hidden execution-agent truth and large stratified nulls, then frozen held-out data; live T-Invest connection remains a separate engineering task requiring scoped user-supplied access.
+
