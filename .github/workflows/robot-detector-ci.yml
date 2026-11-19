@@ -381,6 +381,21 @@ jobs:
                   assert model["missedInjectedPrints"] + model["truePositivePrints"] == trial["injectedExecutionPrints"], model
           assert all(r["injectedExecutionPrints"]==0 for r in p["results"]
                      if r["kind"]=="clustered_null")
+          for kind in sorted({x["kind"] for x in p["results"]}):
+              for model_name in ("fixed_quantity", "variable_quantity"):
+                  cases=[next(m for m in x["models"] if m["model"]==model_name)
+                         for x in p["results"] if x["kind"]==kind]
+                  print("BLIND_SIMULATION_SUMMARY",json.dumps({
+                      "scenario":kind,
+                      "model":model_name,
+                      "cases":len(cases),
+                      "attributedPrints":sum(x["attributedPublicPrints"] for x in cases),
+                      "syntheticTruePositivePrints":sum(x["truePositivePrints"] for x in cases),
+                      "syntheticFalsePositivePrints":sum(x["falsePositivePrints"] for x in cases),
+                      "syntheticMissedInjectedPrints":sum(x["missedInjectedPrints"] for x in cases),
+                      "physicalRobotCountInferred":False,
+                      "isABides":False
+                  }))
           PY
       - name: Ensure no trade/order API dependency
         run: |
