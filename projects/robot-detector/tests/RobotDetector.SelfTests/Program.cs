@@ -107,6 +107,14 @@ internal static partial class Program
         Check("dashboard HTML is deterministic and contains no scripts", DashboardDeterministicOfflineHtml);
         Check("dashboard includes empty and different-width windows", DashboardEmptyAndWindowWidth);
         Check("dashboard refuses malformed aggregate reports", DashboardIntegrityGuard);
+        Check("replay conserves source prints and lots", ReplayConservesSource);
+        Check("replay reorders within watermark without false late flag", ReplayWithinGrace);
+        Check("replay counts late prints without dropping them", ReplayLateAfterWatermark);
+        Check("replay never loses prints when pending queue overflows", ReplayQueuePressure);
+        Check("replay separates trade sources, sessions and clock windows", ReplaySourceIsolation);
+        Check("replay handles empty input", ReplayEmpty);
+        Check("replay aggregates independent of row arrival order", ReplayAggregateParity);
+        Check("replay rejects invalid configuration and nonpositive quantities", ReplayRejectsInvalid);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
