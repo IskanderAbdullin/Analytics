@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p data/raw data/results
-          echo "CLOCK_PILOT_READ_ONLY: SBER_TQBR and MOEX_TQBR for 2026-11-17, no broker credentials"
+          echo "CLOCK_PILOT_READ_ONLY: SBER_TQBR and MOEX_TQBR for 2026-11-18, no broker credentials"
           curl -fsSL --connect-timeout 10 --max-time 30 \
             https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
             -o /tmp/russian_trusted_root_ca.crt
@@ -45,12 +45,12 @@ jobs:
           fi
           export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
           for instrument in SBER_TQBR MOEX_TQBR; do
-            raw="data/raw/$instrument-2026-11-17.csv"
+            raw="data/raw/$instrument-2026-11-18.csv"
             fetched=0
             for attempt in 1 2 3; do
               rm -f "$raw"
               if timeout 90 dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
-                fetch --date 2026-11-17 --instrument-id "$instrument" --output "$raw" \
+                fetch --date 2026-11-18 --instrument-id "$instrument" --output "$raw" \
                 > /tmp/clock-fetch.log 2>&1; then
                 fetched=1
                 break
@@ -80,8 +80,14 @@ jobs:
           for g in report["groups"]:
               assert sum(g["phaseHistogram100Ms"])==g["publicPrintCount"]
               assert not g["feedCoverageVerified"]
+              peak=g["maximumBinControl"]
+              assert peak["observedPeakBinCount"]==max(g["phaseHistogram100Ms"])
+              assert peak["observedPeakBinShare"]==peak["observedPeakBinCount"]/g["publicPrintCount"]
               if g["eligibleForControls"]:
                   assert len(g["rotatedControlCounts"])==99
+                  assert len(peak["rotatedMaximumBinCounts"])==99
+                  assert all(mx>=base for mx,base in
+                             zip(peak["rotatedMaximumBinCounts"],g["rotatedControlCounts"]))
               else:
                   assert g["nullMeanFirstPhaseShare"] is None
                   assert g["descriptiveGlobalTailFrequency"] is None
@@ -96,10 +102,15 @@ jobs:
                   "eligible":g["eligibleForControls"],
                   "rotationMeanShare":g["nullMeanFirstPhaseShare"],
                   "rotation95Share":g["null95FirstPhaseShare"],
-                  "descriptiveTailFrequency":g["descriptiveGlobalTailFrequency"]
+                  "descriptiveTailFrequency":g["descriptiveGlobalTailFrequency"],
+                  "peak100msBin":peak["peak100MsBin"],
+                  "peak100msShare":peak["observedPeakBinShare"],
+                  "rotatedMaximumBinMeanShare":peak["nullMeanMaximumBinShare"],
+                  "rotatedMaximumBin95Share":peak["null95MaximumBinShare"],
+                  "descriptiveAnyBinTailFrequency":peak["descriptiveAnyBinTailFrequency"]
               })
           print("CLOCK_CROSS_INSTRUMENT_OBSERVED",json.dumps({
-              "instrument":instrument,"day":"2026-11-17",
+              "instrument":instrument,"day":"2026-11-18",
               "sourceSha256":report["sourceSha256"],
               "inputPrints":report["inputPrints"],
               "eligibleGroups":report["eligibleSourceGroups"],

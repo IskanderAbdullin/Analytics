@@ -85,6 +85,9 @@ internal static partial class Program
         Check("clock audit random controls reproducible by seed", ClockPhaseDeterministic);
         Check("clock audit respects millisecond boundary precision", ClockPhaseBoundaryPrecision);
         Check("clock audit rejects invalid options and preserves uncertainty", ClockPhaseValidation);
+        Check("phase maximum detects peaks outside the first 100ms", ClockPhasePeakBeyondStart);
+        Check("phase maximum uses maximum statistic in every null trial", ClockPhaseMaxNullCompatibility);
+        Check("phase maximum cannot create evidence on insufficient data", ClockPhaseMaxIneligible);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;

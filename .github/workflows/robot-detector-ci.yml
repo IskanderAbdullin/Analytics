@@ -191,6 +191,10 @@ jobs:
           assert g["phaseHistogram100Ms"]==[13,0,0,0,0,0,0,0,0,0], g
           assert len(g["rotatedControlCounts"])==19, g
           assert g["nullMeanFirstPhaseShare"]<0.6, g
+          assert g["maximumBinControl"]["peak100MsBin"]==0, g
+          assert g["maximumBinControl"]["observedPeakBinCount"]==13, g
+          assert len(g["maximumBinControl"]["rotatedMaximumBinCounts"])==19, g
+          assert g["maximumBinControl"]["descriptiveAnyBinTailFrequency"] >= g["descriptiveGlobalTailFrequency"], g
           PY
       - name: Ensure no trade/order API dependency
         run: |
