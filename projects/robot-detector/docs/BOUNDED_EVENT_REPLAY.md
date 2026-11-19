@@ -60,3 +60,22 @@ No assumption is made about unique parent-order identity, and repeated timestamp
 6. Read-only local API/OsEngine adapter must gate real-time alerts behind successful independent Stage-2 validation. Historical fixed-size forecasts have **not** shown an out-of-sample advantage over placebo.
 
 The current replay stage is valuable for unit testing and architectural preparation but is **not** a completed online robot detector.
+
+
+## Проверенная эмпирическая разница архивного и идеального порядка — 19.11.2026
+
+**GitHub Actions:** [44572400620](https://github.com/IskanderAbdullin/Analytics/actions/runs/44572400620), завершился успешно. Подтверждены **100/100** офлайн-тестов, сохранность всех агрегатов и единый хеш исходного архива `0af872b1c9c861e7af40a1c40e5bbdf565f9161dd997337c08da584c4dafc782`.
+
+| Метрика | `archive_row` | `exchange_time_ideal` |
+|---|---:|---:|
+| Исходные/восстановленные сделки | 121 920 / 121 920 | 121 920 / 121 920 |
+| Агрегированные лоты | 19 769 931 | 19 769 931 |
+| Нарушения монотонности timestamps при чтении | 11 394 | 0 |
+| Записи старше выбранного watermark (500 мс) | 54 429 | 0 |
+| Принудительное освобождение переполненной очереди | 0 | 0 |
+| Максимально ожидающих событий (архивный порядок) | 241 | — |
+| Отброшено сделок | 0 | 0 |
+
+**Критически важно:** 54 429 «опоздавших» сделок — это *артефакт порядка строк в готовом архиве*, а не доказательство задержки, ошибок доставки или проблем с T-Invest Live API. Режим `exchange_time_ideal` искусственно сортирует записи по времени биржи, поэтому нулевые запоздания тоже **не являются измерением реального канала**.
+
+Итоговые окна и лоты идентичны в обоих режимах. Отдельные реальные временные метки получения сообщений в архиве отсутствуют; для них потребуется настоящая потоковая подписка и защищённый локальный захват. Продуктовых заявлений о live latency/полноте/роботах делать нельзя.
