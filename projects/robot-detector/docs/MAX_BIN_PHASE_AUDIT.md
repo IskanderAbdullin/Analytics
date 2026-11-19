@@ -37,4 +37,39 @@ Compute exactly the previously frozen first-bin shares *and* the newly frozen ma
 
 Compare whether a start-of-second effect is consistent across two instruments and whether the strongest peak changes phase. Even if the max-bin descriptive frequency is small under this null, it means only that **public trade timestamps have an unusual clock phase under the chosen approximate rotation model**. It cannot prove any individual trader, number of physical bots or profitable prediction. Source clock/timestamp precision and shared infrastructure remain confounders.
 
-**Results:** append only after the new GitHub Actions job has completed. A missing/unavailable archive must be reported as BLOCKED_BY_DATA rather than silently substituted.
+## Executed result — 2026-11-19
+
+**Completed successfully:** [GitHub Actions run 44551389284](https://github.com/IskanderAbdullin/Analytics/actions/runs/44551389284). The code compiled and **72 of 72** tests passed; both public anonymized archives were processed and the runner removed raw exchange data. Parameters frozen before this date: 100ms bin width, 100 prints/group minimum, 99 independent shared-minute-rotation controls, seed 20261119.
+
+| Metric | SBER_TQBR | MOEX_TQBR |
+|---|---:|---:|
+| Public anonymized trade prints | **83,515** | **10,584** |
+| Exchange source/mode/session | EXCHANGE/UNSPECIFIED/2026-11-18 | EXCHANGE/UNSPECIFIED/2026-11-18 |
+| Distinct UTC minute blocks | 1009 | 967 |
+| **Prespecified first 100ms** observed share | **9.9886%** | **13.0574%** |
+| Prespecified first100ms rotated-null mean | 10.0400% | 9.9889% |
+| Prespecified first100ms descriptive tail | 0.54 | **0.01** |
+| Strongest observed 100ms bin | **200–300ms** | **0–100ms** |
+| Strongest bin observed prints | **9,092** | **1,382** |
+| Strongest bin observed share | **10.8867%** | **13.0574%** |
+| Mean of 99 trial-wise maximum shares | **10.5244%** | **11.2379%** |
+| 95th percentile of trial-wise maximum shares | **10.9106%** | **12.0748%** |
+| Descriptive add-one exceedance of ten-bin maxima | **0.06** | **0.01** |
+| Actual number of independent bot programs | Unknown | Unknown |
+| Statistical significance established | No | No |
+| Feed completeness independently confirmed | No | No |
+
+Raw compressed archive SHA-256:
+- SBER_TQBR: `a6f96c173d904060203e5a840020647b3dbb30681eaa1d688d8f244d01dc4e25`
+- MOEX_TQBR: `c1faf47cfcb68de3b28aca65cec346a9931ae6a328f8750aa09166fecad629d6`
+
+The full ten-bin histograms are in the CI aggregate log. The SBER 200–300ms peak corresponds to 9,092 prints, yet the *trial-wise maximum* comparison returns 0.06 (descriptive), rather than treating the post-hoc selected bin as a fixed planned test. MOEX exhibits a stronger peak specifically in the **predeclared first 100ms**; its observed share is 13.0574% versus mean 9.9889% for the rotated controls, with an exploratory 0.01 tail frequency under the chosen model.
+
+### Compared with November 17
+
+On **2026-11-17**, SBER first-100ms share was **10.8374%** (descriptive first-bin tail 0.02) while MOEX was **10.1789%** (tail 0.41). On **2026-11-18**, SBER was **9.9886%** (tail 0.54), while MOEX was **13.0574%** (tail 0.01). The pattern **does not stay consistently elevated in the same instrument on these two dates**. This illustrates why per-date/instrument validation and clock/data-source diagnostics are necessary before claiming a stable rhythmic process.
+
+**Interpretation limit:** none of these exploratory tail frequencies is a calibrated p-value; the 99 shared-minute rotations do not constitute a verified exact-null market-process model and the public timestamps can contain vendor rounding, bundling or exchange operational artefacts. No owner IDs, no bot count, no evidence of profitable next-trade forecasts and no trading action is implied.
+
+**Decision:** source/CI/synthetic correctness and independent-date descriptive comparison PASSED. Bot-owner identification and calibrated predictive Stage 2 gates **NOT PASSED**. Subsequent work must use independent instruments and data-source precision checks, stronger clustered nulls, and known-agent ground truth.
+
