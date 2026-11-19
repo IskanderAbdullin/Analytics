@@ -67,11 +67,20 @@ jobs:
               clock-phase-audit --input "$raw" --first-ms 100 \
               --min-prints 100 --trials 99 --seed 20261119 \
               --output "data/results/clock_$instrument.json"
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              timestamp-quality --input "$raw" \
+              --output "data/results/quality_$instrument.json"
             INSTRUMENT="$instrument" python3 - <<'PY'
           import os,json,pathlib
           instrument=os.environ["INSTRUMENT"]
           p=pathlib.Path("data/results")/f"clock_{instrument}.json"
           report=json.loads(p.read_text(encoding="utf-8"))
+          quality=json.loads((pathlib.Path("data/results")/f"quality_{instrument}.json").read_text(encoding="utf-8"))
+          assert quality["sourceSha256"] == report["sourceSha256"]
+          assert quality["sourcePrints"] == report["inputPrints"]
+          assert quality["sourceGroups"] == report["sourceGroups"]
+          assert not quality["ownerCountKnown"]
+          assert not quality["sourceTimestampPrecisionVerified"]
           assert report["inputPrints"] > 0
           assert sum(g["publicPrintCount"] for g in report["groups"]) == report["inputPrints"]
           assert report["firstMilliseconds"]==100 and report["nullTrials"]==99
@@ -117,6 +126,27 @@ jobs:
               "ineligibleGroups":report["ineligibleSourceGroups"],
               "groups":groups,"actualOwnerCountKnown":False,
               "statisticalSignificanceEstablished":False
+          },ensure_ascii=False))
+          print("TIMESTAMP_QUALITY_OBSERVED",json.dumps({
+            "instrument":instrument, "date":"2026-11-18",
+            "sourceSha256":quality["sourceSha256"],
+            "totalPrints":quality["sourcePrints"],
+            "sourceGroups":[{
+              "tradeSource":g["tradeSource"],
+              "tradingMode":g["tradingMode"],
+              "sessionId":g["sessionId"],
+              "publicPrints":g["publicPrintCount"],
+              "uniqueTimestamps":g["uniqueTimestampCount"],
+              "timestampCollisionGroups":g["sameTimestampClusters"],
+              "printsInCollisionGroups":g["printsInSameTimestampClusters"],
+              "largestTimestampCluster":g["maxPrintsAtSameTimestamp"],
+              "printsSharingTimestampAndPrice":g["printsInSameTimestampAndPriceClusters"],
+              "wholeMillisecondPrints":g["wholeMillisecondTimestampPrints"],
+              "subMillisecondPrints":g["subMillisecondTimestampPrints"],
+              "nonMicrosecondAlignedPrints":g["notMicrosecondAlignedPrints"],
+              "smallestPositiveGapMicroseconds":g["smallestPositiveGapMicroseconds"],
+              "sourceTimestampPrecisionVerified":False
+            } for g in quality["groups"]]
           },ensure_ascii=False))
           PY
           done
