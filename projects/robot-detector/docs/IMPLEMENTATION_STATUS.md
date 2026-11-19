@@ -1,6 +1,6 @@
 # Implementation status — Market Robot Detector
 
-Date: 2026-11-18. Branch: `main`. Milestone: experimental `0.1`.
+Date: 2026-11-19. Branch: `main`. Milestone: experimental research `0.3`, read-only, no calibrated owner identity.
 
 ## Implemented source files
 
@@ -73,3 +73,14 @@ See [PUBLIC_ARCHIVE_VALIDATION.md](PUBLIC_ARCHIVE_VALIDATION.md) for exact GitHu
 - Core module `RollingForecast.cs` and CLI command `rolling-forecast` remain read-only research interfaces. They never execute trades.
 - Next work: diagnose phase drift/size changes and common market-clock artifacts on a *separate development set*, calibrate stronger nulls/ABIDES-truth, then evaluate untouched instruments/dates before considering live alerts.
 
+## Nov 19, 2026 — independent alternatives and source-quality gates
+
+**Latest confirmed validation:** 83/83 standalone .NET 10 self-tests, existing main CI remains isolated from IPO code. [Verified Robot Detector CI 44554682245](https://github.com/IskanderAbdullin/Analytics/actions/runs/44554682245). Four additional merged PRs [#18](https://github.com/IskanderAbdullin/Analytics/pull/18), [#19](https://github.com/IskanderAbdullin/Analytics/pull/19), [#20](https://github.com/IskanderAbdullin/Analytics/pull/20), [#21](https://github.com/IskanderAbdullin/Analytics/pull/21) are all read-only.
+
+- `ClockPhaseAudit.cs` — market clock first100ms and **maximum-over-10-bin** statistics, 99 shared-minute rotations, source/mode/session isolation. Real 2026-11-18 SBER peak 200–300ms with descriptive max-tail 0.06; MOEX peak 0–100ms with descriptive max-tail 0.01. The null is approximate and these are NOT calibrated p-values or physical bot counts. [MAX_BIN_PHASE_AUDIT.md](MAX_BIN_PHASE_AUDIT.md).
+- `TimestampQualityAudit.cs` — no-dedup collision/resolution diagnostics. 2026-11-18 SBER 83,515 prints, 57,624 distinct timestamps, 32,311 prints in same-time groups; MOEX 10,584 prints, 6,163 distinct timestamps, 5,902 prints in same-time groups. Observed minimum 2µs/1µs gap, not verified source clock precision. [TIMESTAMP_QUALITY_AUDIT.md](TIMESTAMP_QUALITY_AUDIT.md).
+- `ObservablePrintClusters.cs` — derived exact timestamp/price/side/source/mode/session grouping with original EventId traces and **exact lot conservation**. SBER row-level 57 fixed-volume candidate episodes versus 64 in a derived-cluster view; MOEX 6 versus 6. Neither is a confirmed real-robot count and the two event definitions are not directly comparable. [OBSERVABLE_PRINT_CLUSTERS.md](OBSERVABLE_PRINT_CLUSTERS.md).
+- Full read-only public archive workflow [44554682105](https://github.com/IskanderAbdullin/Analytics/actions/runs/44554682105) processed the same SBER/MOEX 2026-11-18 source tapes and purged raw data after use. This reused development data rather than independent validation of parent-order inference.
+- **Key scientific finding:** timestamp collisions and inconsistent clock-phase concentrations across two instruments/dates can cause false impressions of repeated algorithm activity; therefore model choice must use separate event definitions, stronger clustered controls, known-agent ground truth and untouched-date prospective outcomes.
+
+**NOT COMPLETE:** real-time T-Invest MarketDataStream, continuous replay parity, quote/L2 quality and venue-level provenance, UI, production OsEngine client, ABIDES blind truth, calibrated FDR, sustained forecast improvement and reliable physical bot counting. These cannot be claimed successful merely because offline and public-history CI passed.
