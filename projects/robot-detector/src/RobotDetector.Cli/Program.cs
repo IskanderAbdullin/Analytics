@@ -65,6 +65,8 @@ internal static class Program
                     return DashboardCommand(options);
                 case "replay-audit":
                     return ReplayAuditCommand(options);
+                case "compare-archives":
+                    return CompareArchivesCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -193,6 +195,47 @@ internal static class Program
 
 
 
+
+    private static int CompareArchivesCommand(Dictionary<string, string> options)
+    {
+        var paths = Required(options, "inputs").Split(';',
+            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (paths.Length is < 2 or > 20)
+            throw new ArgumentException("Provide 2..20 semicolon-separated --inputs file paths.");
+        if (paths.Select(Path.GetFullPath)
+                .Distinct(StringComparer.OrdinalIgnoreCase).Count() != paths.Length)
+            throw new ArgumentException("An input path is repeated.");
+        int maxRows = Integer(options, "max-rows", 1_000_000);
+        int width = Integer(options, "window-minutes", 5);
+        var reports = paths.Select(path =>
+            ResearchDashboard.Build(CsvTradeReader.Read(path, maxRows), width)).ToArray();
+        var comparison = ResearchComparison.Compare(reports);
+        string outputHtml = Required(options, "html");
+        if (!outputHtml.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("--html output must end in .html.");
+        string? outputJson = options.GetValueOrDefault("json");
+        if (outputJson is not null && !outputJson.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("--json output must end in .json.");
+        if (outputJson is not null &&
+            Path.GetFullPath(outputHtml).Equals(Path.GetFullPath(outputJson),
+                StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("HTML and JSON paths must differ.");
+
+        string html = ResearchComparison.ToStandaloneHtml(comparison);
+        string? json = outputJson is null ? null :
+            JsonSerializer.Serialize(comparison, JsonOptions);
+        EnsureNewFile(outputHtml);
+        if (outputJson is not null) EnsureNewFile(outputJson);
+        File.WriteAllText(outputHtml, html);
+        if (outputJson is not null) File.WriteAllText(outputJson, json);
+        Console.WriteLine($"Offline comparison saved to {outputHtml}");
+        if (outputJson is not null) Console.WriteLine($"Aggregate comparison JSON saved to {outputJson}");
+        Console.Error.WriteLine(
+            $"Distinct source archives={comparison.InputArchiveCount}, " +
+            $"public prints={comparison.TotalPublicPrints}; " +
+            "not a count of physical robots, no trading or network access");
+        return reports.Any(r => r.RejectedRows > 0) ? 3 : 0;
+    }
 
     private static int ReplayAuditCommand(Dictionary<string, string> options)
     {
@@ -701,6 +744,7 @@ internal static class Program
         Console.WriteLine("cluster-compare --input file.csv [--min-matches 6] [--output clusters.json]");
         Console.WriteLine("dashboard --input file.csv|zip --html report.html [--json report.json] [--window-minutes 5] [--max-visible-windows 240]");
         Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--receipt-order archive_row|exchange_time_ideal] [--output replay.json]");
+        Console.WriteLine("compare-archives --inputs \"a.csv;b.csv\" --html comparison.html [--json comparison.json] [--window-minutes 5]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
