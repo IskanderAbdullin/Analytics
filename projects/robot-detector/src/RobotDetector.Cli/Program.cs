@@ -202,7 +202,8 @@ internal static class Program
         {
             AllowedLatenessMilliseconds = Integer(options, "lateness-ms", 500),
             MaximumPendingEvents = Integer(options, "max-pending", 10_000),
-            WindowMinutes = Integer(options, "window-minutes", 5)
+            WindowMinutes = Integer(options, "window-minutes", 5),
+            ReceiptOrdering = options.GetValueOrDefault("receipt-order", "archive_row")
         });
         string json = JsonSerializer.Serialize(replay, JsonOptions);
         if (options.TryGetValue("output", out var path))
@@ -699,7 +700,7 @@ internal static class Program
         Console.WriteLine("timestamp-quality --input file.csv [--output timestamp-quality.json]");
         Console.WriteLine("cluster-compare --input file.csv [--min-matches 6] [--output clusters.json]");
         Console.WriteLine("dashboard --input file.csv|zip --html report.html [--json report.json] [--window-minutes 5] [--max-visible-windows 240]");
-        Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--output replay.json]");
+        Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--receipt-order archive_row|exchange_time_ideal] [--output replay.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
