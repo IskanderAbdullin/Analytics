@@ -30,6 +30,7 @@ jobs:
         run: |
           dotnet build src/RobotDetector.Core/RobotDetector.Core.csproj -c Release --nologo
           dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build src/RobotDetector.Server/RobotDetector.Server.csproj -c Release --nologo
           dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
       - name: Deterministic offline self-tests
         run: dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
@@ -293,6 +294,69 @@ jobs:
           assert "<script" not in html.lower()
           assert "Content-Security-Policy" in html
           assert "SYN001" not in html
+          PY
+      - name: Localhost HTTP snapshot API security and integration smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project src/RobotDetector.Server -c Release --no-build -- \
+            --input fixtures/synthetic_activity_episode.csv --port 18765 \
+            > /tmp/robot-detector-local-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          healthy=0
+          for i in $(seq 1 60); do
+            if curl -fsS --noproxy '*' \
+              http://127.0.0.1:18765/api/v1/health > /tmp/rd-health.json; then
+              healthy=1
+              break
+            fi
+            if ! kill -0 "$pid" 2>/dev/null; then
+              cat /tmp/robot-detector-local-server.log
+              exit 1
+            fi
+            sleep 0.2
+          done
+          test "$healthy" = "1"
+          curl -fsS --noproxy '*' \
+            http://127.0.0.1:18765/api/v1/summary > /tmp/rd-summary.json
+          curl -fsS --noproxy '*' \
+            http://127.0.0.1:18765/ > /tmp/rd-server.html
+          curl -fsSI --noproxy '*' \
+            http://127.0.0.1:18765/ > /tmp/rd-headers.txt
+          post_code=$(curl -sS --noproxy '*' -o /dev/null \
+            -w "%{http_code}" -X POST http://127.0.0.1:18765/api/v1/summary)
+          host_code=$(curl -sS --noproxy '*' -o /dev/null \
+            -w "%{http_code}" -H 'Host: attacker.example' http://127.0.0.1:18765/api/v1/summary)
+          origin_code=$(curl -sS --noproxy '*' -o /dev/null \
+            -w "%{http_code}" -H 'Origin: https://attacker.example' http://127.0.0.1:18765/api/v1/summary)
+          unknown_code=$(curl -sS --noproxy '*' -o /dev/null \
+            -w "%{http_code}" http://127.0.0.1:18765/api/v1/orders)
+          test "$post_code" = "405"
+          test "$host_code" = "403"
+          test "$origin_code" = "403"
+          test "$unknown_code" = "404"
+          python3 - <<'PY'
+          import json,pathlib
+          h=json.loads(pathlib.Path("/tmp/rd-health.json").read_text(encoding="utf-8"))
+          p=json.loads(pathlib.Path("/tmp/rd-summary.json").read_text(encoding="utf-8"))
+          html=pathlib.Path("/tmp/rd-server.html").read_text(encoding="utf-8")
+          headers=pathlib.Path("/tmp/rd-headers.txt").read_text(encoding="utf-8").lower()
+          assert h["status"] == "offline_snapshot", h
+          assert h["tradingEnabled"] is False, h
+          assert h["liveMarketDataConnected"] is False, h
+          assert h["actualBotCountKnown"] is False, h
+          assert h["sourceCoverageVerified"] is False, h
+          assert p["publicPrints"] == 40, p
+          assert p["populatedWindows"] == 5, p
+          assert p["elevatedActivityWindows"] == 1, p
+          assert p["actualBotCountKnown"] is False, p
+          assert p["statisticalSignificanceEstablished"] is False, p
+          assert "<script" not in html.lower()
+          assert "ACT000" not in html
+          assert "content-security-policy:" in headers
+          assert "x-frame-options: deny" in headers
+          assert "cache-control: no-store" in headers
           PY
       - name: Ensure no trade/order API dependency
         run: |
