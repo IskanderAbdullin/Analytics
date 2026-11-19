@@ -16,10 +16,15 @@ Run from `projects/robot-detector/`:
 dotnet run --project src/RobotDetector.Cli -- replay-audit `
   --input fixtures/synthetic_twap_5s.csv `
   --lateness-ms 500 --max-pending 10000 --window-minutes 5 `
-  --output data/results/replay.json
+  --receipt-order archive_row --output data/results/replay.json
+
+# Сравнение с идеализированным порядком по биржевому времени (это НЕ задержка сети!)
+dotnet run --project src/RobotDetector.Cli -- replay-audit `
+  --input fixtures/synthetic_twap_5s.csv `
+  --receipt-order exchange_time_ideal --output data/results/replay-ideal.json
 ```
 
-The JSON report includes input/replayed print count, lots, out-of-order source record count, late-after-watermark count, forced early queue flushes, maximum buffered count and full per-instrument/source/mode/session/window aggregates. Default tolerance is 500 milliseconds; queue cap is 10,000 pending prints; source window width 5 minutes.
+The optional `--receipt-order archive_row|exchange_time_ideal` parameter explicitly distinguishes original archive record ordering from a sorted-by-exchange-time ideal reference. The ideal reference **must not be read as observed network latency or feed reliability**. The JSON report includes input/replayed print count, lots, out-of-order source record count, late-after-watermark count, forced early queue flushes, maximum buffered count and full per-instrument/source/mode/session/window aggregates. Default tolerance is 500 milliseconds; queue cap is 10,000 pending prints; source window width 5 minutes.
 
 A public archive may have been pre-sorted or vendor-batched before download: `ArrivalSequence` in such a file is **not actual gRPC receive order**. Consequently, a small out-of-order count in archived data is *not evidence that the real stream has zero latency or perfect delivery*.
 
