@@ -55,6 +55,8 @@ internal static class Program
                     return FlowFootprintCommand(options);
                 case "activity-episodes":
                     return ActivityEpisodesCommand(options);
+                case "clock-phase-audit":
+                    return ClockPhaseCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -213,6 +215,32 @@ internal static class Program
             $"flagged observable activity windows={result.ActivityWindowCount}; " +
             "actual physical bot count UNKNOWN");
         return source.RejectedRowTotal > 0 ? 3 : 0;
+    }
+
+
+    private static int ClockPhaseCommand(Dictionary<string, string> options)
+    {
+        var input = CsvTradeReader.Read(Required(options, "input"));
+        var report = ClockPhaseAudit.Analyse(input, new ClockPhaseConfig
+        {
+            FirstMilliseconds = Integer(options, "first-ms", 100),
+            MinPrintsPerGroup = Integer(options, "min-prints", 100),
+            NullTrials = Integer(options, "trials", 99),
+            Seed = Integer(options, "seed", 20261119)
+        });
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out string? path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"Read-only market-clock phase report saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine(
+            $"Clock source groups={report.SourceGroups}; " +
+            $"controlled={report.EligibleSourceGroups}; " +
+            "common timestamp rhythm is not an individual bot identity");
+        return input.RejectedRowTotal > 0 ? 3 : 0;
     }
 
     private static int FlowFootprintCommand(Dictionary<string, string> options)
@@ -550,6 +578,7 @@ internal static class Program
         Console.WriteLine("variable-temporal-null --input file.csv [--mode uniform|rotate] [--trials 6] [--block-seconds 60]");
         Console.WriteLine("flow-footprint --input file.csv [--window-minutes 5] [--bin-seconds 1] [--output footprints.json]");
         Console.WriteLine("activity-episodes --input file.csv [--reference-windows 4] [--min-count-ratio 3] [--min-lot-ratio 3] [--min-abs-imbalance 0.6]");
+        Console.WriteLine("clock-phase-audit --input file.csv [--first-ms 100] [--min-prints 100] [--trials 99] [--seed 20261119] [--output clock.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
