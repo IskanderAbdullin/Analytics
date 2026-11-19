@@ -255,6 +255,24 @@ jobs:
           assert "Наблюдался" in html
           assert "ACT000" not in html, "No raw trade identifiers in offline report"
           PY
+      - name: Bounded event-time replay CLI smoke (no data loss)
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- replay-audit \
+            --input fixtures/synthetic_twap_5s.csv --lateness-ms 500 \
+            --max-pending 16 --window-minutes 5 --output /tmp/robot-replay.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-replay.json",encoding="utf-8"))
+          assert r["inputPrints"]==7 and r["replayedPrints"]==7, r
+          assert r["replayedLots"]==640, r
+          assert r["populatedWindows"]==1, r
+          assert r["maximumPendingObserved"]<=16, r
+          assert r["forcedQueueFlushCount"]==0, r
+          assert r["lateAfterWatermarkCount"]==0, r
+          assert r["anyPrintsDropped"] is False, r
+          assert r["hasActualNetworkReceiveTimestamps"] is False, r
+          assert r["actualBotCountKnown"] is False, r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then

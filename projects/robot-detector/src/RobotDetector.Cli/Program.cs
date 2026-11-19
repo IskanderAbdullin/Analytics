@@ -63,6 +63,8 @@ internal static class Program
                     return ClusterCompareCommand(options);
                 case "dashboard":
                     return DashboardCommand(options);
+                case "replay-audit":
+                    return ReplayAuditCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -191,6 +193,34 @@ internal static class Program
 
 
 
+
+    private static int ReplayAuditCommand(Dictionary<string, string> options)
+    {
+        var imported = CsvTradeReader.Read(Required(options, "input"),
+            Integer(options, "max-rows", 1_000_000));
+        var replay = BoundedEventReplay.Analyse(imported, new ReplayAuditConfig
+        {
+            AllowedLatenessMilliseconds = Integer(options, "lateness-ms", 500),
+            MaximumPendingEvents = Integer(options, "max-pending", 10_000),
+            WindowMinutes = Integer(options, "window-minutes", 5),
+            ReceiptOrdering = options.GetValueOrDefault("receipt-order", "archive_row")
+        });
+        string json = JsonSerializer.Serialize(replay, JsonOptions);
+        if (options.TryGetValue("output", out var path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"Event-time replay audit saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine(
+            $"Replayed={replay.ReplayedPrints}/{replay.InputPrints}, " +
+            $"late={replay.LateAfterWatermarkCount}, " +
+            $"outOfOrder={replay.OutOfOrderArrivalCount}, " +
+            $"forcedFlushes={replay.ForcedQueueFlushCount}, " +
+            "feed completeness UNVERIFIED, no owner inference");
+        return imported.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int DashboardCommand(Dictionary<string, string> options)
     {
@@ -670,6 +700,7 @@ internal static class Program
         Console.WriteLine("timestamp-quality --input file.csv [--output timestamp-quality.json]");
         Console.WriteLine("cluster-compare --input file.csv [--min-matches 6] [--output clusters.json]");
         Console.WriteLine("dashboard --input file.csv|zip --html report.html [--json report.json] [--window-minutes 5] [--max-visible-windows 240]");
+        Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--receipt-order archive_row|exchange_time_ideal] [--output replay.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
