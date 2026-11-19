@@ -35,7 +35,7 @@ internal static class Program
         try
         {
             settings = ReadOptions(args);
-            string input = Required(settings, "input");
+            string input = ResolveInput(Required(settings, "input"));
             port = Number(settings, "port", 8765);
             if (port is < 1024 or > 65535)
                 throw new ArgumentException("Local port must be between 1024 and 65535.");
@@ -106,8 +106,9 @@ internal static class Program
             await next(context);
         });
 
-        app.MapGet("/", () => Results.Content(html, "text/html; charset=utf-8"));
-        app.MapGet("/api/v1/health", () => Results.Json(new
+        var safeReadMethods = new[] { HttpMethods.Get, HttpMethods.Head };
+        app.MapMethods("/", safeReadMethods, () => Results.Content(html, "text/html; charset=utf-8"));
+        app.MapMethods("/api/v1/health", safeReadMethods, () => Results.Json(new
         {
             status = "offline_snapshot",
             mode = "read_only",
@@ -118,7 +119,7 @@ internal static class Program
             tradingEnabled = false,
             liveMarketDataConnected = false
         }));
-        app.MapGet("/api/v1/summary", () =>
+        app.MapMethods("/api/v1/summary", safeReadMethods, () =>
             Results.Content(json, "application/json; charset=utf-8"));
         app.MapFallback(() => Results.NotFound(new { error = "unknown_read_only_route" }));
 
@@ -127,6 +128,27 @@ internal static class Program
         Console.WriteLine("No network exposure beyond loopback; stop with Ctrl+C.");
         await app.RunAsync();
         return 0;
+    }
+
+    // dotnet run for Web SDK projects may set the working directory to the
+    // server project, not the shell's directory. Resolve a local relative
+    // archive by walking toward the repo root; absolute paths take priority.
+    private static string ResolveInput(string value)
+    {
+        if (Path.IsPathRooted(value))
+            return Path.GetFullPath(value);
+        string local = Path.GetFullPath(value);
+        if (File.Exists(local)) return local;
+        var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (directory.Parent is not null)
+        {
+            directory = directory.Parent;
+            string candidate = Path.GetFullPath(Path.Combine(directory.FullName, value));
+            if (File.Exists(candidate))
+                return candidate;
+        }
+        throw new FileNotFoundException(
+            "Input archive not found relative to the working directory or its parents: " + value);
     }
 
     private static Dictionary<string, string> ReadOptions(string[] args)
