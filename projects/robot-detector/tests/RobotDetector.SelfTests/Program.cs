@@ -67,6 +67,11 @@ internal static class Program
         Check("temporal rotation preserves within-block relative phase", TemporalNullRotation);
         Check("temporal negative-control summary is deterministic and uncalibrated", TemporalNullComparison);
         Check("invalid variable-size configuration or temporal null mode fails closed", VariableCadenceInvalidConfiguration);
+        Check("flow footprints summarize known signed and unsigned lots", FlowFootprintRegular);
+        Check("flow footprints count bursts and empty bins without fabricating bots", FlowFootprintBurst);
+        Check("flow footprints partition venues and 5min intervals", FlowFootprintPartition);
+        Check("unknown reported side does not invent order direction", FlowFootprintUnknownSide);
+        Check("flow footprint rejects invalid bin configuration", FlowFootprintConfigValidation);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -895,6 +900,102 @@ internal static class Program
         try { TemporalCadenceNull.Resample(From(VariableCadenceFixture("BAD")), "unknown", 5); }
         catch (ArgumentException) { rejected = true; }
         Assert(rejected, "unknown clock-null model must fail closed");
+    }
+
+
+    private static MarketTrade[] FlowSeries(
+        string prefix, string source = "EXCHANGE", int secondOffset = 0)
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero)
+            .AddSeconds(secondOffset);
+        string[] directions = { "BUY", "BUY", "SELL", "SELL" };
+        long[] quantities = { 10, 20, 10, 20 };
+        return Enumerable.Range(0, 4).Select(i =>
+            new MarketTrade($"{prefix}-{i}", start.AddSeconds(i),
+                "SYN-FLOW", "FLOW", source, directions[i], 100m, quantities[i],
+                "TQBR", "SESSION-1", "SYNTHETIC", i)).ToArray();
+    }
+
+    private static void FlowFootprintRegular()
+    {
+        var output = FlowFootprint.Describe(From(FlowSeries("FOOT")));
+        Assert(output.WindowCount == 1 && output.InputPrints == 4,
+            "four prints in one five-minute source/time window");
+        var w = output.Windows.Single();
+        Assert(w.TotalLots == 60 && w.BuyReportedLots == 30 &&
+               w.SellReportedLots == 30 && w.UnknownDirectionLots == 0,
+            "strict lot conservation");
+        Assert(w.ReportedDirectionImbalance == 0, "reported buy and sell volumes are equal");
+        Assert(w.LongestBuyReportedRun == 2 && w.LongestSellReportedRun == 2,
+            "two consecutive known-side prints for each run");
+        Assert(Math.Abs(w.LagOneReportedSignAgreement!.Value - 2.0 / 3) < 1e-12,
+            "two adjacent same-side pairs out of three");
+        Assert(w.MedianInterarrivalMs == 1000 && w.InterarrivalCoefficientOfVariation == 0,
+            "equal one-second inter-arrival deltas");
+        Assert(w.PrintCountFanoFactor == 0 && w.IncludedClockBins == 4,
+            "all four equally occupied one-second bins imply Fano=0");
+        Assert(w.NearWholeSecondPrints == 4 && w.NearWholeSecondPrintShare == 1,
+            "all prints exactly on whole seconds");
+        Assert(!output.ActualBotCountKnown && !output.StatisticalSignificanceEstablished,
+            "counts are descriptive and no owner is known");
+    }
+
+    private static void FlowFootprintBurst()
+    {
+        var input = FlowSeries("CLUSTER");
+        var start = input[0].ExchangeTimeUtc;
+        for (int i = 0; i < 3; i++)
+            input[i] = input[i] with { ExchangeTimeUtc = start };
+        input[3] = input[3] with { ExchangeTimeUtc = start.AddSeconds(10) };
+        var result = FlowFootprint.Describe(From(input));
+        var w = result.Windows.Single();
+        Assert(w.IncludedClockBins == 11, "include nine unoccupied internal bins");
+        Assert(w.PrintCountFanoFactor > 2, "three same-time prints should yield clustering");
+        Assert(w.MedianInterarrivalMs == 0 && w.InterarrivalCoefficientOfVariation > 1,
+            "clock-time burst intervals show variability");
+        Assert(w.PublicPrintCount == 4 && w.TotalLots == 60,
+            "timestamps can collide without losing actual prints");
+    }
+
+    private static void FlowFootprintPartition()
+    {
+        var ex = FlowSeries("EX");
+        var dealer = FlowSeries("DL", "DEALER");
+        var later = FlowSeries("LATE", secondOffset: 301);
+        var report = FlowFootprint.Describe(From(ex.Concat(dealer).Concat(later).ToArray()));
+        Assert(report.WindowCount == 3, "one source 07:00, dealer 07:00, exchange 07:05");
+        Assert(report.Windows.Select(w => w.PublicPrintCount).Sum() == 12,
+            "all prints included, no attribution overlap");
+        Assert(report.Windows.Select(w => w.TradeSource).Distinct().Count() == 2,
+            "source/venue split");
+        Assert(report.Windows.All(w => w.TotalLots == 60),
+            "lot conservation in each independent window");
+    }
+
+    private static void FlowFootprintUnknownSide()
+    {
+        var input = FlowSeries("UN")
+            .Select(t => t with { ReportedDirection = "UNKNOWN" }).ToArray();
+        var w = FlowFootprint.Describe(From(input)).Windows.Single();
+        Assert(w.BuyReportedLots == 0 && w.SellReportedLots == 0 &&
+               w.UnknownDirectionLots == 60, "unknown quantity tracked separately");
+        Assert(w.ReportedDirectionImbalance is null &&
+               w.LagOneReportedSignAgreement is null &&
+               w.LongestBuyReportedRun == 0 && w.LongestSellReportedRun == 0,
+            "cannot imply trade direction where provider does not supply it");
+    }
+
+    private static void FlowFootprintConfigValidation()
+    {
+        bool rejected = false;
+        try { new FlowFootprintConfig { WindowMinutes = 0 }.Validate(); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "zero-minute windows invalid");
+        rejected = false;
+        try { FlowFootprint.Describe(From(FlowSeries("INVALID")),
+            new FlowFootprintConfig { ClockPhaseThresholdMilliseconds = 1000 }); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "phase beyond half-second invalid");
     }
 
     private static void BadConfig()

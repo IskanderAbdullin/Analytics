@@ -51,6 +51,8 @@ internal static class Program
                     return VariableCadenceCommand(options);
                 case "variable-temporal-null":
                     return VariableTemporalNullCommand(options);
+                case "flow-footprint":
+                    return FlowFootprintCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -177,6 +179,30 @@ internal static class Program
 
 
 
+
+
+    private static int FlowFootprintCommand(Dictionary<string, string> options)
+    {
+        var input = CsvTradeReader.Read(Required(options, "input"),
+            Integer(options, "max-rows", 1_000_000));
+        var report = FlowFootprint.Describe(input, new FlowFootprintConfig
+        {
+            WindowMinutes = Integer(options, "window-minutes", 5),
+            CountBinSeconds = Integer(options, "bin-seconds", 1),
+            ClockPhaseThresholdMilliseconds = Integer(options, "clock-phase-ms", 100)
+        });
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Descriptive trade-flow footprints saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine(
+            $"Public prints={report.InputPrints}; windows={report.WindowCount}; physical_bot_count=UNKNOWN");
+        return input.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static VariableCadenceConfig VariableCadenceOptions(Dictionary<string, string> options) => new()
     {
@@ -488,6 +514,7 @@ internal static class Program
         Console.WriteLine("diagnose-forecast --input file.csv [--min-matches 6] [--warmup-minutes 60] [--stride-minutes 30] [--max-cutoffs 12] [--max-training-age-cycles 2]");
         Console.WriteLine("variable-cadence --input file.csv [--min-matches 8] [--min-distinct-sizes 3] [--output candidates.json]");
         Console.WriteLine("variable-temporal-null --input file.csv [--mode uniform|rotate] [--trials 6] [--block-seconds 60]");
+        Console.WriteLine("flow-footprint --input file.csv [--window-minutes 5] [--bin-seconds 1] [--output footprints.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
