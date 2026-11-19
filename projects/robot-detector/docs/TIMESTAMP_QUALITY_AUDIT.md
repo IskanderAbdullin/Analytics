@@ -53,7 +53,40 @@ Use the **already prespecified public SBER_TQBR and MOEX_TQBR archives for 2026-
 
 The job must not upload raw source trades or sensitive data. Downloads are read-only and use the pinned Russian root CA in a process-scoped trust configuration. After the job, delete temporary files and cert; do not disable TLS validation or bypass public API limits.
 
-**Result:** append the actual measured counts only after a successful GitHub Actions run.
+## Observed engineering results — executed 2026-11-19
+
+**CI success:** [GitHub Actions run 44553006960](https://github.com/IskanderAbdullin/Analytics/actions/runs/44553006960). Source files were the same public anonymized SBER_TQBR and MOEX_TQBR archives dated **2026-11-18** used in the earlier clock-phase study; no new scientific holdout claim. **77/77** .NET self-tests passed. No raw trade files, credentials or private account data uploaded.
+
+| Measure | SBER_TQBR | MOEX_TQBR |
+|---|---:|---:|
+| Original public prints (NO dedup) | **83,515** | **10,584** |
+| Distinct exact UTC timestamp values | **57,624** | **6,163** |
+| Distinct timestamp collision groups (count >=2) | 6,420 | 1,481 |
+| Public prints inside those groups | **32,311** | **5,902** |
+| Share of prints inside exact-time collision groups | **38.69%** | **55.76%** |
+| Maximum print multiplicity at one exact timestamp | **217** | **49** |
+| Prints sharing *both* exact timestamp and price | **27,914** | **4,442** |
+| Timestamps aligned exactly to whole millisecond | **89** | **7** |
+| Timestamps with some sub-millisecond fraction | **83,426** | **10,577** |
+| Timestamps not aligned to 1µs | **0** | **0** |
+| Smallest positive observed distinct-timestamp interval | **2µs** | **1µs** |
+| Actual source clock precision independently verified | No | No |
+| Unique account/order/owner identity established | No | No |
+
+Compressed archive SHA-256:
+- SBER_TQBR: `a6f96c173d904060203e5a840020647b3dbb30681eaa1d688d8f244d01dc4e25`
+- MOEX_TQBR: `c1faf47cfcb68de3b28aca65cec346a9931ae6a328f8750aa09166fecad629d6`
+
+All timestamps are representable as integer microseconds in these specific archive files (no 100ns-only increments appeared), but this **does not** prove actual exchange source timestamp precision, time-stamping layer, losslessness or correct temporal ordering. The minimum nonzero gap likewise reflects **observed data precision**, not the exchange clock hardware specification.
+
+### Significance for next stage
+
+A **substantial fraction** of raw public prints have another public print at the exact same timestamp, often the same price. This is a risk for simplistic event-count, interarrival, FFT and periodic-size models. However, **same-time/same-price rows must not be deleted or treated as one parent order**, because the public archive does not supply the necessary source-order or economic event identifier.
+
+A useful alternative is a separate **derived observable print-cluster view**, retaining every underlying source event ID, grouped conservatively by instrument/source/mode/session/exact UTC timestamp/price/reported direction, with aggregated lots and original print cardinality. It should be a separate analytical view and must never overwrite original history or be called an identifiable order/robot. Its structure can be compared to row-level original prints on synthetic known-truth cases and independent dates. See [STAGE_02_VALIDATION.md](STAGE_02_VALIDATION.md).
+
+**Decision:** timestamp collision/precision data-quality gate PASSED as a deterministic descriptive audit; source clock provenance and true parent-order reconstruction are NOT verified.
+
 
 ## Interpretation and next gate
 
