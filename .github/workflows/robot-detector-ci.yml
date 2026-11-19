@@ -299,9 +299,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          fixture="$(pwd)/fixtures/synthetic_activity_episode.csv"
+          # Intentionally pass a project-root-relative input: ASP.NET Web SDK
+          # changes content root; the server resolves this safely by walking up.
           dotnet run --project src/RobotDetector.Server -c Release --no-build -- \
-            --input "$fixture" --port 18765 \
+            --input fixtures/synthetic_activity_episode.csv --port 18765 \
             > /tmp/robot-detector-local-server.log 2>&1 &
           pid=$!
           trap 'kill "$pid" 2>/dev/null || true' EXIT
