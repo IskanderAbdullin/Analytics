@@ -52,13 +52,25 @@ jobs:
           dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
             replay-audit --input data/raw/sber_2026-11-17.csv \
             --lateness-ms 500 --max-pending 10000 --window-minutes 5 \
-            --output data/results/replay.json
+            --receipt-order archive_row --output data/results/replay.json
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            replay-audit --input data/raw/sber_2026-11-17.csv \
+            --lateness-ms 500 --max-pending 10000 --window-minutes 5 \
+            --receipt-order exchange_time_ideal --output data/results/replay-ideal.json
           python3 - <<'PY'
           import pathlib,json
           p=pathlib.Path("data/results/summary.json")
           r=json.loads(p.read_text(encoding="utf-8"))
           html=pathlib.Path("data/results/offline.html").read_text(encoding="utf-8")
           replay=json.loads(pathlib.Path("data/results/replay.json").read_text(encoding="utf-8"))
+          ideal=json.loads(pathlib.Path("data/results/replay-ideal.json").read_text(encoding="utf-8"))
+          assert ideal["receiptOrdering"] == "exchange_time_ideal"
+          assert replay["receiptOrdering"] == "archive_row"
+          assert ideal["lateAfterWatermarkCount"] == 0
+          assert ideal["outOfOrderArrivalCount"] == 0
+          assert ideal["replayedPrints"] == replay["replayedPrints"]
+          assert ideal["replayedLots"] == replay["replayedLots"]
+          assert ideal["populatedWindows"] == replay["populatedWindows"]
           assert replay["sourceSha256"] == r["sourceSha256"]
           assert replay["replayedPrints"] == r["publicPrints"]
           assert replay["replayedLots"] == r["observedLots"]
@@ -79,7 +91,7 @@ jobs:
           assert "<script" not in html.lower()
           assert "Content-Security-Policy" in html
           assert "SYN001" not in html
-          print("PUBLIC_REPLAY_OBSERVED",json.dumps({"outOfOrder":replay["outOfOrderArrivalCount"],"lateAfterWatermark":replay["lateAfterWatermarkCount"],"forcedFlushes":replay["forcedQueueFlushCount"],"maxPending":replay["maximumPendingObserved"],"allPrintsReplayed":replay["replayedPrints"],"sourceSha256":replay["sourceSha256"]},ensure_ascii=False))
+          print("PUBLIC_REPLAY_OBSERVED",json.dumps({"outOfOrder":replay["outOfOrderArrivalCount"],"lateAfterWatermark":replay["lateAfterWatermarkCount"],"forcedFlushes":replay["forcedQueueFlushCount"],"maxPending":replay["maximumPendingObserved"],"idealOutOfOrder":ideal["outOfOrderArrivalCount"],"idealLate":ideal["lateAfterWatermarkCount"],"allPrintsReplayed":replay["replayedPrints"],"sourceSha256":replay["sourceSha256"]},ensure_ascii=False))
           print("PUBLIC_DASHBOARD_OBSERVED",json.dumps({
               "sourceSha256":r["sourceSha256"],
               "publicPrints":r["publicPrints"],
