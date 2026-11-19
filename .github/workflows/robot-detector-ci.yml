@@ -215,6 +215,23 @@ jobs:
           assert g["printsInSameTimestampClusters"]==0, g
           assert g["maxPrintsAtSameTimestamp"]==1, g
           PY
+      - name: Raw-vs-derived observable print-cluster cadence smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- cluster-compare \
+            --input fixtures/synthetic_split_clips_5s.csv \
+            --min-matches 6 --output /tmp/print-cluster-comparison.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/print-cluster-comparison.json",encoding="utf-8"))
+          assert r["originalPublicPrints"]==14 and r["derivedObservableClusters"]==7, r
+          assert r["publicPrintsInMultiPrintClusters"]==14, r
+          assert r["originalFixedSizeCandidateEpisodes"]==0, r
+          assert r["derivedClusterSizeCandidateEpisodes"]==1, r
+          assert r["originalTotalLots"]==r["derivedTotalLots"]==700, r
+          assert r["physicalBotCountKnown"] is False, r
+          assert r["actualParentOrdersIdentified"] is False, r
+          assert r["statisticalSignificanceEstablished"] is False, r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then

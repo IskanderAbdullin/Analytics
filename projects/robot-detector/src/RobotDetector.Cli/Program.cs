@@ -59,6 +59,8 @@ internal static class Program
                     return ClockPhaseCommand(options);
                 case "timestamp-quality":
                     return TimestampQualityCommand(options);
+                case "cluster-compare":
+                    return ClusterCompareCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -220,6 +222,34 @@ internal static class Program
     }
 
 
+
+
+    private static int ClusterCompareCommand(Dictionary<string, string> options)
+    {
+        var input = CsvTradeReader.Read(Required(options, "input"));
+        var config = new DetectorConfig
+        {
+            MinMatches = Integer(options, "min-matches", 6),
+            AnalysisWindowMinutes = Integer(options, "window-minutes", 60),
+            MaximumEventsPerGroup = Integer(options, "max-group-events", 5000)
+        };
+        var comparison = ObservablePrintClusters.CompareFixedSize(input, config);
+        string json = JsonSerializer.Serialize(comparison, JsonOptions);
+        if (options.TryGetValue("output", out string? path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"Derived-versus-raw candidate comparison saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine(
+            $"Public prints={comparison.OriginalPublicPrints}; " +
+            $"derived observational clusters={comparison.DerivedObservableClusters}; " +
+            $"raw candidates={comparison.OriginalFixedSizeCandidateEpisodes}; " +
+            $"derived-view candidates={comparison.DerivedClusterSizeCandidateEpisodes}; " +
+            "neither number is a confirmed bot count");
+        return input.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int TimestampQualityCommand(Dictionary<string, string> options)
     {
@@ -601,6 +631,7 @@ internal static class Program
         Console.WriteLine("activity-episodes --input file.csv [--reference-windows 4] [--min-count-ratio 3] [--min-lot-ratio 3] [--min-abs-imbalance 0.6]");
         Console.WriteLine("clock-phase-audit --input file.csv [--first-ms 100] [--min-prints 100] [--trials 99] [--seed 20261119] [--output clock.json]");
         Console.WriteLine("timestamp-quality --input file.csv [--output timestamp-quality.json]");
+        Console.WriteLine("cluster-compare --input file.csv [--min-matches 6] [--output clusters.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

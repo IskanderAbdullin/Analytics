@@ -93,6 +93,12 @@ internal static partial class Program
         Check("timestamp quality isolates EXCHANGE/DEALER and sessions", TimestampQualitySourceIsolation);
         Check("timestamp quality preserves unknown coverage and owner status", TimestampQualityUncertainty);
         Check("timestamp quality handles empty and one-event sources", TimestampQualitySmallInputs);
+        Check("observable cluster view preserves every original execution and lot", ClusterViewConservesEventsAndLots);
+        Check("observable clusters never mix exchange source, direction or price", ClusterViewNoCrossAttribution);
+        Check("cluster IDs and evidence mapping are deterministic under source reorder", ClusterViewDeterministic);
+        Check("derived cluster regularity can differ from row-level regularity", ClusterViewCadenceSensitivity);
+        Check("cluster comparison remains candidate-only, no owner identity", ClusterComparisonSafeState);
+        Check("cluster grouping refuses duplicate original source event IDs", ClusterViewRejectsDuplicateIds);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
