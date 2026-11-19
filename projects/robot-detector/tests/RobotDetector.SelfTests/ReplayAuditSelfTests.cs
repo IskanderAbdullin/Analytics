@@ -11,15 +11,13 @@ internal static partial class Program
         Assert(replay.InputPrints == 7 && replay.ReplayedPrints == 7, "all prints must remain");
         Assert(replay.ReplayedLots == 640 && replay.PopulatedWindows == 1,
             "observed lots and window conserved");
-        Assert(replay.Windows.Sum(x => x.ReplayedPrintCountForTest()) == 7,
+        Assert(replay.Windows.Sum(x => x.PublicPrints) == 7,
             "window aggregates must cover all source events");
         Assert(replay.Windows.Sum(x => x.ObservedLots) == 640, "no volume loss");
         Assert(!replay.AnyPrintsDropped && !replay.ActualBotCountKnown, "no invisible loss or owner claim");
         Assert(!replay.SourceCoverageVerified && !replay.HasActualNetworkReceiveTimestamps,
             "offline archive cannot prove network-time or completeness");
     }
-
-    private static int ReplayedPrintCountForTest(this ReplayObservedWindow w) => w.PublicPrints;
 
     private static MarketTrade[] OutOfOrderStream()
     {
