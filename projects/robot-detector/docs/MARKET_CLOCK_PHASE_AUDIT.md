@@ -68,3 +68,35 @@ No account, broker or order permissions are used.
 After passing synthetic CI, run **SBER_TQBR** and **MOEX_TQBR** on the same existing public archive day (2026-11-17) under identical frozen settings (100ms, 100 prints minimum, 99 rotations, seed 20261119). Record only source SHA, group counts, observed phase shares and control summary. If a specified archive is not available, report `BLOCKED_BY_DATA` and do not quietly choose an alternative.
 
 This first independent cross-instrument comparison is **descriptive**, not an unseen validation of prior optimized parameters and not a release gate. Neither method is allowed to label its findings confirmed bots or profitable signals.
+
+
+## First empirical cross-instrument result — 2026-11-19
+
+**Completed successfully:** [GitHub Actions run 44549763665](https://github.com/IskanderAbdullin/Analytics/actions/runs/44549763665), same code revision and predeclared settings for SBER_TQBR and MOEX_TQBR on **2026-11-17**. No raw exchange tapes committed or uploaded; source archive and local CA deleted from the runner. [Separate .NET CI](https://github.com/IskanderAbdullin/Analytics/actions/runs/44549763988) passed **69/69** deterministic self-tests, and all CLI smoke checks.
+
+| Measure | SBER_TQBR | MOEX_TQBR |
+|---|---:|---:|
+| Anonymized public prints | **121,920** | **15,208** |
+| Source / trading mode / session | EXCHANGE / UNSPECIFIED / 2026-11-17 | EXCHANGE / UNSPECIFIED / 2026-11-17 |
+| Source-specific UTC minute blocks | 1009 | 975 |
+| Prints in the first 100ms after whole second | 13,213 | 1,548 |
+| Observed first-100ms print share | **10.8374%** | **10.1789%** |
+| Mean randomized shared-minute phase share (99 controls) | **10.0540%** | **10.0500%** |
+| 95th percentile of control share | **10.5167%** | **10.9613%** |
+| Descriptive add-one global-tail fraction | **0.02** | **0.41** |
+| Public feed completeness independently verified | No | No |
+| Physical owner/bot count known | **No** | **No** |
+
+Compressed archive SHA-256:
+- SBER_TQBR: `0af872b1c9c861e7af40a1c40e5bbdf565f9161dd997337c08da584c4dafc782`
+- MOEX_TQBR: `81bbb5270ca7b78efcd7ed353e8ab803ba00f212ee50f623e05e3fa884b44948`
+
+The exact 100ms phase-bin histograms are logged in the CI run. **MOEX has its largest bin at 700–800ms (2,030 prints, approximately 13.35%)**, rather than at the predeclared start-of-second bin. It would be **selection bias** to compare this post-hoc peak to the first-100ms control distribution and declare significance. A separate maximum-over-all-10-bins null, with controls using the *same max* functional, is the appropriate next exploratory diagnostic.
+
+### Interpretation
+
+SBER shows a modest excess in the *predeclared* first-100ms window versus within-minute shared-rotation controls; MOEX does not show this excess under the same first-100ms test. These are **observed aggregate clock-phase features**, not identified bots or a transferable forecasting rule. The 0.02 value is a **descriptive Monte Carlo frequency under an imperfect null**, **not** a calibrated p-value or FDR.
+
+The instruments have different volumes, market activity regimes and potential provider timestamp/venue clock artefacts. A day of public prints from each does not prove completeness, independent observations, exact participant counts, or statistical market microstructure causation.
+
+**Decision:** independent code/runtime/data import gates PASSED; inference/owner identification and live trading release gate NOT PASSED. Next: max-over-10 phase-bin control, source timestamp-precision diagnostics and cross-day robustness.
