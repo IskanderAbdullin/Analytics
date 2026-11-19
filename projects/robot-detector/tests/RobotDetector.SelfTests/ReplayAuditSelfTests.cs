@@ -114,6 +114,41 @@ internal static partial class Program
             "independent flow dashboard must conserve same counts and lots");
     }
 
+
+    private static void ReplayIdealEventTimeReference()
+    {
+        var source = From(OutOfOrderStream());
+        var archived = BoundedEventReplay.Analyse(source, new ReplayAuditConfig
+        {
+            AllowedLatenessMilliseconds = 100,
+            MaximumPendingEvents = 16,
+            ReceiptOrdering = "archive_row"
+        });
+        var ideal = BoundedEventReplay.Analyse(source, new ReplayAuditConfig
+        {
+            AllowedLatenessMilliseconds = 100,
+            MaximumPendingEvents = 16,
+            ReceiptOrdering = "exchange_time_ideal"
+        });
+        Assert(archived.OutOfOrderArrivalCount == 1 &&
+               archived.LateAfterWatermarkCount == 1,
+            "raw file order can create apparently late prints");
+        Assert(ideal.OutOfOrderArrivalCount == 0 &&
+               ideal.LateAfterWatermarkCount == 0,
+            "ideal event-time reference has no artificial out-of-order delivery");
+        Assert(archived.Windows.SequenceEqual(ideal.Windows) &&
+               archived.ReplayedLots == ideal.ReplayedLots,
+            "both order modes retain identical event-time aggregate observations");
+        Assert(ideal.ReceiptOrdering == "exchange_time_ideal" &&
+               ideal.Warnings.Any(w => w.StartsWith("EXCHANGE_TIME_IDEAL:")),
+            "must explicitly warn that ideal reference is not measured network latency");
+
+        bool bad = false;
+        try { new ReplayAuditConfig { ReceiptOrdering = "unknown" }.Validate(); }
+        catch (ArgumentException) { bad = true; }
+        Assert(bad, "unknown receipt-order mode must fail closed");
+    }
+
     private static void ReplayRejectsInvalid()
     {
         bool rejected = false;
