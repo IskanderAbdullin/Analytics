@@ -57,7 +57,8 @@ public sealed record ResearchDashboardReport(
     bool StatisticalSignificanceEstablished,
     IReadOnlyList<ResearchDashboardGroup> Groups,
     IReadOnlyList<ResearchDashboardWindow> Windows,
-    IReadOnlyList<string> Warnings
+    IReadOnlyList<string> Warnings,
+    int WindowMinutes = 5
 );
 
 public static class ResearchDashboard
@@ -162,7 +163,7 @@ public static class ResearchDashboard
                     ? "COVERAGE_FLAG_CAME_FROM_INPUT: verify feed scope independently."
                     : "UNVERIFIED_COVERAGE: a successfully parsed archive does not prove a complete exchange feed.",
                 "READ_ONLY_OFFLINE: this report makes no network, account or order API calls."
-            });
+            }, windowMinutes);
     }
 
     public static string ToStandaloneHtml(ResearchDashboardReport report, int maximumVisibleWindows = 240)
@@ -172,6 +173,7 @@ public static class ResearchDashboard
         if (report.PublicPrints != report.Groups.Sum(g => g.PublicPrints) ||
             report.PublicPrints != report.Windows.Sum(w => w.PublicPrints) ||
             report.PopulatedWindows != report.Windows.Count ||
+            report.WindowMinutes is < 1 or > 1440 ||
             report.ElevatedActivityWindows != report.Windows.Count(w => w.ElevatedActivityObserved))
             throw new InvalidDataException("Dashboard data integrity failed.");
 
@@ -193,7 +195,7 @@ public static class ResearchDashboard
         Metric("Сделок",N(report.PublicPrints));
         Metric("Лотов",N(report.ObservedLots));
         Metric("Инструментов",N(report.DistinctInstruments));
-        Metric("5-минутных окон",N(report.PopulatedWindows));
+        Metric($"{report.WindowMinutes}-минутных окон",N(report.PopulatedWindows));
         Metric("Всплесков активности",N(report.ElevatedActivityWindows));
         Metric("Сделок с совпадающим временем",N(report.PrintsSharingTimestamp));
         sb.AppendLine("</section>");
@@ -210,7 +212,7 @@ public static class ResearchDashboard
                 .Append("</td><td>").Append(P(100 * g.TimestampCollisionShare)).Append("%</td><td>")
                 .Append(P(g.MedianFanoFactor)).Append("</td></tr>\n");
         sb.AppendLine("</tbody></table></div>");
-        sb.AppendLine("<h2>Почасовая структура · наблюдаемые окна</h2>");
+        sb.AppendLine("<h2>Временная структура · наблюдаемые окна</h2>");
         sb.Append("<p class=\"muted\">Показано не более ").Append(N(maximumVisibleWindows))
             .Append(" самых насыщенных окон по количеству сделок из ").Append(N(report.Windows.Count))
             .Append(". Все окна остаются в JSON-отчёте; отображение не влияет на расчёты.</p>\n");
