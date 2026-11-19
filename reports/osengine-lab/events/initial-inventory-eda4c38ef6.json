@@ -1,0 +1,51 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main"
+  },
+  "event": {
+    "id": "eda4c38e-f6fa-472f-aa5d-daabc8cd26b6",
+    "occurred_at": "2026-11-19T21:55:58.684Z",
+    "type": "review",
+    "title": "Первичная инвентаризация проекта и подключение правил Lab v2",
+    "summary": "На основе кода, структуры GitHub и документации создан проектный JSON v2; в AGENTS.md добавлена инструкция вести дальнейшие события по единой схеме. Исходный код приложения не менялся.",
+    "basis": "observed_by_agent",
+    "actor": "ChatGPT (GitHub connector)",
+    "source_commit": "eda4c38ef6fac72f4a5ddaabc8cd26b602fee6e3"
+  },
+  "changes": [
+    {
+      "path": "reports/osengine-lab/project.json",
+      "action": "added",
+      "summary": "Создан доказательный снимок проекта v2.",
+      "implementation_notes": "Использованы источники из GitHub; отдельно отмечена непроверенность исторических тестов."
+    },
+    {
+      "path": "AGENTS.md",
+      "action": "added",
+      "summary": "Подключены инструкции для будущих отчётов агента v2."
+    }
+  ],
+  "checks": [],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "enable-agent-module",
+      "title": "Установить универсальный модуль Lab v2 в рабочую среду Codex и проверить создание следующего события",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "commit",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/commit/eda4c38ef6fac72f4a5ddaabc8cd26b602fee6e3",
+      "source_commit": "eda4c38ef6fac72f4a5ddaabc8cd26b602fee6e3"
+    }
+  ],
+  "limitations": [
+    "Во время первичной инвентаризации не запускались приложения, интеграционные и офлайн-тесты."
+  ]
+}
