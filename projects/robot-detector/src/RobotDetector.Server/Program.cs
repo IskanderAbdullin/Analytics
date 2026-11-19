@@ -72,6 +72,23 @@ internal static class Program
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 return;
             }
+            // Reject DNS-rebinding via an attacker-controlled Host header.
+            // The server intentionally exposes one fixed literal IPv4 address.
+            if (!string.Equals(context.Request.Host.Host, "127.0.0.1",
+                    StringComparison.Ordinal))
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return;
+            }
+            // Reject browser requests with a nonlocal Origin even for safe GET.
+            // No CORS permission is granted to external websites.
+            if (context.Request.Headers.TryGetValue("Origin", out var origins) &&
+                origins.Any(origin => !string.Equals(origin,
+                    $"http://127.0.0.1:{port}", StringComparison.Ordinal)))
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return;
+            }
             // Do not provide write endpoints, even as empty no-op handlers.
             if (!HttpMethods.IsGet(context.Request.Method) &&
                 !HttpMethods.IsHead(context.Request.Method))
