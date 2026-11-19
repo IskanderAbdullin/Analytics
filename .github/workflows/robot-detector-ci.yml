@@ -133,6 +133,25 @@ jobs:
           assert n["trialsRun"] == 3 and n["originalCandidateSequences"] == 1, n
           assert n["actualBotCountKnown"] is False and n["significanceCalibrated"] is False, n
           PY
+      - name: Simple descriptive flow-footprint smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- flow-footprint \
+            --input fixtures/synthetic_variable_clip_5s.csv --window-minutes 5 \
+            --bin-seconds 1 --output /tmp/flow-footprint.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/flow-footprint.json",encoding="utf-8"))
+          assert r["inputPrints"] == 12, r
+          assert r["windowCount"] == 1, r
+          w=r["windows"][0]
+          assert w["publicPrintCount"] == 12, w
+          assert w["totalLots"] == 300 and w["sellReportedLots"] == 300, w
+          assert w["buyReportedLots"] == 0 and w["unknownDirectionLots"] == 0, w
+          assert w["longestSellReportedRun"] == 12, w
+          assert w["medianInterarrivalMs"] == 5000, w
+          assert w["nearWholeSecondPrints"] == 12, w
+          assert not r["actualBotCountKnown"] and not r["statisticalSignificanceEstablished"], r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
