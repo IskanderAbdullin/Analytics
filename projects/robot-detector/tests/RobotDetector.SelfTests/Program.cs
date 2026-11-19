@@ -124,6 +124,14 @@ internal static partial class Program
         Check("multi-file comparison handles empty sources", CompareArchivesEmptySource);
         Check("multi-file comparison HTML and JSON summaries deterministic", CompareArchivesDeterminism);
         Check("multi-file comparison refuses corrupted aggregate summaries", CompareArchivesTamperedReport);
+        Check("blind benchmark creates opaque public IDs separate from private truth", BlindOpaquePublicIdentifiers);
+        Check("blind benchmark distinguishes fixed and variable synthetic execution", BlindFixedAndVariableClips);
+        Check("blind benchmark measures null false positives without recall denominator", BlindNullTruthUndefinedRecall);
+        Check("blind benchmark models partial fills without owner leakage", BlindPartialFills);
+        Check("blind benchmark demonstrates same public tape, different actual producer counts", BlindNonIdentifiability);
+        Check("blind benchmark cannot report real-market identity or confidence", BlindNoRealIdentityClaim);
+        Check("blind benchmark results are deterministic by seed", BlindDeterminism);
+        Check("blind benchmark rejects invalid scenarios and seed counts", BlindRejectInvalid);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;

@@ -67,6 +67,8 @@ internal static class Program
                     return ReplayAuditCommand(options);
                 case "compare-archives":
                     return CompareArchivesCommand(options);
+                case "benchmark-blind":
+                    return BlindBenchmarkCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -195,6 +197,24 @@ internal static class Program
 
 
 
+
+    private static int BlindBenchmarkCommand(Dictionary<string, string> options)
+    {
+        var report = BlindExecutionBenchmark.Run(
+            seedsPerKind: Integer(options, "seeds", 5),
+            backgroundPrints: Integer(options, "background-prints", 120));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"Hidden-truth synthetic comparison saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine($"Blinded synthetic cases={report.Cases}; " +
+            "no real-market bot or owner identification, no calibrated accuracy.");
+        return 0;
+    }
 
     private static int CompareArchivesCommand(Dictionary<string, string> options)
     {
@@ -745,6 +765,7 @@ internal static class Program
         Console.WriteLine("dashboard --input file.csv|zip --html report.html [--json report.json] [--window-minutes 5] [--max-visible-windows 240]");
         Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--receipt-order archive_row|exchange_time_ideal] [--output replay.json]");
         Console.WriteLine("compare-archives --inputs \"a.csv;b.csv\" --html comparison.html [--json comparison.json] [--window-minutes 5]");
+        Console.WriteLine("benchmark-blind [--seeds 5] [--background-prints 120] [--output blind-benchmark.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

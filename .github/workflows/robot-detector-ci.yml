@@ -360,6 +360,43 @@ jobs:
           assert "x-frame-options: deny" in headers
           assert "cache-control: no-store" in headers
           PY
+      - name: Blinded synthetic execution truth and non-identifiability smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- benchmark-blind \
+            --seeds 2 --background-prints 35 --output /tmp/blind-execution-research.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open("/tmp/blind-execution-research.json",encoding="utf-8"))
+          assert p["seedsPerKind"]==2 and p["cases"]==8, p
+          assert {r["kind"] for r in p["results"]} == {
+             "clustered_null","fixed_twap","variable_twap","partial_fill_twap"
+          }, p
+          assert p["canInferActualRealWorldRobotOwners"] is False, p
+          assert p["isABidesExchangeSimulation"] is False, p
+          for trial in p["results"]:
+              assert len(trial["models"])==2, trial
+              for model in trial["models"]:
+                  assert not model["physicalProducerCountInferred"], model
+                  assert model["truePositivePrints"] + model["falsePositivePrints"] == model["attributedPublicPrints"], model
+                  assert model["missedInjectedPrints"] + model["truePositivePrints"] == trial["injectedExecutionPrints"], model
+          assert all(r["injectedExecutionPrints"]==0 for r in p["results"]
+                     if r["kind"]=="clustered_null")
+          for kind in sorted({x["kind"] for x in p["results"]}):
+              for model_name in ("fixed_quantity", "variable_quantity"):
+                  cases=[next(m for m in x["models"] if m["model"]==model_name)
+                         for x in p["results"] if x["kind"]==kind]
+                  print("BLIND_SIMULATION_SUMMARY",json.dumps({
+                      "scenario":kind,
+                      "model":model_name,
+                      "cases":len(cases),
+                      "attributedPrints":sum(x["attributedPublicPrints"] for x in cases),
+                      "syntheticTruePositivePrints":sum(x["truePositivePrints"] for x in cases),
+                      "syntheticFalsePositivePrints":sum(x["falsePositivePrints"] for x in cases),
+                      "syntheticMissedInjectedPrints":sum(x["missedInjectedPrints"] for x in cases),
+                      "physicalRobotCountInferred":False,
+                      "isABides":False
+                  }))
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
