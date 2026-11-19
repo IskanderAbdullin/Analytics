@@ -49,11 +49,24 @@ jobs:
             dashboard --input data/raw/sber_2026-11-17.csv \
             --window-minutes 5 --max-visible-windows 240 \
             --html data/results/offline.html --json data/results/summary.json
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            replay-audit --input data/raw/sber_2026-11-17.csv \
+            --lateness-ms 500 --max-pending 10000 --window-minutes 5 \
+            --output data/results/replay.json
           python3 - <<'PY'
           import pathlib,json
           p=pathlib.Path("data/results/summary.json")
           r=json.loads(p.read_text(encoding="utf-8"))
           html=pathlib.Path("data/results/offline.html").read_text(encoding="utf-8")
+          replay=json.loads(pathlib.Path("data/results/replay.json").read_text(encoding="utf-8"))
+          assert replay["sourceSha256"] == r["sourceSha256"]
+          assert replay["replayedPrints"] == r["publicPrints"]
+          assert replay["replayedLots"] == r["observedLots"]
+          assert replay["populatedWindows"] == r["populatedWindows"]
+          assert not replay["anyPrintsDropped"]
+          assert not replay["actualBotCountKnown"]
+          assert not replay["hasActualNetworkReceiveTimestamps"]
+          assert replay["maximumPendingObserved"] <= replay["maximumPendingAllowed"]
           assert r["publicPrints"] == 121920, r["publicPrints"]
           assert r["rejectedRows"] == 0
           assert r["distinctInstruments"] == 1
@@ -66,6 +79,7 @@ jobs:
           assert "<script" not in html.lower()
           assert "Content-Security-Policy" in html
           assert "SYN001" not in html
+          print("PUBLIC_REPLAY_OBSERVED",json.dumps({"outOfOrder":replay["outOfOrderArrivalCount"],"lateAfterWatermark":replay["lateAfterWatermarkCount"],"forcedFlushes":replay["forcedQueueFlushCount"],"maxPending":replay["maximumPendingObserved"],"allPrintsReplayed":replay["replayedPrints"],"sourceSha256":replay["sourceSha256"]},ensure_ascii=False))
           print("PUBLIC_DASHBOARD_OBSERVED",json.dumps({
               "sourceSha256":r["sourceSha256"],
               "publicPrints":r["publicPrints"],
