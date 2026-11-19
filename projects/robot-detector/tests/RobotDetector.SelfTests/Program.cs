@@ -61,7 +61,8 @@ internal static class Program
         Check("variable-size fixed-clock candidate is detected", VariableCadenceSynthetic);
         Check("variable-size scanner ignores fixed clip size", VariableCadenceRejectsConstantQuantity);
         Check("variable-size screen isolates EXCHANGE and DEALER", VariableCadenceSourceIsolation);
-        Check("variable-size dense windows are explicitly not evaluated", VariableCadenceDenseWindow);
+        Check("variable-size dense windows are split with unique evidence", VariableCadenceDenseWindow);
+        Check("tiny trailing dense chunk is explicitly reported", VariableCadenceTinyRemainder);
         Check("temporal null preserves trade counts, sizes and session", TemporalNullPreservation);
         Check("temporal rotation preserves within-block relative phase", TemporalNullRotation);
         Check("temporal negative-control summary is deterministic and uncalibrated", TemporalNullComparison);
@@ -813,10 +814,31 @@ internal static class Program
             "EXCHANGE", "SELL", 100m, (i % 4 + 1) * 10L,
             "TQBR", "SESSION-1", "SYNTHETIC", i)).ToArray();
         var report = VariableSizeCadence.Detect(From(dense), new VariableCadenceConfig());
-        Assert(report.CandidateSequenceCount == 0 && report.SkippedDenseWindowCount == 1,
-            "dense source must be explicitly skipped, not silently downsampled");
-        Assert(report.Warnings.Any(w => w.StartsWith("DENSE_WINDOW_NOT_EVALUATED")),
-            "show exclusion in report");
+        Assert(report.SplitDenseWindowCount == 1 && report.SkippedDenseWindowCount == 0,
+            "large window must be split instead of losing the entire source");
+        Assert(report.SkippedTinyRemainderCount == 0, "10-event tail is large enough to inspect");
+        Assert(report.Warnings.Any(w => w.StartsWith("DENSE_WINDOW_SPLIT")),
+            "show potential continuity loss across chunks");
+        Assert(report.Candidates.SelectMany(x => x.EvidenceEventIds).Distinct().Count() ==
+            report.UniqueAttributedPrints,
+            "evidence must remain unique across the disjoint chunks");
+    }
+
+
+    private static void VariableCadenceTinyRemainder()
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        var events = Enumerable.Range(0, 2505).Select(i => new MarketTrade(
+            $"TAIL-{i}", start.AddMilliseconds(i * 100), "SYNTH-TAIL", "TAIL",
+            "EXCHANGE", "SELL", 100m, (i % 3 + 1) * 10L,
+            "TQBR", "SESSION-1", "SYNTHETIC", i)).ToArray();
+        var result = VariableSizeCadence.Detect(From(events), new VariableCadenceConfig());
+        Assert(result.SplitDenseWindowCount == 1 && result.SkippedTinyRemainderCount == 1,
+            "5 leftover prints below 8-print threshold must be reported");
+        Assert(result.Warnings.Any(w => w.StartsWith("TINY_CHUNK_NOT_EVALUATED")),
+            "do not silently discard the final small chunk");
+        Assert(result.UniqueAttributedPrints <= 2500,
+            "no tail prints may be falsely attributed after explicit skip");
     }
 
     private static void TemporalNullPreservation()
