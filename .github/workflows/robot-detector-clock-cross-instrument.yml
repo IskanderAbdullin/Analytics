@@ -70,13 +70,24 @@ jobs:
             dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
               timestamp-quality --input "$raw" \
               --output "data/results/quality_$instrument.json"
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+              cluster-compare --input "$raw" --min-matches 6 \
+              --output "data/results/clusters_$instrument.json"
             INSTRUMENT="$instrument" python3 - <<'PY'
           import os,json,pathlib
           instrument=os.environ["INSTRUMENT"]
           p=pathlib.Path("data/results")/f"clock_{instrument}.json"
           report=json.loads(p.read_text(encoding="utf-8"))
           quality=json.loads((pathlib.Path("data/results")/f"quality_{instrument}.json").read_text(encoding="utf-8"))
+          clusters=json.loads((pathlib.Path("data/results")/f"clusters_{instrument}.json").read_text(encoding="utf-8"))
           assert quality["sourceSha256"] == report["sourceSha256"]
+          assert clusters["originalSourceSha256"] == report["sourceSha256"]
+          assert clusters["originalPublicPrints"] == report["inputPrints"]
+          assert clusters["originalTotalLots"] == clusters["derivedTotalLots"]
+          assert clusters["derivedObservableClusters"] <= clusters["originalPublicPrints"]
+          assert not clusters["actualParentOrdersIdentified"]
+          assert not clusters["physicalBotCountKnown"]
+          assert not clusters["statisticalSignificanceEstablished"]
           assert quality["sourcePrints"] == report["inputPrints"]
           assert quality["sourceGroups"] == report["sourceGroups"]
           assert not quality["ownerCountKnown"]
@@ -147,6 +158,20 @@ jobs:
               "smallestPositiveGapMicroseconds":g["smallestPositiveGapMicroseconds"],
               "sourceTimestampPrecisionVerified":False
             } for g in quality["groups"]]
+          },ensure_ascii=False))
+          print("OBSERVABLE_CLUSTER_COMPARISON",json.dumps({
+            "instrument":instrument,"date":"2026-11-18",
+            "sourceSha256":clusters["originalSourceSha256"],
+            "rawPrints":clusters["originalPublicPrints"],
+            "derivedClusters":clusters["derivedObservableClusters"],
+            "printsInsideMultiPrintClusters":clusters["publicPrintsInMultiPrintClusters"],
+            "rawFixedSizeCadenceCandidates":clusters["originalFixedSizeCandidateEpisodes"],
+            "derivedViewCadenceCandidates":clusters["derivedClusterSizeCandidateEpisodes"],
+            "originalLots":clusters["originalTotalLots"],
+            "derivedLots":clusters["derivedTotalLots"],
+            "actualParentOrdersIdentified":False,
+            "physicalBotCountKnown":False,
+            "statisticalSignificanceEstablished":False
           },ensure_ascii=False))
           PY
           done
