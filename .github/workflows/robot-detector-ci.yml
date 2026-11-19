@@ -196,6 +196,25 @@ jobs:
           assert len(g["maximumBinControl"]["rotatedMaximumBinCounts"])==19, g
           assert g["maximumBinControl"]["descriptiveAnyBinTailFrequency"] >= g["descriptiveGlobalTailFrequency"], g
           PY
+      - name: No-dedup timestamp precision smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- timestamp-quality \
+            --input fixtures/synthetic_twap_5s.csv \
+            --output /tmp/timestamp-quality.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/timestamp-quality.json",encoding="utf-8"))
+          assert r["sourcePrints"]==7 and r["sourceGroups"]==1, r
+          assert not r["ownerCountKnown"], r
+          assert not r["sourceTimestampPrecisionVerified"], r
+          assert not r["feedCoverageVerified"], r
+          g=r["groups"][0]
+          assert g["publicPrintCount"]==7, g
+          assert g["uniqueTimestampCount"]==7, g
+          assert g["sameTimestampClusters"]==0, g
+          assert g["printsInSameTimestampClusters"]==0, g
+          assert g["maxPrintsAtSameTimestamp"]==1, g
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
