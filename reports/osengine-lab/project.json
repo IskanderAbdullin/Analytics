@@ -1,0 +1,308 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "project_snapshot",
+  "project": {
+    "id": "analytics",
+    "name": "Analytics",
+    "repository": "IskanderAbdullin/Analytics",
+    "category": "analytics",
+    "default_branch": "main",
+    "tracked_branch": "main",
+    "source_commit": "f554e9c68d63466aca3a6e388458ddeb0ef96062",
+    "description": "Многонаправленная платформа исследовательской аналитики: прогнозирование IPO, анализ сделок T-Invest и Robot Detector для обнаружения алгоритмов по обезличенной ленте.",
+    "languages": [
+      "Python",
+      "C#"
+    ],
+    "tags": [
+      "GitHub",
+      "OsEngine Lab v2"
+    ]
+  },
+  "capture": {
+    "at": "2026-11-19T21:42:45.154Z",
+    "method": "repository_inspection",
+    "limitations": [
+      "Снимок создан по доступному дереву GitHub и проектной документации; независимые тесты не выполнялись.",
+      "Задокументированное состояние относится к исходному коммиту, предшествующему записи этого JSON."
+    ],
+    "references": [
+      {
+        "kind": "documentation",
+        "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+      },
+      {
+        "kind": "documentation",
+        "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/README.md"
+      },
+      {
+        "kind": "documentation",
+        "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/tinvest-trade-analytics/README.md"
+      }
+    ]
+  },
+  "health": {
+    "stage": "development",
+    "verification": "not_run",
+    "deployment": "not_verified",
+    "summary": "Инвентаризация подтверждает структуру исходников/документов, но не проверяет выполнение, качество результатов или живое внедрение."
+  },
+  "goals": [
+    "Создавать воспроизводимые исследования IPO с point-in-time источниками",
+    "Строить аналитику торговли и искать алгоритмические паттерны в потоках сделок"
+  ],
+  "components": [
+    {
+      "id": "ipo",
+      "name": "IPO Analytics & Forecasting",
+      "kind": "documentation",
+      "status": "documented",
+      "paths": [
+        "README.md"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "detector",
+      "name": "Robot Detector C#",
+      "kind": "software",
+      "status": "observed_in_source",
+      "paths": [
+        "projects/robot-detector/src/RobotDetector.Core/PeriodicDetector.cs"
+      ],
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/src/RobotDetector.Core/PeriodicDetector.cs"
+        }
+      ]
+    },
+    {
+      "id": "detector-cli",
+      "name": "CLI Robot Detector",
+      "kind": "software",
+      "status": "observed_in_source",
+      "paths": [
+        "projects/robot-detector/src/RobotDetector.Cli/Program.cs"
+      ],
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/src/RobotDetector.Cli/Program.cs"
+        }
+      ]
+    },
+    {
+      "id": "detector-tests",
+      "name": "Самопроверки Robot Detector",
+      "kind": "software",
+      "status": "observed_in_source",
+      "paths": [
+        "projects/robot-detector/tests/RobotDetector.SelfTests/Program.cs"
+      ],
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/tests/RobotDetector.SelfTests/Program.cs"
+        }
+      ]
+    },
+    {
+      "id": "tinvest",
+      "name": "TInvest Trade Analytics",
+      "kind": "documentation",
+      "status": "documented",
+      "paths": [
+        "projects/tinvest-trade-analytics/README.md"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/tinvest-trade-analytics/README.md"
+        }
+      ]
+    },
+    {
+      "id": "research",
+      "name": "Протокол исследования и источники",
+      "kind": "documentation",
+      "status": "documented",
+      "paths": [
+        "docs/research_protocol.md"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/docs/research_protocol.md"
+        }
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "detector",
+      "name": "Robot Detector C#",
+      "kind": "capability",
+      "status": "observed_in_source",
+      "paths": [
+        "projects/robot-detector/src/RobotDetector.Core/PeriodicDetector.cs"
+      ],
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/src/RobotDetector.Core/PeriodicDetector.cs"
+        }
+      ]
+    },
+    {
+      "id": "detector-cli",
+      "name": "CLI Robot Detector",
+      "kind": "capability",
+      "status": "observed_in_source",
+      "paths": [
+        "projects/robot-detector/src/RobotDetector.Cli/Program.cs"
+      ],
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/src/RobotDetector.Cli/Program.cs"
+        }
+      ]
+    },
+    {
+      "id": "detector-tests",
+      "name": "Самопроверки Robot Detector",
+      "kind": "capability",
+      "status": "observed_in_source",
+      "paths": [
+        "projects/robot-detector/tests/RobotDetector.SelfTests/Program.cs"
+      ],
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/tests/RobotDetector.SelfTests/Program.cs"
+        }
+      ]
+    }
+  ],
+  "requirements": [],
+  "checks": [],
+  "risks": [
+    {
+      "id": "risk-1",
+      "title": "Часть результатов Robot Detector находится в отдельных исследовательских ветках и не должна приписываться main.",
+      "severity": "medium",
+      "state": "open",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "risk-2",
+      "title": "README требует подтверждённые источники и cut-off даты для данных IPO; синтетические данные не являются фактами IPO.",
+      "severity": "medium",
+      "state": "open",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Собрать эксперименты и результаты отдельных исследовательских веток по компонентам",
+      "priority": "high",
+      "state": "todo",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "task-2",
+      "title": "Записать текущий воспроизводимый прогон Robot Detector и аналитики",
+      "priority": "high",
+      "state": "todo",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    }
+  ],
+  "milestones": [],
+  "decisions": [],
+  "dependencies": [],
+  "artifacts": [
+    {
+      "id": "doc-1",
+      "name": "README.md",
+      "kind": "documentation",
+      "path": "README.md",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "doc-2",
+      "name": "projects/robot-detector/README.md",
+      "kind": "documentation",
+      "path": "projects/robot-detector/README.md",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/README.md"
+        }
+      ]
+    },
+    {
+      "id": "doc-3",
+      "name": "projects/tinvest-trade-analytics/README.md",
+      "kind": "documentation",
+      "path": "projects/tinvest-trade-analytics/README.md",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/tinvest-trade-analytics/README.md"
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "title": "Первичная инвентаризация GitHub",
+      "date": "2026-11-19",
+      "kind": "review",
+      "commit": "f554e9c68d63466aca3a6e388458ddeb0ef96062",
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/commit/f554e9c68d63466aca3a6e388458ddeb0ef96062"
+        }
+      ]
+    }
+  ],
+  "open_questions": [
+    "Какие следующие этапы уже выполняются в ветках и какие требуют повторной проверки?"
+  ],
+  "notes": [
+    "Никаких исторических test pass событий при создании снимка не придумано."
+  ]
+}
