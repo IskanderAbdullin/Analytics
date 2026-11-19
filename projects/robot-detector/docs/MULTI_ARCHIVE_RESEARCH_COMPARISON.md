@@ -39,7 +39,37 @@ Synthetic regression checks: 7 + 40 separately loaded public-like prints add up 
 
 Do not interpret cross-instrument difference as a test of independent robots: liquidity, tick size, sessions, dealer mixing, auctions, timestamp formation and source completeness can differ. There is no null-calibrated significance, live prediction or true owner identity.
 
-**Observed results:** only to be added after an actual successful CI run. A failure or missing day must remain visible as `BLOCKED_BY_DATA`, not a zero-robot result.
+## Observed public SBER/MOEX comparison — 2026-11-19
+
+**Successful validation:** [GitHub Actions run 44573901868](https://github.com/IskanderAbdullin/Analytics/actions/runs/44573901868); main .NET test suite [44573901460](https://github.com/IskanderAbdullin/Analytics/actions/runs/44573901460). All **108/108** offline tests, standalone CLI smoke, two public-archive downloads and cleanup succeeded.
+
+| Observable indicator, 2026-11-17 | SBER_TQBR | MOEX_TQBR |
+|---|---:|---:|
+| Public anonymized prints | **121,920** | **15,208** |
+| Total observed lots | **19,769,931** | **322,823** |
+| Populated 5-minute clock windows | **203** | **203** |
+| Past-only elevated activity windows | **1** | **4** |
+| Share of prints in equal-timestamp groups | **36.54%** | **55.36%** |
+| Share of prints within first 100ms of a UTC second | **10.84%** | **10.18%** |
+| Median one-second-bin Fano across populated windows | **8.883** | **3.601** |
+| Data kind/source mode | Historical, EXCHANGE/UNSPECIFIED | Historical, EXCHANGE/UNSPECIFIED |
+| Feed completeness independently verified | **No** | **No** |
+| Actual independently identified bot count | **Unknown** | **Unknown** |
+
+Combined **137,128** prints, **20,092,754** lots. Source SHA-256:
+- SBER: `0af872b1c9c861e7af40a1c40e5bbdf565f9161dd997337c08da584c4dafc782`
+- MOEX: `81bbb5270ca7b78efcd7ed353e8ab803ba00f212ee50f623e05e3fa884b44948`
+
+### Interpretation
+
+Despite substantially fewer MOEX prints, a larger share have identical timestamps; SBER has higher median second-bin Fano. **Neither property identifies trading programs or market participants.** Differences may reflect liquidity, batching, activity intensity, source timestamp precision and market mechanisms, not algorithm count or profitability.
+
+Both instruments have the same number of populated five-minute windows under this file/source/session representation. These are windows with at least one observed print, **not proof that an entire session was continuously observable**. `UNSPECIFIED` trading mode is the provider's imported label, not a verified market board. We do not silently rename it to an actual venue order matching regime.
+
+Original exchange trade files and generated HTML were deleted in the hosted CI at the end; only aggregate count/hash evidence was logged. The HTML comparison remains user-generatable locally through `compare-archives`, no downloadable raw tape is distributed.
+
+**Decision:** engineering and synthetic regression gates PASSED, real data ingestion and comparison PASSED. Forecasting, causal identity inference and validated bot detection remain NOT PASSED.
+
 
 ## Research next steps
 
