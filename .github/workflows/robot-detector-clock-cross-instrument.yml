@@ -46,10 +46,20 @@ jobs:
           export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
           for instrument in SBER_TQBR MOEX_TQBR; do
             raw="data/raw/$instrument-2026-11-17.csv"
-            if ! dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
-              fetch --date 2026-11-17 --instrument-id "$instrument" --output "$raw" \
-              > /tmp/clock-fetch.log 2>&1; then
-              echo "BLOCKED_BY_DATA: $instrument archive unavailable"
+            fetched=0
+            for attempt in 1 2 3; do
+              rm -f "$raw"
+              if timeout 90 dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+                fetch --date 2026-11-17 --instrument-id "$instrument" --output "$raw" \
+                > /tmp/clock-fetch.log 2>&1; then
+                fetched=1
+                break
+              fi
+              echo "PUBLIC_FETCH_RETRY: instrument=$instrument attempt=$attempt"
+              if [[ $attempt -lt 3 ]]; then sleep 5; fi
+            done
+            if [[ $fetched -ne 1 ]]; then
+              echo "BLOCKED_BY_DATA: $instrument archive inaccessible after 3 bounded attempts"
               sed -n '1,8p' /tmp/clock-fetch.log
               exit 1
             fi
