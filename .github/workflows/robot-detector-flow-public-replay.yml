@@ -1,0 +1,91 @@
+name: Robot Detector trade-flow real-data smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/robot-detector-flow-public-replay.yml'
+      - 'projects/robot-detector/docs/FLOW_PUBLIC_PILOT.md'
+
+permissions:
+  contents: read
+
+jobs:
+  public-flow-window-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Compile and verify standalone offline tests
+        run: |
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet run --project tests/RobotDetector.SelfTests -c Release
+      - name: Read public SBER archive and output descriptive aggregates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          echo "FLOW_FOOTPRINT_PILOT read-only SBER_TQBR 2026-11-17, no broker access"
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt
+          openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject |
+            grep -q "Russian Trusted Root CA"
+          pinned='D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31'
+          actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+          if [[ "$actual" != "$pinned" ]]; then
+            echo "BLOCKED_UNVERIFIED_CA: fingerprint differs; refusing TLS bypass"
+            exit 1
+          fi
+          export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            fetch --date 2026-11-17 --instrument-id SBER_TQBR \
+            --output data/raw/sber_2026-11-17.csv
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            flow-footprint --input data/raw/sber_2026-11-17.csv \
+            --window-minutes 5 --bin-seconds 1 \
+            --output data/results/sber-flow.json
+          python3 - <<'PY'
+          import json,math,pathlib,statistics
+          p=json.loads(pathlib.Path("data/results/sber-flow.json").read_text())
+          w=p["windows"]
+          assert p["windowCount"] == len(w) and len(w) > 0
+          assert p["inputPrints"] == sum(x["publicPrintCount"] for x in w)
+          assert p["inputPrints"] == 121920
+          assert all(x["totalLots"]==x["buyReportedLots"]+
+                   x["sellReportedLots"]+x["unknownDirectionLots"] for x in w)
+          assert all(x["publicPrintCount"]>0 for x in w)
+          assert all(x["nearWholeSecondPrints"]<=x["publicPrintCount"] for x in w)
+          assert not p["actualBotCountKnown"] and not p["statisticalSignificanceEstablished"]
+          assert not any(x["hasVerifiedFeedCoverage"] for x in w)
+          signed=[x["reportedDirectionImbalance"] for x in w if x["reportedDirectionImbalance"] is not None]
+          fano=[x["printCountFanoFactor"] for x in w if x["printCountFanoFactor"] is not None]
+          print("SBER_FLOW_OBSERVED",json.dumps({
+            "date":"2026-11-17",
+            "sourceSha256":p["sourceSha256"],
+            "publicPrintCount":p["inputPrints"],
+            "fiveMinuteWindows":p["windowCount"],
+            "aggregateLots":sum(x["totalLots"] for x in w),
+            "maximumPrintCountInOneWindow":max(x["publicPrintCount"] for x in w),
+            "windowsWithComputableFano":len(fano),
+            "medianOneSecondFano":statistics.median(fano) if fano else None,
+            "maxOneSecondFano":max(fano) if fano else None,
+            "windowsWithReportedImbalance":len(signed),
+            "medianReportedImbalance":statistics.median(signed) if signed else None,
+            "nearRoundSecondPrintShare":sum(x["nearWholeSecondPrints"] for x in w)/p["inputPrints"],
+            "botCountKnown":False,"statisticalSignificanceEstablished":False
+          },ensure_ascii=False))
+          PY
+          echo "FLOW_PUBLIC_REPLAY_COMPLETED — descriptive statistics only, not unique bots"
+      - name: Delete public raw tape, reports and scoped root certificate
+        if: always()
+        shell: bash
+        run: |
+          rm -rf data/raw data/results
+          rm -f /tmp/russian_trusted_root_ca.crt
