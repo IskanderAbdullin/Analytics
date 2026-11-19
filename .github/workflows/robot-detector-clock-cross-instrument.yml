@@ -80,8 +80,14 @@ jobs:
           for g in report["groups"]:
               assert sum(g["phaseHistogram100Ms"])==g["publicPrintCount"]
               assert not g["feedCoverageVerified"]
+              peak=g["maximumBinControl"]
+              assert peak["observedPeakBinCount"]==max(g["phaseHistogram100Ms"])
+              assert peak["observedPeakBinShare"]==peak["observedPeakBinCount"]/g["publicPrintCount"]
               if g["eligibleForControls"]:
                   assert len(g["rotatedControlCounts"])==99
+                  assert len(peak["rotatedMaximumBinCounts"])==99
+                  assert all(mx>=base for mx,base in
+                             zip(peak["rotatedMaximumBinCounts"],g["rotatedControlCounts"]))
               else:
                   assert g["nullMeanFirstPhaseShare"] is None
                   assert g["descriptiveGlobalTailFrequency"] is None
@@ -96,7 +102,12 @@ jobs:
                   "eligible":g["eligibleForControls"],
                   "rotationMeanShare":g["nullMeanFirstPhaseShare"],
                   "rotation95Share":g["null95FirstPhaseShare"],
-                  "descriptiveTailFrequency":g["descriptiveGlobalTailFrequency"]
+                  "descriptiveTailFrequency":g["descriptiveGlobalTailFrequency"],
+                  "peak100msBin":peak["peak100MsBin"],
+                  "peak100msShare":peak["observedPeakBinShare"],
+                  "rotatedMaximumBinMeanShare":peak["nullMeanMaximumBinShare"],
+                  "rotatedMaximumBin95Share":peak["null95MaximumBinShare"],
+                  "descriptiveAnyBinTailFrequency":peak["descriptiveAnyBinTailFrequency"]
               })
           print("CLOCK_CROSS_INSTRUMENT_OBSERVED",json.dumps({
               "instrument":instrument,"day":"2026-11-17",
