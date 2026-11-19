@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main"
+  },
+  "event": {
+    "id": "437a2b7d-2768-44a0-a57e-0c036162bd94",
+    "occurred_at": "2026-11-19T22:04:18.667Z",
+    "type": "review",
+    "title": "Предметное дополнение универсального JSON-снимка v2",
+    "summary": "Добавлены workstreams IPO, Robot Detector, TInvest, исследовательский replay, метрики и источники",
+    "basis": "observed_by_agent",
+    "actor": "ChatGPT (GitHub connector)",
+    "source_commit": "437a2b7d276844a0a57e0c036162bd94d65d6d2d"
+  },
+  "changes": [
+    {
+      "path": "reports/osengine-lab/project.json",
+      "action": "modified",
+      "summary": "Добавлены workstreams IPO, Robot Detector, TInvest, исследовательский replay, метрики и источники",
+      "implementation_notes": "Структурированы данные, эксперименты, метрики, интерфейсы и ограничения со ссылками; код не менялся."
+    }
+  ],
+  "checks": [],
+  "issues": [],
+  "next_actions": [],
+  "evidence": [
+    {
+      "kind": "commit",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/commit/437a2b7d276844a0a57e0c036162bd94d65d6d2d",
+      "source_commit": "437a2b7d276844a0a57e0c036162bd94d65d6d2d"
+    }
+  ],
+  "limitations": [
+    "Тесты, исследовательские метрики и deployed status взяты из проектных документов, а не повторно измерены этой сессией."
+  ]
+}
