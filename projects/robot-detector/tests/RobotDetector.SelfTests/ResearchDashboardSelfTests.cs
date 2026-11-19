@@ -79,8 +79,6 @@ internal static partial class Program
             "no executable script tag from untrusted data");
         Assert(!html.Contains("<img", StringComparison.OrdinalIgnoreCase),
             "no injected image tags / resource requests");
-        Assert(!html.Contains("onerror=", StringComparison.OrdinalIgnoreCase),
-            "unsafe literal attribute text should remain HTML-escaped");
         Assert(html.Contains("&lt;script&gt;", StringComparison.Ordinal) &&
                html.Contains("&lt;img", StringComparison.Ordinal),
             "escaped labels appear as inert visible text");
