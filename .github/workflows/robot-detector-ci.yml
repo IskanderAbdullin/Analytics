@@ -273,6 +273,27 @@ jobs:
           assert r["hasActualNetworkReceiveTimestamps"] is False, r
           assert r["actualBotCountKnown"] is False, r
           PY
+      - name: Standalone multi-archive comparison HTML/JSON smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- compare-archives \
+            --inputs "fixtures/synthetic_twap_5s.csv;fixtures/synthetic_activity_episode.csv" \
+            --window-minutes 5 \
+            --html /tmp/robot-comparison.html --json /tmp/robot-comparison.json
+          python3 - <<'PY'
+          import json,pathlib
+          r=json.load(open("/tmp/robot-comparison.json",encoding="utf-8"))
+          html=pathlib.Path("/tmp/robot-comparison.html").read_text(encoding="utf-8")
+          assert r["inputArchiveCount"]==2, r
+          assert r["totalPublicPrints"]==47, r
+          assert r["windowMinutes"]==5, r
+          assert sum(x["publicPrints"] for x in r["archives"])==47, r
+          assert r["comparableDataKinds"] is True, r
+          assert r["actualBotCountKnown"] is False, r
+          assert r["statisticalSignificanceEstablished"] is False, r
+          assert "<script" not in html.lower()
+          assert "Content-Security-Policy" in html
+          assert "SYN001" not in html
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
