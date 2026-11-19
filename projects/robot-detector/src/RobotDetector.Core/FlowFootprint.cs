@@ -56,7 +56,8 @@ public sealed record TradeFlowFootprintReport(
     bool ActualBotCountKnown,
     bool StatisticalSignificanceEstablished,
     IReadOnlyList<TradeFlowWindow> Windows,
-    IReadOnlyList<string> Warnings
+    IReadOnlyList<string> Warnings,
+    int WindowMinutes = 5
 );
 
 public static class FlowFootprint
@@ -93,7 +94,7 @@ public static class FlowFootprint
                     ? "COVERAGE_FLAG_FROM_SOURCE: verify scope of claimed feed completeness independently."
                     : "UNVERIFIED_FEED_COVERAGE: missing prints and exchange halts cannot be distinguished from inactive windows.",
                 "READ_ONLY: no trading APIs, orders, account data or owner IDs."
-            });
+            }, config.WindowMinutes);
     }
 
     private static TradeFlowWindow DescribeWindow(
