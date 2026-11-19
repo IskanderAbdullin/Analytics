@@ -51,6 +51,11 @@ jobs:
             flow-footprint --input data/raw/sber_2026-11-17.csv \
             --window-minutes 5 --bin-seconds 1 \
             --output data/results/sber-flow.json
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            activity-episodes --input data/raw/sber_2026-11-17.csv \
+            --reference-windows 4 --min-prints 10 --min-count-ratio 3 \
+            --min-lot-ratio 3 --min-abs-imbalance 0.6 \
+            --output data/results/sber-activity.json
           python3 - <<'PY'
           import json,math,pathlib,statistics
           p=json.loads(pathlib.Path("data/results/sber-flow.json").read_text())
@@ -80,6 +85,31 @@ jobs:
             "medianReportedImbalance":statistics.median(signed) if signed else None,
             "nearRoundSecondPrintShare":sum(x["nearWholeSecondPrints"] for x in w)/p["inputPrints"],
             "botCountKnown":False,"statisticalSignificanceEstablished":False
+          },ensure_ascii=False))
+          PY
+          python3 - <<'PY'
+          import json,pathlib
+          p=json.loads(pathlib.Path("data/results/sber-activity.json").read_text())
+          assert p["inputPrints"] == 121920
+          assert p["activityWindowCount"] == len(p["activityWindows"])
+          assert p["evaluatedWindows"]+p["unscorableWarmupOrGapWindows"] == p["inputPopulatedWindows"]
+          assert not p["actualBotCountKnown"] and not p["significanceCalibrated"]
+          assert all(x["state"] == "unvalidated_observed_activity" and not x["actorIdentityKnown"]
+                     for x in p["activityWindows"])
+          print("SBER_ACTIVITY_OBSERVED",json.dumps({
+              "date":"2026-11-17",
+              "fileSha256":p["sourceSha256"],
+              "inputPrints":p["inputPrints"],
+              "populatedWindows":p["inputPopulatedWindows"],
+              "evaluatedWindows":p["evaluatedWindows"],
+              "warmupOrGapWindows":p["unscorableWarmupOrGapWindows"],
+              "highActivityWindows":p["activityWindowCount"],
+              "dominantReportedBuy":sum(x["label"] == "reported_buy_dominant_high_activity"
+                                        for x in p["activityWindows"]),
+              "dominantReportedSell":sum(x["label"] == "reported_sell_dominant_high_activity"
+                                         for x in p["activityWindows"]),
+              "actualBotCountKnown":False,
+              "significanceCalibrated":False
           },ensure_ascii=False))
           PY
           echo "FLOW_PUBLIC_REPLAY_COMPLETED — descriptive statistics only, not unique bots"
