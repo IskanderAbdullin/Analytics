@@ -126,7 +126,8 @@ internal static partial class Program
             new ClockPhaseConfig { NullTrials = 0 }); }
         catch (ArgumentException) { refused = true; }
         Assert(refused, "zero repetitions rejected");
-        var report = ClockPhaseAudit.Analyse(From(ClockTape("OTHER")),
+        var historical = From(ClockTape("OTHER")) with { HasVerifiedFeedCoverage = false };
+        var report = ClockPhaseAudit.Analyse(historical,
             new ClockPhaseConfig { NullTrials = 3 });
         Assert(report.Groups.All(x => !x.FeedCoverageVerified) &&
                !report.StatisticalSignificanceEstablished && !report.OwnerCountKnown,
