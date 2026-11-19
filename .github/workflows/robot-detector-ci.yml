@@ -173,6 +173,25 @@ jobs:
           assert not a["actorIdentityKnown"], a
           assert not r["actualBotCountKnown"] and not r["significanceCalibrated"], r
           PY
+      - name: Market-wide clock phase and minute-rotation null smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- clock-phase-audit \
+            --input fixtures/synthetic_long_cadence_5min.csv \
+            --min-prints 8 --trials 19 --seed 19 \
+            --output /tmp/robot-market-clock.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-market-clock.json",encoding="utf-8"))
+          assert r["inputPrints"]==13, r
+          assert r["sourceGroups"]==1 and r["eligibleSourceGroups"]==1, r
+          assert r["ownerCountKnown"] is False and r["statisticalSignificanceEstablished"] is False, r
+          g=r["groups"][0]
+          assert g["printsInFirstMilliseconds"]==13, g
+          assert g["observedFirstPhaseShare"]==1, g
+          assert g["phaseHistogram100Ms"]==[13,0,0,0,0,0,0,0,0,0], g
+          assert len(g["rotatedControlCounts"])==19, g
+          assert g["nullMeanFirstPhaseShare"]<0.6, g
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then

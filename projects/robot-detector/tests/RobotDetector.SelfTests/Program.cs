@@ -9,7 +9,7 @@ namespace RobotDetector.SelfTests;
 /// Zero-NuGet deterministic checks; executable with dotnet run --project tests/RobotDetector.SelfTests.
 /// Tests of real accuracy and broker connectivity are deliberately NOT claimed.
 /// </summary>
-internal static class Program
+internal static partial class Program
 {
     private static int _passed;
     private static int _failed;
@@ -78,6 +78,13 @@ internal static class Program
         Check("activity observation resets after a missing bucket", ActivityEpisodeResetsOnGap);
         Check("activity observation is independent of later prints", ActivityEpisodeNoFutureLeakage);
         Check("activity observation thresholds reject invalid inputs", ActivityEpisodeInvalidSettings);
+        Check("clock phase audit detects round-second concentration", ClockPhaseConcentrated);
+        Check("clock audit recognizes evenly distributed intra-second controls", ClockPhaseEvenlyDistributed);
+        Check("clock audit partitions venues and trading modes", ClockPhaseSourceSeparation);
+        Check("clock audit refuses false certainty for small groups", ClockPhaseInsufficient);
+        Check("clock audit random controls reproducible by seed", ClockPhaseDeterministic);
+        Check("clock audit respects millisecond boundary precision", ClockPhaseBoundaryPrecision);
+        Check("clock audit rejects invalid options and preserves uncertainty", ClockPhaseValidation);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
