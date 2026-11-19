@@ -299,8 +299,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          fixture="$(pwd)/fixtures/synthetic_activity_episode.csv"
           dotnet run --project src/RobotDetector.Server -c Release --no-build -- \
-            --input fixtures/synthetic_activity_episode.csv --port 18765 \
+            --input "$fixture" --port 18765 \
             > /tmp/robot-detector-local-server.log 2>&1 &
           pid=$!
           trap 'kill "$pid" 2>/dev/null || true' EXIT
