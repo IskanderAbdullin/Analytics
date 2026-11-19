@@ -88,6 +88,11 @@ internal static partial class Program
         Check("phase maximum detects peaks outside the first 100ms", ClockPhasePeakBeyondStart);
         Check("phase maximum uses maximum statistic in every null trial", ClockPhaseMaxNullCompatibility);
         Check("phase maximum cannot create evidence on insufficient data", ClockPhaseMaxIneligible);
+        Check("timestamp quality detects same-time collisions without dropping prints", TimestampQualityCollisions);
+        Check("timestamp quality distinguishes millisecond and microsecond alignment", TimestampQualityGranularity);
+        Check("timestamp quality isolates EXCHANGE/DEALER and sessions", TimestampQualitySourceIsolation);
+        Check("timestamp quality preserves unknown coverage and owner status", TimestampQualityUncertainty);
+        Check("timestamp quality handles empty and one-event sources", TimestampQualitySmallInputs);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
