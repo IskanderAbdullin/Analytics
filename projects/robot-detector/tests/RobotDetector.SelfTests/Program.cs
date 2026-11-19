@@ -99,6 +99,14 @@ internal static partial class Program
         Check("derived cluster regularity can differ from row-level regularity", ClusterViewCadenceSensitivity);
         Check("cluster comparison remains candidate-only, no owner identity", ClusterComparisonSafeState);
         Check("cluster grouping refuses duplicate original source event IDs", ClusterViewRejectsDuplicateIds);
+        Check("dashboard conserves all public prints and observed lots", DashboardConservesCounts);
+        Check("dashboard isolates trade sources and sessions", DashboardSourceIsolation);
+        Check("dashboard does not deduplicate equal timestamps", DashboardTimestampCollisions);
+        Check("dashboard highlights past-only activity windows", DashboardActivityWindows);
+        Check("dashboard HTML escapes untrusted source labels", DashboardHtmlEscaping);
+        Check("dashboard HTML is deterministic and contains no scripts", DashboardDeterministicOfflineHtml);
+        Check("dashboard includes empty and different-width windows", DashboardEmptyAndWindowWidth);
+        Check("dashboard refuses malformed aggregate reports", DashboardIntegrityGuard);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;

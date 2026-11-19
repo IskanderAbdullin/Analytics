@@ -61,6 +61,8 @@ internal static class Program
                     return TimestampQualityCommand(options);
                 case "cluster-compare":
                     return ClusterCompareCommand(options);
+                case "dashboard":
+                    return DashboardCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -189,6 +191,41 @@ internal static class Program
 
 
 
+
+    private static int DashboardCommand(Dictionary<string, string> options)
+    {
+        var imported = CsvTradeReader.Read(Required(options, "input"),
+            Integer(options, "max-rows", 1_000_000));
+        string htmlPath = Required(options, "html");
+        if (!htmlPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("--html output must have .html extension.");
+        string? jsonPath = options.GetValueOrDefault("json");
+        if (jsonPath is not null && !jsonPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("--json output must have .json extension.");
+        if (jsonPath is not null &&
+            Path.GetFullPath(jsonPath).Equals(Path.GetFullPath(htmlPath),
+                StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("HTML and JSON output paths must be different.");
+
+        var report = ResearchDashboard.Build(imported,
+            windowMinutes: Integer(options, "window-minutes", 5));
+        string html = ResearchDashboard.ToStandaloneHtml(report,
+            maximumVisibleWindows: Integer(options, "max-visible-windows", 240));
+        string? json = jsonPath is null ? null : JsonSerializer.Serialize(report, JsonOptions);
+        EnsureNewFile(htmlPath);
+        if (jsonPath is not null) EnsureNewFile(jsonPath);
+        File.WriteAllText(htmlPath, html);
+        if (jsonPath is not null) File.WriteAllText(jsonPath, json);
+        Console.Error.WriteLine(
+            $"Offline dashboard: public prints={report.PublicPrints}, " +
+            $"populated windows={report.PopulatedWindows}, " +
+            $"timestamp-colliding prints={report.PrintsSharingTimestamp}, " +
+            $"reported elevated-activity windows={report.ElevatedActivityWindows}; " +
+            "actual physical bot count UNKNOWN, no network or trading calls");
+        Console.WriteLine($"HTML report saved to {htmlPath}");
+        if (jsonPath is not null) Console.WriteLine($"Aggregated JSON saved to {jsonPath}");
+        return imported.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int ActivityEpisodesCommand(Dictionary<string, string> options)
     {
@@ -632,6 +669,7 @@ internal static class Program
         Console.WriteLine("clock-phase-audit --input file.csv [--first-ms 100] [--min-prints 100] [--trials 99] [--seed 20261119] [--output clock.json]");
         Console.WriteLine("timestamp-quality --input file.csv [--output timestamp-quality.json]");
         Console.WriteLine("cluster-compare --input file.csv [--min-matches 6] [--output clusters.json]");
+        Console.WriteLine("dashboard --input file.csv|zip --html report.html [--json report.json] [--window-minutes 5] [--max-visible-windows 240]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

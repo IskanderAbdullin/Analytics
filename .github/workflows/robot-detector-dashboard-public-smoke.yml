@@ -1,0 +1,89 @@
+name: Robot Detector offline dashboard public SBER smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/robot-detector-dashboard-public-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  public-archive-dashboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Compile standalone read-only CLI and run offline regressions
+        run: |
+          dotnet build src/RobotDetector.Cli/RobotDetector.Cli.csproj -c Release --nologo
+          dotnet build tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj -c Release --nologo
+          dotnet run --project tests/RobotDetector.SelfTests -c Release --no-build
+      - name: Obtain one public T-Invest archive without account token
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/results
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+            -o /tmp/russian_trusted_root_ca.crt
+          openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -subject | grep -q 'Russian Trusted Root CA'
+          pinned='D2:6D:2D:02:31:B7:C3:9F:92:CC:73:85:12:BA:54:10:35:19:E4:40:5D:68:B5:BD:70:3E:97:88:CA:8E:CF:31'
+          actual="$(openssl x509 -in /tmp/russian_trusted_root_ca.crt -noout -fingerprint -sha256 | cut -d= -f2)"
+          if [[ "$actual" != "$pinned" ]]; then
+            echo "BLOCKED_UNVERIFIED_CA: refusing TLS bypass on root rotation"
+            exit 1
+          fi
+          export SSL_CERT_FILE=/tmp/russian_trusted_root_ca.crt
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            fetch --date 2026-11-17 --instrument-id SBER_TQBR \
+            --output data/raw/sber_2026-11-17.csv
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- \
+            dashboard --input data/raw/sber_2026-11-17.csv \
+            --window-minutes 5 --max-visible-windows 240 \
+            --html data/results/offline.html --json data/results/summary.json
+          python3 - <<'PY'
+          import pathlib,json
+          p=pathlib.Path("data/results/summary.json")
+          r=json.loads(p.read_text(encoding="utf-8"))
+          html=pathlib.Path("data/results/offline.html").read_text(encoding="utf-8")
+          assert r["publicPrints"] == 121920, r["publicPrints"]
+          assert r["rejectedRows"] == 0
+          assert r["distinctInstruments"] == 1
+          assert r["populatedWindows"] > 0
+          assert sum(g["publicPrints"] for g in r["groups"]) == r["publicPrints"]
+          assert sum(w["publicPrints"] for w in r["windows"]) == r["publicPrints"]
+          assert sum(g["observedLots"] for g in r["groups"]) == r["observedLots"]
+          assert not r["actualBotCountKnown"] and not r["statisticalSignificanceEstablished"]
+          assert not r["feedCoverageVerified"]
+          assert "<script" not in html.lower()
+          assert "Content-Security-Policy" in html
+          assert "SYN001" not in html
+          print("PUBLIC_DASHBOARD_OBSERVED",json.dumps({
+              "sourceSha256":r["sourceSha256"],
+              "publicPrints":r["publicPrints"],
+              "observedLots":r["observedLots"],
+              "populatedWindows":r["populatedWindows"],
+              "evaluatedActivityWindows":r["evaluatedActivityWindows"],
+              "elevatedActivityWindows":r["elevatedActivityWindows"],
+              "printsSharingTimestamp":r["printsSharingTimestamp"],
+              "sourceGroups":len(r["groups"]),
+              "offlineHtmlBytes":len(html.encode("utf-8")),
+              "actualBotCountKnown":False,
+              "dataCoverageVerified":False
+          },ensure_ascii=False))
+          PY
+          echo "PUBLIC_DASHBOARD_SMOKE_SUCCEEDED: no raw tape or HTML artifact uploaded"
+      - name: Delete raw trades and temporary CA
+        if: always()
+        shell: bash
+        run: |
+          rm -rf data/raw data/results
+          rm -f /tmp/russian_trusted_root_ca.crt

@@ -232,6 +232,29 @@ jobs:
           assert r["actualParentOrdersIdentified"] is False, r
           assert r["statisticalSignificanceEstablished"] is False, r
           PY
+      - name: Standalone offline research dashboard CLI and data integrity smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- dashboard \
+            --input fixtures/synthetic_activity_episode.csv \
+            --window-minutes 5 --html /tmp/robot-dashboard.html \
+            --json /tmp/robot-dashboard.json
+          python3 - <<'PY'
+          import json,pathlib
+          report=json.loads(pathlib.Path("/tmp/robot-dashboard.json").read_text(encoding="utf-8"))
+          html=pathlib.Path("/tmp/robot-dashboard.html").read_text(encoding="utf-8")
+          assert report["publicPrints"] == 40, report
+          assert report["populatedWindows"] == 5, report
+          assert report["elevatedActivityWindows"] == 1, report
+          assert sum(x["publicPrints"] for x in report["groups"]) == 40, report
+          assert sum(x["publicPrints"] for x in report["windows"]) == 40, report
+          assert report["feedCoverageVerified"] is False, report
+          assert report["actualBotCountKnown"] is False, report
+          assert report["statisticalSignificanceEstablished"] is False, report
+          assert "<script" not in html.lower(), "HTML must not execute code"
+          assert "Content-Security-Policy" in html
+          assert "Наблюдался" in html
+          assert "ACT000" not in html, "No raw trade identifiers in offline report"
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
