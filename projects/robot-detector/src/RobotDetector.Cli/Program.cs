@@ -53,6 +53,8 @@ internal static class Program
                     return VariableTemporalNullCommand(options);
                 case "flow-footprint":
                     return FlowFootprintCommand(options);
+                case "activity-episodes":
+                    return ActivityEpisodesCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -180,6 +182,38 @@ internal static class Program
 
 
 
+
+
+    private static int ActivityEpisodesCommand(Dictionary<string, string> options)
+    {
+        var source = CsvTradeReader.Read(Required(options, "input"),
+            Integer(options, "max-rows", 1_000_000));
+        var flow = FlowFootprint.Describe(source, new FlowFootprintConfig
+        {
+            WindowMinutes = Integer(options, "window-minutes", 5),
+            CountBinSeconds = Integer(options, "bin-seconds", 1)
+        });
+        var result = FlowActivityEpisodes.Find(flow, new FlowActivityConfig
+        {
+            ReferenceWindows = Integer(options, "reference-windows", 4),
+            MinimumPrintCount = Integer(options, "min-prints", 10),
+            MinimumCountRatio = Double(options, "min-count-ratio", 3),
+            MinimumLotRatio = Double(options, "min-lot-ratio", 3),
+            MinimumAbsoluteReportedImbalance = Double(options, "min-abs-imbalance", 0.6)
+        });
+        string json = JsonSerializer.Serialize(result, JsonOptions);
+        if (options.TryGetValue("output", out var output))
+        {
+            EnsureNewFile(output);
+            File.WriteAllText(output, json + Environment.NewLine);
+            Console.WriteLine($"Research-only high-activity window observations saved to {output}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine($"Evaluated windows={result.EvaluatedWindows}; " +
+            $"flagged observable activity windows={result.ActivityWindowCount}; " +
+            "actual physical bot count UNKNOWN");
+        return source.RejectedRowTotal > 0 ? 3 : 0;
+    }
 
     private static int FlowFootprintCommand(Dictionary<string, string> options)
     {
@@ -515,6 +549,7 @@ internal static class Program
         Console.WriteLine("variable-cadence --input file.csv [--min-matches 8] [--min-distinct-sizes 3] [--output candidates.json]");
         Console.WriteLine("variable-temporal-null --input file.csv [--mode uniform|rotate] [--trials 6] [--block-seconds 60]");
         Console.WriteLine("flow-footprint --input file.csv [--window-minutes 5] [--bin-seconds 1] [--output footprints.json]");
+        Console.WriteLine("activity-episodes --input file.csv [--reference-windows 4] [--min-count-ratio 3] [--min-lot-ratio 3] [--min-abs-imbalance 0.6]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }
