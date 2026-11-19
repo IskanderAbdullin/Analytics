@@ -71,3 +71,24 @@ Research examples, inspected from actual public source:
 Our tiny C# generator does **not** integrate or claim identical results to these Python agents; it is a set of deterministic unit tests for truth isolation and false claims.
 
 **Status of real-bot identification:** not validated. Stage-2 scientific and forecasting release gates remain **CLOSED**.
+
+## Executed reproducible smoke — 2026-11-19
+
+**CI:** [Robot Detector .NET CI 44577833225](https://github.com/IskanderAbdullin/Analytics/actions/runs/44577833225). Verified **116/116** offline checks and all 8 benchmark cases (2 seeds for each scenario), using **35 clustered background prints** per case. Original IPO CI also passed. These are small unit-test cohorts, **not** independently calibrated statistical confidence intervals.
+
+| Scenario (2 seeds) | Detector | Correctly attributed synthetic prints | Background false attributions | Missed injected synthetic prints |
+|---|---|---:|---:|---:|
+| Clustered null | Fixed-quantity | 0 | 0 | N/A (0 injected) |
+| Clustered null | Variable-quantity | 0 | 0 | N/A (0 injected) |
+| Fixed TWAP | Fixed-quantity | **24** | 0 | 0 |
+| Fixed TWAP | Variable-quantity | 0 | 0 | 24 |
+| Variable-clip TWAP | Fixed-quantity | 0 | 0 | 24 |
+| Variable-clip TWAP | Variable-quantity | **24** | 0 | 0 |
+| Two-print partial-fill TWAP | Fixed-quantity | 32 | 0 | 16 |
+| Two-print partial-fill TWAP | Variable-quantity | 24 | 0 | 24 |
+
+**What this shows:** the two methods have complementary strengths in this deliberately controlled case. The fixed-clip model entirely misses varying child clips; the variable-clip model entirely misses constant clip sizes, because it requires size diversity. Both lose evidence under simultaneous two-print partial fills. Therefore a simple one-model "bot counter" cannot cover even all four stylized generators.
+
+**What this does NOT show:** zero real-market false discovery, high precision on MOEX/SPB, actual parent-order identification, proof that an execution was profitable, or live forecast accuracy. Two toy null seeds and simplified noise are too weak for calibrated market claims. The public-print non-identifiability test still makes the real-world physical owner count unknown even if event-level synthetic recovery were perfect.
+
+Next scientific validation must use ABIDES-NG known-agent public projections, broader noise and queue/matching scenarios, predeclared null families and truly independent held-out market data before any live trading signal.
