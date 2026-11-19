@@ -152,6 +152,27 @@ jobs:
           assert w["nearWholeSecondPrints"] == 12, w
           assert not r["actualBotCountKnown"] and not r["statisticalSignificanceEstablished"], r
           PY
+      - name: Simple history-only activity burst smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- activity-episodes \
+            --input fixtures/synthetic_activity_episode.csv \
+            --output /tmp/robot-activity.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/robot-activity.json",encoding="utf-8"))
+          assert r["inputPrints"] == 40, r
+          assert r["inputPopulatedWindows"] == 5, r
+          assert r["evaluatedWindows"] == 1, r
+          assert r["activityWindowCount"] == 1, r
+          a=r["activityWindows"][0]
+          assert a["publicPrintCount"] == 20 and a["totalLots"] == 2000, a
+          assert a["baselineMedianPrintCount"] == 5, a
+          assert a["baselineMedianLots"] == 50, a
+          assert a["printCountRatio"] == 4 and a["totalLotsRatio"] == 40, a
+          assert a["state"] == "unvalidated_observed_activity", a
+          assert not a["actorIdentityKnown"], a
+          assert not r["actualBotCountKnown"] and not r["significanceCalibrated"], r
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
