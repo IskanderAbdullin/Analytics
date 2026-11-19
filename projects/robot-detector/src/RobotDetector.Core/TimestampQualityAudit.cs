@@ -38,7 +38,7 @@ public sealed record TimestampQualityReport(
     string SourceSha256,
     int SourcePrints,
     int SourceGroups,
-    int AccountOrOwnerKnownCount,
+    bool OwnerCountKnown,
     bool SourceTimestampPrecisionVerified,
     bool FeedCoverageVerified,
     bool StatisticalSignificanceEstablished,
@@ -107,7 +107,7 @@ public static class TimestampQualityAudit
         }
         return new TimestampQualityReport(
             "0.1-exploratory-timestamp-quality", source.FileSha256,
-            source.Trades.Count, output.Count, 0,
+            source.Trades.Count, output.Count, false,
             false, source.HasVerifiedFeedCoverage, false,
             output, new[]
             {
