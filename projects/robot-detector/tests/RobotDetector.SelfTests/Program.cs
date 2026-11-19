@@ -115,6 +115,7 @@ internal static partial class Program
         Check("replay handles empty input", ReplayEmpty);
         Check("replay aggregates independent of row arrival order", ReplayAggregateParity);
         Check("replay rejects invalid configuration and nonpositive quantities", ReplayRejectsInvalid);
+        Check("ideal event-time baseline removes file-order artifacts without changing counts", ReplayIdealEventTimeReference);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
