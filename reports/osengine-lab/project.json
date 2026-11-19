@@ -304,5 +304,181 @@
   ],
   "notes": [
     "Никаких исторических test pass событий при создании снимка не придумано."
+  ],
+  "workstreams": [
+    {
+      "id": "ipo",
+      "title": "IPO forecasting",
+      "state": "in_progress",
+      "description": "Point-in-time сбор данных, IPO-факторы и базовые модели",
+      "component_ids": [
+        "ipo"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "robot-detector",
+      "title": "Robot Detector",
+      "state": "in_progress",
+      "description": "Анонимные торговые отпечатки, гипотезы периодичности и проверка на synthetic/null",
+      "component_ids": [
+        "detector",
+        "detector-cli",
+        "detector-tests"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/docs/IMPLEMENTATION_STATUS.md"
+        }
+      ]
+    },
+    {
+      "id": "tinvest-trade",
+      "title": "TInvest Trade Analytics",
+      "state": "in_progress",
+      "description": "Учет собственных сделок, P&L, происхождение и сверка брокерских данных; без выставления заявок",
+      "component_ids": [
+        "tinvest"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/tinvest-trade-analytics/README.md"
+        }
+      ]
+    }
+  ],
+  "data_assets": [
+    {
+      "id": "ipo-templates",
+      "title": "Шаблоны событий IPO",
+      "kind": "research_dataset",
+      "status": "available",
+      "path": "data/templates/ipo_events.csv",
+      "provenance": "Пустой шаблон для воспроизводимого сбора, не подтверждённые факты об IPO",
+      "privacy": "public",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "synthetic-twap",
+      "title": "Синтетическая лента TWAP",
+      "kind": "synthetic_fixture",
+      "status": "available",
+      "path": "projects/robot-detector/fixtures/synthetic_twap_5s.csv",
+      "provenance": "Созданная для тестов фикстура, не реальные обезличенные сделки",
+      "privacy": "public",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/docs/BOUNDED_EVENT_REPLAY.md"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "id": "bounded-replay",
+      "title": "Bounded event-time replay",
+      "state": "documented_result",
+      "hypothesis": "Ограниченная очередь событий позволяет воспроизводимо обрабатывать события, пришедшие не по времени биржи",
+      "method": "Офлайн replay CSV, упорядочение по ArrivalSequence и контроль окна задержки",
+      "result_summary": "В исходном документе описан реализованный прототип; это не живой коннектор и не независимый повторный прогон.",
+      "limitations": [
+        "Нет измеренной реальной сетевой задержки",
+        "Не устанавливается личность владельца сделок"
+      ],
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/docs/BOUNDED_EVENT_REPLAY.md"
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "id": "brier",
+      "name": "Brier score прогноза IPO",
+      "status": "defined",
+      "description": "Метрика вероятностной калибровки",
+      "unit": "score",
+      "direction": "lower",
+      "basis": "documentation",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "detector-false-positive",
+      "name": "False positive rate Robot Detector",
+      "status": "defined",
+      "description": "Доля ложных обнаружений на контролях, требует независимого протокола",
+      "unit": "ratio",
+      "direction": "lower",
+      "basis": "documentation",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/docs/IMPLEMENTATION_STATUS.md"
+        }
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "detector-cli",
+      "name": "Robot Detector CLI",
+      "kind": "cli",
+      "status": "implemented",
+      "contract_path": "projects/robot-detector/src/RobotDetector.Cli/Program.cs",
+      "description": "Offline detect/benchmark/replay",
+      "evidence": [
+        {
+          "kind": "source",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/src/RobotDetector.Cli/Program.cs"
+        }
+      ]
+    }
+  ],
+  "safety_controls": [
+    {
+      "id": "point-in-time",
+      "title": "Антиутечка будущих IPO данных",
+      "state": "documented",
+      "category": "quality_gate",
+      "description": "Доступные до cut-off данные, отдельные synthetic и verified источники",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/README.md"
+        }
+      ]
+    },
+    {
+      "id": "detector-read-only",
+      "title": "Robot Detector не атрибутирует владельцев сделок",
+      "state": "documented",
+      "category": "risk",
+      "evidence": [
+        {
+          "kind": "documentation",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/blob/f554e9c68d63466aca3a6e388458ddeb0ef96062/projects/robot-detector/docs/IMPLEMENTATION_STATUS.md"
+        }
+      ]
+    }
   ]
 }
