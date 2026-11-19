@@ -3,6 +3,22 @@
 **Версия проекта:** 0.2 (исследовательская) · **Обновлено:** 2026-11-19 · **Статус:** исторический прототип с подтверждённым импортом 121 920 реальных обезличенных сделок SBER (17.11.2026); статистическая точность распознавания не установлена.
 
 
+## Текущее состояние: локальная панель и API (19.11.2026)
+
+**Проверено: 108/108 автоматических тестов.** Реализованы `dashboard` (один архив), `compare-archives` (2–20 архивов) и отдельный локальный сервер `RobotDetector.Server`. Проверки [сравнения SBER/MOEX](https://github.com/IskanderAbdullin/Analytics/actions/runs/44573901868) и [защищённого HTTP API](https://github.com/IskanderAbdullin/Analytics/actions/runs/44575738794) успешно прошли. История и локальный интерфейс работают без токена брокера и без торговых функций.
+
+```powershell
+# Из projects/robot-detector/
+dotnet run --project src/RobotDetector.Server -- `
+  --input fixtures/synthetic_activity_episode.csv --port 8765
+# Открыть http://127.0.0.1:8765/
+# Агрегированные данные: http://127.0.0.1:8765/api/v1/summary
+```
+
+Без сервера: `compare-archives --inputs "data/raw/SBER.csv;data/raw/MOEX.csv" --html comparison.html`. Подробности в [локальном API](docs/LOCAL_READ_ONLY_API.md) и [сравнении архивов](docs/MULTI_ARCHIVE_RESEARCH_COMPARISON.md). Сервер слушает **только 127.0.0.1**, отклоняет POST и внешние Host/Origin; HTML без скриптов и внешних ресурсов.
+
+**Не готово:** аутентифицированный live T-Invest MarketDataStream, отдельный OsEngine клиент и статистически валидированный подсчёт физических роботов. На исторических holdout-данных старый прогноз регулярного q не обошёл placebo. Панель показывает рыночные наблюдения, а не подтверждённые роботы.
+
 ## Replay на исторической ленте — проверен на реальном SBER
 
 Реализована команда `replay-audit` с ограниченным буфером событий и event-time watermark. В проверке [GitHub Actions #44572400620](https://github.com/IskanderAbdullin/Analytics/actions/runs/44572400620) воспроизведены **121 920** сделок SBER и **19 769 931** лот, без потерь и принудительного сброса очереди. **100/100 тестов пройдены**; [реализация в PR #23](https://github.com/IskanderAbdullin/Analytics/pull/23) объединена с `main`.
