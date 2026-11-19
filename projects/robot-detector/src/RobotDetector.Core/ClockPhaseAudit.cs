@@ -21,6 +21,16 @@ public sealed class ClockPhaseConfig
     }
 }
 
+public sealed record ClockPhasePeakControl(
+    int Peak100MsBin,
+    int ObservedPeakBinCount,
+    double ObservedPeakBinShare,
+    double? NullMeanMaximumBinShare,
+    double? Null95MaximumBinShare,
+    double? DescriptiveAnyBinTailFrequency,
+    IReadOnlyList<int> RotatedMaximumBinCounts
+);
+
 public sealed record ClockPhaseGroup(
     string InstrumentUid,
     string Ticker,
@@ -39,7 +49,8 @@ public sealed record ClockPhaseGroup(
     double? DescriptiveGlobalTailFrequency,
     IReadOnlyList<int> RotatedControlCounts,
     bool FeedCoverageVerified,
-    string Interpretation
+    string Interpretation,
+    ClockPhasePeakControl MaximumBinControl
 );
 
 public sealed record ClockPhaseReport(
@@ -99,33 +110,50 @@ public static class ClockPhaseAudit
 
             int n = group.Count();
             bool eligible = n >= config.MinPrintsPerGroup && minuteToPhases.Count >= 2;
+            int observedPeakCount = histogram.Max();
+            int observedPeakIndex = Array.IndexOf(histogram, observedPeakCount);
             int[] controls = Array.Empty<int>();
+            int[] maxBinControls = Array.Empty<int>();
             double? nullMean = null, null95 = null, tail = null;
+            double? maxMean = null, max95 = null, maxTail = null;
             if (eligible)
             {
                 var minuteArrays = minuteToPhases.Values.Select(x => x.ToArray()).ToArray();
                 controls = new int[config.NullTrials];
+                maxBinControls = new int[config.NullTrials];
                 for (int trial = 0; trial < config.NullTrials; trial++)
                 {
                     var rng = new Random(unchecked(config.Seed + groupIndex * 1_000_003 +
                         trial * 1_009));
                     int count = 0;
+                    var rotatedHistogram = new int[10];
                     foreach (int[] minutePhases in minuteArrays)
                     {
                         // Shared offset within the minute: retains relative
                         // local bursts, unlike independent per-print resampling.
                         int shiftMs = rng.Next(1, 1000);
                         foreach (int phase in minutePhases)
-                            if ((phase + shiftMs) % 1000 < config.FirstMilliseconds)
-                                count++;
+                        {
+                            int shiftedPhaseMs = (phase + shiftMs) % 1000;
+                            rotatedHistogram[shiftedPhaseMs / 100]++;
+                            if (shiftedPhaseMs < config.FirstMilliseconds) count++;
+                        }
                     }
                     controls[trial] = count;
+                    // Use the maximum over all ten bins for EACH null trial,
+                    // not the first-bin null after observing which bin peaks.
+                    maxBinControls[trial] = rotatedHistogram.Max();
                 }
                 nullMean = controls.Average(x => (double)x / n);
                 var sorted = controls.OrderBy(x => x).ToArray();
                 int percentileIndex = Math.Max(0, (int)Math.Ceiling(0.95 * sorted.Length) - 1);
                 null95 = (double)sorted[percentileIndex] / n;
                 tail = (1.0 + controls.Count(x => x >= hits)) / (config.NullTrials + 1.0);
+                maxMean = maxBinControls.Average(x => (double)x / n);
+                int[] sortedMax = maxBinControls.OrderBy(x => x).ToArray();
+                max95 = (double)sortedMax[percentileIndex] / n;
+                maxTail = (1.0 + maxBinControls.Count(x => x >= observedPeakCount)) /
+                    (config.NullTrials + 1.0);
             }
 
             results.Add(new ClockPhaseGroup(
@@ -134,12 +162,15 @@ public static class ClockPhaseAudit
                 minuteToPhases.Count, config.FirstMilliseconds, hits, (double)hits / n,
                 histogram, eligible, nullMean, null95, tail, controls,
                 source.HasVerifiedFeedCoverage,
-                "Common absolute-second alignment in public prints, NOT a distinct execution bot."));
+                "Common absolute-second alignment in public prints, NOT a distinct execution bot.",
+                new ClockPhasePeakControl(observedPeakIndex, observedPeakCount,
+                    (double)observedPeakCount / n, maxMean, max95, maxTail,
+                    maxBinControls)));
             groupIndex++;
         }
 
         return new ClockPhaseReport(
-            "0.1-exploratory-market-clock", source.FileSha256, source.Trades.Count,
+            "0.2-exploratory-market-clock", source.FileSha256, source.Trades.Count,
             results.Count, results.Count(x => x.EligibleForControls),
             results.Count(x => !x.EligibleForControls),
             config.FirstMilliseconds, config.NullTrials, false, false,
@@ -149,6 +180,8 @@ public static class ClockPhaseAudit
                 "SHARED_MINUTE_ROTATION: the null rotates each UTC minute's whole cluster by one random millisecond phase.",
                 "BURST_DEPENDENCE: within-minute relative timing is mostly retained, but wrap boundaries and cross-minute dynamics are altered.",
                 "DESCRIPTIVE_FREQUENCY_ONLY: Monte Carlo exceedance is not a validated statistical p-value, per-bot confidence or FDR.",
+                "MAXIMUM_BIN_CONTROL: after examining ten 100ms bins, use the maximum of those ten bins in EACH resampled trial.",
+                "SELECTION_CORRECTED_STATISTIC_NOT_VALIDATED_NULL: matching max statistics handles bin selection but does not make minute rotations an exact exchange null.",
                 "SECOND_CLOCK_AND_PRECISION: provider timestamp resolution, rounding and auction/halts require independent verification.",
                 "SESSION_MODE_ISOLATION: never pool instruments, EXCHANGE/DEALER, trading modes or reported sessions.",
                 "PHASE_HISTOGRAM_IS_AGGREGATE: no raw trade print identities or account information.",
