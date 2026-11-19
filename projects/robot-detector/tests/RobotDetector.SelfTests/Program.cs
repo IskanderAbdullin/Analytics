@@ -72,6 +72,12 @@ internal static class Program
         Check("flow footprints partition venues and 5min intervals", FlowFootprintPartition);
         Check("unknown reported side does not invent order direction", FlowFootprintUnknownSide);
         Check("flow footprint rejects invalid bin configuration", FlowFootprintConfigValidation);
+        Check("activity observation flags expected synthetic burst after quiet baseline", ActivityEpisodeDetectsBurst);
+        Check("activity observation refuses balanced-side high volume", ActivityEpisodeNeedsDirectionalDominance);
+        Check("activity observation does not borrow baseline from other venue", ActivityEpisodeSourceIsolation);
+        Check("activity observation resets after a missing bucket", ActivityEpisodeResetsOnGap);
+        Check("activity observation is independent of later prints", ActivityEpisodeNoFutureLeakage);
+        Check("activity observation thresholds reject invalid inputs", ActivityEpisodeInvalidSettings);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
@@ -996,6 +1002,115 @@ internal static class Program
             new FlowFootprintConfig { ClockPhaseThresholdMilliseconds = 1000 }); }
         catch (ArgumentException) { rejected = true; }
         Assert(rejected, "phase beyond half-second invalid");
+    }
+
+
+    private static MarketTrade[] MakeActivityTape(
+        bool balancedBurst = false, bool missingBucket = false,
+        string baselineSource = "EXCHANGE", string burstSource = "EXCHANGE")
+    {
+        var start = new DateTimeOffset(2026, 11, 18, 7, 0, 0, TimeSpan.Zero);
+        var list = new List<MarketTrade>();
+        for (int w = 0; w < 5; w++)
+        {
+            int actualWindow = missingBucket && w == 4 ? 5 : w;
+            int count = w == 4 ? 20 : 5;
+            for (int i = 0; i < count; i++)
+            {
+                bool burst = w == 4;
+                list.Add(new MarketTrade($"ACT-{w}-{i}",
+                    start.AddMinutes(actualWindow * 5).AddSeconds(i),
+                    "SYNTH-ACT", "ACT",
+                    burst ? burstSource : baselineSource,
+                    burst ? balancedBurst && i % 2 == 1 ? "SELL" : "BUY"
+                          : i % 2 == 0 ? "BUY" : "SELL",
+                    100m, burst ? 100 : 10, "TQBR", "SESSION-1",
+                    "SYNTHETIC", w * 100 + i));
+            }
+        }
+        return list.ToArray();
+    }
+
+    private static void ActivityEpisodeDetectsBurst()
+    {
+        var tape = CsvTradeReader.Read(Fixture("synthetic_activity_episode.csv"));
+        Assert(tape.Trades.Count == 40, "fixture must contain four 5-print baselines and 20-print burst");
+        var footprints = FlowFootprint.Describe(tape);
+        var result = FlowActivityEpisodes.Find(footprints);
+        Assert(footprints.WindowCount == 5 && result.EvaluatedWindows == 1,
+            "four quiet windows establish historical-only reference");
+        Assert(result.ActivityWindowCount == 1 &&
+               result.UnscorableWarmupOrGapWindows == 4, "one burst, four warmup windows");
+        var activity = result.ActivityWindows.Single();
+        Assert(activity.PublicPrintCount == 20 && activity.TotalLots == 2000,
+            "observed burst public volume");
+        Assert(activity.BaselineMedianPrintCount == 5 && activity.BaselineMedianLots == 50,
+            "only four earlier windows used for baseline");
+        Assert(activity.PrintCountRatio == 4 && activity.TotalLotsRatio == 40,
+            "burst is four times as many prints and 40 times as many lots");
+        Assert(activity.Label == "reported_buy_dominant_high_activity" &&
+               activity.State == "unvalidated_observed_activity" && !activity.ActorIdentityKnown,
+            "return descriptive reported-side label with no bot identity");
+        Assert(!result.ActualBotCountKnown && !result.SignificanceCalibrated,
+            "cannot invent owners or calibrated probability");
+    }
+
+    private static void ActivityEpisodeNeedsDirectionalDominance()
+    {
+        var footprints = FlowFootprint.Describe(From(MakeActivityTape(balancedBurst: true)));
+        var result = FlowActivityEpisodes.Find(footprints);
+        Assert(result.EvaluatedWindows == 1 && result.ActivityWindowCount == 0,
+            "balanced buy/sell print volumes do not meet dominant-side rule");
+    }
+
+    private static void ActivityEpisodeSourceIsolation()
+    {
+        var footprints = FlowFootprint.Describe(From(
+            MakeActivityTape(baselineSource: "EXCHANGE", burstSource: "DEALER")));
+        var result = FlowActivityEpisodes.Find(footprints);
+        Assert(result.EvaluatedWindows == 0 && result.ActivityWindowCount == 0,
+            "dealer burst may not use exchange-only historical baseline");
+    }
+
+    private static void ActivityEpisodeResetsOnGap()
+    {
+        var footprints = FlowFootprint.Describe(From(MakeActivityTape(missingBucket: true)));
+        var result = FlowActivityEpisodes.Find(footprints);
+        Assert(result.EvaluatedWindows == 0 && result.ActivityWindowCount == 0,
+            "a missing five-minute source bucket resets historical reference");
+    }
+
+    private static void ActivityEpisodeNoFutureLeakage()
+    {
+        var original = MakeActivityTape();
+        var extra = original.Concat(new[]
+        {
+            new MarketTrade("SIXTH", new DateTimeOffset(2026, 11, 18, 7, 25, 0, TimeSpan.Zero),
+                "SYNTH-ACT", "ACT", "EXCHANGE", "SELL", 101m, 1000,
+                "TQBR", "SESSION-1", "SYNTHETIC", 999)
+        }).ToArray();
+        var first = FlowActivityEpisodes.Find(FlowFootprint.Describe(From(original)));
+        var extended = FlowActivityEpisodes.Find(FlowFootprint.Describe(From(extra)));
+        Assert(first.ActivityWindows.Count == 1,
+            "baseline burst expected");
+        Assert(extended.ActivityWindows.Any(x =>
+            x.WindowStartUtc == first.ActivityWindows[0].WindowStartUtc &&
+            x.PublicPrintCount == first.ActivityWindows[0].PublicPrintCount &&
+            x.BaselineMedianLots == first.ActivityWindows[0].BaselineMedianLots),
+            "later data cannot revise past episode's reference or label");
+    }
+
+    private static void ActivityEpisodeInvalidSettings()
+    {
+        bool rejected = false;
+        try { new FlowActivityConfig { ReferenceWindows = 1 }.Validate(); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "one bucket is not enough historical reference");
+        rejected = false;
+        try { FlowActivityEpisodes.Find(FlowFootprint.Describe(From(MakeActivityTape())),
+            new FlowActivityConfig { MinimumCountRatio = 1 }); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "ratio <=1 invalid");
     }
 
     private static void BadConfig()
