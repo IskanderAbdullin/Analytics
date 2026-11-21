@@ -1,0 +1,64 @@
+{
+  "schema_version": "public-timing-phase-and-tied-split-fills-protocol-v1",
+  "date_frozen_utc": "2026-11-21",
+  "research_stage": "RD-PHASE-ROBUSTNESS-11",
+  "triggering_original_source_runs": [
+    44936592641,
+    44937478576
+  ],
+  "source_type": "fully synthetic construction, no new genuine ABIDES or vendor tape",
+  "clock_semantics": "integer nanoseconds since exchange-local midnight, fixed 09:31 origin",
+  "phase_anchor_exchange_local_seconds_after_midnight": 34260,
+  "grid_periods_seconds": [
+    20,
+    45
+  ],
+  "clock_tolerance_nanoseconds": 250000000,
+  "diagnostic_shifts_milliseconds": [
+    -300,
+    -250,
+    0,
+    250,
+    300
+  ],
+  "observed_within_session": [
+    "09:30:00",
+    "09:38:00"
+  ],
+  "source_public_baseline": {
+    "fixed_20s_grid_events_timestamps_synthetic_offset_periods": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "additional_45s_only_timestamp_offset_seconds": 45,
+    "single_public_fill_at_45_only_timestamp": 1,
+    "split_public_fills_at_same_45_only_timestamp": 100,
+    "all_synthetic_events_are_non_target_background": true,
+    "source_visible_fields": [
+      "time_ns",
+      "price_cents",
+      "quantity",
+      "reported_aggressor_side"
+    ]
+  },
+  "fixed_descriptive_alarm_ratio_threshold": 0.6,
+  "expected_counterexample": "split-filled print-weighted grid score high; unique timestamp-group grid score low",
+  "phase_shift_metric": "record all fixed shifts, never select favorable phase",
+  "abstention_if_denominator_grid20_zero": true,
+  "private_owner_or_agent_IDs_forbidden_in_public_inputs": true,
+  "source_raw_timestamps_or_per_event_tapes_not_exported": true,
+  "real_market_owner_FDR_p_value_or_classifier_accuracy_unavailable": true,
+  "synthetic_ties_not_identification_of_parent_order": true,
+  "no_GitHub_source_network_download_required": true,
+  "preserve_negative_outcomes_if_rule_fails": true
+}
