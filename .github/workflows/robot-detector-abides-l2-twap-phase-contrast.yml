@@ -1,0 +1,66 @@
+name: Robot Detector genuine L2 controlled TWAP clock-origin contrast
+
+# This single preregistered developmental run is followed by manual-only
+# reproducibility. Never treat already registered seeds as new holdouts.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-abides-l2-twap-phase-contrast.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-four-run-public-contrast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit source-frozen seed registry and pure synthetic tests
+        run: |
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_l2_twap_phase_contrast.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
+      - name: Install pinned genuine ABIDES matching engine
+        run: |
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run two seeds by two actual market configurations with 3 correlated public clock phases
+        run: |
+          python tools/abides_l2_twap_phase_contrast.py --output /tmp/abides-l2-twap-phase-contrast.json
+          python - <<'PY'
+          import json
+          path='/tmp/abides-l2-twap-phase-contrast.json'
+          r=json.load(open(path,encoding='utf-8'))
+          p=r['frozen_plan']
+          assert p['development_seeds_local_only']==[2401,2402]
+          assert p['scenarios']==['background_only','twap_injected']
+          assert p['phases_seconds']==[0,10,20]
+          assert r['genuine_matching_runs']==4
+          assert r['non_independent_analytical_views']==12
+          assert len(r['cases'])==12 and len(r['cohorts'])==6
+          assert not r['private_truth_used_for_feature']
+          assert not r['private_truth_exported']
+          assert not r['real_market_significance_established']
+          assert not r['physical_bot_count_known']
+          assert not r['trade_execution_enabled']
+          assert all(not c['private_identity_used_for_feature'] for c in r['cases'])
+          assert all(len(c['full_public_tape_sha256'])==64 for c in r['cases'])
+          for row in r['cohorts']:
+              print('PUBLIC_TWAP_PHASE_COHORT',json.dumps(row,sort_keys=True))
+          PY
+      - name: Publish aggregate-only source-controlled developmental evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-l2-twap-phase-contrast
+          path: /tmp/abides-l2-twap-phase-contrast.json
+          if-no-files-found: error
+          retention-days: 7
