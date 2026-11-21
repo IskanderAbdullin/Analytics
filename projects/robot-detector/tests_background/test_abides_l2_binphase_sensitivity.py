@@ -108,6 +108,53 @@ class FrozenClockPhaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             aggregate(bad)
 
+    def test_fails_closed_on_nan_infinite_or_non_numeric_rho(self):
+        for bad_rho in (float("nan"), float("inf"), -float("inf"),
+                        True, "0.1", [], 0j):
+            with self.subTest(bad_rho=repr(bad_rho)), self.assertRaises(ValueError):
+                cases=[dict(x) for x in matrix()]
+                cases[0]["descriptive_rho"]=bad_rho
+                aggregate(cases)
+
+    def test_counts_must_be_exact_and_physically_consistent(self):
+        for key, value in (
+            ("seed", True), ("phase_seconds", False),
+            ("public_prints", 600.0), ("public_lots", True),
+            ("l2_snapshots", "950"), ("eligible_lagged_bins", 12.0),
+            ("populated_trade_bins", 0), ("abstained_bins", -1),
+            ("public_lots", 599), ("public_prints", 14),
+            ("eligible_lagged_bins", 951),
+        ):
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                cases=[dict(x) for x in matrix()]
+                cases[0][key]=value
+                aggregate(cases)
+        cases=[dict(x) for x in matrix()]
+        cases[0].update(eligible_lagged_bins=1, abstained_bins=14,
+                        descriptive_rho=0.5)
+        with self.assertRaises(ValueError):
+            aggregate(cases)
+
+    def test_digest_and_flags_require_canonical_exact_types(self):
+        for key, value in (
+            ("public_sha256", "x"*64),
+            ("public_sha256", "A"*64),
+            ("public_sha256", "0"*63),
+            ("public_sha256", 123),
+            ("claimed_real_feed_completeness", 0),
+            ("private_identity_accessed", None),
+            ("model_selected", "false"),
+        ):
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                cases=[dict(x) for x in matrix()]
+                cases[0][key]=value
+                aggregate(cases)
+        for bad_matrix in (None, {}, [None], [dict(x) for x in matrix()]):
+            if isinstance(bad_matrix, list) and bad_matrix and type(bad_matrix[0]) is dict:
+                del bad_matrix[0]["background"]
+            with self.assertRaises(ValueError):
+                aggregate(bad_matrix)
+
     def test_undefined_rho_and_false_evidence_claims_fail_closed(self):
         r=aggregate(matrix({0:None,10:-0.1,20:None}))
         self.assertEqual(len(r["cohorts"]),6)

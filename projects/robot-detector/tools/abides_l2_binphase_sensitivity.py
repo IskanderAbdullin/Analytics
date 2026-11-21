@@ -11,6 +11,7 @@ import argparse
 from dataclasses import replace
 from hashlib import sha256
 import json
+import math
 from pathlib import Path
 import statistics
 from types import SimpleNamespace
@@ -70,6 +71,38 @@ def shift_public_clock(snapshots: Any, public: tuple, phase_seconds: int):
 
 
 def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Validate all frozen public case inputs before computing summaries.
+
+    Reject non-finite rho, bool/float counts, false evidence flags and
+    malformed source digests instead of silently contaminating medians.
+    """
+    if type(rows) is not list or any(type(row) is not dict for row in rows):
+        raise ValueError("Frozen phase matrix must be a list of case mappings")
+    integer_fields = (
+        "seed", "phase_seconds", "public_prints", "public_lots",
+        "l2_snapshots", "eligible_lagged_bins", "populated_trade_bins",
+        "abstained_bins",
+    )
+    forbidden_claims = (
+        "claimed_real_feed_completeness", "private_identity_accessed",
+        "model_selected",
+    )
+    required_fields = set(integer_fields) | set(forbidden_claims) | {
+        "background", "public_sha256", "descriptive_rho",
+    }
+    for row in rows:
+        if not required_fields.issubset(row):
+            raise ValueError("Incomplete public phase case")
+        if any(type(row[key]) is not int for key in integer_fields):
+            raise ValueError("Public source counts and frozen identifiers must be exact integers")
+        if type(row["background"]) is not str:
+            raise ValueError("Invalid background type")
+        digest = row["public_sha256"]
+        if (type(digest) is not str or len(digest) != 64
+                or any(ch not in "0123456789abcdef" for ch in digest)):
+            raise ValueError("Invalid public SHA-256 hex digest")
+        if any(type(row[key]) is not bool or row[key] for key in forbidden_claims):
+            raise ValueError("Forbidden or malformed evidence claim")
     expected = {
         (s, mode, phase)
         for s in SEEDS for mode in BACKGROUNDS for phase in PHASES_SECONDS
@@ -81,6 +114,9 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for row in rows:
         if (row["public_prints"] <= 0 or row["public_lots"] <= 0
             or row["l2_snapshots"] <= 0
+            or row["public_lots"] < row["public_prints"]
+            or row["public_prints"] < row["populated_trade_bins"]
+            or row["eligible_lagged_bins"] > row["l2_snapshots"]
             or row["eligible_lagged_bins"] < 0
             or row["eligible_lagged_bins"] > row["populated_trade_bins"]
             or row["eligible_lagged_bins"] + row["abstained_bins"] != row["populated_trade_bins"]
@@ -88,8 +124,13 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
             or row["private_identity_accessed"] or row["model_selected"]):
             raise ValueError("Public phase case violated source/research contract")
         rho = row["descriptive_rho"]
-        if rho is not None and not (-1 <= rho <= 1):
-            raise ValueError("Invalid rho")
+        if rho is not None and (
+            type(rho) not in (int, float)
+            or not (-1 <= rho <= 1)
+            or not math.isfinite(rho)
+            or row["eligible_lagged_bins"] < 2
+        ):
+            raise ValueError("Invalid or non-finite rho")
         groups.setdefault((row["seed"], row["background"]), []).append(row)
     for key, group in groups.items():
         if (len(group) != len(PHASES_SECONDS)
