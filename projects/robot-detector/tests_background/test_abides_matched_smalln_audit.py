@@ -118,6 +118,13 @@ class ExactSmallSampleSyntheticSourceTests(unittest.TestCase):
     def test_forged_source_counts_missing_seed_or_change_outcome_fail(self):
         for mutator in (
             lambda x: x.update({"original_source_artifact_id":0}),
+            lambda x: x.update({"source_commit":"forged"}),
+            lambda x: x.update({"engine_revision":"forged"}),
+            lambda x: x.update({"private_truth":{"agent_id":123}}),
+            lambda x: x["totals"].update({"private_agent_id":"leaked"}),
+            lambda x: x["original_all_16_case_public_summary"][0].update({"agent_id":123}),
+            lambda x: x["original_cohort_aggregates"]["poisson_noise_null"].update({"raw_trades":[1,2]}),
+            lambda x: x["original_cohort_aggregates"]["poisson_noise_null"].update({"grouped_timestamp_false_alarms":0}),
             lambda x: x["original_all_16_case_public_summary"].pop(),
             lambda x: x["original_all_16_case_public_summary"][0].update({"seed":3202}),
             lambda x: x["original_all_16_case_public_summary"][0].update({"prints":1}),
