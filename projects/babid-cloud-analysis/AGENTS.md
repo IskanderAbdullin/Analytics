@@ -7,7 +7,7 @@ This is an analytical-only project in the **Analytics** GitHub repository.
 - Do not commit trading source code, real accounts, trade logs, credentials,
   snapshots, broker APIs, or genuine market recordings into this public project.
 - Use only synthetic fixtures in GitHub Actions, which run in Analytics itself.
-- Do not attempt to connect to a broker or control a user's Windows desktop.
+- Do not connect to a broker or access/control the user's Windows computer without separately explicit user authorization for the specific purpose. Even with approval, this analytical project is limited to read-only inspection of a frozen local copy or authorized read-only broker evidence; no GUI trading, order entry, position changes or edits to a running robot.
 - Analysis scripts read a user-supplied **copy** and emit local reports only.
 - A source mismatch, fill anomaly or quote-feasibility score is evidence for
   investigation, not permission to change live trading parameters.
