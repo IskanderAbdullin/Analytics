@@ -1,0 +1,53 @@
+{
+  "schema_version": "robot-detector-fixed-grid-toy-rhythm-frozen-v1",
+  "frozen_date_utc": "2026-11-21",
+  "source": "ONLY_CONSTRUCTED_TOY_NO_REAL_EXCHANGE_OR_GENUINE_ABIDES",
+  "development_seeds": [
+    2601,
+    2602,
+    2603,
+    2604
+  ],
+  "uninspected_holdout_seed_ids_at_freeze": [
+    2701,
+    2702,
+    2703,
+    2704
+  ],
+  "not_globally_certified_unseen": true,
+  "session_clock_seconds_after_midnight": [
+    34200,
+    34800
+  ],
+  "periodic_clock_grid_seconds": 10,
+  "within_phase_grid_tolerance_microseconds": 250000,
+  "phase_origin_seconds_after_midnight": 34200,
+  "threshold_fraction_of_public_executed_prints_on_grid": 0.22,
+  "scoring_rule": "score=number_of_public_execution_prints_at_within_250ms_of_fixed_10s_grid / total_executed_prints; predicted periodic-source if score>=0.22; never fit from holdout",
+  "scenarios": [
+    {
+      "key": "independent_noise_null",
+      "source_public_prints": 120,
+      "truth_injected_target_present": false
+    },
+    {
+      "key": "periodic_noise_hard_negative",
+      "source_public_prints": 180,
+      "truth_injected_target_present": false
+    },
+    {
+      "key": "periodic_target_positive",
+      "source_public_prints": 180,
+      "truth_injected_target_present": true
+    }
+  ],
+  "identical_public_tape_between_hard_negative_and_target_positive_for_each_seed": true,
+  "all_cases_still_need_to_be_reported": true,
+  "no_best_phase_or_threshold_selection": true,
+  "private_truth_used_only_after_detection": true,
+  "not_true_market_traffic_simulation": true,
+  "no_market_fdr_real_bot_owner_accuracy_or_trading_claims": true,
+  "must_record_false_positives_in_periodic_noise_cohort": true,
+  "commercial_execution_or_live_broker_trading_enabled": false,
+  "raw_actual_market_data_used": false
+}
