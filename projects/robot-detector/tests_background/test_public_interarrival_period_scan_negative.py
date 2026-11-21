@@ -82,6 +82,21 @@ class PrecommittedPeriodScanNegatives(unittest.TestCase):
         with self.assertRaises(ValueError):
             make_public(global_shift_ns=0,add_split_fills=1)
 
+    def test_saved_four_by_seven_original_negative_aggregates_match_source_code(self):
+        f=Path(__file__).resolve().parents[1]/"fixtures"/"public_interarrival_period_scan_observed_20261121.json"
+        saved=json.loads(f.read_text(encoding="utf-8"))
+        computed=original_negative_matrix()
+        self.assertEqual(saved["source_free_verification_ci_run"],44945259589)
+        self.assertEqual(
+            {k:v for k,v in saved.items() if k!="source_free_verification_ci_run"},
+            computed
+        )
+        self.assertEqual(len(saved["four_precommitted_public_source_cases"]),4)
+        self.assertEqual(sum(len(c["period_grid_all_frozen_candidates"])
+                             for c in saved["four_precommitted_public_source_cases"]),28)
+        self.assertTrue(saved["timestamp_split_fills_not_independent_parent_orders"])
+        self.assertFalse(saved["actual_exchange_or_ABIDES_source_accessed"])
+
     def test_refuse_protocol_edits_after_frozen_design(self):
         p=frozen_protocol()
         for k,value in (
