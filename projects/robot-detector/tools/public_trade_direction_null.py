@@ -16,6 +16,23 @@ MINUTE_US = 60_000_000
 DAY_US = 86_400_000_000
 NULL_SEEDS = (32001, 32003, 32009, 32027, 32029, 32051, 32057, 32063)
 MAX_PRINTS = 3_000_000
+OCCUPANCY_CLASSES = ("1", "2", "3-4", "5-9", "10+")
+
+
+def occupancy_class(public_prints: int) -> str:
+    """Precommitted mutually exclusive 30-second public-print-count bins."""
+    if type(public_prints) is not int or public_prints < 1:
+        raise ValueError("Occupancy only defined for nonempty public print bins")
+    if public_prints == 1:
+        return "1"
+    if public_prints == 2:
+        return "2"
+    if public_prints <= 4:
+        return "3-4"
+    if public_prints <= 9:
+        return "5-9"
+    return "10+"
+
 
 
 def _stats(slots: list[list[int]], sides: list[bool]) -> list[dict]:
@@ -28,8 +45,17 @@ def _stats(slots: list[list[int]], sides: list[bool]) -> list[dict]:
                 continue
             pair = bins[i].setdefault(bucket, [0, 0])
             pair[int(buyer_maker)] += 1
-    return [
-        {
+    per_phase = []
+    for i, phase in enumerate(PHASES_SECONDS):
+        occupancy = {k: {"eligible_bins": 0, "one_sided_bins": 0}
+                     for k in OCCUPANCY_CLASSES}
+        for buy, sell in bins[i].values():
+            key = occupancy_class(buy + sell)
+            occupancy[key]["eligible_bins"] += 1
+            occupancy[key]["one_sided_bins"] += int(buy == 0 or sell == 0)
+        if occupancy["1"]["eligible_bins"] != occupancy["1"]["one_sided_bins"]:
+            raise AssertionError("One-trade bin must be mechanically one-sided")
+        per_phase.append({
             "origin_seconds": phase,
             "complete_nonempty_bins": len(bins[i]),
             "one_sided_bins": sum(0 in pair for pair in bins[i].values()),
@@ -37,9 +63,9 @@ def _stats(slots: list[list[int]], sides: list[bool]) -> list[dict]:
             "sell_dominant_bins": sum(pair[0] < pair[1] for pair in bins[i].values()),
             "tied_print_count_bins": sum(pair[0] == pair[1] for pair in bins[i].values()),
             "included_public_prints": sum(sum(pair) for pair in bins[i].values()),
-        }
-        for i, phase in enumerate(PHASES_SECONDS)
-    ]
+            "occupancy_strata": occupancy,
+        })
+    return per_phase
 
 
 def evaluate_public_side_null(
@@ -97,6 +123,9 @@ def evaluate_public_side_null(
 
     observed = _stats(slots, sides)
     controls = [[] for _ in PHASES_SECONDS]
+    controls_ge5 = [[] for _ in PHASES_SECONDS]
+    occupancy_controls = [{key: [] for key in OCCUPANCY_CLASSES}
+                          for _ in PHASES_SECONDS]
     for seed in NULL_SEEDS:
         shuffled = sides.copy()
         rng = Random(seed)
@@ -129,6 +158,16 @@ def evaluate_public_side_null(
                     observed[i]["complete_nonempty_bins"]):
                 raise AssertionError("Fixed timestamp permutation changed source coverage")
             controls[i].append(row["one_sided_bins"])
+            for key in OCCUPANCY_CLASSES:
+                original = observed[i]["occupancy_strata"][key]
+                randomized = row["occupancy_strata"][key]
+                if original["eligible_bins"] != randomized["eligible_bins"]:
+                    raise AssertionError("Bin print occupancy moved under side shuffle")
+                occupancy_controls[i][key].append(randomized["one_sided_bins"])
+            controls_ge5[i].append(
+                row["occupancy_strata"]["5-9"]["one_sided_bins"]+
+                row["occupancy_strata"]["10+"]["one_sided_bins"]
+            )
 
     variants = []
     for i, phase in enumerate(PHASES_SECONDS):
@@ -138,6 +177,27 @@ def evaluate_public_side_null(
             raise AssertionError("Observed direction bins do not reconcile")
         full_count = (DAY_US - phase * 1_000_000)//BIN_US
         nulls = controls[i]
+        strata = []
+        for key in OCCUPANCY_CLASSES:
+            observed_group = row["occupancy_strata"][key]
+            shuffled = occupancy_controls[i][key]
+            strata.append({
+                "class": key,
+                "eligible_complete_bins": observed_group["eligible_bins"],
+                "observed_one_sided_bins": observed_group["one_sided_bins"],
+                "null_one_sided_min": min(shuffled),
+                "null_one_sided_median": median(shuffled),
+                "null_one_sided_max": max(shuffled),
+                "above_all_eight_controls": observed_group["one_sided_bins"]>max(shuffled),
+            })
+        if (sum(x["eligible_complete_bins"] for x in strata)
+                != row["complete_nonempty_bins"]
+                or sum(x["observed_one_sided_bins"] for x in strata)
+                != row["one_sided_bins"]):
+            raise AssertionError("Occupancy partition lost source public prints")
+        qualifying = sum(x["eligible_complete_bins"] for x in strata[3:])
+        one_sided_ge5 = sum(x["observed_one_sided_bins"] for x in strata[3:])
+        strong_controls_ge5 = controls_ge5[i]
         variants.append({
             "origin_seconds": phase,
             "bin_width_seconds": 30,
@@ -154,6 +214,16 @@ def evaluate_public_side_null(
             "null_one_sided_bin_count_max": max(nulls),
             "num_predeclared_weak_null_replicates": len(nulls),
             "predeclared_null_seeds": list(NULL_SEEDS),
+            "occupancy_classes_predeclared": list(OCCUPANCY_CLASSES),
+            "one_sided_bins_by_public_print_occupancy": strata,
+            "qualifying_bins_with_at_least_five_prints": qualifying,
+            "one_sided_bins_with_at_least_five_prints": one_sided_ge5,
+            "null_ge5_one_sided_min": min(strong_controls_ge5),
+            "null_ge5_one_sided_median": median(strong_controls_ge5),
+            "null_ge5_one_sided_max": max(strong_controls_ge5),
+            "observed_ge5_one_sided_above_all_eight_nulls": (
+                one_sided_ge5 > max(strong_controls_ge5)
+            ),
             "source_archive_independence_claimed": False,
             "statistical_p_value_or_FDR_calibrated": False,
         })
@@ -168,6 +238,8 @@ def evaluate_public_side_null(
         "independent_market_days_in_this_report": 1,
         "same_public_tape_reused_in_phase_and_null_analyses": True,
         "clock_phases_seconds": list(PHASES_SECONDS),
+        "bin_occupancy_classes": list(OCCUPANCY_CLASSES),
+        "primary_conditioned_bin_occupancy_minimum": 5,
         "null_type": (
             "same_size_same_timestamp_side_vector_cluster_shuffle_within_utc_minute"
             if preserve_same_timestamp_clusters else
@@ -201,6 +273,8 @@ def evaluate_public_side_null(
         "raw_print_timestamps_or_labels_exported": False,
         "limitations": [
             "Eight fixed shuffles per UTC day are descriptive controls, not an inferential null distribution.",
+            "Every exactly-one-trade bin is mechanically 100% one-sided, regardless of any actor or exchange behavior.",
+            "Five-print-minimum conditioning is precommitted ONLY for separately frozen unseen source dates, not retroactive proof for inspected development days.",
             ("Whole timestamp clusters are shuffled only across equal-size groups; "
              "unmodelled order queues and within-minute timing relations remain."
              if preserve_same_timestamp_clusters else
