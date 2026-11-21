@@ -161,6 +161,40 @@ class TransferPrecommittedTests(unittest.TestCase):
             with self.subTest(key=key),self.assertRaises(ValueError):
                 validate_precommit(altered)
 
+    def test_pinned_prospective_bch_negative_result_must_remain_negative(self):
+        fixture=ROOT/"fixtures"/"binance_spot_transfer_20261120_observed.json"
+        observed=load_json(fixture,max_bytes=10000)
+        self.assertEqual(observed["precommit_sha"],
+                         "ae0d013645e4d7a1ab84757438c69ddff256dfbe")
+        self.assertEqual(observed["source_original_workflow_run_id"],44920626852)
+        self.assertEqual(observed["total_source_real_public_trade_prints"],268459)
+        self.assertEqual(observed["independent_utc_market_dates"],1)
+        self.assertEqual(observed["distinct_market_instruments"],2)
+        self.assertFalse(observed["original_predeclared_all_cases_success"])
+        self.assertTrue(observed["not_blind_actual_robot_classifier_test"])
+        self.assertTrue(observed["not_calibrated_FDR_or_p_value"])
+        self.assertFalse(observed["commercial_trading_licence_granted"])
+        cases=observed["cases"]
+        self.assertEqual([r["symbol"] for r in cases],["LTCUSDT","BCHUSDT"])
+        self.assertEqual([r["public_trade_count"] for r in cases],[195180,73279])
+        self.assertEqual([r["first_primary_strong_control_envelope_met"] for r in cases],
+                         [True,False])
+        self.assertEqual(cases[0]["first_observed_trade_id"],608464661)
+        self.assertEqual(cases[0]["source_zip_sha256"],
+                         "98eaafeb4f814f36f1d59de203e5cf74e4e7b3e7dd3cd93f2ca3153d32100a5a")
+        self.assertEqual(cases[1]["source_zip_sha256"],
+                         "553421be8eaf1e339eb0e111a25604ce7d2965e85ad15cea1650ffa0d012e46c")
+        self.assertEqual([x["origin_seconds"] for x in cases[0]["origins"]],[0,10,20])
+        self.assertEqual([x["origin_seconds"] for x in cases[1]["origins"]],[0,10,20])
+        self.assertEqual([x["observed_above_all_8_strong_controls"]
+                          for x in cases[0]["origins"]],[True,True,True])
+        self.assertEqual([x["observed_above_all_8_strong_controls"]
+                          for x in cases[1]["origins"]],[False,False,False])
+        self.assertEqual([x["observed_one_sided_bins"]
+                          for x in cases[1]["origins"]],[511,507,515])
+        self.assertEqual([x["strong_equal_timestamp_control_median"]
+                          for x in cases[1]["origins"]],[504,525.5,518])
+
     def test_duplicate_json_fields_fail_closed(self):
         with self.assertRaises(ValueError):
             json.loads('{"x": 1, "x": 2}',object_pairs_hook=strict_pairs)
