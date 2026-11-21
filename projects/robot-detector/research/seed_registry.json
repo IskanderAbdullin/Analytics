@@ -1,7 +1,7 @@
 {
   "schema_version": "market-robot-detector-seed-ledger-v1",
   "scope": "locally_known_studies_only_not_global_novelty_proof",
-  "description": "Project-local known-spent seed sets, including two precommitted development seeds 2401/2402 for controlled public L2 TWAP-vs-background. No global novelty attestation; registered seeds cannot be called unused blind holdouts.; synthetic fixed-grid toy development and holdout seeds 2601-2604 and 2701-2704 are now spent, not genuine ABIDES or real-market holdouts.; preregistered genuine 10-second public-only ABIDES transfer seeds 2801/2802 (not globally certified blind).",
+  "description": "Project-local known-spent seed sets, including two precommitted development seeds 2401/2402 for controlled public L2 TWAP-vs-background. No global novelty attestation; registered seeds cannot be called unused blind holdouts.; synthetic fixed-grid toy development and holdout seeds 2601-2604 and 2701-2704 are now spent, not genuine ABIDES or real-market holdouts.; preregistered genuine 10-second public-only ABIDES transfer seeds 2801/2802 (not globally certified blind).; pre-registered 2901/2902/2903 multiscale ABIDES development seeds for twelve original four-cohort matching-engine runs; source run NOT yet confirmed.",
   "studies": [
     {
       "id": "initial_execution_development",
@@ -174,6 +174,18 @@
         2802
       ],
       "source_file": "tools/abides_fixed_clock_transfer.py",
+      "source_constant": "SEEDS"
+    },
+    {
+      "id": "genuine_abides_public_multiscale_l2_12run",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        2901,
+        2902,
+        2903
+      ],
+      "source_file": "tools/abides_multiscale_public_l2.py",
       "source_constant": "SEEDS"
     }
   ],
