@@ -11,7 +11,6 @@ import csv
 import json
 import re
 import sys
-from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 from report_safety import validate_report_output

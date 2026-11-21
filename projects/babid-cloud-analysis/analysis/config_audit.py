@@ -126,17 +126,17 @@ def analyze(root: Path) -> tuple[list[dict], list[dict]]:
                 category="invalid_config", severity="error", files=file.name,
                 description=str(error)[:180]
             ))
-    for path, files in by_state.items():
+    for files in by_state.values():
         if len(files) > 1:
             issues.append(dict(category="shared_state_dir", severity="warning",
                                files=" | ".join(files),
                                description="Multiple config files refer to one state directory; simultaneous runs would collide"))
-    for path, files in by_logs.items():
+    for files in by_logs.values():
         if len(files) > 1:
             issues.append(dict(category="shared_log_dir", severity="review",
                                files=" | ".join(files),
                                description="Multiple config files refer to one log directory; histories can be mixed"))
-    for key, files in by_account_instrument.items():
+    for files in by_account_instrument.values():
         if len(files) > 1:
             issues.append(dict(category="same_account_instrument", severity="review",
                                files=" | ".join(files),

@@ -1,5 +1,4 @@
 """Synthetic offline tests for market_study; no network or live broker."""
-import csv
 import gzip
 import tempfile
 import unittest

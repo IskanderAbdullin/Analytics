@@ -10,7 +10,7 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from report_safety import validate_report_output
 
@@ -62,7 +62,7 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
     # the report explicitly says it is not an atomic snapshot.
     files = inventory(root)
     output.mkdir(parents=True, exist_ok=False)
-    manifest = dict(created_utc=datetime.now(timezone.utc).isoformat(),
+    manifest = dict(created_utc=datetime.now(UTC).isoformat(),
                     root=str(root), files=files, reports={},
                     limitations=["Input folders are not an atomic filesystem snapshot",
                                  "No independent broker-side executed-trade reconciliation",
@@ -125,7 +125,7 @@ def main() -> int:
                    help="skip potentially lengthy scans of market recordings")
     args = p.parse_args()
     root = args.root.resolve()
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     output = args.output or (root / "reports" / ("complete-audit-" + stamp))
     try:
         result = run(root, output, not args.skip_market)

@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import statistics
 import sys
 from collections import defaultdict
 from decimal import Decimal, InvalidOperation

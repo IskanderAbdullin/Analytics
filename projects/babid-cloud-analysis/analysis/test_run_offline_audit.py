@@ -1,5 +1,4 @@
 """Synthetic safety and provenance tests for the audit coordinator."""
-import hashlib
 import tempfile
 import unittest
 from pathlib import Path

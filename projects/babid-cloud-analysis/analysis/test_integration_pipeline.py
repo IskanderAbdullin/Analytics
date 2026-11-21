@@ -1,7 +1,6 @@
 """End-to-end test: the coordinator must run on a fabricated archive only."""
 from __future__ import annotations
 
-import csv
 import gzip
 import json
 import tempfile

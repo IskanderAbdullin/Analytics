@@ -1,5 +1,4 @@
 """Synthetic Babid configuration analysis: no tokens, broker or live files."""
-import csv
 import json
 import tempfile
 import unittest

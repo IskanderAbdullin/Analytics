@@ -329,7 +329,7 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
     table(output / "pnl_daily.csv",
           ["day", "state", "samples", "first", "last", "minimum", "maximum", "max_drawdown", "change"], equity)
     table(output / "errors_daily.csv", ["day", "log_dir", "level", "category", "count"],
-          [dict(zip(["day", "log_dir", "level", "category"], k), count=v) for k, v in sorted(errors.items())])
+          [dict(zip(["day", "log_dir", "level", "category"], k, strict=True), count=v) for k, v in sorted(errors.items())])
     table(output / "incident_timeline.csv", ["at_msk", "log_dir", "level", "category", "file", "line", "message"],
           sorted(incidents, key=lambda x: x["at_msk"]))
     table(output / "recordings.csv", ["instrument", "filename", "records",
