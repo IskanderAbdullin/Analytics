@@ -76,6 +76,8 @@ def classify(message: str):
         return "engine_started", message[len("Engine started: "):]
     if message.startswith("Risk: "):
         return "risk", message[len("Risk: "):]
+    if message.startswith("P&L at stop: "):
+        return "engine_stopped", ""
     if message.startswith("Schedule ") and " MSK: regime " in message:
         return "schedule", message
     if message.startswith("Schedule: the regime was changed by hand to "):
@@ -116,6 +118,13 @@ def reconstruct(folder: Path) -> tuple[list[dict], list[dict]]:
     log_dir = folder.name
     for item in events:
         kind, changes = item["kind"], item["values"]
+        if kind == "engine_stopped":
+            if epochs:
+                epochs[-1]["end_msk"] = item["at"]
+            state = {}  # Nothing may be attributed after an observed stop.
+            issues.append(dict(log_dir=log_dir, at_msk=item["at"], kind="observed_stop",
+                               source_file=item["file"], line=item["line"]))
+            continue
         if kind in ("config_reload_failed", "ignored_identity_change"):
             issues.append(dict(log_dir=log_dir, at_msk=item["at"], kind=kind,
                                source_file=item["file"], line=item["line"]))

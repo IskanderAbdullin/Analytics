@@ -69,6 +69,18 @@ class ConfigEpochTests(unittest.TestCase):
         self.assertEqual(rows[1]["max_position_lots"], "1")
         self.assertEqual(rows[1]["position_check_sec"], "")
 
+    def test_stop_closes_epoch_and_following_time_is_unknown(self):
+        self.log.write_text(
+            "2026-11-21 14:00:00.000 INF Engine started: regime=On; maxPositionLots=4; buy=1@level>=10; sell=1@level>=10\n"
+            "2026-11-21 15:00:00.000 INF P&L at stop: total=+3.00; fills=3\n"
+            "2026-11-21 17:00:00.000 INF Engine started: regime=On; maxPositionLots=8; buy=2@level>=20; sell=2@level>=20\n",
+            encoding="utf-8")
+        epochs, events = reconstruct(self.logs)
+        self.assertEqual(len(epochs), 2)
+        self.assertEqual(epochs[0]["end_msk"], "2026-11-21 15:00:00.000")
+        self.assertEqual(epochs[1]["start_msk"], "2026-11-21 17:00:00.000")
+        self.assertEqual(events[0]["kind"], "observed_stop")
+
     def test_close_no_loss_and_without_short_detection(self):
         part = extract("regime=On; buy=2@level>=4; sell=2@level>=5; closing@level>=20 when not at a loss",
                        "config_applied")
