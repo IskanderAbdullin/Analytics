@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Optional completed-archive watermark gate
+
+The strictly read-only public previous-bin book monitor now accepts an optional exclusive `complete_through_ns` watermark: a trade bin whose **end** is later than the supplied watermark is **excluded** from the statistic and recorded as a separate abstention. This prevents a truncated terminal archive bin from being silently interpreted as complete **when a trustworthy watermark is available**. The algorithm **cannot independently certify a source-provided watermark**; with no watermark, all existing descriptive results remain available but terminal archive completeness is explicitly **unverified**. Six deterministic tests cover boundary equality, null/partial bins, future-append invariance and malformed watermarks.
+
+[Source completeness specification](docs/L2_ARCHIVE_WATERMARK.md). No new robot classifier, live feed collection or trading.
+
 ## Genuine matching-engine background-only public L2 nulls
 
 Added `tools/abides_l2_background_nulls.py` with **six frozen genuine ABIDES-NG simulations**: two new development seeds across a baseline Poisson background, fixed-cadence noise-agent background, and heterogeneous noise-plus-momentum background. **No separately injected TWAP/VWAP/POV parent execution agent** is introduced. This is not a claim that these markets have no other algorithmic participants.
