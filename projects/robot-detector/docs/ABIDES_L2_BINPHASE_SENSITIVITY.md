@@ -144,3 +144,29 @@ standard-library-only Python phase/review test suites, including
 the original aggregate-only numeric fixture, without starting ABIDES.
 A future manual matching-engine rerun may check reproducibility, but
 cannot be advertised as a fresh holdout.
+
+## Full public L2 source integrity (post-experiment correction)
+
+The historical phase study's `public_sha256` fingerprint was derived from
+**executed trade prints only**. Equal snapshot counts and print digests
+do **not** establish equality of the entire book. Thus its prior output
+cannot retrospectively prove every L2 price, lot count, event timestamp
+or equal-time update order was unchanged. The original raw L2 event
+stream was not preserved in its seven-day aggregate-only result.
+
+A new standard-library-only `public_tape_fingerprint.py` hashes every
+bounded public L2 snapshot and trade print in event order with separate
+domain prefixes and combined SHA-256. When given an exactly known 0/10/20s
+coordinate shift, it restores the time origin before hashing. The
+future `public_tape_sha256` field is **optional for legacy reports** and
+required consistently across all twelve views if present; differing
+values within one original simulation now fail closed. The aggregate
+explicitly declares `full_public_tape_digest_available_all_phases`.
+
+Five new tests cover exact rephasing, changed L2 sizes and quote order,
+trade mutation, identical legacy trade-only hashes despite changed
+books, malformed source integers and unsupported sides. These are
+software integrity tests, not newly observed market evidence.
+No cryptographic signature from an independent market-data provider
+or source-completeness proof exists; Stage-2 physical identity remains
+unvalidated. New pins cannot be retroactively added to old archives.
