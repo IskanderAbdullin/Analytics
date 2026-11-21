@@ -9,6 +9,15 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [ABIDES genuine 12-run multiscale и L2, отрицательная переносимость](
+  docs/ABIDES_MULTISCALE_PUBLIC_L2_20261121.md):
+  на seeds 2901–2903 **67** posthoc TWAP fills;
+  fixed-20s фон без target дал **0,0820**
+  доли на 45s сетке против **0,0302** у TWAP,
+  а legacy 10s baseline **3/3** ложно сработал
+  на fixed-noise и **3/3** пропустил TWAP.
+  Следующий этап — анализ harmonic aliasing и holdout #90.
+
 - [Независимый genuine ABIDES-NG тест переносимости](
   docs/GENUINE_ABIDES_FIXED_CLOCK_TRANSFER_20261121.md):
   заранее зафиксированный 10-секундный детектор дал
@@ -67,11 +76,11 @@
 следующий, а master issue #72 остаётся открытым.
 Текущий этап определяется **только** актуальным
 [checkpoint](research/autonomy_state.json), а не историческим
-списком выше. На момент обновления плана:
-[public-only ABIDES multiscale #89](
-https://github.com/IskanderAbdullin/Analytics/issues/89),
-предзарегистрированный design 2901–2903; исходных
-подтверждённых результатов этой новой матрицы ещё нет.
+списком выше. Пререгистрированный 12-run ABIDES multiscale
+эксперимент [#89](https://github.com/IskanderAbdullin/Analytics/issues/89)
+**успешно выполнен**, его **отрицательные результаты**
+подтверждены. Следующий этап — [#90](https://github.com/IskanderAbdullin/Analytics/issues/90):
+исследование ложных ритмов и независимый holdout.
 
 ## Постоянная исследовательская программа и автоматическое продолжение
 

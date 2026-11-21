@@ -2,10 +2,9 @@ name: Robot Detector genuine ABIDES multiscale L2 preregistered 12-case source
 # Frozen source protocol and seed reservation on preceding commits.
 # Exactly 3 fixed seeds x 4 genuine matching-engine background/target cohorts.
 # Original one-time source run: convert push trigger to workflow_dispatch after success.
+# Original 12 genuine ABIDES matching-engine source runs #44935340284 PASSED.
+# Subsequent source reruns require intentional workflow_dispatch only.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-abides-multiscale-l2-original.yml'
   workflow_dispatch:
 
 permissions:

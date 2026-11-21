@@ -87,7 +87,9 @@ class LivingResearchPlanContract(unittest.TestCase):
                 self.assertIn(clause.lower(),self.plan.lower())
         self.assertRegex(self.plan,r"\[ \] .+")
         self.assertIn("зарезервированные в локальном seed registry",self.plan.lower())
-        self.assertIn("исходные прогоны для него ещё не подтверждены",self.plan)
+        self.assertIn("original CI #44935340284",self.plan)
+        self.assertIn("ABIDES_MULTISCALE_PUBLIC_L2_20261121.md",self.plan)
+        self.assertIn("RD-SYNTHETIC-HOLDOUT-09",self.plan)
 
     def test_evidence_not_reported_as_true_physical_owner_detection(self):
         self.assertIn("real-market",self.plan)

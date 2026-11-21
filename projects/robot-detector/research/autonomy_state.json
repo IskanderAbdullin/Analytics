@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "5c661f266edcd1aac95b456b50bb17e82a7e4de2",
+  "last_verified_base_commit": "f289c5b9370b224c4e6be54150b6c2da08e81e42",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-ABIDES-MULTISCALE-08",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44935340284",
+      "result": "Original genuine ABIDES 12 matching engine runs on 2901-2903: public 45s fraction fixed-20s background 0.08201092 (no target) > injected TWAP 0.03022026; legacy 10s 3/3 fixed-cadence false alarms and 3/3 missed TWAP despite 67 posthoc controlled fills. 12568 public executed prints/21675 L2 snapshots; negative specificity confirmed.",
+      "status": "VERIFIED_GENUINE_ABIDES_NEGATIVE_SPECIFICITY_NOT_REAL_MARKET_FDR"
+    },
     {
       "stage_id": "RD-ABIDES-INDEPENDENT-07",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44928306325",
@@ -71,32 +77,32 @@
     }
   ],
   "current_stage": {
-    "id": "RD-ABIDES-MULTISCALE-08",
-    "status": "IN_PROGRESS",
-    "title": "Precommitted public-only multiscale clock/L2 features against periodic and momentum hard-negative background",
-    "why_next": "Frozen ten-second grid detector on six original genuine ABIDES runs produced 2/2 periodic-background false alarms and 2/2 misses despite 29 genuine TWAP fills. Must develop observable rather than owner-claiming features, then evaluate against a diverse independent source-free and source-controlled null study.",
+    "id": "RD-SYNTHETIC-HOLDOUT-09",
+    "status": "READY_TO_IMPLEMENT",
+    "title": "Prove periodic 20s vs 45s clock aliasing, then freeze independent background-conditioned synthetic ABIDES validation",
+    "why_next": "All 12 predeclared genuine ABIDES engine runs succeeded; fixed-20s hard negative has even greater 45s-grid fraction than injected TWAP. Need exact aliasing controls, not hindsight 45s threshold adjustment.",
     "inputs": [
-      "tools/abides_fixed_clock_transfer.py",
-      "tools/l2_trade_context.py",
-      "tools/lagged_l2_bin.py",
-      "docs/GENUINE_ABIDES_FIXED_CLOCK_TRANSFER_20261121.md",
+      "docs/ABIDES_MULTISCALE_PUBLIC_L2_20261121.md",
+      "fixtures/abides_multiscale_public_l2_observed_20261121.json",
+      "tools/abides_multiscale_public_l2.py",
       "research/seed_registry.json",
-      "research/abides_multiscale_public_l2_protocol_20261121.json"
+      "docs/MASTER_RESEARCH_PLAN.md"
     ],
     "deliverables": [
-      "Audited public-only predictor feature candidates without private agent identifiers",
-      "Precommit a multiscale cadence/L2/abstention research design before new simulations",
-      "Explicit background null families with fixed-cadence and momentum activity",
-      "Unchanged negative source evidence and held-out/seed provenance",
-      "Frozen 12-source-run 3-seed 4-cohort ABIDES protocol committed before source simulation; results not yet available"
+      "Independent mathematical synthetic demonstration that fixed-20s background can alias into a fixed 45s grid at the preregistered anchor",
+      "No source/oracle identity in public-only features",
+      "Precommitted independent background-conditioned hypothesis and actually unspent local seeds before new genuine engine simulation",
+      "Explicit hard-negative false positives, invalid-data abstention and limited synthetic truth labels",
+      "Checkpoint, own issue #90, updated living plan decision record and source-only tests"
     ],
     "acceptance": [
-      "No private synthetic agent/owner truth in feature path",
-      "No held-out tuning or false unspent seed claim",
-      "Negative results preserved with coverage and abstention rates",
-      "Cheap public CI, commit/push, checkpoint; main scientific goal remains open"
+      "All original 12 ABIDES outcomes preserved without retuning or filtering",
+      "Exact modular aliasing synthetic counterexample and tests pass",
+      "New validation protocol frozen before new independent ABIDES seed data",
+      "New source-needs complete separate original CI and no false global blind claim",
+      "Commit/push verified, next stage chosen; master issue #72 stays open"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/89"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/90"
   },
   "backlog": [
     {
@@ -136,6 +142,6 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "Created living MASTER_RESEARCH_PLAN.md from all verified sources and negative experiments, froze pre-run 12-case ABIDES multiscale source protocol for seeds 2901-2903, bound AGENTS.md and README/TZ to flexible research update governance. Current stage #89 is in progress, no new source runs verified. Next: implement source-only multiscale/L2 read-only aggregator with offline negative tests.",
+  "last_session_result": "Completed full living master plan/AGENTS adaptive governance and original RD-ABIDES-MULTISCALE-08 source runs CI #44935340284, 12/12 cases passed, 67 injected TWAP fills, strong 45s-grid fixed-cadence hard-negative confounding. Negative result pinned, expensive workflow manual-only, active RD-SYNTHETIC-HOLDOUT-09 issue #90 next. No real-market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }

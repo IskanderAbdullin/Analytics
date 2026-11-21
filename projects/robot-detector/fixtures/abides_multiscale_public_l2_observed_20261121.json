@@ -1,0 +1,296 @@
+{
+  "schema_version": "abides-multiscale-l2-original-observed-20261121-v1",
+  "original_research_run_id": 44935340284,
+  "original_compact_aggregate_artifact": 14719426242,
+  "source_protocol": "research/abides_multiscale_public_l2_protocol_20261121.json",
+  "original_abides_upstream_commit": "ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "genuine_pinned_simulator_engine": true,
+  "local_canonical_seeds": [
+    2901,
+    2902,
+    2903
+  ],
+  "original_independent_simulation_runs": 12,
+  "background_cohorts": [
+    "poisson_noise_null",
+    "fixed_20s_noise_hard_negative",
+    "momentum_noise_hard_negative"
+  ],
+  "positive_cohort": "twap_45s_positive",
+  "source_aggregate_executed_prints": 12568,
+  "source_aggregate_l2_snapshots": 21675,
+  "source_aggregate_posthoc_controlled_twap_fills": 67,
+  "original_case_descriptive_aggregates": [
+    {
+      "cohort": "poisson_noise_null",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.06818182,
+        "20": 0.03146853,
+        "45": 0.00786713,
+        "90": 0.00262238
+      },
+      "lagged_30": 14,
+      "lagged_60": 7,
+      "public_executions": 1144,
+      "public_l2_snapshot_events": 2001,
+      "real_owner_truth_known": false,
+      "seed": 2901
+    },
+    {
+      "cohort": "fixed_20s_noise_hard_negative",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.66099773,
+        "20": 0.65079365,
+        "45": 0.07256236,
+        "90": 0.07142857
+      },
+      "lagged_30": 9,
+      "lagged_60": 4,
+      "public_executions": 882,
+      "public_l2_snapshot_events": 1399,
+      "real_owner_truth_known": false,
+      "seed": 2901
+    },
+    {
+      "cohort": "momentum_noise_hard_negative",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.0613155,
+        "20": 0.03121516,
+        "45": 0.00668896,
+        "90": 0.00445931
+      },
+      "lagged_30": 11,
+      "lagged_60": 5,
+      "public_executions": 897,
+      "public_l2_snapshot_events": 1415,
+      "real_owner_truth_known": false,
+      "seed": 2901
+    },
+    {
+      "cohort": "twap_45s_positive",
+      "controlled_fills_posthoc": 22,
+      "grid_fractions": {
+        "10": 0.07862191,
+        "20": 0.03533569,
+        "45": 0.02738516,
+        "90": 0.01413428
+      },
+      "lagged_30": 13,
+      "lagged_60": 7,
+      "public_executions": 1132,
+      "public_l2_snapshot_events": 2232,
+      "real_owner_truth_known": false,
+      "seed": 2901
+    },
+    {
+      "cohort": "poisson_noise_null",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.05349048,
+        "20": 0.02810517,
+        "45": 0.01178604,
+        "90": 0.00634633
+      },
+      "lagged_30": 14,
+      "lagged_60": 7,
+      "public_executions": 1103,
+      "public_l2_snapshot_events": 1825,
+      "real_owner_truth_known": false,
+      "seed": 2902
+    },
+    {
+      "cohort": "fixed_20s_noise_hard_negative",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.72102161,
+        "20": 0.72102161,
+        "45": 0.08742633,
+        "90": 0.08644401
+      },
+      "lagged_30": 14,
+      "lagged_60": 7,
+      "public_executions": 1018,
+      "public_l2_snapshot_events": 1913,
+      "real_owner_truth_known": false,
+      "seed": 2902
+    },
+    {
+      "cohort": "momentum_noise_hard_negative",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.05009823,
+        "20": 0.02652259,
+        "45": 0.01178782,
+        "90": 0.00687623
+      },
+      "lagged_30": 14,
+      "lagged_60": 7,
+      "public_executions": 1018,
+      "public_l2_snapshot_events": 1802,
+      "real_owner_truth_known": false,
+      "seed": 2902
+    },
+    {
+      "cohort": "twap_45s_positive",
+      "controlled_fills_posthoc": 24,
+      "grid_fractions": {
+        "10": 0.06643047,
+        "20": 0.03631532,
+        "45": 0.03542958,
+        "90": 0.01948627
+      },
+      "lagged_30": 14,
+      "lagged_60": 7,
+      "public_executions": 1129,
+      "public_l2_snapshot_events": 2040,
+      "real_owner_truth_known": false,
+      "seed": 2902
+    },
+    {
+      "cohort": "poisson_noise_null",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.05165114,
+        "20": 0.0211685,
+        "45": 0.01100762,
+        "90": 0.00592718
+      },
+      "lagged_30": 15,
+      "lagged_60": 7,
+      "public_executions": 1181,
+      "public_l2_snapshot_events": 2029,
+      "real_owner_truth_known": false,
+      "seed": 2903
+    },
+    {
+      "cohort": "fixed_20s_noise_hard_negative",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.69464848,
+        "20": 0.68205666,
+        "45": 0.08604407,
+        "90": 0.0818468
+      },
+      "lagged_30": 12,
+      "lagged_60": 5,
+      "public_executions": 953,
+      "public_l2_snapshot_events": 1477,
+      "real_owner_truth_known": false,
+      "seed": 2903
+    },
+    {
+      "cohort": "momentum_noise_hard_negative",
+      "controlled_fills_posthoc": 0,
+      "grid_fractions": {
+        "10": 0.04719101,
+        "20": 0.02247191,
+        "45": 0.01123596,
+        "90": 0.00449438
+      },
+      "lagged_30": 10,
+      "lagged_60": 5,
+      "public_executions": 890,
+      "public_l2_snapshot_events": 1451,
+      "real_owner_truth_known": false,
+      "seed": 2903
+    },
+    {
+      "cohort": "twap_45s_positive",
+      "controlled_fills_posthoc": 21,
+      "grid_fractions": {
+        "10": 0.05487305,
+        "20": 0.02538903,
+        "45": 0.02784603,
+        "90": 0.01310401
+      },
+      "lagged_30": 14,
+      "lagged_60": 7,
+      "public_executions": 1221,
+      "public_l2_snapshot_events": 2091,
+      "real_owner_truth_known": false,
+      "seed": 2903
+    }
+  ],
+  "source_cohort_descriptive_aggregates": {
+    "poisson_noise_null": {
+      "cohort": "poisson_noise_null",
+      "descriptive_mean_fraction_by_period": {
+        "10": 0.05777448,
+        "20": 0.02691407,
+        "45": 0.01022026,
+        "90": 0.0049653
+      },
+      "independent_engine_runs": 3,
+      "original_10s_legacy_false_alarms_or_hits": 0,
+      "real_market_accuracy_established": false,
+      "total_abstained_trade_bins_30s": 5,
+      "total_abstained_trade_bins_60s": 3,
+      "total_executed_prints": 3428,
+      "total_l2_snapshots": 5855,
+      "total_posthoc_controlled_twap_fills": 0
+    },
+    "fixed_20s_noise_hard_negative": {
+      "cohort": "fixed_20s_noise_hard_negative",
+      "descriptive_mean_fraction_by_period": {
+        "10": 0.69222261,
+        "20": 0.68462397,
+        "45": 0.08201092,
+        "90": 0.07990646
+      },
+      "independent_engine_runs": 3,
+      "original_10s_legacy_false_alarms_or_hits": 3,
+      "real_market_accuracy_established": false,
+      "total_abstained_trade_bins_30s": 13,
+      "total_abstained_trade_bins_60s": 8,
+      "total_executed_prints": 2853,
+      "total_l2_snapshots": 4789,
+      "total_posthoc_controlled_twap_fills": 0
+    },
+    "momentum_noise_hard_negative": {
+      "cohort": "momentum_noise_hard_negative",
+      "descriptive_mean_fraction_by_period": {
+        "10": 0.05286825,
+        "20": 0.02673655,
+        "45": 0.00990425,
+        "90": 0.00527664
+      },
+      "independent_engine_runs": 3,
+      "original_10s_legacy_false_alarms_or_hits": 0,
+      "real_market_accuracy_established": false,
+      "total_abstained_trade_bins_30s": 13,
+      "total_abstained_trade_bins_60s": 7,
+      "total_executed_prints": 2805,
+      "total_l2_snapshots": 4668,
+      "total_posthoc_controlled_twap_fills": 0
+    },
+    "twap_45s_positive": {
+      "cohort": "twap_45s_positive",
+      "descriptive_mean_fraction_by_period": {
+        "10": 0.06664181,
+        "20": 0.03234668,
+        "45": 0.03022026,
+        "90": 0.01557485
+      },
+      "independent_engine_runs": 3,
+      "original_10s_legacy_false_alarms_or_hits": 0,
+      "real_market_accuracy_established": false,
+      "total_abstained_trade_bins_30s": 7,
+      "total_abstained_trade_bins_60s": 3,
+      "total_executed_prints": 3482,
+      "total_l2_snapshots": 6363,
+      "total_posthoc_controlled_twap_fills": 67
+    }
+  },
+  "legacy_10s_fixed_negative_false_alarms": 3,
+  "legacy_10s_twap_positive_misses": 3,
+  "fixed_noise_45sec_grid_fraction_exceeds_twap_fraction": true,
+  "hard_negative_confounding_preserved": true,
+  "oracle_owner_IDs_exported": false,
+  "real_market_FDR_or_owner_identity_calibrated": false,
+  "source_total_exchange_completeness_certified": false,
+  "source_results_were_not_used_to_fit_thresholds": true,
+  "no_original_simulator_raw_event_or_l2_tapes_uploaded": true
+}
