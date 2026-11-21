@@ -146,6 +146,34 @@ class RealTradeArchiveTests(unittest.TestCase):
         self.assertEqual([v["boundary_trades_excluded"] for v in phases],[0,3,3])
         self.assertEqual([v["eligible_nonempty_bins"] for v in phases],[3,1,1])
 
+    def test_real_source_decoder_preserves_phase_and_null_evidence(self):
+        raw,check=archive()
+        report=analyze_verified_zip(
+            raw,check,symbol=SYMBOL,day=DAY,
+            clock_origin_study=True,direction_null_study=True)
+        null=report["public_within_minute_weak_direction_null_v1"]
+        phase=report["clock_origin_descriptive_v1"]
+        self.assertEqual(null["source_event_count"],report["public_trade_count"])
+        self.assertEqual(null["clock_phases_seconds"],[0,10,20])
+        for value,original in zip(null["variants"],phase["variants"]):
+            self.assertEqual(value["origin_seconds"],original["origin_seconds"])
+            self.assertEqual(value["observed_one_sided_bins"],
+                             original["strictly_buy_one_sided_bins_or_sell_one_sided_bins"])
+            self.assertEqual(value["observed_prints_in_full_bins"],
+                             original["public_prints_in_full_bins"])
+            self.assertEqual(value["excluded_utc_edge_prints"],
+                             original["boundary_trades_excluded"])
+        self.assertFalse(null["physical_robot_identification_validated"])
+        self.assertFalse(null["commercial_or_live_trading_allowed"])
+        self.assertFalse(null["raw_print_timestamps_or_labels_exported"])
+
+    def test_rejects_nonboolean_null_flag(self):
+        raw,check=archive()
+        for value in (1,0,"yes",None):
+            with self.assertRaises(ValueError):
+                analyze_verified_zip(raw,check,symbol=SYMBOL,day=DAY,
+                                     direction_null_study=value)
+
     def test_rejects_nonboolean_phase_switch(self):
         raw,check=archive()
         for bad in (0,1,"yes",None):
