@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "d5b0c4b7-ed03-4919-87ca-d8a314f0f3af",
+    "occurred_at": "2026-11-21T15:13:06.296Z",
+    "type": "development",
+    "title": "Support explicitly scoped markout and PnL attribution in one offline audit command",
+    "summary": "Optional CLI mapping for state, log folder, instrument and day; partial identity arguments are rejected and failed add-on analysis is flagged in the overall quality gate.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Explicit epoch and markout selections added to coordinator without inferring robot identity."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_explicit_attribution.py",
+      "action": "added",
+      "summary": "Synthetic opt-in integration and partial-identity safety tests."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Document exact read-only invocation and mapping caveat."
+    }
+  ],
+  "checks": [
+    {
+      "id": "explicit-ci",
+      "title": "Cross-platform explicit identity synthetic tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending GitHub Actions."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "merge-reviewed",
+      "title": "Verify CI, open Analytics-only pull request and merge after green checks",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Identity is explicitly user-supplied but not historically proven.",
+    "No live trading or repository writes outside Analytics."
+  ]
+}
