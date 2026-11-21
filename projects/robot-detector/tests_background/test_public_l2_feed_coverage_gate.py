@@ -52,6 +52,15 @@ class L2CoverageAbstentionTests(unittest.TestCase):
         self.assertIsNone(r["source_sequence_coverage_fraction_if_oracle_attested"])
         self.assertFalse(r["unattested_real_source_completeness_declared"])
 
+    def test_known_range_extra_ids_never_claim_more_than_full_coverage(self):
+        r=analyze_coverage(
+            synthetic_frames(),
+            trusted_synthetic_expected_sequence_range=(200,202))
+        self.assertEqual(r["status"],"ABSTAIN_SOURCE_OR_BOOK_INTEGRITY")
+        self.assertIn("TRUSTED_SOURCE_BOUNDARY_MISMATCH",r["reason_codes"])
+        self.assertEqual(r["source_expected_total_events_if_oracle_attested"],3)
+        self.assertEqual(r["source_sequence_coverage_fraction_if_oracle_attested"],1)
+
     def test_missing_sequence_abstains_with_explicit_known_denominator(self):
         all_frames=synthetic_frames()
         partial=all_frames[:2]+all_frames[3:]

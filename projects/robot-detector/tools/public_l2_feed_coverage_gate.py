@@ -138,8 +138,11 @@ def analyze_coverage(
         "UNKNOWN_SOURCE_COMPLETENESS" if only_unobservable_sequence or not reasons else
         "ABSTAIN_SOURCE_OR_BOOK_INTEGRITY"
     )
-    coverage=(len(seen_sequences)/(expected[1]-expected[0]+1)
-              if expected is not None else None)
+    coverage=(
+        sum(expected[0]<=seq<=expected[1] for seq in seen_sequences) /
+        (expected[1]-expected[0]+1)
+        if expected is not None else None
+    )
     return {
         "schema_version":"public-l2-research-source-coverage-abstention-v1",
         "status":state,
