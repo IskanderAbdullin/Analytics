@@ -45,6 +45,23 @@ python tools/l2_trade_context.py --seed 1501 \
 
 The separate [L2 feasibility workflow](../../.github/workflows/robot-detector-l2-feasibility.yml) installs the pinned ABIDES source, runs the actual exchange matching engine, checks count/lot conservation and public attribution isolation, and uploads a 14-day **aggregate-only** artifact. Raw L2 tapes, execution-level records and private simulator truth are intentionally never committed nor published.
 
+## Genuine ABIDES result — strict timing abstains (2026-11-21)
+
+The isolated [successful simulated L2 CI #44895496910](https://github.com/IskanderAbdullin/Analytics/actions/runs/44895496910) ran **nine** public-only unit tests (including the earlier book-schema tests) and actual matching-engine simulations for an agent-free background, POV and VWAP, using a new exploratory seed **1501**.
+
+| Synthetic case | Public L2 updates | Public executed fills | Fills exactly matching an L2 update timestamp | Strictly prior quote eligible |
+|---|---:|---:|---:|---:|
+| Agent-free background | 1,443 | 917 | **917** | **0** |
+| POV execution agent | 1,266 | 797 | **797** | **0** |
+| VWAP execution agent | 1,440 | 916 | **916** | **0** |
+| **Total** | **4,149** | **2,630** | **2,630** | **0** |
+
+The 2,630 prints were **all abstentions** (`same_timestamp_ambiguous`), not negative algorithm classifications. The source book logs also contained additional snapshots sharing a timestamp: 501 for background, 443 for POV and 496 for VWAP (1,440 additional same-time events across runs). In this ABIDES output the public L2 and trade timestamps alone **cannot** establish whether a book update precedes or follows a same-time fill. Thus `descriptive_prior_quote_alignment_fraction` is **null** in all three scenarios, as is the rotated-placebo fraction.
+
+**Important negative outcome:** A strict as-of same-event public quote/print classifier cannot be validated from these timestamps in these ABIDES outputs. Loosening strict inequality or picking a same-time quote by row position would fabricate source event ordering. This is an identifiability/data-quality problem, not evidence that VWAP/POV are absent or that a model performs badly on accurately joined prints.
+
+The next protocol should instead study *previous completed clock-bin* public book state as a lagged exposure for subsequent **whole-bin** public execution outcomes. Such a relationship is descriptive and could arise under market-wide shocks; it still cannot identify a parent order or individual robot. Seed 1501 is now **spent**, and its label is not eligible for new holdout claims.
+
 ## Next genuine scientific gate
 
 Any stronger inference needs **public book and trade clocks with verified sequencing/coverage**, a model specified before evaluation and multiple source-conditional nulls preserving realistic market-book/execution constraints (market-wide shocks, timestamps, missing quotes, correlated volume, heterogeneous producers). A price/side rotation is **not** one of those strong nulls. Only after development on new seeds should a **new** seed cohort be frozen and tested blind, then independent real market sessions if obtainable.
