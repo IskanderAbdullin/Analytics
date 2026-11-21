@@ -29,7 +29,9 @@ class ResearchSeedLedgerTests(unittest.TestCase):
         r = audit_sources(self.registry, ROOT)
         self.assertGreaterEqual(r["canonical_studies"], 11)
         self.assertGreaterEqual(r["canonical_spent_seeds"], 25)
-        self.assertEqual(len(r["source_constant_checks"]), 6)
+        expected_checked=sum("source_file" in study
+                             for study in self.registry["studies"])
+        self.assertEqual(len(r["source_constant_checks"]), expected_checked)
         self.assertEqual(r["non_independent_replay_groups"], 1)
         self.assertFalse(r["globally_unused_seeds_verified"])
         self.assertFalse(r["blind_evaluation_reuse_allowed"])
@@ -37,7 +39,7 @@ class ResearchSeedLedgerTests(unittest.TestCase):
 
     def test_all_prior_development_and_toy_seeds_are_blocked_for_blind_claim(self):
         for seed in (41, 61, 71, 901, 1101, 1301, 1401, 1501,
-                     1701, 1801, 1901, 2101, 2401):
+                     1701, 1801, 1901, 2101, 2401, 2601, 2701):
             with self.subTest(seed=seed):
                 r = assess_proposed_seeds(self.registry, [seed])
                 self.assertTrue(r["known_spent_overlap"])
