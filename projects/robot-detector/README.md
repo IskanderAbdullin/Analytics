@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Strict public market scalar integrity (timestamps, prices, lots)
+
+The L2 and anonymous execution pipeline now validates discrete exchange timestamp, price and quantity fields with a lossless integer-only `__index__` check rather than `int(...)`, which previously could silently truncate fractional inputs. Noninteger floats (even `100.0`), booleans, decimal/string masquerades and nonpositive sizes/prices are rejected before any model statistic is calculated. Valid integer-only ABIDES fixtures retain the same results.
+
+[Exact source type rules, test cases and limitations](docs/L2_PUBLIC_NUMERIC_INTEGRITY.md). No real source attestation or trading permission is inferred.
+
 ## Independent L2-book and trade-feed coverage claims (read-only)
 
 Added a conservative optional **two-stream metadata gate**: the previous completed L2 clock bin and the next observed trade bin must each be covered by their own **caller-declared** feed time range, with explicit non-overlapping missing-data intervals. Declared instrument, venue and session must match across book and trade metadata; absent or mismatched coverage causes a recorded abstention rather than filling gaps. A raw ABIDES book/trade tuple **cannot verify the caller's provider identity or coverage claim**, so the output continues to explicitly report real-market completeness as **unverified**.

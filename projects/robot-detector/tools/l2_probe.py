@@ -13,12 +13,14 @@ from pathlib import Path
 from typing import Any
 
 from abides_export import UPSTREAM_COMMIT
+from public_numeric import exact_nonnegative_integer as exact_int
 
 
 def audit_l2_public(snapshots: Any, *, max_depth: int) -> dict:
-    if snapshots is None or max_depth < 1:
-        raise ValueError("No L2 capture or invalid bounded book depth")
-    times = [int(x) for x in snapshots.times_ns]
+    max_depth = exact_int(max_depth, "max_depth", positive=True)
+    if snapshots is None:
+        raise ValueError("No L2 capture")
+    times = [exact_int(x, "book time ns") for x in snapshots.times_ns]
     if not times or len(times) != len(snapshots.bids) or len(times) != len(snapshots.asks):
         raise ValueError("Empty, truncated, or mismatched L2 time arrays")
     if any(t < 0 for t in times) or any(b < a for a, b in zip(times, times[1:])):
@@ -34,9 +36,8 @@ def audit_l2_public(snapshots: Any, *, max_depth: int) -> dict:
         for levels, side in ((bids, "bid"), (asks, "ask")):
             prev_price = None
             for price, qty in levels:
-                price, qty = int(price), int(qty)
-                if price <= 0 or qty <= 0:
-                    raise ValueError("Nonpositive price or size in supposedly resting book level")
+                price = exact_int(price, "book price", positive=True)
+                qty = exact_int(qty, "book quantity", positive=True)
                 if prev_price is not None:
                     if side == "bid" and price > prev_price:
                         raise ValueError("Bid levels not in best-to-worst order")

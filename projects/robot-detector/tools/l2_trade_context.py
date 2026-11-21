@@ -18,6 +18,7 @@ from typing import Any, Iterable
 
 from abides_export import UPSTREAM_COMMIT
 from l2_probe import audit_l2_public
+from public_numeric import exact_nonnegative_integer as exact_int
 
 MAX_SNAPSHOTS = 250_000
 MAX_FILLS = 200_000
@@ -42,7 +43,9 @@ def public_projection(raw_fills: Iterable[Any]) -> tuple[PublicExecution, ...]:
         if passive not in ("BUY", "SELL"):
             raise ValueError("ABIDES side convention unknown")
         result.append(PublicExecution(
-            int(trade.time_ns), int(trade.price_cents), int(trade.quantity),
+            exact_int(trade.time_ns, "fill time ns"),
+            exact_int(trade.price_cents, "fill price", positive=True),
+            exact_int(trade.quantity, "fill lots", positive=True),
             "SELL" if passive == "BUY" else "BUY"))
         if len(result) > MAX_FILLS:
             raise ValueError("Excessive public fill count")
@@ -75,21 +78,23 @@ def audit_public_join(snapshots: Any,
     Trades at any snapshot's exact timestamp are abstentions, never assigned
     a within-timestamp order. No future snapshot can affect an earlier fill.
     """
-    if not 0 < max_age_ns <= 60_000_000_000:
+    max_age_ns = exact_int(max_age_ns, "max quote age ns", positive=True)
+    if max_age_ns > 60_000_000_000:
         raise ValueError("Maximum quote age must be 1 ns to 60 s")
     if snapshots is None or len(snapshots.times_ns) > MAX_SNAPSHOTS:
         raise ValueError("Missing or oversized public quote tape")
     quote_quality = audit_l2_public(snapshots, max_depth=max_depth)
-    times = tuple(int(x) for x in snapshots.times_ns)
+    times = tuple(exact_int(x, "book time ns") for x in snapshots.times_ns)
     equal_times = set(times)
     public_trades = list(trades)
     if len(public_trades) > MAX_FILLS:
         raise ValueError("Excessive public fill count")
     for fill in public_trades:
-        if (fill.time_ns < 0 or fill.price_cents <= 0 or
-            fill.quantity <= 0 or
-            fill.reported_aggressor_side not in ("BUY", "SELL")):
-            raise ValueError("Invalid anonymous public fill")
+        exact_int(fill.time_ns, "public fill time")
+        exact_int(fill.price_cents, "public fill price", positive=True)
+        exact_int(fill.quantity, "public fill lots", positive=True)
+        if fill.reported_aggressor_side not in ("BUY", "SELL"):
+            raise ValueError("Invalid anonymous public fill side")
     counts = Counter()
     lots = Counter()
     for fill in public_trades:

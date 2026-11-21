@@ -235,3 +235,8 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 - Seven no-simulator tests and cheap independent Python CI include mismatch/boundary/gap rejection, source pair conservation and prior watermark regression. Full contract: [L2_DUAL_STREAM_COVERAGE.md](L2_DUAL_STREAM_COVERAGE.md). Stage-2 physical ownership/market-statistics/live-trading release remains CLOSED.
 
 - **Executed optional two-stream public coverage gate:** [success CI #44911006336](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911006336), **7 new feed-integrity tests + 6 watermark regression tests**, and [successful pinned genuine ABIDES L2 CI #44911006251](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911006251). Caller-supplied coverage claims cannot prove raw provider completeness; no trader identities, trading or real-market FDR released.
+
+## 2026-11-21 — strict public timestamp/price/lot integer validation
+
+- Corrected potentially lossy integer coercion in the public L2 snapshot, public execution projection/join and lagged L2 analysis paths: new `public_numeric.exact_nonnegative_integer` uses the standard `operator.index` protocol and refuses fractional/numerically-integral floats, booleans, decimal/text strings and invalid negative/zero exchange values. Existing valid int fixtures retain identical behavior.
+- Added eight no-ABIDES tests in `tests_l2/test_public_numeric.py`, covered by the existing L2 CI; no additional expensive ABIDES workflow is needed. Documentation: [L2_PUBLIC_NUMERIC_INTEGRITY.md](L2_PUBLIC_NUMERIC_INTEGRITY.md). This fixes one class of source-data distortion, not feed completeness, exchange causal ordering, physical bot identity or real-market FDR.
