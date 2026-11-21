@@ -1,0 +1,43 @@
+{
+  "schema_version": "public-clock-cluster-size-permutation-exact-precommit-v1",
+  "frozen_date_utc": "2026-11-21",
+  "scientific_stage": "RD-CONDITIONAL-NULL-12",
+  "source_type": "constructed toy only, no source market vendor or ABIDES raw tape",
+  "previous_source_free_control_run": 44937958809,
+  "source_public_model": "13 unique timestamp clusters; exactly one cluster size 100, twelve size 1",
+  "source_grid_clock_anchor_exchange_local_seconds_after_midnight": 34260,
+  "fixed_grid_periods_seconds": [
+    20,
+    45
+  ],
+  "tolerance_ns": 250000000,
+  "ratio_threshold": 0.6,
+  "conditional_null_hypothesis": "the identity of the 100-fill cluster timestamp is exchangeable across the exact 13 observed timestamps under a restrictive toy model",
+  "exhaustive_permutation_count": 13,
+  "cluster_cardinality_multiset": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    100
+  ],
+  "timestamp_support_unchanged": true,
+  "total_public_fill_count_unchanged": true,
+  "trade_direction_volume_price_distribution_not_conditioned_on": true,
+  "unique_timestamp_cluster_weighting_produces_one_invariant_score": true,
+  "all_13_placements_required_even_if_non_alarm": true,
+  "no_random_seeds_or_sampling_required": true,
+  "no_best_grid_phase_or_threshold_selection": true,
+  "event_parent_owner_identity_unidentifiable": true,
+  "two_source_clock_time_lattices_are_not_market_conditional_null_proof": true,
+  "tail_frequency_is_toy_conditional_not_market_p_value_or_FDR": true,
+  "raw_source_event_timestamps_or_owner_IDs_not_exported": true
+}
