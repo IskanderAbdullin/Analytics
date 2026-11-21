@@ -22,6 +22,20 @@ Fixed UTC bins of `bin_seconds=30` are computed in simulator nanoseconds. For a 
 
 This is a **retrospective exposure/outcome association**. It does not tell which participant initiated the print, whether displayed book imbalance caused the trade, or whether a hidden parent order existed.
 
+## Genuine ABIDES output — public-only exploratory evidence
+
+The [successful isolated L2 CI #44895877902](https://github.com/IskanderAbdullin/Analytics/actions/runs/44895877902) ran **15 pure-Python integrity tests**, including the six new lagged-window checks, followed by actual exchange simulations for each public null/POV/VWAP mode using the already **spent development seed 1501** and unchanged 30-second bins.
+
+| Simulated market mode | Current-bin observations with valid previous-bin L2 | Spearman(previous depth-five imbalance, next reported BUY fraction) | Rotated-bin placebo Spearman |
+|---|---:|---:|---:|
+| Agent-free background | **13** | **−0.341** | 0.159 |
+| POV | **10** | **0.152** | 0.115 |
+| VWAP | **13** | **0.104** | 0.247 |
+
+The original exact-timestamp per-fill join still **abstained on every executed print**: 917/917 background, 797/797 POV and 916/916 VWAP. However, the separate previous-*completed*-bin approach did yield **10–13** chronological public quote/flow pairs per mode. This validates the **data extraction and timing method**, not the usefulness of the correlation as an execution identifier.
+
+The small observed correlations **do not reliably discriminate** the controlled execution modes from the agent-free simulated background. Note the rotated-bin control is not a market-conditional valid null or a calibrated significance test. The sample is small, the three simulator economies are not exact causal counterfactuals, and `rho` is not TP/FP/FN for a private parent order. **Do not select a correlation threshold from these now-spent observations.**
+
 ## Controls and limitations
 
 - The existing true **agent-free background** simulated market, plus separate POV/VWAP synthetic controlled-execution runs, are included as exploratory contrasts. A high correlation in background means the feature is not discriminative.

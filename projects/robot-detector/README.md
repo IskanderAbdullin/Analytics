@@ -7,7 +7,7 @@
 
 The new **read-only** `tools/lagged_l2_bin.py` describes depth-five order-book imbalance in an **entirely completed previous 30-second bin** versus BUY share in the **next completed** bin of anonymous executed prints. It avoids the intra-timestamp sequencing impossibility seen in the strict per-fill join (all 2,630 prints were ambiguous) and explicitly abstains if the prior clock bin has no valid fresh two-sided book. Five or more eligible observations with changing ranks are needed to report a *descriptive*, ties-aware Spearman correlation; otherwise the coefficient is undefined. It **cannot** identify VWAP/POV agents, infer queue position or supply a calibrated market FDR. The public-bin outcome is retrospective, not a forecast available at bin open.
 
-[Method and strict limits](docs/L2_LAGGED_BIN.md). No real broker L2 archive or user order account is accessed.
+[Method, genuine ABIDES evidence and strict limits](docs/L2_LAGGED_BIN.md). [CI #44895877902](https://github.com/IskanderAbdullin/Analytics/actions/runs/44895877902) passed 15 public-only tests and yielded 13 valid lagged bins in the agent-free background, 10 in POV and 13 in VWAP. Their descriptive Spearman coefficients were **−0.341 / 0.152 / 0.104**, respectively: **not an independently validated VWAP/POV discriminator**. No real broker L2 archive or user order account is accessed.
 
 ## Public executed-print / prior L2 context — experimental, no attribution
 
