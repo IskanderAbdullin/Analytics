@@ -1,7 +1,19 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
-**Версия проекта:** 0.2 (исследовательская) · **Обновлено:** 2026-11-19 · **Статус:** исторический прототип с подтверждённым импортом 121 920 реальных обезличенных сделок SBER (17.11.2026); статистическая точность распознавания не установлена.
+**Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 128 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
+
+## Public-only lagged volume response — experimental Stage 2
+
+The new **read-only** `volume-response` command examines whether reported BUY/SELL volume in bin `t` is associated with observable market volume in the **preceding completed** UTC clock bin `t-1`. It does not access ABIDES private labels or identify VWAP/POV orders or their owners. Missing populated bins break the lag; uniform side volume yields an undefined (null) rank correlation; source/session/data-kind boundaries are isolated.
+
+```powershell
+dotnet run --project src/RobotDetector.Cli -- volume-response `
+  --input fixtures/synthetic_variable_clip_5s.csv `
+  --bin-seconds 5 --min-pairs 8 --output data/results/volume-response.json
+```
+
+[Method, safety, scientific references and reproducibility](docs/VOLUME_RESPONSE_PUBLIC.md). [Full ABIDES simulation validation #44892179775](https://github.com/IskanderAbdullin/Analytics/actions/runs/44892179775) ran a separate nine-case public-only survey: median lagged rho for BUY/SELL **null 0.510/0.548, POV 0.538/0.501, VWAP 0.511/0.596**. These overlapping correlations, and a stronger single null than TWAP development case, demonstrate that this public volume feature **does not discriminate identified agents** in the observed toy exchange cases. Existing fixed-q and variable-q detectors are unchanged; no VWAP/POV bot flag was invented. The feature does not establish predictive edge or significance.
 
 ## Genuine ABIDES-NG exchange execution — blind validation
 

@@ -121,6 +121,69 @@ jobs:
               print("ABIDES_ALT_EXECUTION",json.dumps({"mode":kind,"public_prints":report["publicPrints"],
                    "controlled_prints":controlled,"models":report["models"]}))
           PY
+      - name: Public-only volume-response diagnostics on spent development seeds
+        run: |
+          # Only pre-existing development seeds 41/42/43/44. Do not fit thresholds
+          # or inspect the frozen 901..904 private truth for model selection.
+          for kind in twap null vwap pov; do
+            case "$kind" in
+              twap) public=/tmp/abides_twap_public.csv ;;
+              null) public=/tmp/abides_null_public.csv ;;
+              vwap) public=/tmp/abides_vwap.csv ;;
+              pov) public=/tmp/abides_pov.csv ;;
+            esac
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- volume-response \
+              --input "$public" --bin-seconds 30 --min-pairs 8 \
+              --output "/tmp/abides_public_volume_${kind}.json"
+          done
+          python3 - <<'PY'
+          import json,math
+          for kind in ('twap','null','vwap','pov'):
+              r=json.load(open(f'/tmp/abides_public_volume_{kind}.json',encoding='utf-8'))
+              assert r['inputPublicPrints']>0 and r['evaluatedSourceGroups']>0,r
+              assert r['skippedDenseGroups']==0,r
+              assert not r['physicalBotCountKnown'] and not r['statisticalSignificanceEstablished'],r
+              assert r['sourceCoverageVerified'] is False,r
+              assert len(r['sideProfiles'])==2*r['evaluatedSourceGroups'],r
+              assert all(not v['ownerIdentityKnown'] and not v['significanceCalibrated']
+                         for v in r['sideProfiles']),r
+              assert all(o['previousTotalMarketLots']>0 and o['currentTotalMarketLots']>0
+                         for o in r['observations']),r
+              assert all(v['spearmanPreviousMarketLotsToCurrentSideLots'] is None or
+                         -1.000001<=v['spearmanPreviousMarketLotsToCurrentSideLots']<=1.000001
+                         for v in r['sideProfiles']),r
+              # Public-only associations are descriptive, not synthetic-actor scores.
+              print('ABIDES_PUBLIC_VOLUME_DEV',json.dumps({
+                  'kind':kind,'public':r['inputPublicPrints'],
+                  'adjacent_observations':len(r['observations']),
+                  'side_associations':[
+                      {'direction':v['reportedDirection'],
+                       'rho_lag':v['spearmanPreviousMarketLotsToCurrentSideLots'],
+                       'pairs':v['eligibleAdjacentPairs']}
+                      for v in r['sideProfiles']]
+              }))
+          PY
+      - name: Separate development-seed public-only volume null survey
+        run: |
+          # Fresh development seeds, not the spent frozen 901..904 evaluation set.
+          # No private execution truth is passed to or read by this descriptor.
+          python tools/volume_response_dev_survey.py --dev-seeds 61 62 63 \
+            --cli-dll src/RobotDetector.Cli/bin/Release/net10.0/RobotDetector.Cli.dll \
+            --output /tmp/abides-public-volume-dev-survey.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides-public-volume-dev-survey.json',encoding='utf-8'))
+          assert r['development_seeds']==[61,62,63],r
+          assert r['case_count']==9 and len(r['public_summary'])==6,r
+          assert r['private_truth_exported'] is False,r
+          assert r['candidate_model_fitted'] is False,r
+          assert r['bot_owner_identity_known'] is False,r
+          assert r['real_market_specificity_known'] is False,r
+          for row in r['public_summary']:
+              assert row['simulated_runs']==3,row
+              assert not row['owner_identity_known'] and not row['significance_calibrated'],row
+              assert row['mode'] in ('null','pov','vwap'),row
+          PY
       - name: Frozen-seed cross-run blinded replication
         run: |
           python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
@@ -142,6 +205,13 @@ jobs:
               if row["mode"]=="null":
                   assert row["controlled_prints"]==0 and row["micro_event_recall"] is None,row
           PY
+      - name: Upload public-only development volume summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-volume-development
+          path: /tmp/abides-public-volume-dev-survey.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Upload aggregate blinded scores only (no private truth)
         uses: actions/upload-artifact@v4
         with:

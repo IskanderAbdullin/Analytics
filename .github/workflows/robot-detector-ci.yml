@@ -153,6 +153,49 @@ jobs:
           assert w["nearWholeSecondPrints"] == 12, w
           assert not r["actualBotCountKnown"] and not r["statisticalSignificanceEstablished"], r
           PY
+      - name: Public-only previous-bin volume response and source isolation smoke
+        run: |
+          python3 - <<'PY'
+          import csv,datetime
+          from pathlib import Path
+          base=datetime.datetime(2026,11,19,7,0,tzinfo=datetime.timezone.utc)
+          fields=['TRADE_TS','INSTRUMENT_UID','DIRECTION','PRICE','QUANTITY',
+                  'TRADE_SOURCE','EVENT_ID','TICKER','TRADING_MODE','SESSION_ID','DATA_KIND']
+          with Path('/tmp/volume-response-dev.csv').open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields)
+              w.writeheader()
+              for i in range(12):
+                  ts=(base+datetime.timedelta(seconds=30*i)).isoformat().replace('+00:00','Z')
+                  for side,quantity in [('BUY',40*i),('SELL',(i+1)*100-40*i)]:
+                      if quantity<=0: continue
+                      w.writerow(dict(TRADE_TS=ts,INSTRUMENT_UID='VOLUME-DEV',
+                         DIRECTION=side,PRICE='100.00',QUANTITY=quantity,
+                         TRADE_SOURCE='EXCHANGE',EVENT_ID=f'{side}-{i}',
+                         TICKER='DEV',TRADING_MODE='SIM',SESSION_ID='DEV-S1',
+                         DATA_KIND='SYNTHETIC'))
+          PY
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- volume-response \
+            --input /tmp/volume-response-dev.csv --bin-seconds 30 --min-pairs 8 \
+            --output /tmp/volume-response-dev.json
+          python3 - <<'PY'
+          import json, math
+          r=json.load(open('/tmp/volume-response-dev.json',encoding='utf-8'))
+          assert r['inputPublicPrints']==23 and len(r['sideProfiles'])==2, r
+          assert len(r['observations'])==11, r
+          assert not r['physicalBotCountKnown'] and not r['statisticalSignificanceEstablished'], r
+          buy=next(p for p in r['sideProfiles'] if p['reportedDirection']=='BUY')
+          assert buy['publicPrintsForSide']==11 and buy['observedLotsForSide']==2640, buy
+          assert buy['eligibleAdjacentPairs']==11 and buy['unobservedClockTransitions']==0, buy
+          assert math.isclose(buy['spearmanPreviousMarketLotsToCurrentSideLots'],1.0), buy
+          assert math.isclose(buy['medianCurrentSideLotsOverPreviousMarketLots'],0.4), buy
+          assert not buy['ownerIdentityKnown'] and not buy['significanceCalibrated'], buy
+          assert all(o['previousTotalMarketLots']>0 and 'agent' not in str(o).lower() for o in r['observations']), r
+          print('VOLUME_RESPONSE_DEV_PUBLIC_ONLY',json.dumps({
+              'groups':r['evaluatedSourceGroups'],'observations':len(r['observations']),
+              'rho':buy['spearmanPreviousMarketLotsToCurrentSideLots'],
+              'calibrated':r['statisticalSignificanceEstablished']
+          }))
+          PY
       - name: Simple history-only activity burst smoke
         run: |
           dotnet run --project src/RobotDetector.Cli -c Release --no-build -- activity-episodes \
