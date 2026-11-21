@@ -68,6 +68,7 @@ def validate_state(s: dict) -> dict:
         "branch": BRANCH,
         "master_issue": MASTER_ISSUE,
         "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
+        "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
     }
     for key, value in expected.items():
         if s.get(key) != value:
@@ -141,6 +142,15 @@ def validate_state(s: dict) -> dict:
         raise ValueError("All current tasks done but future step not selected")
     if not TZ.is_file():
         raise ValueError("Operational research TZ missing from repository")
+    master_plan=ROOT / s["master_research_plan"]
+    if not master_plan.is_file():
+        raise ValueError("Living scientific master plan missing from repository")
+    plan_text=master_plan.read_text(encoding="utf-8")
+    if (s["current_stage"]["id"] not in plan_text
+            or "Что уже выполнено" not in plan_text
+            or "Что предстоит" not in plan_text
+            or "Как самостоятельно пересматривать" not in plan_text):
+        raise ValueError("Live master plan lacks current stage, evidence or adaptive rules")
     return {
         "status": s["status"],
         "current_stage_id": active["id"],

@@ -4,6 +4,7 @@
 **Область:** только projects/robot-detector в открытом репозитории IskanderAbdullin/Analytics  
 **Постоянный контроль конечной цели:** https://github.com/IskanderAbdullin/Analytics/issues/72  
 **Актуальное машинно-читаемое состояние:** research/autonomy_state.json  
+**Адаптивная карта всей науки и этапов:** [MASTER_RESEARCH_PLAN.md](MASTER_RESEARCH_PLAN.md)  
 **Исполнитель:** любой следующий агент, получивший доступ к репозиторию и данному ТЗ.
 
 ## 1. Конечная цель, а не очередная задача
