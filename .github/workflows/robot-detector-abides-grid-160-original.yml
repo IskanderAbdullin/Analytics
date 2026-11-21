@@ -3,11 +3,6 @@ name: Robot Detector original 160 ABIDES source-only frozen grid replication
 # After a successful run, remove push trigger and keep only workflow_dispatch.
 # No raw public trades, L2 rows, or private agent IDs in artifacts.
 on:
-  push:
-    branches:
-      - agent/robot-detector-l2-binphase-20261121
-    paths:
-      - .github/workflows/robot-detector-abides-grid-160-original.yml
   workflow_dispatch:
 
 permissions:
