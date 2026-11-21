@@ -106,12 +106,13 @@ def simulate(seed: int, *, mode: str = "twap") -> tuple[bytes, dict[str, Any]]:
     """Use the genuine ABIDES-NG exchange/limit-book matching pipeline."""
     from abides_markets.config_system import SimulationBuilder
     from abides_markets.config_system.agent_configs import (
-        NoiseAgentConfig, TWAPExecutionAgentConfig,
+        NoiseAgentConfig, POVExecutionAgentConfig,
+        TWAPExecutionAgentConfig, VWAPExecutionAgentConfig,
     )
     from abides_markets.simulation import ResultProfile, run_simulation
 
-    if mode not in ("twap", "null"):
-        raise ValueError("mode must be twap or null")
+    if mode not in ("twap", "vwap", "pov", "null"):
+        raise ValueError("mode must be twap, vwap, pov or null")
     ticker = "ABM"
     builder = (
         SimulationBuilder().apply_template("liquid_market")
@@ -121,13 +122,21 @@ def simulate(seed: int, *, mode: str = "twap") -> tuple[bytes, dict[str, Any]]:
                              noise_mkt_close_time="10:00:00"), count=60
         ).seed(seed)
     )
+    execution_window = dict(
+        start_time_offset="00:01:00", end_time_offset="00:01:00",
+        freq="45s", direction="BID", quantity=1_200, trade=True,
+    )
     if mode == "twap":
         builder = builder.enable_agent(
-            TWAPExecutionAgentConfig(
-                start_time_offset="00:01:00", end_time_offset="00:01:00",
-                freq="45s", direction="BID", quantity=1_200,
-                order_style="market", trade=True,
-            ), count=1
+            TWAPExecutionAgentConfig(**execution_window, order_style="market"), count=1
+        )
+    elif mode == "vwap":
+        builder = builder.enable_agent(
+            VWAPExecutionAgentConfig(**execution_window, order_style="market"), count=1
+        )
+    elif mode == "pov":
+        builder = builder.enable_agent(
+            POVExecutionAgentConfig(**execution_window, pov=0.25), count=1
         )
     # Trade attribution is sufficient: no raw agent logs, no account data.
     result = run_simulation(builder.build(),
@@ -135,11 +144,12 @@ def simulate(seed: int, *, mode: str = "twap") -> tuple[bytes, dict[str, Any]]:
     market = result.markets[ticker]
     if market.trades is None:
         raise RuntimeError("ABIDES did not expose complete trade attribution")
+    expected_prefix = mode.upper() + "_EXECUTION_AGENT_"
     controlled = sorted(
         int(agent.agent_id) for agent in result.agents
-        if str(agent.agent_name).startswith("TWAP_EXECUTION_AGENT_")
+        if str(agent.agent_name).startswith(expected_prefix)
     )
-    if (mode == "twap" and len(controlled) != 1) or (mode == "null" and controlled):
+    if (mode != "null" and len(controlled) != 1) or (mode == "null" and controlled):
         raise RuntimeError("Controlled agent identity is ambiguous")
     output, private = project_executions(
         list(market.trades), seed=seed, ticker=ticker,
@@ -149,12 +159,12 @@ def simulate(seed: int, *, mode: str = "twap") -> tuple[bytes, dict[str, Any]]:
         raise RuntimeError("No ABIDES matching-engine executions: cannot validate")
     # A controlled agent must actually execute: missing fills are a failed
     # experimental scenario, NOT proof that the detector missed a robot.
-    if mode == "twap" and not any(
+    if mode != "null" and not any(
         e["passive_agent_id"] in controlled or
         e["aggressive_agent_id"] in controlled
         for e in private["events"]
     ):
-        raise RuntimeError("Controlled TWAP had zero matched fills")
+        raise RuntimeError(f"Controlled {mode} had zero matched fills")
     return output, private
 
 
@@ -167,7 +177,7 @@ def _create_once(path: Path, contents: bytes) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seed", type=int, default=41)
-    parser.add_argument("--mode", choices=("twap", "null"), default="twap")
+    parser.add_argument("--mode", choices=("twap", "vwap", "pov", "null"), default="twap")
     parser.add_argument("--public", type=Path, required=True)
     parser.add_argument("--truth", type=Path, required=True)
     args = parser.parse_args()

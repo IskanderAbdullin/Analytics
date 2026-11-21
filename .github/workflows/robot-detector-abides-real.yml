@@ -90,6 +90,37 @@ jobs:
                   'models':report['models'],'upstream':private['simulator_revision']
               }))
           PY
+      - name: Real VWAP and POV execution-agent projection cross-check
+        run: |
+          python tools/abides_export.py --mode vwap --seed 43 \
+            --public /tmp/abides_vwap.csv --truth /tmp/abides_vwap_private.json
+          python tools/abides_export.py --mode pov --seed 44 \
+            --public /tmp/abides_pov.csv --truth /tmp/abides_pov_private.json
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- benchmark-abides-blind \
+            --public /tmp/abides_vwap.csv --truth /tmp/abides_vwap_private.json \
+            --output /tmp/abides_vwap_report.json
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- benchmark-abides-blind \
+            --public /tmp/abides_pov.csv --truth /tmp/abides_pov_private.json \
+            --output /tmp/abides_pov_report.json
+          python3 - <<'PY'
+          import json
+          for kind in ("vwap","pov"):
+              truth=json.load(open(f"/tmp/abides_{kind}_private.json", encoding="utf-8"))
+              report=json.load(open(f"/tmp/abides_{kind}_report.json", encoding="utf-8"))
+              control=set(truth["controlled_agent_ids"])
+              controlled=sum(e["passive_agent_id"] in control or e["aggressive_agent_id"] in control
+                             for e in truth["events"])
+              assert len(control)==1 and controlled>0,(kind,control,controlled)
+              assert report["publicPrints"] == len(truth["events"])
+              assert report["controlledPrints"]==controlled
+              assert not report["physicalOwnerIdentityKnown"]
+              assert not report["realMarketAccuracyCalibrated"]
+              for model in report["models"]:
+                  assert model["truePositivePrints"]+model["falsePositivePrints"]==model["attributedPublicPrints"]
+                  assert model["truePositivePrints"]+model["missedInjectedPrints"]==controlled
+              print("ABIDES_ALT_EXECUTION",json.dumps({"mode":kind,"public_prints":report["publicPrints"],
+                   "controlled_prints":controlled,"models":report["models"]}))
+          PY
       - name: Frozen-seed cross-run blinded replication
         run: |
           python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
