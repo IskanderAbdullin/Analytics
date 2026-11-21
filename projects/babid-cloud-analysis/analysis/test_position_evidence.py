@@ -94,7 +94,7 @@ class PositionEvidenceTests(unittest.TestCase):
         baseline = (
             "2026-11-21 14:55:00.000 INF Position check: "
             "Broker position: +31 lots; robot journal: +33 lots; "
-            "outside the robot: -2 lots\\n"
+            "outside the robot: -2 lots\n"
         )
         path.write_text(baseline + path.read_text(encoding="utf-8"), encoding="utf-8")
         positions, intervals, summary = reconcile(self.root, "state-nvda", "logs-nvda")
