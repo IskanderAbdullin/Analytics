@@ -71,6 +71,8 @@ internal static class Program
                     return BlindBenchmarkCommand(options);
                 case "benchmark-clock-null":
                     return ClockNullBenchmarkCommand(options);
+                case "benchmark-abides-blind":
+                    return AbidesBlindCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -199,6 +201,24 @@ internal static class Program
 
 
 
+
+    private static int AbidesBlindCommand(Dictionary<string, string> options)
+    {
+        var report = AbidesBlindEvaluation.Score(
+            Required(options, "public"), Required(options, "truth"));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"ABIDES-NG blind evidence assessment saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine($"ABIDES-NG simulated public prints={report.PublicPrints}; " +
+            "private execution-agent labels were used only for post-detection scoring; " +
+            "real market accuracy and physical identities are NOT established.");
+        return 0;
+    }
 
     private static int ClockNullBenchmarkCommand(Dictionary<string, string> options)
     {
@@ -790,6 +810,7 @@ internal static class Program
         Console.WriteLine("compare-archives --inputs \"a.csv;b.csv\" --html comparison.html [--json comparison.json] [--window-minutes 5]");
         Console.WriteLine("benchmark-blind [--seeds 5] [--background-prints 120] [--output blind-benchmark.json]");
         Console.WriteLine("benchmark-clock-null [--trials 20] [--background-prints 120] [--cycles 12] [--period-ms 5000] [--clip-mode fixed|variable] [--output clock-null.json]");
+        Console.WriteLine("benchmark-abides-blind --public abides.csv --truth private.json [--output report.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

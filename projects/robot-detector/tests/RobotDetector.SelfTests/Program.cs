@@ -136,6 +136,9 @@ internal static partial class Program
         Check("clocked null summaries conserve attributed false positives", ClockedNullSummaryConservation);
         Check("clocked null seeds deterministic and bounds validated", ClockedNullDeterministicAndValidated);
         Check("clocked null variable sizes preserve truth separation", ClockedNullVariableQuantityStress);
+        Check("ABIDES public/private execution truth scoring", AbidesPrivateTruthScoring);
+        Check("ABIDES background-only recall denominator remains undefined", AbidesNullRecallUndefined);
+        Check("ABIDES public and private tampering rejected", AbidesIntegrityRejectsTampering);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;

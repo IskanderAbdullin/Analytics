@@ -1,0 +1,100 @@
+name: Robot Detector genuine ABIDES-NG blinded integration
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/src/**'
+      - 'projects/robot-detector/tools/abides_export.py'
+      - 'projects/robot-detector/tests_python/**'
+      - 'projects/robot-detector/tests/**'
+      - '.github/workflows/robot-detector-abides-real.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/src/**'
+      - 'projects/robot-detector/tools/abides_export.py'
+      - 'projects/robot-detector/tests_python/**'
+      - 'projects/robot-detector/tests/**'
+      - '.github/workflows/robot-detector-abides-real.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-abides-public-private:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Test pure Python public/private projection
+        run: python -m unittest discover -s tests_python -p 'test_*.py' -v
+      - name: Install pinned upstream genuine ABIDES-NG simulator
+        run: |
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+          python -c 'from abides_markets.simulation import run_simulation; print("genuine_abides_import_ok")'
+      - name: Run actual ABIDES matching simulation with one TWAP and one null
+        run: |
+          python tools/abides_export.py --mode twap --seed 41 \
+            --public /tmp/abides_twap_public.csv --truth /tmp/abides_twap_truth.json
+          python tools/abides_export.py --mode null --seed 42 \
+            --public /tmp/abides_null_public.csv --truth /tmp/abides_null_truth.json
+      - name: Test C# core, source schema, and exact public/private reconciliation
+        run: |
+          dotnet run --project tests/RobotDetector.SelfTests -c Release
+          dotnet run --project src/RobotDetector.Cli -c Release -- benchmark-abides-blind \
+            --public /tmp/abides_twap_public.csv --truth /tmp/abides_twap_truth.json \
+            --output /tmp/abides_twap_report.json
+          dotnet run --project src/RobotDetector.Cli -c Release -- benchmark-abides-blind \
+            --public /tmp/abides_null_public.csv --truth /tmp/abides_null_truth.json \
+            --output /tmp/abides_null_report.json
+          python3 - <<'PY'
+          import csv,hashlib,json
+          for kind in ('twap','null'):
+              public = open(f'/tmp/abides_{kind}_public.csv','rb').read()
+              private = json.load(open(f'/tmp/abides_{kind}_truth.json'))
+              report = json.load(open(f'/tmp/abides_{kind}_report.json'))
+              rows = list(csv.DictReader(public.decode().splitlines()))
+              assert len(rows)>0 and len(rows)==len(private['events'])==report['publicPrints']
+              assert hashlib.sha256(public).hexdigest()==private['public_sha256']==report['publicSha256']
+              assert 'passive_agent_id' not in rows[0] and 'aggressive_agent_id' not in rows[0]
+              assert len({r['EVENT_ID'] for r in rows})==len(rows)
+              assert report['simulator']=='abides-ng'
+              assert report['physicalOwnerIdentityKnown'] is False
+              assert report['realMarketAccuracyCalibrated'] is False
+              assert report['liveTradingEnabled'] is False
+              control=set(private['controlled_agent_ids'])
+              counted=sum(e['passive_agent_id'] in control or e['aggressive_agent_id'] in control
+                          for e in private['events'])
+              assert report['controlledPrints']==counted
+              assert report['backgroundPrints']==len(rows)-counted
+              if kind=='twap': assert counted>0 and len(control)==1
+              else: assert counted==0 and len(control)==0
+              for m in report['models']:
+                  assert m['truePositivePrints']+m['falsePositivePrints']==m['attributedPublicPrints']
+                  assert m['truePositivePrints']+m['missedInjectedPrints']==counted
+                  assert not m['physicalProducerCountInferred']
+                  if kind=='null': assert m['eventRecall'] is None
+              print('GENUINE_ABIDES_BLIND', json.dumps({
+                  'kind':kind,'public_prints':len(rows),'controlled_prints':counted,
+                  'models':report['models'],'upstream':private['simulator_revision']
+              }))
+          PY
+      - name: Keep original and private broker data off the repository
+        run: |
+          test ! -e data/raw/abides_twap_truth.json
+          test ! -e data/results/abides_null_truth.json
+          if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
+            echo 'Trading API forbidden'
+            exit 1
+          fi
