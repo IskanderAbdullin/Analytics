@@ -74,7 +74,8 @@ def evaluate_phase_fragility(summary: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version":"abides-public-l2-phase-fragility-audit-v1",
         "descriptive_state":state,
-        "original_independent_market_simulations":len(SEEDS)*len(BACKGROUNDS),
+        "original_matching_engine_runs":len(SEEDS)*len(BACKGROUNDS),
+        "independence_between_background_regimes_established":False,
         "correlated_analytic_views":len(cases),
         "simulations_with_strict_sign_reversal":reversals,
         "simulations_with_changed_eligible_bin_count":changed_counts,
@@ -93,6 +94,7 @@ def evaluate_phase_fragility(summary: dict[str, Any]) -> dict[str, Any]:
         "live_trading_allowed":False,
         "limitations":[
             "Clock-origin shifts of the same simulated tape are not independent.",
+            "Same seeds reused across different backgrounds do not prove independent samples.",
             "Differences in eligible clock bins confound changes in rho.",
             "Two seeds per background cannot support inferential calibration.",
             "Zero or undefined rho prevents a robust sign assertion.",

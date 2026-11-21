@@ -25,7 +25,8 @@ class FragilityTests(unittest.TestCase):
     def test_strict_sign_reversal_is_per_original_simulation(self):
         report=evaluate_phase_fragility(prepared())
         self.assertEqual(report["descriptive_state"],"SIGN_REVERSAL_OBSERVED")
-        self.assertEqual(report["original_independent_market_simulations"],4)
+        self.assertEqual(report["original_matching_engine_runs"],4)
+        self.assertFalse(report["independence_between_background_regimes_established"])
         self.assertEqual(report["correlated_analytic_views"],12)
         self.assertEqual(report["simulations_with_strict_sign_reversal"],4)
         self.assertFalse(report["scientific_stage2_release_allowed"])

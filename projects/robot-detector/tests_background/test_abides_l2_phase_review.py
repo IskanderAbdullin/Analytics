@@ -38,6 +38,10 @@ class OfflineReviewTests(unittest.TestCase):
         self.assertTrue(all(x["simulations_with_defined_paired_rho"]==2
                             for x in r["paired_cohort_contrasts"]))
         self.assertFalse(r["source_file_authenticity_verified"])
+        self.assertEqual(r["phase_fragility"]["descriptive_state"],
+                         "SIGN_REVERSAL_OBSERVED")
+        self.assertEqual(r["phase_fragility"]["original_matching_engine_runs"],4)
+        self.assertFalse(r["phase_fragility"]["scientific_stage2_release_allowed"])
 
     def test_legacy_sensitivity_keys_are_accepted(self):
         report=saved_report()
@@ -60,6 +64,7 @@ class OfflineReviewTests(unittest.TestCase):
             ("real_market_accuracy_calibrated",0),
             ("cohorts",[]),
             ("per_simulation_sensitivity",[]),
+            ("full_public_tape_digest_available_all_phases",True),
         ):
             with self.subTest(key=key),self.assertRaises(ValueError):
                 data=saved_report()

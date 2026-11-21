@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from abides_l2_binphase_sensitivity import aggregate, frozen_plan
+from abides_l2_phase_fragility import evaluate_phase_fragility
 
 MAX_INPUT_BYTES = 256_000
 INPUT_SCHEMA = "abides-public-l2-clock-phase-v1"
@@ -65,6 +66,11 @@ def reanalyse_saved_result(data: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Cases were not sorted in the original frozen order")
     if data.get("cohorts") != calculated["cohorts"]:
         raise ValueError("Original cohort summaries disagree with raw cases")
+    if ("full_public_tape_digest_available_all_phases" in data and
+            (type(data["full_public_tape_digest_available_all_phases"]) is not bool or
+             data["full_public_tape_digest_available_all_phases"] !=
+             calculated["full_public_tape_digest_available_all_phases"])):
+        raise ValueError("Full book/print digest evidence disagrees with cases")
     old = data.get("per_simulation_sensitivity")
     if type(old) is not list or len(old) != 4:
         raise ValueError("Missing original per-simulation sensitivity")
@@ -81,6 +87,7 @@ def reanalyse_saved_result(data: dict[str, Any]) -> dict[str, Any]:
         "additional_simulations_run": 0,
         "per_simulation_sensitivity": calculated["per_simulation_sensitivity"],
         "paired_cohort_contrasts": calculated["paired_cohort_contrasts"],
+        "phase_fragility": evaluate_phase_fragility(calculated),
         "source_file_authenticity_verified": False,
         "source_completeness_independently_verified": False,
         "physical_agent_identified": False,
