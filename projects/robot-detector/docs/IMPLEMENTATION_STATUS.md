@@ -264,3 +264,37 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 
 - **Executed genuine 30-second clock-origin sensitivity:** [successful ABIDES CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330), **6 frozen-plan Python tests**, 4 actual matching-engine simulations, 12 correlated public analytic views. Two-seed median Poisson rho **−0.0137 / −0.1608 / −0.1809** with **39 / 42 / 41** eligible lagged-bin pairs across offsets 0/10/20 seconds; fixed-cadence rho **−0.2178 / −0.1946 / −0.4925** with **42 / 41 / 42** pairs. No median sign flip in this phase survey, but magnitude changes substantially on identical tapes. All original public SHA, book events, prints and lots conserved; source completeness unverified, no threshold/model/phase selected. Seeds 2101/2102 spent.
 - [Successful research provenance CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) confirmed the updated 12-study/31-seed ledger and five frozen source constants; earlier example 2101/2102 became spent and therefore had to be replaced with nonregistered 2201/2202, which are **not globally verified fresh**.
+
+## Post-phase robustness and prospective controlled-TWAP contrast (2026-11-21)
+
+- The prior 2101/2102 four-tape retrospective review now includes strict
+  nonfinite/type checks, a per-seed signed correlation phase contrast,
+  changed eligible-bin count, and a **threshold-free abstention gate**.
+  One of four original synthetic runs actually **reverses rho sign**
+  although all six two-seed phase medians remain negative. All four
+  simulations change eligible-bin counts across origins. Four matching
+  runs may also share seed-level randomness across backgrounds; do
+  not call them statistically independent market samples.
+- Previous `public_sha256` provenance hashes only *executed print
+  records*, so old aggregate-only artifacts **do not prove equality
+  of entire L2 book contents**. New strict domain-separated
+  `public_tape_fingerprint.py` adds exact hashes of quote timestamps,
+  ordered same-time snapshots, unique price/size levels, public prints
+  and side labels; a source-normalized phase shift must preserve
+  the combined SHA. No exchange-provider authenticity claim.
+- Pure review `abides_l2_phase_review.py` and
+  `abides_l2_phase_fragility.py` produce descriptive JSON and keep
+  `scientific_stage2_release_allowed=false`, irrespective of
+  observed rho. No raw private agent IDs or account data exported.
+- Newly reserved development seeds `2401/2402` (13 canonical ledger
+  records / 33 locally known seed values / 6 constant checks) specify
+  one *controlled TWAP* against background-only ABIDES conditions, two
+  runs each, with three analytical origins each. Tests reject missing
+  case matrices, content drift, misreported controlled fills and
+  posthoc truth leak claims. Study protocol:
+  [ABIDES_L2_TWAP_PHASE_CONTRAST.md](ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+  Until genuine matching-engine CI is checked, no empirical result
+  for the injected-TWAP study is asserted.
+- Live trading, physical bot identification, independent source
+  completeness and real-market phase false-alarm estimates remain
+  **CLOSED / UNKNOWN**, not silently inferred.

@@ -64,3 +64,26 @@ The genuine ABIDES 30-second **clock-origin phase** protocol precommits the fres
 ## Ledger validation after phase study
 
 [Successful source-ledger CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) confirms **12 canonical studies, 31 known spent seed values and five frozen Python constant checks** after including the 2101/2102 genuine clock-origin cohort. A formerly "unknown" candidate example using 2101/2102 now correctly collides with the registry; the test and workflow use 2201/2202 solely to illustrate absence from the local list, not proof that they were never used globally.
+
+## Prospective controlled-TWAP L2 phase experiment (2026-11-21)
+
+A new project-local development-only cohort **2401/2402** is registered
+to the literal `SEEDS` constant in
+`tools/abides_l2_twap_phase_contrast.py`, extending the canonical ledger
+to **13 studies, 33 registered/spent values and 6 frozen-source constant
+checks**. These seeds had no collision with the prior project-local
+ledger before registration but this is **not** globally verified novelty
+or certified independent blind evaluation. This is a predeclared,
+not tuned, exploratory contrast and any obtained outcomes immediately
+spend these seeds for all later blind claims.
+
+Four genuine ABIDES runs (background-only versus injected market-order
+TWAP across the same two development seeds) are summarized at three
+correlated fixed 30-second origins. The private simulated TWAP agent ID
+is used **only after all public features are computed** to count
+executed controlled fills; it never enters the detector. The public
+full-depth book/print source fingerprint is checked for equal content
+across each set of phase views. No real-market identity or false
+discovery probability is inferred.
+
+[Prospective protocol](ABIDES_L2_TWAP_PHASE_CONTRAST.md).

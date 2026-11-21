@@ -3,6 +3,26 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## New controlled TWAP versus background genuine ABIDES L2 experiment
+
+The preregistered development-only `tools/abides_l2_twap_phase_contrast.py`
+adds exactly **one known TWAP execution strategy** to a Poisson background
+and compares its public depth-five L2/print timing against a background-only
+configuration at fixed 0/10/20s origins. Two source-registered development
+seeds (2401/2402), two scenarios and three **correlated** views per
+simulated market imply **4 genuine market runs, not 12 independent markets**.
+The instrument is synthetic ABM, not MOEX or SPB; real market owner count
+and accuracy remain unknown. Both the contrast and the new
+`abides_l2_phase_fragility.py` use only public analytics; simulated
+controlled agent IDs are inspected *after* features, only to check
+execution actually occurred.
+
+[Exact frozen experimental protocol, failure gates and provenance](docs/ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+The `public_tape_fingerprint.py` now verifies **ordered full L2 snapshots
+plus executed prints** under known clock shifts. Earlier ABIDES phase
+archives fingerprinted only prints, so historical book content equality
+cannot be independently reconstructed from those aggregate-only results.
+
 ## Genuine ABIDES public L2 30-second clock-origin sensitivity
 
 The new **pre-registered** `tools/abides_l2_binphase_sensitivity.py` evaluates the same anonymous ABIDES depth-five book/trade tape at three **30-second clock origins (0, 10 and 20 seconds)**. Exactly **four new genuine market simulations** (seeds 2101/2102 × Poisson/fixed-cadence backgrounds) produce twelve **correlated** views. Relative public event times, quantities and reported sides are conserved; no phase is selected as a best model and no private execution actor is identified. The two new seeds are registered as spent in the research provenance ledger.
