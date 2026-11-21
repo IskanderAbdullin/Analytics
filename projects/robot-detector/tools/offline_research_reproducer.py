@@ -42,6 +42,7 @@ SUITES=(
     "test_abides_split_half_momentum_holdout.py",
     "test_public_timing_phase_tied_fills.py",
     "test_public_cluster_conditional_toy_null.py",
+    "test_abides_clustered_grid_holdout.py",
     "test_public_clock_aliasing_negative.py",
     "test_binance_public_trade_archive.py",
     "test_public_trade_direction_null.py",
