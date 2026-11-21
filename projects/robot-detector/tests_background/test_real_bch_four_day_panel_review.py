@@ -137,6 +137,48 @@ class FourDayBchPanelTests(unittest.TestCase):
                 seen,"2026-11-20",expected_count=73279,
                 expected_sha=panel.EXPECTED_SEEN_SHA)
 
+    def test_original_fourday_real_bch_source_negative_outcomes_pinned(self):
+        path=Path(__file__).resolve().parents[1]/"fixtures"/"binance_bch_four_day_public_panel_20261121.json"
+        data=load_json(path,max_bytes=12000)
+        self.assertEqual(data["original_run_id"],44921851326)
+        self.assertEqual(data["precommit_sha"],
+                         "a71958e59f8195852a2f664a82c3969c934d26f5")
+        self.assertEqual(data["precommit_amendment_sha"],
+                         "e2a71147990659a19e43c4949be33795045398e1")
+        self.assertEqual(data["total_public_real_trades"],194636)
+        self.assertEqual(data["frozen_new_sources_before_original_download"],
+                         ["2026-11-18","2026-11-19"])
+        self.assertEqual(data["provider_ids_contiguous_between_all_three_adjacent_date_boundaries"],
+                         [True,True,True])
+        self.assertTrue(data["source_zip_provider_checksums_matched"])
+        self.assertEqual(data["precommitted_new_case_primary_passes"],1)
+        self.assertEqual(data["precommitted_new_case_primary_total"],2)
+        self.assertTrue(data["not_a_real_robot_FDR_or_owner_count_test"])
+        self.assertTrue(data["not_for_live_or_commercial_trading"])
+        cases=data["cases"]
+        self.assertEqual([r["day"] for r in cases],
+                         ["2026-11-17","2026-11-18","2026-11-19","2026-11-20"])
+        self.assertEqual([r["public_trade_count"] for r in cases],
+                         [42678,28466,50213,73279])
+        self.assertEqual([r["clock_phases"][0]["one_sided_ge5"] for r in cases],
+                         [504,610,541,334])
+        self.assertEqual([r["clock_phases"][0]["strong_null_ge5_median"] for r in cases],
+                         [509.5,620.5,530.5,323.5])
+        self.assertEqual([r["clock_phases"][0]["above_all_eight_strong_controls"] for r in cases],
+                         [False,False,True,False])
+        self.assertEqual([r["new_precommitted_source"] for r in cases],
+                         [False,True,True,False])
+        self.assertEqual(cases[1]["sha"],
+                         "52db334a1d9bd96e2f6ea1673a8e8f0f39aa2f9872d0482121bd174f9090fed5")
+        self.assertEqual(cases[2]["sha"],
+                         "bea94c8e9280824ced48ceb5aeccfa322662e8c96203eb6b9cf74f2e58b264c3")
+        self.assertEqual(sum(r["public_trade_count"] for r in cases),194636)
+        for i,r in enumerate(cases):
+            self.assertEqual(r["last_id"]-r["first_id"]+1,r["public_trade_count"])
+            self.assertEqual([x["origin_seconds"] for x in r["clock_phases"]],[0,10,20])
+            if i:
+                self.assertEqual(cases[i-1]["last_id"]+1,r["first_id"])
+
     def test_changed_frozen_bch_source_or_posthoc_metric_fails(self):
         import json
         for key,value in (
