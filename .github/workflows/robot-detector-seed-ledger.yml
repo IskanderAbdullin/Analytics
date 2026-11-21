@@ -5,6 +5,9 @@ on:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
       - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/tools/abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/tests_background/test_abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/research/abides_split_half_momentum_precommit_20261121.json'
       - 'projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_background_ratio_holdout.py'
       - 'projects/robot-detector/research/abides_background_conditioned_ratio_precommit_20261121.json'
@@ -92,6 +95,9 @@ on:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
       - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/tools/abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/tests_background/test_abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/research/abides_split_half_momentum_precommit_20261121.json'
       - 'projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_background_ratio_holdout.py'
       - 'projects/robot-detector/research/abides_background_conditioned_ratio_precommit_20261121.json'
@@ -213,6 +219,7 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_abides_fixed_clock_transfer.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_multiscale_public_l2.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_background_ratio_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_split_half_momentum_holdout.py' -v
           python -m unittest discover -s tests_background -p 'test_public_clock_aliasing_negative.py' -v
           python tools/public_clock_aliasing_negative.py
           python tools/toy_public_execution_rhythm.py --output data/results/heldout-public-rhythm-hard-negative.json

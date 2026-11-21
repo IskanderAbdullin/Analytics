@@ -39,6 +39,7 @@ SUITES=(
     "test_abides_fixed_clock_transfer.py",
     "test_abides_multiscale_public_l2.py",
     "test_abides_background_ratio_holdout.py",
+    "test_abides_split_half_momentum_holdout.py",
     "test_public_clock_aliasing_negative.py",
     "test_binance_public_trade_archive.py",
     "test_public_trade_direction_null.py",
