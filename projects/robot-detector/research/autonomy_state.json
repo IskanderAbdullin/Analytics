@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "f289c5b9370b224c4e6be54150b6c2da08e81e42",
+  "last_verified_base_commit": "91de69665026cbc97065ccf7c730e6d0ce6e0118",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-SYNTHETIC-HOLDOUT-09.A",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44935804124",
+      "result": "Source-free 20s periodic background overlaps fixed 45s grid exactly every lcm(20,45)=180sec, so 10 of 90 periodic events look like 45s clock hits with ZERO target. Shift background by +1s gives 0 of 90. Frozen original ABIDES hard-negative 45s fraction remains greater than positive TWAP.",
+      "status": "VERIFIED_SYNTHETIC_MODULAR_ALIASING_NEGATIVE_NOT_REAL_MARKET_PROBABILITY"
+    },
     {
       "stage_id": "RD-ABIDES-MULTISCALE-08",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44935340284",
@@ -78,7 +84,7 @@
   ],
   "current_stage": {
     "id": "RD-SYNTHETIC-HOLDOUT-09",
-    "status": "READY_TO_IMPLEMENT",
+    "status": "IN_PROGRESS",
     "title": "Prove periodic 20s vs 45s clock aliasing, then freeze independent background-conditioned synthetic ABIDES validation",
     "why_next": "All 12 predeclared genuine ABIDES engine runs succeeded; fixed-20s hard negative has even greater 45s-grid fraction than injected TWAP. Need exact aliasing controls, not hindsight 45s threshold adjustment.",
     "inputs": [
@@ -86,21 +92,25 @@
       "fixtures/abides_multiscale_public_l2_observed_20261121.json",
       "tools/abides_multiscale_public_l2.py",
       "research/seed_registry.json",
-      "docs/MASTER_RESEARCH_PLAN.md"
+      "docs/MASTER_RESEARCH_PLAN.md",
+      "research/abides_background_conditioned_ratio_precommit_20261121.json"
     ],
     "deliverables": [
       "Independent mathematical synthetic demonstration that fixed-20s background can alias into a fixed 45s grid at the preregistered anchor",
       "No source/oracle identity in public-only features",
       "Precommitted independent background-conditioned hypothesis and actually unspent local seeds before new genuine engine simulation",
       "Explicit hard-negative false positives, invalid-data abstention and limited synthetic truth labels",
-      "Checkpoint, own issue #90, updated living plan decision record and source-only tests"
+      "Checkpoint, own issue #90, updated living plan decision record and source-only tests",
+      "Exact source-free 20s-to-45s clock aliasing counterexample verified and reported without private IDs",
+      "New ratio>=0.60, min samples/hits/L2 abstain protocol frozen with caveat it was chosen after prior development source inspection"
     ],
     "acceptance": [
       "All original 12 ABIDES outcomes preserved without retuning or filtering",
       "Exact modular aliasing synthetic counterexample and tests pass",
       "New validation protocol frozen before new independent ABIDES seed data",
       "New source-needs complete separate original CI and no false global blind claim",
-      "Commit/push verified, next stage chosen; master issue #72 stays open"
+      "Commit/push verified, next stage chosen; master issue #72 stays open",
+      "Run exact 16 matching-engine cases on locally new 3001-3004 without modifying the pretrained ratio thresholds"
     ],
     "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/90"
   },
@@ -142,6 +152,6 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "Completed full living master plan/AGENTS adaptive governance and original RD-ABIDES-MULTISCALE-08 source runs CI #44935340284, 12/12 cases passed, 67 injected TWAP fills, strong 45s-grid fixed-cadence hard-negative confounding. Negative result pinned, expensive workflow manual-only, active RD-SYNTHETIC-HOLDOUT-09 issue #90 next. No real-market FDR.",
+  "last_session_result": "RD-08 genuine 12-run original negative #44935340284 pinned; CI #44935804124 confirmed exact aliasing 20s->45s without TWAP (10/90 events) vs shifted no alias. New independent synthetic ratio hypothesis and abstention bounds frozen but NOT YET tested on source seeds 3001-3004. Continue implementing 16-run ABIDES source benchmark with no private oracle leakage.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }

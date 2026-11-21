@@ -9,6 +9,15 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Проверено математическое aliasing 20s фоновой стратегии с 45s clock grid](
+  docs/PUBLIC_CLOCK_ALIASING_NEGATIVE_20261121.md):
+  при полном отсутствии TWAP **1/9** фоновых событий
+  попадает в «TWAP-подобную» 45s сетку; подмена
+  detector specificity невозможна. Новый ratio
+  baseline выбран **после** старых 2901–2903,
+  предзарегистрирован **до** новых 3001–3004 и
+  ждёт независимой симуляционной проверки.
+
 - [ABIDES genuine 12-run multiscale и L2, отрицательная переносимость](
   docs/ABIDES_MULTISCALE_PUBLIC_L2_20261121.md):
   на seeds 2901–2903 **67** posthoc TWAP fills;

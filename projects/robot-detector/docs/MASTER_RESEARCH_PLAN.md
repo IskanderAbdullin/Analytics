@@ -85,6 +85,15 @@ Source-only 45s fraction: Poisson **0,01022026**, fixed-20s background **0,08201
 
 **Новый приоритет после отрицательного RD-08:** сначала доказать на source-free синтетике, почему фиксированный 20s фон может пересекаться с 45s сеткой при неизменном clock anchor (НОК/модульные фазы); затем зафиксировать **новую** адаптированную *conditioned-null* гипотезу и только после этого брать независимые seeds (ранее потраченные 2901–2903 не считать holdout). [Issue #90](https://github.com/IskanderAbdullin/Analytics/issues/90). Оценивать не «число роботов», а **специфичность наблюдаемого признака** при наличии сложного фона.
 
+**Прогресс этапа (source-free проверено, original next source ещё не запускался):**
+[Модульное доказательство 20s↔45s aliasing](PUBLIC_CLOCK_ALIASING_NEGATIVE_20261121.md):
+`lcm(20,45)=180s` и **1/9** совпадений при полном отсутствии целевого TWAP;
+односекундный сдвиг фона даёт **0/90** на той же сетке. [Новый frozen
+exploratory hypothesis](../research/abides_background_conditioned_ratio_precommit_20261121.json):
+`R=N45/N20>=0.60` по public prints, abstain если N<200, N20<8 или eligible lagged30<5.
+**Этот порог выбран по уже просмотренным 2901–2903**, поэтому никакой
+confirmatory точности до нового отдельного 16-run ABIDES с 3001–3004 нет.
+
 - До просмотра данных объявить новое разделение development/test **по независимым matching-engine seeds и семействам фонов**, а не по фазам одного и того же файла.
 - Разделить **периодические без injected target**, random, momentum, market-maker-like, а при возможности несколько TWAP/VWAP/POV режимов, выбор инструментов и активности. Исключить label leakage и дубль seed/replay.
 - Конкуренты: trivial always-negative, random-fixed-rate, 10s legacy, intensity-conditioned grid, cluster-preserving timing, лагированное imbalance и их обоснованная простая комбинация.
@@ -223,5 +232,7 @@ Source-only 45s fraction: Poisson **0,01022026**, fixed-20s background **0,08201
 | 2026-11-21 | До первого engine-прогона зарезервированы seeds 2901–2903 и начата реализация source-only multiscale/L2 агрегатора с негативными offline tests (source results пока не подтверждены). | IN_PROGRESS; код/QA не являются исходным исследованием |
 | 2026-11-21 | До исходного прогона зафиксирована 12-run ABIDES матрица (seeds 2901–2903, четыре сценария, сетки 10/20/45/90s, lagged L2 30/60s); на момент frozen дизайна результаты ещё отсутствовали | FROZEN на момент проектирования, затем проверено оригинальным CI #44935340284 |
 | 2026-11-21 | В 12 matching-engine прогонах fixed-20s фон без target дал 45s-grid fraction **0,0820**, выше TWAP **0,0302**. 10s baseline дал 3/3 ложных и 3/3 пропуска. Приоритет скорректирован: сначала модель гармонического aliasing, затем отдельный independent synthetic holdout | REFUTED исходная гипотеза о специфичности, #90 открыт |
+
+| 2026-11-21 | После original negative #44935340284 доказано точное фоновое aliasing 20s→45s (1/9 при нулевом TWAP); создана НОВАЯ ratio-гипотеза из просмотренной выборки с порогом 0,60 и abstention, назначено 16 независимых simulation cases 3001–3004 | source-free negative VERIFIED; ratio = FROZEN до нового исходного прогона, ещё НЕ подтверждено |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
