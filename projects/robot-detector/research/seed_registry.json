@@ -1,7 +1,7 @@
 {
   "schema_version": "market-robot-detector-seed-ledger-v1",
   "scope": "locally_known_studies_only_not_global_novelty_proof",
-  "description": "Previously evaluated development, validation and constructed toy seeds. Includes the source-precommitted 2101–2102 clock-phase study; all listed values are spent for fresh blinded evaluation.",
+  "description": "Project-local known-spent seed sets, including two precommitted development seeds 2401/2402 for controlled public L2 TWAP-vs-background. No global novelty attestation; registered seeds cannot be called unused blind holdouts.",
   "studies": [
     {
       "id": "initial_execution_development",
@@ -126,6 +126,17 @@
         2102
       ],
       "source_file": "tools/abides_l2_binphase_sensitivity.py",
+      "source_constant": "SEEDS"
+    },
+    {
+      "id": "controlled_twap_public_l2_phase_contrast",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        2401,
+        2402
+      ],
+      "source_file": "tools/abides_l2_twap_phase_contrast.py",
       "source_constant": "SEEDS"
     }
   ],
