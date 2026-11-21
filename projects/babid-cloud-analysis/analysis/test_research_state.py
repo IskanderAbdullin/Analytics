@@ -32,7 +32,7 @@ class ResearchStateTests(unittest.TestCase):
         before = (self.root / "STATE.json").read_bytes()
         line = next_action(self.root)
         self.assertIn("A-001 [blocked_external]", line)
-        self.assertIn("FROZEN_BABITCLOUD_COPY", line)
+        self.assertIn(json.loads((self.root / "NEXT_ACTION.json").read_text(encoding="utf-8"))["next_command"], line)
         self.assertEqual(before, (self.root / "STATE.json").read_bytes())
 
     def test_mismatched_action_pointer_fails(self):
