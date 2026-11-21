@@ -439,6 +439,8 @@ L2/coverage abstention и 4 семьи сценариев.
 
 | 2026-11-21 | RD-MATCHED-UNCERTAINTY-14: additional source-fixture integrity hardening — exact allowlist for top-level/case/cohort/totals, original source and ABIDES revision pins, false-alarm/missed-TWAP conservation; adversarial private-ID/count tampering cases. No new simulations, no new threshold, no increase in claimed confidence. | Implementation committed; cheap CI required for verification |
 
+| 2026-11-21 | PRE-SOURCE уточнение RD-ABIDES-POWER-15: исходный frozen 40×4 протокол оставлен неизменным; [отдельное addendum](../research/abides_160_zero_execution_oracle_handling_addendum_20261121.json) предотвращает отбрасывание source-сценариев, где injected TWAP агент не получил ни одного фактического исполнения; сохраняются все 160 seed×cohort, отдельно считаются zero-execution positives. Не считать их подтверждёнными публично наблюдаемыми execution patterns, не менять seed/порог/фазу и не включать oracle в public scoring. | PRE-SOURCE methodological guard; original 160 engine runs not yet verified |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
