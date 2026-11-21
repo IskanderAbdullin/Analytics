@@ -1,0 +1,68 @@
+name: Robot Detector synthetic L2 common-factor null controls
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/tools/l2_common_factor_null.py'
+      - 'projects/robot-detector/tests_l2/test_l2_common_factor_null.py'
+      - '.github/workflows/robot-detector-public-l2-nulls.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/tools/l2_common_factor_null.py'
+      - 'projects/robot-detector/tests_l2/test_l2_common_factor_null.py'
+      - '.github/workflows/robot-detector-public-l2-nulls.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-public-market-null:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source-only counterexamples with no ABIDES installation
+        run: python -m unittest discover -s tests_l2 -p 'test_l2_common_factor_null.py' -v
+      - name: Generate public common-factor controls
+        run: |
+          python tools/l2_common_factor_null.py --seed 1701 --bins 24 \
+            --output /tmp/l2-public-common-market-nulls.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/l2-public-common-market-nulls.json',encoding='utf-8'))
+          assert r['schema_version']=='public-l2-common-market-factor-null-v1',r
+          assert r['seed']==1701 and r['session_bins']==24,r
+          assert r['underlying_source']=='deterministic_educational_synthetic_not_ABIDES',r
+          assert r['private_agent_labels_created'] is False,r
+          assert r['real_market_significance_calibrated'] is False,r
+          assert r['unique_physical_actor_count_identifiable'] is False,r
+          assert r['no_actual_orders_sent'] is True,r
+          assert len(r['families'])==4,r
+          for c in r['families']:
+              assert c['eligible_past_book_to_next_bin_pairs']==24,c
+              assert c['public_execution_lots']==2400,c
+              assert c['anonymous_public_execution_prints']==144,c
+              assert c['single_identified_parent_order_present'] is False,c
+              assert c['real_market_null_calibrated'] is False,c
+              print('PUBLIC_L2_COMMON_FACTOR_CONTROL',json.dumps(c,sort_keys=True))
+          for kind in ('common_factor','market_wide_shock'):
+              c=next(c for c in r['families'] if c['family']==kind)
+              assert c['descriptive_spearman']>0.99,c
+          synchronized=next(c for c in r['families']
+                            if c['family']=='synchronized_clock')
+          assert synchronized['strict_same_timestamp_execution_abstentions']==144,synchronized
+          PY
+      - name: Preserve aggregates only
+        uses: actions/upload-artifact@v4
+        with:
+          name: l2-public-common-factor-null-controls
+          path: /tmp/l2-public-common-market-nulls.json
+          if-no-files-found: error
+          retention-days: 7
