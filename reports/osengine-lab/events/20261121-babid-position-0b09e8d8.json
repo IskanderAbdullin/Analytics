@@ -1,0 +1,69 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "0b09e8d8-6d68-4cfa-a67a-0111017cbb77",
+    "occurred_at": "2026-11-21T15:17:18.928Z",
+    "type": "research",
+    "title": "Correlate broker and journal position checks with local fill deltas",
+    "summary": "Directly addresses the unexplained two-lot NVDA incident through read-only time-window reconciliation of position observations, local fill flows, source times, and arithmetic consistency without attributing the cause prematurely.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/position_evidence.py",
+      "action": "added",
+      "summary": "Parse actual OnBrokerPosition log signatures and compare broker/journal/external changes against local fills."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_position_evidence.py",
+      "action": "added",
+      "summary": "Three synthetic regressions including two-lot discrepancy, missing fill and report isolation."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Run position evidence scan only when state/log mapping is explicit."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Document exact position evidence interpretation and limits."
+    }
+  ],
+  "checks": [
+    {
+      "id": "position-evidence-ci",
+      "title": "Cross-platform synthetic position delta tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending GitHub Actions."
+    }
+  ],
+  "issues": [
+    {
+      "id": "initial-two-lots",
+      "title": "Initial two-lot NVDA discrepancy cause is still unknown",
+      "state": "open",
+      "severity": "critical",
+      "description": "Wait for read-only local full archive processing and independent T-Invest execution reconciliation to determine first appearance."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "position-lifecycle",
+      "title": "After passing tests, add concise incident evidence summary and merge Analytics-only PR",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Observed broker positions may be stale; signed interval arithmetic does not establish causal attribution.",
+    "No original robot modifications or live broker requests."
+  ]
+}
