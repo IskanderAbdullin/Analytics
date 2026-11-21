@@ -4,7 +4,7 @@
   "goal_id": "G-001",
   "goal_status": "in_progress",
   "incident_status": "unresolved",
-  "data_status": "late_cancelled_sell2_confirmed_journal_unchanged_prune_or_status_credit_unknown",
+  "data_status": "late_fill_source_hazard_confirmed_historical_prune_vs_silent_status_unresolved",
   "checkpoint_date": "2026-11-21",
   "baseline_main_sha": "e9fa99dbdea889bbac655eec03a5abed6b17b161",
   "current_action_id": "A-001",
@@ -43,7 +43,8 @@
     "E-035",
     "E-036",
     "E-037",
-    "E-038"
+    "E-038",
+    "E-039"
   ],
   "hypotheses": [
     {
@@ -232,9 +233,17 @@
         "E-037",
         "E-038"
       ]
+    },
+    {
+      "id": "M-019",
+      "description": "Read-only source inspection established that FilledByState can rise without an order-state transition log; an archived terminal order receiving a late fill is not restored. The private source-contract report was written, but sandbox PowerShell invocation returned PC_AGENT_HTTP_404; no script run or historical cause confirmation.",
+      "evidence_refs": [
+        "E-039"
+      ]
     }
   ],
   "unknowns": [
+    "Нет явного archive event и нет полной истории всех FilledByState сообщений для подозрительной заявки; переходы FilledByState при неизменном State обычно не логируются",
     "Была ли фактически удалена из коллекции Position.OpenOrders отменённая заявка до позднего Sell2: удаление не логируется",
     "Содержал ли статус FilledByState=2 до поступления позднего Sell2 и привёл ли он уже к изменению Journal",
     "Соответствует ли внешний broker−journal=-2 в 13:17:51 этой же пропавшей продаже: нужна независимая брокерская история",
