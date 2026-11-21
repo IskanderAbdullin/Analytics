@@ -1,0 +1,59 @@
+name: Robot Detector research seed provenance audit
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/research/seed_registry.json'
+      - 'projects/robot-detector/tools/research_seed_registry.py'
+      - 'projects/robot-detector/tests_research/**'
+      - 'projects/robot-detector/tools/directional_shift_frozen_replication.py'
+      - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
+      - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
+      - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - '.github/workflows/robot-detector-seed-ledger.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/research/seed_registry.json'
+      - 'projects/robot-detector/tools/research_seed_registry.py'
+      - 'projects/robot-detector/tests_research/**'
+      - 'projects/robot-detector/tools/directional_shift_frozen_replication.py'
+      - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
+      - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
+      - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - '.github/workflows/robot-detector-seed-ledger.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-source-provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate known spent seeds and no source constant drift
+        run: |
+          python -m unittest discover -s tests_research -p 'test_*.py' -v
+          python tools/research_seed_registry.py
+          python - <<'PY'
+          from tools.research_seed_registry import read_ledger, audit_sources, assess_proposed_seeds
+          ledger=read_ledger()
+          audit=audit_sources(ledger)
+          assert audit['source_constant_checks'] and not audit['globally_unused_seeds_verified'],audit
+          spent=assess_proposed_seeds(ledger,[1801,1901])
+          assert len(spent['known_spent_overlap'])==2,spent
+          assert spent['eligible_for_claim_of_fresh_blind_test'] is False,spent
+          candidate=assess_proposed_seeds(ledger,[2101,2102])
+          assert candidate['not_previously_listed_in_project_ledger'] is True,candidate
+          assert candidate['globally_unused_or_unseen_elsewhere_verified'] is False,candidate
+          print('SEED_LEDGER_GUARD_VALIDATED',
+                {'canonical_spent_seeds':audit['canonical_spent_seeds'],
+                 'frozen_source_checks':len(audit['source_constant_checks'])})
+          PY
