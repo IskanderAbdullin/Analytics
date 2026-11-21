@@ -70,20 +70,21 @@ def _decimal(value: str, label: str, *, positive: bool = False) -> Decimal:
 
 def analyze_verified_zip(
     raw_zip: bytes, checksum_text: str, *, symbol: str, day: str,
-    clock_origin_study: bool = False
+    clock_origin_study: bool = False, direction_null_study: bool = False
 ) -> dict:
     """Process bounded real or synthetic ZIP entirely in memory; no raw export.
 
     File SHA verifies byte-level identity with provider published CHECKSUM,
     NOT whether exchange captured all trades or timestamps accurately.
     """
-    if type(clock_origin_study) is not bool:
-        raise ValueError("Clock-origin study must be a strict research-only boolean")
+    if type(clock_origin_study) is not bool or type(direction_null_study) is not bool:
+        raise ValueError("Studies must be strict research-only booleans")
     name, trading_day, url, checksum_url = frozen_source(symbol, day)
     digest = verify_checksum(raw_zip, checksum_text, name)
     min_us = int(datetime.combine(trading_day,time(),timezone.utc).timestamp()) * 1_000_000
     max_us = min_us + 86_400_000_000
     phase_buckets = {phase: {} for phase in (0, 10, 20)} if clock_origin_study else None
+    directional_observations = [] if direction_null_study else None
     excluded_edges = {phase: 0 for phase in (0, 10, 20)} if clock_origin_study else None
     with zipfile.ZipFile(io.BytesIO(raw_zip)) as archive:
         files = archive.infolist()
@@ -138,6 +139,8 @@ def analyze_verified_zip(
                     buyer_taker_count += 1
                     buy_qty += q
                 minutes[(ts-min_us)//60_000_000] += 1
+                if directional_observations is not None:
+                    directional_observations.append((ts, maker))
                 if phase_buckets is not None:
                     for phase in (0, 10, 20):
                         origin = phase * 1_000_000
@@ -245,6 +248,15 @@ def analyze_verified_zip(
             "threshold_or_best_phase_selected": False,
             "real_world_bot_calibration_claimed": False,
         }
+    if directional_observations is not None:
+        from public_trade_direction_null import evaluate_public_side_null
+        report["public_within_minute_weak_direction_null_v1"] = (
+            evaluate_public_side_null(directional_observations,
+                                      utc_day_start_us=min_us)
+        )
+        if (report["public_within_minute_weak_direction_null_v1"]["source_event_count"]
+                != count):
+            raise AssertionError("Controlled shuffle changed real archive source count")
     return report
 
 
@@ -263,6 +275,8 @@ def main() -> None:
     parser.add_argument("--date",default="2026-11-18")
     parser.add_argument("--clock-origin-study",action="store_true",
                         help="Three preregistered 30s public-print phases; never L2")
+    parser.add_argument("--direction-null-study",action="store_true",
+                        help="8 fixed minute-preserving timestamp controls; no FDR calibration")
     parser.add_argument("--output",type=Path,required=True)
     args = parser.parse_args()
     name, _, url, checksum_url = frozen_source(args.symbol,args.date)
@@ -271,7 +285,8 @@ def main() -> None:
     checksum = _download_bounded(checksum_url, 250).decode("ascii")
     raw = _download_bounded(url, MAX_ZIP_BYTES)
     summary = analyze_verified_zip(raw,checksum,symbol=args.symbol,day=args.date,
-                                   clock_origin_study=args.clock_origin_study)
+                                   clock_origin_study=args.clock_origin_study,
+                                   direction_null_study=args.direction_null_study)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     with args.output.open("x",encoding="utf-8") as file:
         json.dump(summary,file,sort_keys=True,indent=2,allow_nan=False)
