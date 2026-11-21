@@ -35,7 +35,9 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          from tools.abides_background_ratio_holdout import (
+          import sys
+          sys.path.insert(0,'tools')
+          from abides_background_ratio_holdout import (
               SEEDS,COHORTS,THRESHOLD,MIN_PRINTS,MIN_20S_GRID_HITS,
               MIN_LAGGED_L2_BINS,frozen_plan,check_seed_registry
           )
