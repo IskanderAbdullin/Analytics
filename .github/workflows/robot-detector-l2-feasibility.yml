@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - 'projects/robot-detector/tools/l2_probe.py'
+      - 'projects/robot-detector/tools/l2_trade_context.py'
       - 'projects/robot-detector/tests_l2/**'
       - '.github/workflows/robot-detector-l2-feasibility.yml'
   pull_request:
     paths:
       - 'projects/robot-detector/tools/l2_probe.py'
+      - 'projects/robot-detector/tools/l2_trade_context.py'
       - 'projects/robot-detector/tests_l2/**'
       - '.github/workflows/robot-detector-l2-feasibility.yml'
   workflow_dispatch:
@@ -60,6 +62,48 @@ jobs:
               'same_time':b['same_timestamp_repeated_snapshots'],
               'trade_prints':r['public_trade_print_count']}))
           PY
+      - name: Public-only quote/trade temporal context with rotated placebo
+        run: |
+          python tools/l2_trade_context.py --seed 1501 \
+            --output /tmp/abides-public-l2-trade-context.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides-public-l2-trade-context.json',encoding='utf-8'))
+          assert r['seed']==1501 and r['simulator_revision']=='ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242',r
+          assert [c['mode'] for c in r['cases']]==['null','pov','vwap'],r
+          assert r['private_execution_truth_used'] is False,r
+          assert r['physical_owner_count_known'] is False,r
+          assert r['market_false_discovery_rate_calibrated'] is False,r
+          assert r['real_historical_l2_verified'] is False,r
+          for case in r['cases']:
+              a,b=case['natural'],case['rotated_public_print_placebo']
+              assert a['l2_snapshot_count']>0 and a['public_fill_count']>0,case
+              assert a['public_fill_count']==b['public_fill_count'],case
+              assert a['public_total_lots']==b['public_total_lots'],case
+              assert sum(a['categories'].values())==a['public_fill_count'],case
+              assert sum(b['categories'].values())==b['public_fill_count'],case
+              assert sum(a['lots_by_category'].values())==a['public_total_lots'],case
+              assert sum(b['lots_by_category'].values())==b['public_total_lots'],case
+              assert a['join_rule']=='strict_prior_snapshot_only_same_timestamp_abstains',case
+              assert not a['physical_owner_identity_known'],case
+              assert not a['statistical_significance_established'],case
+              assert a['eligible_two_sided_fills']<=a['public_fill_count'],case
+              print('PUBLIC_L2_TRADE_CONTEXT_CHECK',json.dumps({
+                  'mode':case['mode'],'quotes':case['public_book']['snapshot_events'],
+                  'fills':a['public_fill_count'],
+                  'ambiguous_same_time':a['categories']['same_timestamp_ambiguous'],
+                  'eligible':a['eligible_two_sided_fills'],
+                  'compatible_natural':a['categories']['at_or_through_prior_opposite_best'],
+                  'compatible_placebo':b['categories']['at_or_through_prior_opposite_best'],
+              }))
+          PY
+      - name: Upload public-only quote/trade context aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-l2-trade-context-development
+          path: /tmp/abides-public-l2-trade-context.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload aggregate public simulated book audit only
         uses: actions/upload-artifact@v4
         with:
