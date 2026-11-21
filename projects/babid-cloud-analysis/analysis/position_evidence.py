@@ -77,7 +77,10 @@ def observations(folder: Path):
                 else:
                     continue
                 external = broker - journal
-                key = (stamp, broker, journal, external)
+                # An identical exported notice may repeat, but a baseline and a
+                # transition (or different reported 'from' values) are distinct
+                # evidence even at the exact same timestamp and position.
+                key = (stamp, kind, broker, journal, external, prev, reported)
                 if key in seen:
                     continue
                 seen.add(key)

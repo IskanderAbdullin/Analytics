@@ -88,5 +88,44 @@ class PositionEvidenceTests(unittest.TestCase):
         self.assertTrue(summary["first_observation_transition_unanchored"])
 
 
+    def test_same_millisecond_baseline_does_not_hide_change_notice(self):
+        self.fixture()
+        path = self.logs / "babid01.log"
+        baseline = (
+            "2026-11-21 14:55:00.000 INF Position check: "
+            "Broker position: +31 lots; robot journal: +33 lots; "
+            "outside the robot: -2 lots\\n"
+        )
+        path.write_text(baseline + path.read_text(encoding="utf-8"), encoding="utf-8")
+        positions, intervals, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(len(positions), 3)
+        self.assertEqual(positions[0]["kind"], "baseline")
+        self.assertEqual(positions[1]["kind"], "changed")
+        self.assertEqual(summary["reported_external_transitions"], 2)
+        self.assertEqual(str(positions[1]["reported_transition_lots"]), "-2")
+        self.assertEqual(len(intervals), 2)
+
+    def test_same_millisecond_distinct_reported_transitions_survive(self):
+        self.fixture()
+        path = self.logs / "babid01.log"
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        alternate = lines[0].replace("changed from 0 to -2", "changed from -1 to -2")
+        path.write_text(lines[0] + alternate + lines[1], encoding="utf-8")
+        positions, _, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(len(positions), 3)
+        self.assertEqual(summary["reported_external_transitions"], 3)
+        self.assertEqual(str(positions[0]["previous_external_lots"]), "0")
+        self.assertEqual(str(positions[1]["previous_external_lots"]), "-1")
+
+    def test_repeated_identical_notice_is_still_deduplicated(self):
+        self.fixture()
+        path = self.logs / "babid01.log"
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        path.write_text(lines[0] + lines[0] + lines[1], encoding="utf-8")
+        positions, _, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(len(positions), 2)
+        self.assertEqual(summary["reported_external_transitions"], 2)
+
+
 if __name__ == "__main__":
     unittest.main()
