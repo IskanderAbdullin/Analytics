@@ -32,7 +32,7 @@ class ResearchStateTests(unittest.TestCase):
         before = (self.root / "STATE.json").read_bytes()
         line = next_action(self.root)
         self.assertIn("A-001 [blocked_external]", line)
-        self.assertIn("FROZEN_BABITCLOUD_COPY", line)
+        self.assertIn(json.loads((self.root / "NEXT_ACTION.json").read_text(encoding="utf-8"))["next_command"], line)
         self.assertEqual(before, (self.root / "STATE.json").read_bytes())
 
     def test_mismatched_action_pointer_fails(self):
@@ -62,6 +62,21 @@ class ResearchStateTests(unittest.TestCase):
     def test_missing_file_is_reported(self):
         (self.root / "BACKLOG.md").unlink()
         self.assertTrue(any("BACKLOG.md" in e for e in check(self.root)))
+
+    def test_duplicate_evidence_id_fails(self):
+        with (self.root / "EVIDENCE.md").open("a", encoding="utf-8") as stream:
+            stream.write("\n| E-001 | duplicate | synthetic | test |\n")
+        self.assertTrue(any("duplicate evidence ID" in e for e in check(self.root)))
+
+    def test_duplicate_milestone_id_fails(self):
+        self.change("STATE.json", lambda x: x["verified_progress"].append(
+            dict(x["verified_progress"][0])))
+        self.assertTrue(any("duplicate milestone ID" in e for e in check(self.root)))
+
+    def test_duplicate_state_evidence_reference_fails(self):
+        self.change("STATE.json", lambda x: x["evidence_refs"].append(
+            x["evidence_refs"][0]))
+        self.assertTrue(any("duplicate state evidence" in e for e in check(self.root)))
 
 
 if __name__ == "__main__":

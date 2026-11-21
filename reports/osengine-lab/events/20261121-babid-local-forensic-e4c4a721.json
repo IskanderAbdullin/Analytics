@@ -1,0 +1,70 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-local-evidence-access-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "e4c4a721-9985-4fe8-8d6c-c177a2a92d63",
+    "occurred_at": "2026-11-21T16:49:14.297Z",
+    "type": "research",
+    "title": "Verified local copy and isolated full-history read bottleneck",
+    "summary": "With explicit read-only authorization, established local source/state/log presence and source-code mechanism for repeated position Halted; did not determine initial mismatch root cause. Full log and fills exceed connector size limit; prepared precise local offline-audit next step without publishing private records.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Mark real local copy verified and full-history processing unresolved."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Replace permission blocker with concrete PC Agent command-size/execution blocker and safe local audit command."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Record sanitized local observations and explicit uncertainty."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Keep P0 in progress until full logs and broker record reconciliation."
+    }
+  ],
+  "checks": [
+    {
+      "id": "checkpoint-ci",
+      "title": "Check research state consistency in public synthetic-only CI",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending GitHub Actions."
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-003",
+      "title": "No arbitrary command execution in connected PC Agent",
+      "state": "open",
+      "severity": "high",
+      "description": "Existing Python/Powershell audit must be run via an explicitly configured execution tool or locally by user; never work around security boundary."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Execute safe local offline audit of frozen copy and analyze small summaries",
+      "priority": "high",
+      "state": "blocked"
+    }
+  ],
+  "limitations": [
+    "No broker trade history was accessed.",
+    "No private transaction data was uploaded.",
+    "No trading application or settings modified."
+  ]
+}

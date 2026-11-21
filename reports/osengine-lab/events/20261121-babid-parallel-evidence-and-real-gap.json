@@ -1,0 +1,93 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-distinct-notices-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "c6710d69-3187-494e-a4f4-359205419fd3",
+    "occurred_at": "2026-11-21T17:09:00Z",
+    "type": "research",
+    "title": "Reconcile parallel evidence with first real NVDA +2 accounting discontinuity",
+    "summary": "Merged evidence from main PR #81 and real offline audit PR #84 with existing forensic parser/source-fix PR #77. Renumbered independent E-018..E-025 and milestones M-009..M-013 without replacing original E-013..E-017 documenting 13:08 +2 jump. Added unique evidence/milestone validators and contextual source-fix spec P0-S5.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Preserve real E-013..E-017 and independent E-018..E-025, add E-026"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Preserve M-008 real local evidence and append M-009..M-014"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Retain focused local 13:08 and first mismatch extraction"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Add conditional original-code accounting correction test P0-S5 / T16"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/research_state.py",
+      "action": "modified",
+      "summary": "Reject duplicated E-/M-IDs from concurrent branches"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_research_state.py",
+      "action": "modified",
+      "summary": "Add three collision regressions"
+    }
+  ],
+  "checks": [
+    {
+      "id": "research-ci",
+      "title": "Ubuntu + Windows synthetic tests plus research-state consistency",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Expected after merge commit; no raw data"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-004",
+      "title": "Large private source unreadable directly",
+      "severity": "high",
+      "state": "open",
+      "description": "Focused small local extract of original daily log and rows around 13:08 is missing."
+    },
+    {
+      "id": "B-006",
+      "title": "Causal link not yet tested",
+      "severity": "high",
+      "state": "open",
+      "description": "Need source lines around 13:08 and the actual first mismatch time, not only risk message copied at reset."
+    },
+    {
+      "id": "B-007",
+      "title": "Independent broker evidence missing",
+      "severity": "high",
+      "state": "open",
+      "description": "Actual broker executions/position snapshots have not been independently reconciled."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Read focused private 13:08 and first mismatch extract; test accounting rebasing against omitted fill",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Observed local +2 discontinuity is not causal proof; no independently confirmed broker fills.",
+    "No raw trade data, account IDs, secret or live source code in public CI."
+  ]
+}

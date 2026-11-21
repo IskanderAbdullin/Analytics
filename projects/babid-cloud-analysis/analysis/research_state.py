@@ -95,9 +95,18 @@ def check(root: Path) -> list[str]:
         date.fromisoformat(state["checkpoint_date"])
     except (KeyError, TypeError, ValueError):
         errors.append("invalid checkpoint_date")
-    evidence_ids = set(EVIDENCE_RE.findall(text["evidence"]))
+    evidence_rows = EVIDENCE_RE.findall(text["evidence"])
+    evidence_ids = set(evidence_rows)
     if not evidence_ids:
         errors.append("EVIDENCE.md must contain an evidence register")
+    if len(evidence_ids) != len(evidence_rows):
+        errors.append("duplicate evidence ID in EVIDENCE.md")
+    state_refs = state.get("evidence_refs", [])
+    if not isinstance(state_refs, list):
+        errors.append("state evidence_refs must be a list")
+        state_refs = []
+    if len(set(state_refs)) != len(state_refs):
+        errors.append("duplicate state evidence reference")
     hypothesis_ids: set[str] = set()
     for hypothesis in state.get("hypotheses", []):
         if not isinstance(hypothesis, dict):
@@ -118,13 +127,21 @@ def check(root: Path) -> list[str]:
         for ref in refs:
             if ref not in evidence_ids:
                 errors.append("unknown hypothesis evidence: " + str(ref))
-    for ref in state.get("evidence_refs", []):
+    for ref in state_refs:
         if ref not in evidence_ids:
             errors.append("unknown state evidence: " + str(ref))
+    milestone_ids: set[str] = set()
     for milestone in state.get("verified_progress", []):
         if not isinstance(milestone, dict) or not milestone.get("evidence_refs"):
             errors.append("milestone lacks cited evidence")
             continue
+        mid = milestone.get("id")
+        if not isinstance(mid, str) or not re.fullmatch(r"M-\d{3,}", mid):
+            errors.append("invalid milestone ID")
+        elif mid in milestone_ids:
+            errors.append("duplicate milestone ID")
+        else:
+            milestone_ids.add(mid)
         for ref in milestone["evidence_refs"]:
             if ref not in evidence_ids:
                 errors.append("unknown milestone evidence: " + str(ref))
