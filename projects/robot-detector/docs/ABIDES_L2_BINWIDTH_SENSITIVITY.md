@@ -30,6 +30,25 @@ A large span across widths shows **time discretization sensitivity** but cannot 
 
 The ABIDES output is a simulated archive. Without a separately source-attested exclusive completeness watermark, the data function preserves the earlier descriptive tape behavior and explicitly reports `completion_watermark_independently_verified=false`. The study keeps `source_completion_verified=false`; no statement of real L2 completeness is permitted.
 
+## Verified genuine ABIDES result (2026-11-21)
+
+[Successful pinned ABIDES CI #44903121650](https://github.com/IskanderAbdullin/Analytics/actions/runs/44903121650) passed six plan/conservation tests and executed **four actual matching-engine simulations** on the source-frozen seeds 1901–1902 (two background modes). Each public tape was re-analysed at the **three prespecified** bin widths, producing twelve *correlated analytical views*, not twelve independent experiments.
+
+| Background | Bin width | Eligible lagged 30s-equivalent quote/trade-bin pairs (two simulations) | Median **descriptive** Spearman rho |
+|---|---:|---:|---:|
+| Poisson noise | **10 s** | 123 | **−0.2430** |
+| Poisson noise | **30 s** | 40 | **−0.1271** |
+| Poisson noise | **60 s** | 20 | **+0.2061** |
+| Fixed-cadence noise | **10 s** | 95 | **−0.2776** |
+| Fixed-cadence noise | **30 s** | 33 | **−0.4279** |
+| Fixed-cadence noise | **60 s** | 14 | **−0.1929** |
+
+**Negative robustness finding:** Even the *sign* of the **two-seed cohort median** changes for the Poisson background between 30-second and 60-second binning, without any different market simulation or new private agent. Fixed-cadence coefficients vary substantially too. This is direct evidence that the **observed public statistic is sensitive to the arbitrary, research-chosen clock width** under these conditions. It does not prove every individual simulation reverses sign; cohort medians and per-simulation ranges are separate descriptive quantities preserved in the uploaded artifact.
+
+The same-source SHA-256, print/lot/book-count conservation checks passed for all three re-analyses within each genuine simulation. Source completion remains unverified; the result is not a calibrated market FDR, a validated causal effect, an individual participant identifier, or a trading edge. Neither the 10-, 30-, nor 60-second width is selected as "best" after these outcomes; **1901 and 1902 are now spent**.
+
+Artifact `abides-public-l2-binwidth-sensitivity` (aggregate-only, seven-day retention) contains the per-seed correlations and public-only count summaries. No private maker/taker IDs, account tokens, raw book/event tapes or trading orders were used.
+
 ## Verification and safety
 
 Six pure-Python tests in `tests_background/test_abides_l2_binwidth_sensitivity.py` exercise frozen seeds, incomplete/duplicated matrices, conservation, identical tape across widths, explicit null correlations and rejection of false attribution/calibration fields.
