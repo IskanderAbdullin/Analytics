@@ -132,7 +132,7 @@
   ],
   "current_stage": {
     "id": "RD-PUBLIC-CONDITIONAL-NULL-16",
-    "status": "ACTIVE_METHOD_DEVELOPMENT",
+    "status": "IN_PROGRESS",
     "title": "Source-domain gap audit and new period-agnostic timestamp-cluster/lagged-L2 conditional null",
     "why_next": "Frozen 160-source ABIDES study shows Poisson and momentum false alarms remain and exact-time grouping loses 7 additional TWAP positives. Tuning threshold 0.60 after seeing 3301-3340 cannot establish independent validation; we need a source-free measurement-limit audit and new period-agnostic public null.",
     "inputs": [
@@ -194,7 +194,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Commit actual source-free public period scan + seven adversarial tests (scratch tests passed but NOT in repository yet), integrate into cheap CI; add timing-position null with burst-preserving hard negatives, and prove/limit conditional exchangeability. Do not claim fixed-timestamp cluster-size shuffle measures timing significance. Verify new CI, update #97 and checkpoint; keep #72 open.",
-  "last_session_result": "2026-11-21: CI at pre-session HEAD 95f6a284 passed three workflows; added source-free measurement-identifiability proof in docs/PUBLIC_CONDITIONAL_NULL_IDENTIFIABILITY_20261121.md: timestamp-preserving multiplicity shuffles cannot calibrate cadence, so no timing p-value. Locally seven independent Python adversarial checks passed in scratch only (NOT yet committed/CI). No new ABIDES source run, no real FDR.",
+  "resume_instruction": "NEXT_ACTION: Confirm provenance CI after checkpoint status repair; implement and test the preregistered seven-period descriptive scan with full period reporting, fixed-timestamp multiplicity-invariance negative, and lagged-L2 gate. Do not infer p-values or owner identities. Freeze any future burst-preserving timing null and its exchangeability assumptions before new ABIDES source seeds; update #97 and plan.",
+  "last_session_result": "2026-11-21: Detected failed provenance CI run 44950270121 at commit 084e8fd4: checkpoint current_stage.status ACTIVE_METHOD_DEVELOPMENT violates validator STAGE_STATES. Corrected to IN_PROGRESS without weakening validator; prior source negatives unchanged. No new source experiments or holdout.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
