@@ -1,0 +1,61 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "3b6b1a4f-7851-4cbf-8864-2bb464bf17c7",
+    "occurred_at": "2026-11-21T15:12:10.512Z",
+    "type": "bugfix",
+    "title": "Add explicit forensic report quality gate so incomplete scans are not reported as success",
+    "summary": "Audit manifest now classifies missing/failed substudies, mutated source files, journal discrepancies, unknown settings and corrupt market data. It always prohibits automatic live tuning and returns nonzero for incomplete scans.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_quality.py",
+      "action": "added",
+      "summary": "Conservative local audit quality gate, explicitly separating completeness from broker confirmation."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_audit_quality.py",
+      "action": "added",
+      "summary": "Six synthetic quality gate unit tests and safety invariants."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Persist quality_gate.json and exit code 2 on incomplete audit."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Explain quality classifications and strict limits on strategy deployment."
+    }
+  ],
+  "checks": [
+    {
+      "id": "quality-ci",
+      "title": "Quality policy and coordinator tests in GitHub Actions",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending cross-platform CI."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "audit-report",
+      "title": "Review quality gate in a frozen full trading data copy",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No actual user trades were processed.",
+    "Audit does not approve live strategy changes."
+  ]
+}

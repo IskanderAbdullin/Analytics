@@ -24,6 +24,7 @@ import config_audit
 import tape_integrity
 import time_weighted_books
 import config_epochs
+import audit_quality
 
 
 def checksum(path: Path) -> str:
@@ -128,10 +129,14 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
     manifest["changed_inputs_across_scan"] = audit_provenance.changes_since_inventory(root, files)
     manifest["input_files_appear_stable"] = (
         manifest["unstable_input_files"] == 0 and not manifest["changed_inputs_across_scan"])
+    manifest["quality_gate"] = audit_quality.evaluate(manifest)
+    (output / "quality_gate.json").write_text(
+        json.dumps(manifest["quality_gate"], ensure_ascii=False, indent=2), encoding="utf-8")
     (output / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     return dict(output=str(output), files=len(files),
                 unstable_input_files=manifest["unstable_input_files"],
+                audit_status=manifest["quality_gate"]["status"],
                 reports=list(manifest["reports"]))
 
 
@@ -151,7 +156,7 @@ def main() -> int:
         print("Offline audit refused:", error, file=sys.stderr)
         return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return 0
+    return 2 if result["audit_status"] == "incomplete" else 0
 
 
 if __name__ == "__main__":
