@@ -1,0 +1,84 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-distinct-notices-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "d25b8340-2b62-477a-9431-70fc25a398e9",
+    "occurred_at": "2026-11-21T16:45:30.787Z",
+    "type": "research",
+    "title": "Abstain from ordering equal-time position observations and classify endpoint fills",
+    "summary": "Avoid two concrete forensic inference errors: fills on observation endpoints mislabelled outside window, and same-time position samples treated as a causal ordered delta.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/position_evidence.py",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_position_evidence.py",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_quality.py",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Conservative evidence treatment and research checkpoint"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-ci",
+      "title": "Cross-platform synthetic test suite",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Awaiting GitHub Actions; no private data used"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-001",
+      "title": "Frozen real evidence not authorized",
+      "state": "open",
+      "severity": "high",
+      "description": "Cannot verify NVDA root cause without private archive."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Inspect frozen archive through separately authorized read-only access",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No live trading, broker connection or PC Agent access.",
+    "No real source evidence inspected."
+  ]
+}

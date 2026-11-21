@@ -127,5 +127,33 @@ class PositionEvidenceTests(unittest.TestCase):
         self.assertEqual(summary["reported_external_transitions"], 2)
 
 
+    def test_endpoint_timestamp_fills_are_boundaries_not_unseen(self):
+        self.fixture()
+        with (self.state / "fills.csv").open("a", encoding="utf-8") as stream:
+            stream.write("2026-11-21 14:55:00.000;ex;edge1;Buy;1;0\n")
+            stream.write("2026-11-21 15:01:47.000;ex;edge2;Sell;1;0\n")
+        _, intervals, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(summary["fills_on_timestamp_boundaries"], 2)
+        self.assertEqual(summary["fills_outside_observed_windows"], 0)
+        self.assertEqual(intervals[0]["fills_in_window"], 2)
+
+    def test_simultaneous_position_checks_do_not_prove_ordered_delta(self):
+        self.fixture()
+        path = self.logs / "babid01.log"
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        second = lines[0].replace(
+            "changed from 0 to -2", "changed from -2 to -1"
+        ).replace("broker +31", "broker +32")
+        path.write_text(lines[0] + second + lines[1], encoding="utf-8")
+        _, intervals, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(len(intervals), 2)
+        self.assertTrue(intervals[0]["same_timestamp_order_ambiguous"])
+        self.assertEqual(intervals[0]["broker_delta_lots"], "")
+        self.assertEqual(intervals[0]["external_delta_lots"], "")
+        self.assertEqual(intervals[0]["journal_fill_delta_consistent"], "")
+        self.assertEqual(summary["same_timestamp_unordered_intervals"], 1)
+        self.assertEqual(summary["journal_fill_mismatches"], 0)
+        self.assertEqual(summary["external_changes"], 1)
+
 if __name__ == "__main__":
     unittest.main()

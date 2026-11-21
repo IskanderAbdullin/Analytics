@@ -39,6 +39,9 @@ def evaluate(manifest: dict) -> dict:
             "broker_journal_position_mismatch_logged")
     warn_if((reports.get("position_evidence") or {}).get(
         "reported_external_transitions", 0) > 0, "external_position_transitions_reported")
+    warn_if((reports.get("position_evidence") or {}).get(
+        "same_timestamp_unordered_intervals", 0) > 0,
+        "position_observations_same_timestamp_unordered")
     warn_if((reports.get("config_epochs") or {}).get("observed_epochs", 0) == 0,
             "no_historical_config_events")
     tape = reports.get("tape_integrity") or {}

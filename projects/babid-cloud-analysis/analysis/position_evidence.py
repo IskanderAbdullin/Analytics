@@ -34,7 +34,7 @@ OBS_FIELDS = ("at_msk", "kind", "broker_lots", "journal_lots", "external_lots",
               "reported_transition_lots", "reported_consistent",
               "source_file", "source_line")
 DELTA_FIELDS = (
-    "from_msk", "to_msk", "broker_delta_lots", "journal_delta_lots",
+    "from_msk", "to_msk", "same_timestamp_order_ambiguous", "broker_delta_lots", "journal_delta_lots",
     "external_delta_lots", "fill_net_lots_in_window", "fills_in_window",
     "synthetic_fills_in_window", "journal_fill_delta_consistent",
     "position_arithmetic_consistent", "outside_position_changed",
@@ -116,16 +116,23 @@ def reconcile(root: Path, state: str, logs: str):
         d_broker = current["broker_lots"] - prev["broker_lots"]
         d_journal = current["journal_lots"] - prev["journal_lots"]
         d_external = current["external_lots"] - prev["external_lots"]
+        # Equal timestamps have unknown causal order, even when file-order is stable.
+        tied = current["at_msk"] == prev["at_msk"]
         intervals.append(dict(
             from_msk=prev["at_msk"], to_msk=current["at_msk"],
-            broker_delta_lots=d_broker, journal_delta_lots=d_journal,
-            external_delta_lots=d_external, fill_net_lots_in_window=Decimal(0),
+            same_timestamp_order_ambiguous=tied,
+            broker_delta_lots="" if tied else d_broker,
+            journal_delta_lots="" if tied else d_journal,
+            external_delta_lots="" if tied else d_external,
+            fill_net_lots_in_window=Decimal(0),
             fills_in_window=0, synthetic_fills_in_window=0,
             sample_trade_ids=[], position_arithmetic_consistent=(
-                d_broker - d_journal == d_external),
-            outside_position_changed=d_external != 0,
-            journal_fill_delta_consistent=False,
-            note="Broker minus journal changes are observations, not proven causes.",
+                "" if tied else d_broker - d_journal == d_external),
+            outside_position_changed="" if tied else d_external != 0,
+            journal_fill_delta_consistent="" if tied else False,
+            note=("Identical observation timestamps: order unknown; paired deltas withheld."
+                  if tied else
+                  "Broker minus journal changes are observations, not proven causes."),
         ))
     unseen = 0
     bad = 0
@@ -158,11 +165,13 @@ def reconcile(root: Path, state: str, logs: str):
                 # Strict inequality avoids attributing a fill at the instant
                 # of a position check when ordering within that millisecond is unknown.
                 i = bisect.bisect_left(times, at)
+                # An exact match to even the first/last check is a boundary,
+                # not an observation outside the window.
+                if i < len(times) and times[i] == at:
+                    boundary += 1
+                    continue
                 if i < 1 or i >= len(times):
                     unseen += 1
-                    continue
-                if times[i - 1] == at or times[i] == at:
-                    boundary += 1
                     continue
                 entry = intervals[i - 1]
                 entry["fill_net_lots_in_window"] += lots if row["side"] == "Buy" else -lots
@@ -173,8 +182,9 @@ def reconcile(root: Path, state: str, logs: str):
             except (ValueError, InvalidOperation, TypeError, KeyError, OverflowError):
                 bad += 1
     for row in intervals:
-        row["journal_fill_delta_consistent"] = (
-            row["journal_delta_lots"] == row["fill_net_lots_in_window"])
+        if not row["same_timestamp_order_ambiguous"]:
+            row["journal_fill_delta_consistent"] = (
+                row["journal_delta_lots"] == row["fill_net_lots_in_window"])
         row["sample_trade_ids"] = ",".join(row["sample_trade_ids"])
     transition_reports = [p for p in positions
                           if p["kind"] in ("changed", "restart_comparison")
@@ -186,12 +196,15 @@ def reconcile(root: Path, state: str, logs: str):
             prior_position_disagreements += 1
     summary = dict(state=state, logs=logs, observations=len(positions),
                    comparison_intervals=len(intervals),
-                   external_changes=sum(x["outside_position_changed"] for x in intervals),
+                   external_changes=sum(x["outside_position_changed"] is True for x in intervals),
+                   same_timestamp_unordered_intervals=sum(
+                       x["same_timestamp_order_ambiguous"] for x in intervals),
                    reported_external_transitions=len(transition_reports),
                    first_observation_transition_unanchored=bool(
                        positions and positions[0]["kind"] != "baseline"),
                    reported_prior_position_disagreements=prior_position_disagreements,
-                   journal_fill_mismatches=sum(not x["journal_fill_delta_consistent"] for x in intervals),
+                   journal_fill_mismatches=sum(
+                       x["journal_fill_delta_consistent"] is False for x in intervals),
                    inconsistent_observation_arithmetic=sum(not x["reported_consistent"] for x in positions),
                    duplicate_fill_ids=duplicate, invalid_fills=bad,
                    fills_outside_observed_windows=unseen, fills_on_timestamp_boundaries=boundary,
@@ -201,6 +214,8 @@ def reconcile(root: Path, state: str, logs: str):
                        "A mismatch between a logged prior value and an earlier sample may reflect skipped checks or stale responses.",
                        "Broker position samples are sparse and may be stale or delayed.",
                        "Fills use exchange timestamps, logs use robot observation timestamps.",
+                       "Fills exactly at the first/last check are time-boundary ambiguous.",
+                       "Same-time position samples cannot establish a causal pairwise delta.",
                        "Net change in external lots does not prove manual trades, missing executions or a software bug.",
                        "Missing fills and duplicate event delivery may invalidate interval completeness.",
                        "This audit does not request broker positions or change trading risk state.",
