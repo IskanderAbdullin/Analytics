@@ -420,3 +420,48 @@ ZIP, private IDs, credentials or large artifacts were committed.
   their Windows machine. No local clone or raw data download was
   necessary: archives are only a few MB and cloud CI passed.
   Never claim local mirror exists until actually created.
+
+## 2026-11-21 — public-source eight-archive 4-day, two-symbol original panel
+
+- Original precommit transfer on 2026-11-20:
+  [GitHub Actions #44920626852](https://github.com/IskanderAbdullin/Analytics/actions/runs/44920626852)
+  **success**, **195,180 LTCUSDT** and **73,279 BCHUSDT**
+  real public spot trades. The fixed phase-0 strong-null
+  endpoint passed on LTC (68 > max 53) but **failed on BCH**
+  (511 <= max 528). This negative result is permanently pinned.
+- Subsequent **five-print occupancy-conditioned** precommit
+  on 2026-11-17:
+  [GitHub Actions #44921288804](https://github.com/IskanderAbdullin/Analytics/actions/runs/44921288804)
+  **success**, **107,788 LTC** and **42,678 BCH**.
+  The primary >=5 bin condition passed LTC (133 > max103)
+  and failed BCH (504 <= max519). Control windows with exactly
+  one print are always one-sided and can be ignored for
+  this conditional endpoint.
+- A final precommitted previously-uninspected BCH
+  **2026-11-18/19** completion:
+  [GitHub Actions #44921851326](https://github.com/IskanderAbdullin/Analytics/actions/runs/44921851326)
+  **success**, **28,466 + 50,213** new real public source prints.
+  Fixed phase-0 strong-null test **failed** on BCH Nov18
+  (610 <= max626), **narrowly passed** on Nov19
+  (541 > max539); **one of two newly held-back dates**
+  positive. Already-seen BCH Nov20 was separately replayed
+  under the five-print condition and failed (334 <= max343).
+- Now **776,007 original public trade prints**: LTCUSDT
+  2026-11-17..20 **581,371**, BCHUSDT 2026-11-17..20
+  **194,636**. Four original provider daily ZIPs per symbol
+  were SHA256-matched against their official checksums.
+  Observed adjacent day trade-ID endpoints contiguous
+  across all 3 boundaries in EACH symbol. This verifies
+  provider archive continuity, **not independent exchange
+  completeness, no source L2 and no real agent identity**.
+- Source fetch always noncommercial research only under
+  Binance Vision CC BY-NC-SA 4.0/provider terms.
+  All original network CI workflow triggers converted
+  to **manual-only** immediately after successful runs.
+  No raw exchange ZIP, private IDs, per-event timestamps,
+  credentials or large replay artifacts committed/uploaded.
+- Research Stage-2 live-market actor detection, FDR and any
+  trading release remain **BLOCKED**. Repeating more null
+  shuffles or choosing a better posthoc phase cannot solve
+  the missing L2/actual source-owner ground-truth problem.
+  See [complete four-day BCH source/negative results](BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md).

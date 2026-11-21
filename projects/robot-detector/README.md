@@ -1,5 +1,42 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
+## Extended source-verified real spot print panel: 776,007 public executions
+
+The project has verified **8 independent exchange daily SPOT public trade
+source archives** from Binance Vision: **LTCUSDT and BCHUSDT** on
+**each UTC day 2026-11-17 through 2026-11-20**, totalling **776,007
+public executions** (LTC 581,371; BCH 194,636). The four observed
+daily public trade-ID ranges are exactly consecutive for each symbol,
+and every original provider ZIP passed its published SHA-256 check.
+This is **provider dataset continuity**, not independent proof every
+matching-engine event was captured, and not full L2.
+
+The frozen stronger null preserves whole equal-timestamp-side-vector
+execution groups inside one-minute shuffle controls and separately
+conditions on **>=5 public trades per complete 30s bin**.
+Results are **not transferable uniformly across markets**.
+For BCHUSDT, original phase-0 five-print minimum source days
+Nov17/18/19/20 observed one-sided counts **504/610/541/334**,
+versus strong-null eight-shuffle maximums **519/626/539/343**:
+only **Nov19** exceeds the eight-controls envelope.
+The two new BCH Nov18–19 sources were fixed before inspection:
+one failed and one narrowly passed. A selected 20s alternative
+phase must **not** replace the fixed primary 0s outcome.
+
+[Four-day BCH panel, original source links, full per-origin stats,
+licensing and negative results](docs/BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md)
+· [Exact 17 Nov five-print occupancy protocol](docs/REAL_SPOT_OCCUPANCY_TRANSFER_20261117.md)
+· [Earlier LTC/BCH real 20 Nov transfer](docs/REAL_SPOT_PRECOMMITTED_TRANSFER_20261120.md).
+
+**No actual robot owner truth, real-market accuracy/FDR, independent
+complete historical L2 or commercial trading entitlement.** Binance
+Vision source data is noncommercial research use only under
+CC BY-NC-SA 4.0/provider terms. All original source-acquisition
+GitHub Actions were converted to **manual-only** after their
+successful original runs, with tiny aggregate-only artifacts.
+The authorized Windows PC-Agent was not needed for these small,
+bounded experiments.
+
 ## Real-public-trade negative controls: clock and partial-fill preservation
 
 **Executed twice on the same two inspected real LTCUSDT UTC days.**
