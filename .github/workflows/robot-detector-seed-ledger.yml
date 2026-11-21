@@ -33,6 +33,9 @@ on:
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
       - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/fixtures/l2_synthetic_owner_worlds_observed_20261121.json'
       - 'projects/robot-detector/tools/public_l2_ownership_nonidentifiability.py'
       - 'projects/robot-detector/tests_background/test_public_l2_ownership_nonidentifiability.py'
       - 'projects/robot-detector/tools/l2_duration_weighting.py'
@@ -96,6 +99,9 @@ on:
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
       - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/fixtures/l2_synthetic_owner_worlds_observed_20261121.json'
       - 'projects/robot-detector/tools/public_l2_ownership_nonidentifiability.py'
       - 'projects/robot-detector/tests_background/test_public_l2_ownership_nonidentifiability.py'
       - 'projects/robot-detector/tools/l2_duration_weighting.py'
@@ -159,6 +165,8 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_lobster_event_time_features.py' -v
           python -m unittest discover -s tests_background -p 'test_l2_duration_weighting.py' -v
           python -m unittest discover -s tests_background -p 'test_public_l2_ownership_nonidentifiability.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_l2_feed_coverage_gate.py' -v
+          python tools/public_l2_feed_coverage_gate.py
           python tools/public_l2_ownership_nonidentifiability.py
           python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
           python tools/autonomy_checkpoint.py
