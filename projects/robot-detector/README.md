@@ -1,6 +1,6 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
-**Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 128 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
+**Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
 ## Public-only directional regime shifts — experimental Stage 2
@@ -38,7 +38,7 @@ python tools/abides_export.py --mode twap --seed 41 --public data/raw/abides-pub
 dotnet run --project src/RobotDetector.Cli -- benchmark-abides-blind --public data/raw/abides-public.csv --truth data/raw/abides-truth.json --output data/results/abides-score.json
 ```
 
-[Full setup, data contract, null protocol and limitations](docs/ABIDES_GENUINE_REPLAY.md). [Verified ABIDES CI #44890937246](https://github.com/IskanderAbdullin/Analytics/actions/runs/44890937246) includes **123/123** offline C# checks, four frozen-seed TWAP/null simulations each, and real VWAP/POV execution tests. In four frozen TWAP runs the fixed-q detector recovered 101 of 197 controlled prints; the variable-q screen recovered none. On single VWAP (50 controlled) and POV (14 controlled) runs **both screens recovered zero**. Dedicated GitHub Actions workflow runs the real simulator without touching a trading account. Results are **not** real-market calibrated precision or a count of real physical robots; Stage 2 scientific gate stays closed.
+[Full setup, data contract, null protocol and limitations](docs/ABIDES_GENUINE_REPLAY.md). [Verified ABIDES CI #44890937246](https://github.com/IskanderAbdullin/Analytics/actions/runs/44890937246) includes **123/123** offline C# checks, four frozen-seed TWAP/null simulations each, and real VWAP/POV execution tests. In four frozen TWAP runs the fixed-q detector recovered 101 of 197 controlled prints; the variable-q screen recovered none. On single VWAP (50 controlled) and POV (14 controlled) runs **both screens recovered zero**. A **new pre-registered, unchanged-screen 16-case baseline** on independent synthetic seeds 1301–1304 ([successful real ABIDES CI #44894042225](https://github.com/IskanderAbdullin/Analytics/actions/runs/44894042225)) found, for the fixed-quantity screen: **TWAP 98/183 controlled fills recovered (53.55%), VWAP 6/191 (3.14%), POV 0/66**; the variable-quantity screen recovered **0 controlled fills in all three strategies**. The agent-free null (13,773 public fills) produced no attributed prints from either baseline. This demonstrates strong *synthetic* dependence on execution strategy, not a real-market precision estimate or actual number of physical bots. The real simulator ran in GitHub Actions without touching any trading account. **Stage-2 scientific gate remains CLOSED.**
 
 ## Adversarial common-clock null experiment — 2026-11-21
 

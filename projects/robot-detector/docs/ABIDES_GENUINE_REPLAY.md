@@ -101,6 +101,23 @@ The protocol runs **16 genuine matching-engine simulations** with complete maker
 
 This test cannot establish physical traders, actual MOEX/SPB precision, a market opportunity or independent physical bots. The 1301–1304 cohort becomes **spent immediately after evaluation**; no further model tuning against it is permitted. Any future new strategy requires a new unrelated hidden evaluation set.
 
+### Verified independent execution-strategy result (frozen 1301–1304)
+
+The **unmodified detectors and frozen parameters** passed the [genuine ABIDES-NG CI run #44894042225](https://github.com/IskanderAbdullin/Analytics/actions/runs/44894042225) with 134/134 C# self-tests and 16 actual matching-engine simulations. The summary-only, 14-day artifact is named `abides-frozen-executed-strategy-baseline`. All private maker/taker attribution used strictly **post-detection** and was deleted with the temporary CI work directory.
+
+| Executed simulator strategy (4 runs each) | Public fills | Controlled fills | Fixed-q TP / FP / missed | Fixed-q recall | Variable-q TP / FP / missed |
+|---|---:|---:|---|---:|---|
+| No injected execution agent | 13,773 | 0 | 0 / 0 / 0 | Undefined | 0 / 0 / 0 |
+| TWAP | 14,028 | 183 | **98 / 0 / 85** | **53.55%** | 0 / 0 / 183 |
+| VWAP | 13,803 | 191 | **6 / 0 / 185** | **3.14%** | 0 / 0 / 191 |
+| POV | 13,581 | 66 | **0 / 0 / 66** | **0%** | 0 / 0 / 66 |
+
+The fixed-q screen had any attribution in **4/4 TWAP** cases, **1/4 VWAP** cases, **0/4 POV** and **0/4 null** cases. The variable-q screen had zero attributions in every one of these 16 simulations. Precision, where defined, was 100% *only in these simulations* because there were no uncontrolled attributed prints among emitted candidates; when no prints are attributed, event precision is **undefined rather than 0 or 100%**.
+
+**Scientific conclusion:** The existing fixed periodic-volume screen partially recognizes this particular simulated TWAP but **barely recognizes VWAP** and **misses POV entirely** in the frozen four-seed cohorts. The second periodic varying-volume screen has **no observable sensitivity** to the simulated executions tested here. These outcomes independently corroborate the earlier single-seed weakness; they are **not** market-wide sensitivity, calibrated false discovery or physical robot identities. The current market change-point and volume-lag public features also failed to establish reliable discrimination against ABIDES nulls, and therefore **none should be promoted into live robot alerts**.
+
+These frozen seeds (1301–1304) are now **spent**. A future model may be developed using entirely separate development data and evaluated only on a **new, committed-before-training** independent holdout. ABIDES-agent differences in schedules, sizes, matching, market regime and synthetic queue execution matter; this four-seed dataset is not a valid causal representation of MOEX/SPB.
+
 ## Scientific limits and release gates
 
 ABIDES-NG is a synthetic exchange simulator, not a calibrated representation of MOEX/SPB, nor an independent prediction trial on untouched real instruments/dates. One seeded scenario with an ABIDES execution agent does not prove precision, recall or model advantage on a real market. Exchange per-fill truth identifies synthetic agent participants, **not** independent physical real-world owners. The private truth is an evaluator input; tampering SHA mismatches or event records fails closed, but the scorer cannot cryptographically prove that an external manifest really originated from ABIDES unless the environment/source is independently audited.
