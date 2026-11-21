@@ -115,7 +115,9 @@
             91
           ]
         }
-      ]
+      ],
+      "first_observed_trade_id": 608078470,
+      "last_observed_trade_id": 608186257
     },
     {
       "symbol": "BCHUSDT",
@@ -217,7 +219,9 @@
             187
           ]
         }
-      ]
+      ],
+      "first_observed_trade_id": 296851413,
+      "last_observed_trade_id": 296894090
     }
   ]
 }

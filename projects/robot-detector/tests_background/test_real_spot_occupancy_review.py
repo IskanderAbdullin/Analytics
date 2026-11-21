@@ -130,6 +130,49 @@ class RealSpotOccupancyReviewTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 analyze(self.cfg,reports)
 
+    def test_original_observed_outcomes_are_pinned_with_bch_failure(self):
+        fp=Path(__file__).resolve().parents[1]/"fixtures"/"binance_spot_occupancy_20261117_observed.json"
+        data=load_json(fp,max_bytes=10000)
+        self.assertEqual(data["precommit_sha"],
+                         "c64303eac0aa9da8ee9de97f8af4381bbd7fcd1f")
+        self.assertEqual(data["original_run_id"],44921288804)
+        self.assertEqual(data["source_public_trades_total"],150466)
+        self.assertFalse(data["precommitted_joint_primary_both_pass"])
+        self.assertEqual([x["symbol"] for x in data["cases"]],["LTCUSDT","BCHUSDT"])
+        self.assertEqual([x["public_trades"] for x in data["cases"]],[107788,42678])
+        self.assertEqual([x["primary_pass"] for x in data["cases"]],[True,False])
+        self.assertEqual(data["cases"][0]["first_observed_trade_id"],608078470)
+        self.assertEqual(data["cases"][0]["last_observed_trade_id"],608186257)
+        self.assertEqual(data["cases"][1]["first_observed_trade_id"],296851413)
+        self.assertEqual(data["cases"][1]["last_observed_trade_id"],296894090)
+        ltc,bch=data["cases"]
+        self.assertEqual([p["observed_ge5_one_sided"] for p in ltc["phases"]],
+                         [133,127,138])
+        self.assertEqual([p["null_ge5_median"] for p in ltc["phases"]],
+                         [98.5,94.5,92.5])
+        self.assertEqual([p["observed_ge5_one_sided"] for p in bch["phases"]],
+                         [504,495,503])
+        self.assertEqual([p["null_ge5_median"] for p in bch["phases"]],
+                         [509.5,503.5,488.5])
+        self.assertEqual([p["precommitted_strong_null_envelope_pass"]
+                          for p in bch["phases"]],[False,False,True])
+        for case in data["cases"]:
+            self.assertEqual(
+                case["last_observed_trade_id"]-case["first_observed_trade_id"]+1,
+                case["public_trades"])
+            for phase in case["phases"]:
+                self.assertEqual(
+                    sum(phase["occupancy_bin_counts"]),
+                    phase["occupancy_bin_counts"][0]+
+                    phase["occupancy_bin_counts"][1]+
+                    phase["occupancy_bin_counts"][2]+
+                    phase["eligible_ge5"])
+                self.assertEqual(phase["occupancy_bin_counts"][0],
+                                 phase["occupancy_one_sided_counts"][0])
+                self.assertEqual(
+                    phase["observed_ge5_one_sided"],
+                    sum(phase["occupancy_one_sided_counts"][3:]))
+
     def test_changed_protocol_fails_before_inspecting_new_data(self):
         import json
         for field,value in (
