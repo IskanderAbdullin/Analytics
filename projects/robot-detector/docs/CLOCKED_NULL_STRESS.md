@@ -4,7 +4,7 @@
 
 ## Threat model and hidden truth
 
-`MarketClockNullStress.Generate(seed, backgroundPrints, cycles, periodMilliseconds)` emits anonymous, deterministically SHA-identified `MarketTrade` records. Their public timestamps sit near a shared periodic clock grid, each trade has 100 lots and reported SELL side. Crucially, **each print is given a different private background producer label** and there are **zero controlled execution agents**. These labels are never supplied to either detector; they are retained solely for scoring by the existing `BlindExecutionBenchmark.Evaluate` path.
+`MarketClockNullStress.Generate(seed, backgroundPrints, cycles, periodMilliseconds)` emits anonymous, deterministically SHA-identified `MarketTrade` records. Their public timestamps sit near a shared periodic clock grid, with reported SELL side and a global clip-size schedule. The default `--clip-mode fixed` gives all prints 100 lots; `--clip-mode variable` cycles public quantities 25/50/75/100 lots by clock slot. Neither mode has repeated controlled execution producers. Crucially, **each print is given a different private background producer label** and there are **zero controlled execution agents**. These labels are never supplied to either detector; they are retained solely for scoring by the existing `BlindExecutionBenchmark.Evaluate` path.
 
 This is a worst-case test for over-interpreting a rhythmic *market-wide event* as an identified execution program. It does not claim that real print-level independence is observable or that this model is statistically representative of an exchange.
 
@@ -18,6 +18,8 @@ dotnet run --project src/RobotDetector.Cli -- benchmark-clock-null `
   --output data/results/clock-null.json
 ```
 
+Use `--clip-mode variable` to run the same zero-controlled-truth challenge against models that require variable-size evidence. Fixed and variable runs use disjoint opaque ID domains and keep private producer labels separate.
+
 Without `--output`, the command prints JSON; with `--output`, it requires a new file path to avoid overwriting prior evidence. It never contacts brokers, downloads archives, reads accounts or places orders.
 
 ## Interpretation
@@ -30,7 +32,9 @@ For any model, exactly conserve counts: the sum of `FalsePositivePrints` across 
 
 ## Checks and release gates
 
-Three additional deterministic no-NuGet self-tests check: independent private producers and opaque IDs; zero controlled truth, false-positive conservation and undefined recall; summary arithmetic, reproducibility and fail-closed input bounds. The Windows convenience `RobotDetector.DotnetTests` wrapper executes the entire console self-test battery through `dotnet test`; this optional local wrapper is not required by upstream's no-NuGet CI.
+Four additional deterministic no-NuGet self-tests check: independent private producers and opaque IDs; zero controlled truth, false-positive conservation and undefined recall; summary arithmetic, reproducibility and fail-closed input bounds. The Windows convenience `RobotDetector.DotnetTests` wrapper executes the entire console self-test battery through `dotnet test`; this optional local wrapper is not required by upstream's no-NuGet CI.
+
+**Executed fixed-q stress smoke (3 seeds × 60 background prints; 2026-11-21):** the fixed-quantity detector attributed 81/180 independent public prints as candidate evidence across 3/3 adverse null cases; the variable-quantity detector attributed 0/180 because clip sizes were constant. This is a counterexample to naive physical-robot identification, **not** an empirical market-wide false-positive rate. [Source CI run](https://github.com/IskanderAbdullin/Analytics/actions/runs/44888157567). Variable-size adversarial results require a separate run; do not infer its performance from the fixed-q control.
 
 Current research status: `Stage 2 scientific release gate CLOSED`. This experiment is neither ABIDES-NG with hidden agent truth and queue matching nor empirically calibrated clustered-null validation. Before any real-market claims: hold out entire dates/instruments, run multiple competing conditional null families through the full candidate-selection pipeline, check source clock precision/market session coverage, and evaluate forecast ability against prespecified placebo.
 

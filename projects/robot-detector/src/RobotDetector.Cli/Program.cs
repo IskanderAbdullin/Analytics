@@ -206,7 +206,8 @@ internal static class Program
             trials: Integer(options, "trials", 20),
             backgroundPrints: Integer(options, "background-prints", 120),
             cycles: Integer(options, "cycles", 12),
-            periodMilliseconds: Integer(options, "period-ms", 5000));
+            periodMilliseconds: Integer(options, "period-ms", 5000),
+            clipMode: options.GetValueOrDefault("clip-mode", "fixed"));
         string json = JsonSerializer.Serialize(report, JsonOptions);
         if (options.TryGetValue("output", out var path))
         {
@@ -788,7 +789,7 @@ internal static class Program
         Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--receipt-order archive_row|exchange_time_ideal] [--output replay.json]");
         Console.WriteLine("compare-archives --inputs \"a.csv;b.csv\" --html comparison.html [--json comparison.json] [--window-minutes 5]");
         Console.WriteLine("benchmark-blind [--seeds 5] [--background-prints 120] [--output blind-benchmark.json]");
-        Console.WriteLine("benchmark-clock-null [--trials 20] [--background-prints 120] [--cycles 12] [--period-ms 5000] [--output clock-null.json]");
+        Console.WriteLine("benchmark-clock-null [--trials 20] [--background-prints 120] [--cycles 12] [--period-ms 5000] [--clip-mode fixed|variable] [--output clock-null.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

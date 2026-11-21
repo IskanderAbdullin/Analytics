@@ -5,7 +5,7 @@
 
 ## Adversarial common-clock null experiment — 2026-11-21
 
-New read-only command `benchmark-clock-null` constructs market-wide periodic **background** prints (zero controlled execution agents) with opaque IDs and private independent producer labels. Both detectors see only the identical public tape; any claimed controlled-execution evidence is counted as a synthetic false attribution. Aggregated per-trial alarms are **not** calibrated real-market FPR or proof of physical robot identities.
+New read-only command `benchmark-clock-null` constructs market-wide periodic **background** prints (zero controlled execution agents) with opaque IDs and private independent producer labels. Both detectors see only the identical public tape; any claimed controlled-execution evidence is counted as a synthetic false attribution. Two independent profiles are available: fixed 100-lot prints and variable 25/50/75/100-lot market-wide clocked prints (`--clip-mode variable`). Both have **zero** controlled program ground truth. Aggregated per-trial alarms are **not** calibrated real-market FPR or proof of physical robot identities.
 
 ```powershell
 dotnet run --project src/RobotDetector.Cli -- benchmark-clock-null `

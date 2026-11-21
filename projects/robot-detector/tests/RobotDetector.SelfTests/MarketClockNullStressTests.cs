@@ -57,6 +57,39 @@ internal static partial class Program
         }
     }
 
+    private static void ClockedNullVariableQuantityStress()
+    {
+        var fixedTape = MarketClockNullStress.Generate(502, 60, clipMode: "fixed");
+        var variableTape = MarketClockNullStress.Generate(502, 60, clipMode: "variable");
+        Assert(variableTape.PublicTape.Trades.Count == fixedTape.PublicTape.Trades.Count,
+            "both modes must preserve the number of public background prints");
+        Assert(variableTape.PublicTape.Trades.Select(t => t.QuantityLots).Distinct().Count() == 4 &&
+               fixedTape.PublicTape.Trades.Select(t => t.QuantityLots).Distinct().Count() == 1,
+            "variable mode should stress a variable-clip detector, not only the fixed model");
+        Assert(!variableTape.PublicTape.Trades.Select(t => t.EventId).Intersect(
+               fixedTape.PublicTape.Trades.Select(t => t.EventId)).Any(),
+            "different null generators must not alias public event identifiers");
+        Assert(variableTape.HiddenProducerByEventId.Values.Distinct().Count() == 60 &&
+               variableTape.InjectedExecutionPrintCount == 0,
+            "variable-size clock null must remain entirely unrelated background");
+
+        var report = MarketClockNullStress.Run(3, 60, clipMode: "variable");
+        Assert(report.ClipMode == "variable" && report.Cases.Count == 3 &&
+               report.Cases.All(c => c.Kind == "market_clock_variable_null" &&
+                   c.TrueSyntheticProducerCount == 0 && c.InjectedExecutionPrints == 0),
+            "variable-size null must not invent controlled producer truth");
+        Assert(report.Cases.All(c => c.Models.All(m =>
+                   m.TruePositivePrints == 0 &&
+                   m.FalsePositivePrints == m.AttributedPublicPrints &&
+                   m.EventRecall is null)),
+            "all candidate evidence remains synthetic background false attribution");
+
+        bool rejected = false;
+        try { MarketClockNullStress.Run(1, 20, clipMode: "secret-third-mode"); }
+        catch (ArgumentException) { rejected = true; }
+        Assert(rejected, "unknown clip mode must fail closed");
+    }
+
     private static void ClockedNullDeterministicAndValidated()
     {
         var first = MarketClockNullStress.Run(2, 45);
