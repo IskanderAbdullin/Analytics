@@ -5,18 +5,18 @@
   "action_id": "A-001",
   "status": "blocked_external",
   "priority": "P0",
-  "title": "Выполнить потоковый офлайн-аудит всей доступной копии и получить локальный компактный отчёт по расхождению NVDA",
-  "uncertainty_reduced": "В локальной копии подтверждены реальные исходники и файлы, но большие логи нельзя проверить целиком через pc_read; безопасный потоковый анализ снимет этот конкретный блокер",
+  "title": "Дочитать локальный forensic-отчёт NVDA и установить раннюю по времени аномалию 19–21 ноября",
+  "uncertainty_reduced": "Историческая сводка уже получена; теперь необходима конкретная последовательность первых position_mismatch и исполнений, а не дополнительные синтетические тесты",
   "blockers": [
-    {
-      "id": "B-003",
-      "kind": "pc_connector_execution_limit",
-      "description": "Доступный PC Agent допускает только фиксированные диагностические команды, а не запуск Python или PowerShell; запуск существующего RUN_AUDIT.cmd требует обычного локального выполнения"
-    },
     {
       "id": "B-004",
       "kind": "large_local_source",
-      "description": "Суточный лог и fills.csv превышают лимит 256 КБ для PC Agent pc_read, поэтому построчная реконструкция первого изменения пока не выполнена"
+      "description": "Подробная incident_timeline.csv и исходные суточные логи превышают лимит 256 КБ для pc_read"
+    },
+    {
+      "id": "B-005",
+      "kind": "partial_report",
+      "description": "На момент проверки в каталоге локального полного аудита присутствовал только history; отдельный nvda/summary.json и итоговый manifest.json ещё не наблюдались"
     }
   ],
   "prerequisites": [
@@ -24,19 +24,20 @@
     "Офлайн-анализ выполняется на копии, без запуска/остановки робота и без брокерских операций",
     "Отчёты остаются только внутри локального каталога reports/ и никогда не выгружаются в публичный GitHub"
   ],
-  "next_command": "В каталоге локальной копии запустить analysis\\RUN_AUDIT.cmd (существующий read-only потоковый аудитор), затем прочитать reports/complete-audit-*/nvda/summary.json и history/summary.json через PC Agent",
+  "next_command": "Прочитать через PC Agent reports/complete-audit-20261121T165547Z/nvda/summary.json и broker_journal_checks.csv сразу после появления. Если итоговый manifest.json не создаётся, локально запустить отдельный read-only анализ: python analysis/position_forensics.py --root . --state state-nvda-iis-live --logs logs-nvda-iis-live --start '2026-11-19 00:00:00' --end '2026-11-21 15:10:00' --output reports/nvda-first-mismatch",
   "expected_artifacts": [
-    "Локальный private reports/complete-audit-*/manifest.json с SHA-256 источников и флагами устойчивости",
-    "Локальный reports/complete-audit-*/nvda/summary.json и broker_journal_checks.csv",
-    "Локальный reports/complete-audit-*/history/summary.json и сводка полноты по всем состояниям"
+    "Маленький локальный nvda/summary.json с fill_rows, дубликатами, continuity, position_check_events",
+    "Первое время и контекст position_mismatch 19 ноября, затем подробный путь до 21 ноября",
+    "Флаг завершения общего manifest.json и перечень нестабильных исходных файлов",
+    "Сопоставление со временем GetPositions по брокеру; пока оно отсутствует"
   ],
   "completion_criteria": [
-    "Проверен фактический выход кода и неизменность исходных файлов (без замены живых данных)",
-    "Построены первые временные метки локальных исполнений и смены внешней позиции",
-    "Отсутствующие брокерские первичные операции явно отмечены; обновлены EVIDENCE, STATE и NEXT_ACTION"
+    "По полному отчёту установлен первый точный момент и текст ошибки NVDA без догадок",
+    "Сверены знаковые изменения лотов в local fills.csv и position checks; недостаток брокерских данных явно отмечен",
+    "Прочитаны флаги качества, далее обновлены EVIDENCE и NEXT_ACTION в том же коммите"
   ],
   "on_completion": "A-002",
   "public_ci_allowed": false,
-  "fallback": "Если запуск скрипта недоступен через разрешённый инструмент, сохранить blocked_external и указать единственный ручной запуск локального RUN_AUDIT.cmd; не улучшать абстрактные тесты вместо анализа данных.",
+  "fallback": "Большие CSV не выгружать в публичный GitHub и не пытаться обходить лимиты PC Agent; при отсутствии компактного отчёта оставить конкретный read-only локальный forensic запуск для следующего сеанса.",
   "access_scope": "Пользователь в текущем диалоге явно разрешил read-only PC Agent/Computer Use для копии BabitCloud и запуск офлайн-аналитики. Не разрешено управление роботом, торговыми заявками или загрузка приватных файлов в публичный GitHub."
 }
