@@ -71,6 +71,7 @@ FIXTURES=(
     "fixtures/public_phase_tied_fills_observed_20261121.json",
     "fixtures/public_cluster_conditional_toy_null_observed_20261121.json",
     "fixtures/abides_clustered_grid_original_20261121.json",
+    "fixtures/public_interarrival_period_scan_observed_20261121.json",
     "fixtures/abides_multiscale_public_l2_observed_20261121.json",
 )
 DOCS=(
