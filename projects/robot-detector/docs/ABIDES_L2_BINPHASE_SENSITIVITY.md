@@ -170,3 +170,34 @@ software integrity tests, not newly observed market evidence.
 No cryptographic signature from an independent market-data provider
 or source-completeness proof exists; Stage-2 physical identity remains
 unvalidated. New pins cannot be retroactively added to old archives.
+
+## Deterministic phase fragility and **release abstention** gate
+
+The new source-only `abides_l2_phase_fragility.py` reports three
+predefined descriptive states: `SIGN_REVERSAL_OBSERVED`,
+`SIGN_STABILITY_UNDETERMINED` (missing/zero coefficients), and
+`NO_REVERSAL_IN_TINY_SYNTHETIC_SAMPLE`. These states do **not**
+represent calibrated confidence or probability. Per-original-simulation
+zero crossings and eligible-bin count drift are separate outputs. The
+audit also flags paired phase changes with **opposing signs across two
+seed runs** even when their median nearly cancels.
+
+For the original ABIDES artifact's twelve observed scalar rows the
+source-only audit finds **one of four original simulations** with a
+strict sign reversal, **four of four original simulations** with
+changing eligible-bin counts, and **one of four paired background/phase
+contrasts** with opposing signed seed differences. This is descriptive
+instability, not proof of a true agent or market-wide false alarm rate.
+
+The four original matching runs are not four independently proven
+statistical samples: the same seeds were reused under two alternative
+background configurations. All four phase outcome rows per
+seed/background derive from the **same** run (three phases). The
+output enforces `scientific_stage2_release_allowed=false` and
+`live_trading_allowed=false` regardless of whether synthetic rho
+signs look stable; no physical owner is identified.
+
+The offline review CLI appends this audit to earlier aggregate JSON
+without requiring ABIDES. Historical reports without an L2 content
+digest remain explicitly unverified. Cheap CI runs all pure-Python tests;
+the original expensive matching workflow remains manual-only.
