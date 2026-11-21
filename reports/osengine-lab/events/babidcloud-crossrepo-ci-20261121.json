@@ -8,7 +8,7 @@
   },
   "event": {
     "id": "10bc2be0-e8b1-44bd-80db-d9cf867713c6",
-    "occurred_at": "2026-11-21T14:40:00Z",
+    "occurred_at": "2026-11-21T14:33:51Z",
     "type": "development",
     "title": "Prepare opt-in private Babid audit tests on public Analytics GitHub Actions",
     "summary": "Workflow checks a least-privilege read token before privately checking out Babid C Cloud to run synthetic Python tests on Linux and Windows. When token is absent tests are explicitly NOT TESTED; no private code is committed to Analytics.",
@@ -55,5 +55,8 @@
   "limitations": [
     "No private code, trading logs or credentials are published to Analytics.",
     "No live trading; no default-branch changes."
+  ],
+  "notes": [
+    "Event timestamp corrected from planned time to verified initial Git commit timestamp."
   ]
 }

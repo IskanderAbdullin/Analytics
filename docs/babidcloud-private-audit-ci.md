@@ -30,3 +30,10 @@ The branch trigger exists for initial verification of this CI design.
 `workflow_dispatch` also allows manual runs once the workflow is on the
 default branch. Any future addition of private integration tests must avoid
 printing transaction data or publishing artifact archives.
+
+## First verified Actions run — 2026-11-21
+
+- [Workflow run 44914583018](https://github.com/IskanderAbdullin/Analytics/actions/runs/44914583018) completed with conclusion `success` for the `access-check` job.
+- Both private testing matrix jobs were **skipped**, because `BABIDCLOUD_READ_TOKEN` was not configured. No private source was fetched and no Babid unit test was run.
+- A green workflow indicator **must not** be interpreted as passing private Python tests while this secret is missing.
+- The GitHub source branch for the private robot remains unchanged. No permission or credential was created automatically.
