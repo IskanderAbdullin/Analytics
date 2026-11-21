@@ -1,0 +1,56 @@
+name: Robot Detector public feed metamorphic invariants
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/tools/public_feed_metamorphic.py'
+      - 'projects/robot-detector/tests_research/test_public_feed_metamorphic.py'
+      - '.github/workflows/robot-detector-feed-metamorphic.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/tools/public_feed_metamorphic.py'
+      - 'projects/robot-detector/tests_research/test_public_feed_metamorphic.py'
+      - '.github/workflows/robot-detector-feed-metamorphic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-adversarial-invariants:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate generated no-lookahead, separate-gaps and watermark invariants
+        run: |
+          python -m unittest discover -s tests_research -p 'test_public_feed_metamorphic.py' -v
+          python tools/public_feed_metamorphic.py \
+            --trials 64 --output /tmp/public-feed-metamorphic.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/public-feed-metamorphic.json',encoding='utf-8'))
+          assert r['fixture_count']==64,r
+          assert r['future_append_closed_prefix_stable'],r
+          assert r['book_and_trade_coverage_loss_does_not_increase_eligibility'],r
+          assert r['watermark_tightening_never_adds_eligible_observations'],r
+          assert r['all_public_bin_accounting_conserved'],r
+          assert r['provider_completeness_independently_verified'] is False,r
+          assert r['private_agent_truth_used'] is False,r
+          assert r['real_market_accuracy_calibrated'] is False,r
+          assert r['live_trading_enabled'] is False,r
+          print('PUBLIC_FEED_METAMORPHIC_GATES_PASSED',r['fixture_count'])
+          PY
+      - name: Preserve only synthetic test aggregates for seven days
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-public-feed-metamorphic
+          path: /tmp/public-feed-metamorphic.json
+          retention-days: 7
+          if-no-files-found: error
