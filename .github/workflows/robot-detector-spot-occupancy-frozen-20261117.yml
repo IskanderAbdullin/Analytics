@@ -4,10 +4,9 @@ name: Robot Detector precommitted unseen LTC BCH occupancy controls
 # original 8 RNG seeds and 0s primary frozen in c64303eac0aa
 # BEFORE this first genuine provider archive execution.
 # Scientific noncommercial source-only analysis, not bot calibration.
+# Original frozen 2026-11-17 real-source run #44921288804 succeeded.
+# Future execution of downloaded archives must be manually requested.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-spot-occupancy-frozen-20261117.yml'
   workflow_dispatch:
 
 permissions:
