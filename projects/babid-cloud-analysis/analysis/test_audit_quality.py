@@ -68,6 +68,17 @@ class QualityGateTests(unittest.TestCase):
         self.assertEqual(result["status"], "review_required")
         self.assertIn("incident_timeline_truncated", result["review_issues"])
 
+    def test_geometry_invalid_rows_and_overlap_are_review_issues(self):
+        manifest = self.template()
+        manifest["reports"]["geometry_validation"] = {
+            "invalid_source_rows": 2, "possible_overlapping_groups": 1,
+        }
+        result = evaluate(manifest)
+        self.assertEqual(result["status"], "review_required")
+        self.assertIn("geometry_input_rows_invalid", result["review_issues"])
+        self.assertIn("market_hour_overlap_suspected", result["review_issues"])
+
+
 
 if __name__ == "__main__":
     unittest.main()
