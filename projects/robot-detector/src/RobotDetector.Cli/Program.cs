@@ -69,6 +69,8 @@ internal static class Program
                     return CompareArchivesCommand(options);
                 case "benchmark-blind":
                     return BlindBenchmarkCommand(options);
+                case "benchmark-clock-null":
+                    return ClockNullBenchmarkCommand(options);
                 default:
                     Console.Error.WriteLine($"Unknown command: {args[0]}");
                     PrintHelp();
@@ -197,6 +199,27 @@ internal static class Program
 
 
 
+
+    private static int ClockNullBenchmarkCommand(Dictionary<string, string> options)
+    {
+        var report = MarketClockNullStress.Run(
+            trials: Integer(options, "trials", 20),
+            backgroundPrints: Integer(options, "background-prints", 120),
+            cycles: Integer(options, "cycles", 12),
+            periodMilliseconds: Integer(options, "period-ms", 5000),
+            clipMode: options.GetValueOrDefault("clip-mode", "fixed"));
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"Clocked negative-control research saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine($"Clocked synthetic null trials={report.Trials}; " +
+            "false alarms are toy-background measurements, NOT calibrated market precision.");
+        return 0;
+    }
 
     private static int BlindBenchmarkCommand(Dictionary<string, string> options)
     {
@@ -766,6 +789,7 @@ internal static class Program
         Console.WriteLine("replay-audit --input file.csv|zip [--lateness-ms 500] [--max-pending 10000] [--window-minutes 5] [--receipt-order archive_row|exchange_time_ideal] [--output replay.json]");
         Console.WriteLine("compare-archives --inputs \"a.csv;b.csv\" --html comparison.html [--json comparison.json] [--window-minutes 5]");
         Console.WriteLine("benchmark-blind [--seeds 5] [--background-prints 120] [--output blind-benchmark.json]");
+        Console.WriteLine("benchmark-clock-null [--trials 20] [--background-prints 120] [--cycles 12] [--period-ms 5000] [--clip-mode fixed|variable] [--output clock-null.json]");
         Console.WriteLine("No order placement, account access, owner identification or calibrated confidence.");
     }
 }

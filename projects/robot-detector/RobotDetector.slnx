@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="src/RobotDetector.Core/RobotDetector.Core.csproj" />
+  <Project Path="src/RobotDetector.Cli/RobotDetector.Cli.csproj" />
+  <Project Path="src/RobotDetector.Server/RobotDetector.Server.csproj" />
+  <Project Path="tests/RobotDetector.SelfTests/RobotDetector.SelfTests.csproj" />
+  <Project Path="tests/RobotDetector.DotnetTests/RobotDetector.DotnetTests.csproj" />
+</Solution>

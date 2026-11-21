@@ -132,6 +132,10 @@ internal static partial class Program
         Check("blind benchmark cannot report real-market identity or confidence", BlindNoRealIdentityClaim);
         Check("blind benchmark results are deterministic by seed", BlindDeterminism);
         Check("blind benchmark rejects invalid scenarios and seed counts", BlindRejectInvalid);
+        Check("clocked null has no controlled execution truth", ClockedNullNoControlledExecution);
+        Check("clocked null summaries conserve attributed false positives", ClockedNullSummaryConservation);
+        Check("clocked null seeds deterministic and bounds validated", ClockedNullDeterministicAndValidated);
+        Check("clocked null variable sizes preserve truth separation", ClockedNullVariableQuantityStress);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;

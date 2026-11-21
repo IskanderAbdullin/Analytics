@@ -106,3 +106,11 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 - **Scientific Stage-2 release gate remains CLOSED.** The benchmark is not ABIDES matching/queue simulation and has no market-calibrated null, per-pattern p-values, real future edge, identified owners or trading recommendations.
 - Next priority: genuine controlled ABIDES-NG public projection with independently hidden execution-agent truth and large stratified nulls, then frozen held-out data; live T-Invest connection remains a separate engineering task requiring scoped user-supplied access.
 
+
+## 2026-11-21 — adversarial market-clock negative controls (Stage 2)
+
+- [PR #28](https://github.com/IskanderAbdullin/Analytics/pull/28) on `agent/robot-detector-clock-null-20261121`: standalone synthetic public-clock negative controls with *zero* repeated controlled producers, two periodic background quantity profiles (fixed / cycling clip sizes), and a CLI `benchmark-clock-null`. Producer truth is held outside both detectors.
+- [Successful CI #44888523166](https://github.com/IskanderAbdullin/Analytics/actions/runs/44888523166): **120/120** original no-NuGet deterministic checks and new fixed/variable-clock CLI smokes passed. Local Windows .NET 10.0.402 solution build and `dotnet test` adapter also succeeded without warnings/errors.
+- With 3 seeds and 60 independent background prints per case: fixed-q detector attributed **81/180** events in 3/3 constant-q clocked nulls; variable-q detector attributed **81/180** events in 3/3 changing-q clocked nulls. Neither source had a controlled execution agent. These are **toy-model false attributions**, not calibrated exchange FPR or unique robot IDs; the complementary screens missed the other profile's adversarial signal.
+- Validated report interpretation and reproduction: [CLOCKED_NULL_STRESS.md](CLOCKED_NULL_STRESS.md); [LOCAL_WINDOWS_TESTING.md](LOCAL_WINDOWS_TESTING.md).
+- **Stage-2 scientific identity/accuracy gate remains CLOSED**. Next validation requires real matching/queue simulation with hidden independent producer truth, calibrated source-specific nulls, frozen out-of-sample dates/instruments and source timestamp/coverage checks. Do not connect to live trading or call any inferred count a physical robot count.

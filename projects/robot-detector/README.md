@@ -3,6 +3,18 @@
 **Версия проекта:** 0.2 (исследовательская) · **Обновлено:** 2026-11-19 · **Статус:** исторический прототип с подтверждённым импортом 121 920 реальных обезличенных сделок SBER (17.11.2026); статистическая точность распознавания не установлена.
 
 
+## Adversarial common-clock null experiment — 2026-11-21
+
+New read-only command `benchmark-clock-null` constructs market-wide periodic **background** prints (zero controlled execution agents) with opaque IDs and private independent producer labels. Both detectors see only the identical public tape; any claimed controlled-execution evidence is counted as a synthetic false attribution. Two independent profiles are available: fixed 100-lot prints and variable 25/50/75/100-lot market-wide clocked prints (`--clip-mode variable`). Both have **zero** controlled program ground truth. Aggregated per-trial alarms are **not** calibrated real-market FPR or proof of physical robot identities.
+
+```powershell
+dotnet run --project src/RobotDetector.Cli -- benchmark-clock-null `
+  --trials 20 --background-prints 120 --cycles 12 --period-ms 5000 `
+  --output data/results/clock-null.json
+```
+
+[Protocol, limitations and acceptance](docs/CLOCKED_NULL_STRESS.md). In the [verified 120-check CI smoke](https://github.com/IskanderAbdullin/Analytics/actions/runs/44888523166), each detector falsely attributed 81/180 independent prints from its matching adverse 3-seed clocked-null profile; this does **not** establish a real-world market false-positive rate. The prior four-scenario blinded benchmark remains available and unchanged. **Stage-2 scientific release gate remains CLOSED.**
+
 ## Научная проверка с приватной синтетической разметкой — 19.11.2026
 
 Добавлен независимый `benchmark-blind` на четырёх сценариях: кластеризованный фон без контролируемого агента, TWAP с фиксированным объёмом, TWAP с переменным объёмом и TWAP с двумя отпечатками на один временной срез. **116 из 116 тестов пройдены**: [CI #44577833225](https://github.com/IskanderAbdullin/Analytics/actions/runs/44577833225).
