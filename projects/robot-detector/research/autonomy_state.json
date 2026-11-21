@@ -108,9 +108,9 @@
   ],
   "current_stage": {
     "id": "RD-CLUSTER-MARKET-13",
-    "status": "READY_TO_IMPLEMENT",
+    "status": "SOURCE_WORKFLOW_COMMITTED_NOT_EXECUTED",
     "title": "Genuine ABIDES matching source naive print-weighting versus same-timestamp cluster-aware clock ratio",
-    "why_next": "Source-free exact toy conditional null shows a single large split-fill cluster can create 2/13 naive false-alarm placements although timestamp support is invariant. Need empirical independent ABIDES background/target comparisons and abstain/coverage testing without assuming same timestamp means same parent order.",
+    "why_next": "Frozen 3201–3204 16-case genuine ABIDES workflow committed at 902fdeb; two branch CI checks passed but no genuine ABIDES source workflow run attached to HEAD. Source results must not be inferred from successful generic CI.",
     "inputs": [
       "tools/public_cluster_conditional_toy_null.py",
       "tools/abides_background_ratio_holdout.py",
@@ -119,11 +119,10 @@
       "docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md"
     ],
     "deliverables": [
-      "Freeze new separate source simulator seeds and four cohort configurations before running",
-      "Public-only per-print vs per-unique-time grid metrics with no owner agent IDs",
-      "Negative tests for timestamp clusters, split fills, phase and source confidence",
-      "Original ABIDES only if cheap/justified, all cohort negatives and abstentions preserved",
-      "Update scientific plan, checkpoint, no raw source upload, continue next stage"
+      "Execute already frozen 16-case source workflow once, without changing seed/cohort/threshold",
+      "Retrieve aggregate-only source output and record all 16 negative/positive/abstain results",
+      "Compare print vs exact timestamp grouping and assess source confidence",
+      "Update plan and checkpoint; select next stage"
     ],
     "acceptance": [
       "All 4 background/target cohort outcomes accounted for across locally new seeds",
@@ -170,7 +169,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Read remote HEAD, AGENTS, MASTER_RESEARCH_PLAN, AUTONOMOUS_RESEARCH_TZ, current state, seed ledger, #72 and #94. Freeze new locally unused ABIDES seeds/cohorts in separate protocol before source. Compare public-only naive prints vs exact timestamp clusters under fixed 20s/45s ratio; preserve abstain and negative, no owner ID. Run tests and commit/push with next checkpoint.",
-  "last_session_result": "RD-CONDITIONAL-NULL-12 verified in source-free CI #44938416432: exact 13 positions for one 100-fill cluster, same public timestamps and cluster-size multiset; naive 2/13 false alarms, grouped timestamp 0/13, 23 suites/174 tests. Only toy conditional count, not real market FDR. Next genuine ABIDES cluster-aware source stage #94 selected.",
+  "resume_instruction": "Check remote HEAD and all workflow runs; execute existing .github/workflows/robot-detector-abides-clustered-grid-16-original.yml once (workflow_dispatch if no push run), pinned ABIDES revision ac7a2a7. Do not change frozen protocol. Retrieve aggregate-only artifact and account for all 16 cases before declaring RD-CLUSTER-MARKET-13 verified. Keep #72 open.",
+  "last_session_result": "HEAD 902fdeb has frozen source workflow for 3201–3204, but only general CI runs 44938997233 and 44938997239 confirmed green; no ABIDES source outcome verified. This is infrastructure progress, not scientific result.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
