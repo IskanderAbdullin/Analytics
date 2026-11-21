@@ -35,6 +35,7 @@ SUITES=(
     "test_public_l2_ownership_nonidentifiability.py",
     "test_public_l2_feed_coverage_gate.py",
     "test_toy_public_execution_rhythm.py",
+    "test_abides_fixed_clock_transfer.py",
     "test_binance_public_trade_archive.py",
     "test_public_trade_direction_null.py",
     "test_real_public_trade_pair_review.py",
@@ -53,6 +54,7 @@ FIXTURES=(
     "fixtures/binance_spot_transfer_20261120_observed.json",
     "fixtures/binance_spot_occupancy_20261117_observed.json",
     "fixtures/binance_bch_four_day_public_panel_20261121.json",
+    "fixtures/toy_public_rhythm_hard_negative_holdout_20261121.json",
 )
 DOCS=(
     "docs/AUTONOMOUS_RESEARCH_TZ.md",
