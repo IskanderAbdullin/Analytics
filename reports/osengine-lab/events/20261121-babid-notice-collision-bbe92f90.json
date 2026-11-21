@@ -1,0 +1,79 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-distinct-notices-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "bbe92f90-f4c1-40c5-82e8-f9add4512572",
+    "occurred_at": "2026-11-21T16:42:02.665Z",
+    "type": "research",
+    "title": "Preserve distinct same-timestamp position notices in Babid offline forensic parser",
+    "summary": "A semantically distinct baseline or reported-from transition could be silently deduplicated when timestamp and observed broker/journal values matched. Fix dedup identity, add three invented-log regressions, preserve unresolved real-incident checkpoint.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/position_evidence.py",
+      "action": "modified",
+      "summary": "Distinguish baseline and changed notices, including reported previous/external values, in replay deduplication."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_position_evidence.py",
+      "action": "modified",
+      "summary": "Regression scenarios for same-millisecond baseline/change, distinct reported-from, and identical replay."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-007 records confirmed parser logic and limits."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Add M-005 while keeping H-001..H-005 untested and A-001 blocked."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Record M-005 without closing root-cause investigation."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Retain permitted-source prerequisite for future local reconciliation."
+    }
+  ],
+  "checks": [
+    {
+      "id": "position-collision-regressions",
+      "title": "Synthetic cross-platform tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Awaiting PR GitHub Actions; no private data."
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-001",
+      "title": "Frozen real source copy unavailable without separate authorization",
+      "state": "open",
+      "severity": "high",
+      "description": "No evidence this collision happened in actual NVDA execution history."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Inspect frozen BabitCloud logs and broker/journal divergence after separate read-only authorization",
+      "priority": "high",
+      "state": "blocked"
+    }
+  ],
+  "limitations": [
+    "No private log, Windows PC, live broker or robot was accessed.",
+    "Static reasoning and invented-log regression cannot prove NVDA root cause."
+  ]
+}

@@ -63,6 +63,21 @@ class ResearchStateTests(unittest.TestCase):
         (self.root / "BACKLOG.md").unlink()
         self.assertTrue(any("BACKLOG.md" in e for e in check(self.root)))
 
+    def test_duplicate_evidence_id_fails(self):
+        with (self.root / "EVIDENCE.md").open("a", encoding="utf-8") as stream:
+            stream.write("\n| E-001 | duplicate | synthetic | test |\n")
+        self.assertTrue(any("duplicate evidence ID" in e for e in check(self.root)))
+
+    def test_duplicate_milestone_id_fails(self):
+        self.change("STATE.json", lambda x: x["verified_progress"].append(
+            dict(x["verified_progress"][0])))
+        self.assertTrue(any("duplicate milestone ID" in e for e in check(self.root)))
+
+    def test_duplicate_state_evidence_reference_fails(self):
+        self.change("STATE.json", lambda x: x["evidence_refs"].append(
+            x["evidence_refs"][0]))
+        self.assertTrue(any("duplicate state evidence" in e for e in check(self.root)))
+
 
 if __name__ == "__main__":
     unittest.main()

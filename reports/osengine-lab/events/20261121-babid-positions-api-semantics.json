@@ -1,0 +1,89 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-distinct-notices-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "aff3e121-6889-4514-b661-fcc147e8d0ee",
+    "occurred_at": "2026-11-21T16:59:06.322Z",
+    "type": "research",
+    "title": "Verify T-Invest position balance/blocked field semantics",
+    "summary": "Official T-Bank OperationsService schema defines balance as unblocked and blocked as reserved, so adding these fields is not itself a double count. Remains unknown whether lot conversion or stale snapshots affected original incident.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Add API field semantics and negative hypothesis guard"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-014 source and limitation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "M-009 while maintaining unresolved original incident"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Retain position unit verification"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Source verification checkpoint"
+    }
+  ],
+  "checks": [
+    {
+      "id": "metadata-ci",
+      "title": "Analytics synthetic and state validation",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "To run after push"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-001",
+      "title": "frozen_input_unproven",
+      "state": "open",
+      "severity": "high",
+      "description": "Рабочая копия через PC-Agent обнаружена, но неизменяемая копия с SHA-256 манифестом и полной историей пока не подтверждена."
+    },
+    {
+      "id": "B-003",
+      "title": "streaming_audit_channel_unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "Доступный PC-Agent MCP имеет pc_read ограниченных UTF-8 файлов и фиксированные диагностические команды, но не предоставляет Python streaming scanner больших журналов."
+    },
+    {
+      "id": "B-004",
+      "title": "broker_evidence_unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "Разрешение на PC-Agent не включает брокерские запросы; независимые отчёты исполнений не доступны через этот разрешённый источник."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Frozen local source and complete read-only audit",
+      "priority": "high",
+      "state": "blocked"
+    }
+  ],
+  "limitations": [
+    "No private log or broker information published.",
+    "No original robot code modified.",
+    "Documentation schema does not settle full causation."
+  ]
+}

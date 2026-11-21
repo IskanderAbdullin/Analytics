@@ -37,3 +37,16 @@ No private data in public GitHub, no live broker action, no bot changes.
 Computer Use / PC Agent requires separately explicit user authorization.
 GitHub Actions may run synthetic-only tests and a deterministic state checker.
 A scheduled CI run is NOT an autonomous researcher and cannot wake ChatGPT Work.
+
+## Source-fix specification and concurrent evidence merges
+
+Whenever a verified source-code weakness is relevant to G-001, maintain
+`SOURCE_FIX_SPEC.md` with exact source member, confidence, limitations,
+corrective design and offline synthetic acceptance tests. Never edit or
+operate the original trading robot as part of Analytics research.
+
+Before merging another research branch, compare all E- and M-IDs with
+CURRENT main; preserve both independent evidence sets with unique IDs.
+The checkpoint validator must reject duplicate evidence and milestone IDs.
+Real observed data always take precedence over older speculative checkpoints,
+and green CI is not evidence of the historical root cause.
