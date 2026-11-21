@@ -63,5 +63,21 @@
   "do_not_claim_independent_exchange_completeness_or_actor_identity": true,
   "never_upload_raw_trades_or_personal_ids": true,
   "do_not_claim_p_values_FDR_or_live_trading_licence": true,
-  "if_data_unavailable_abort_without_substitution": true
+  "if_data_unavailable_abort_without_substitution": true,
+  "previously_inspected_BCH_2026_11_20_to_recompute_for_same_5plus_occupancy_method": {
+    "symbol": "BCHUSDT",
+    "day": "2026-11-20",
+    "original_source_sha256": "553421be8eaf1e339eb0e111a25604ce7d2965e85ad15cea1650ffa0d012e46c",
+    "original_verified_public_trades": 73279,
+    "already_seen_source_not_independent_validation": true,
+    "secondary_to_original_18_19_source_acquisitions": true
+  },
+  "four_day_panel_expected_dates": [
+    "2026-11-17",
+    "2026-11-18",
+    "2026-11-19",
+    "2026-11-20"
+  ],
+  "earlier_2026_11_17_occupancy_fixture": "fixtures/binance_spot_occupancy_20261117_observed.json",
+  "comparability_caveat": "BCH2026-11-17 is already inspected occupancy data, BCH2026-11-20 is retrospective recomputation, BCH2026-11-18/19 alone are precommitted uninspected source dates."
 }
