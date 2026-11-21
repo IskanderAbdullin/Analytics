@@ -37,6 +37,7 @@ BEGIN_NS=34_200_000_000_000
 SPLIT_NS=34_440_000_000_000
 END_NS=34_680_000_000_000
 HALF_NAMES=("early","late")
+DAY_NS=86_400_000_000_000  # ABIDES timestamps are Unix-day-relative nanoseconds
 HALF_MIN_PRINTS=100
 HALF_MIN_HITS20=4
 HALF_MIN_ELIGIBLE_LAG=2
@@ -123,9 +124,15 @@ def public_half_stability(public:tuple[PublicExecution,...],book)->dict:
         raise ValueError("Expected nonempty bounded public-only executed prints")
     if book is None or len(book.times_ns)>MAX_SNAPSHOTS:
         raise ValueError("Missing/oversized anonymous public L2")
+    # Genuine ABIDES keeps absolute nanoseconds on simulated date 2021-02-05.
+    # Preregistered 09:30-09:38 split is an EXCHANGE-LOCAL clock split,
+    # NOT an absolute Unix epoch timestamp comparison.
     if any(type(x) is not PublicExecution or type(x.time_ns) is not int or
-           not BEGIN_NS<=x.time_ns<END_NS for x in public):
-        raise ValueError("Unknown public print class or out-of-session source time")
+           x.time_ns<0 or not BEGIN_NS <= x.time_ns%DAY_NS < END_NS
+           for x in public):
+        raise ValueError("Unknown public print class or out-of-session local clock")
+    if len({x.time_ns//DAY_NS for x in public})!=1:
+        raise ValueError("Single preregistered trading session crosses epoch day")
     # This recomputes all original and lagged source statistics on public-only
     # projections; the private truth is not even an argument.
     measured=public_multiscale_l2_summary(public,book)
@@ -135,7 +142,7 @@ def public_half_stability(public:tuple[PublicExecution,...],book)->dict:
         (HALF_NAMES[0],BEGIN_NS,SPLIT_NS),
         (HALF_NAMES[1],SPLIT_NS,END_NS)
     ):
-        trades=tuple(row for row in public if start<=row.time_ns<end)
+        trades=tuple(row for row in public if start<=row.time_ns%DAY_NS<end)
         if not trades:
             half={
                 "half":name,"public_execution_prints":0,

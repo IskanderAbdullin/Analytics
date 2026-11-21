@@ -1,5 +1,9 @@
 name: Robot Detector original ABIDES 16-case split-half momentum control
 # Frozen source protocol before new seeds 3101..3104.
+# First source CI #44937339312 stopped BEFORE any model result: source
+# timestamp absolute 2021 day was incorrectly compared with seconds-since-
+# midnight. Correct to exchange-local nanosecond modulo day; no threshold,
+# seed or hypothesis was changed. Source-only rerun remains confirmatory.
 # One bounded genuine matching-engine replay, no real broker access,
 # no source raw tape/order or private agent labels in artifact.
 # Switch to workflow_dispatch only after first successful source run.

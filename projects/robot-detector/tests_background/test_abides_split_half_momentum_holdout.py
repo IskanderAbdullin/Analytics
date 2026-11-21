@@ -128,6 +128,32 @@ class FrozenSplitHalfPublicNegatives(unittest.TestCase):
         self.assertEqual(sum(h["public_execution_prints"] for h in
                              source["per_half_public_only"]),481)
 
+    def test_genuine_abides_absolute_nanoseconds_are_split_by_local_session(self):
+        # Genuine ABIDES source uses a full calendar day since epoch,
+        # not 34_200e9 nanoseconds measured from absolute Unix epoch.
+        from abides_split_half_momentum_holdout import DAY_NS
+        original=fake_public(inject_periodic=True)
+        derived=tuple(PublicExecution(
+            x.time_ns+18663*DAY_NS,
+            x.price_cents,x.quantity,x.reported_aggressor_side
+        ) for x in original)
+        raw=public_half_stability(original,fake_book())
+        # Shift book clock too; both are full Unix-day timestamps.
+        book=fake_book()
+        shifted=SimpleNamespace(
+            times_ns=tuple(v+18663*DAY_NS for v in book.times_ns),
+            bids=book.bids,asks=book.asks
+        )
+        shifted_result=public_half_stability(derived,shifted)
+        self.assertEqual(raw["new_split_half_decision"],
+                         shifted_result["new_split_half_decision"])
+        self.assertEqual(raw["per_half_public_only"],
+                         shifted_result["per_half_public_only"])
+        self.assertEqual(raw["original_whole_session_baseline_decision"],
+                         shifted_result["original_whole_session_baseline_decision"])
+        self.assertNotEqual(raw["public_tape_sha256"],
+                            shifted_result["public_tape_sha256"])
+
     def test_invalid_source_time_and_private_type_rejected(self):
         for invalid in (
             (PublicExecution(BEGIN_NS-1,100_000,1,"BUY"),),
