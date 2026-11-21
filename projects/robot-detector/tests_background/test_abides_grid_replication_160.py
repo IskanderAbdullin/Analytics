@@ -85,6 +85,25 @@ class Frozen160SourceTests(unittest.TestCase):
         self.assertEqual(x["source_cohorts"]["twap_45s_positive"]["posthoc_controlled_TWAP_fills"],120)
         self.assertEqual(x["source_cohorts"]["poisson_noise_null"]["per_print_false_alarms"],40)
 
+    def test_injected_target_zero_source_executions_are_retained_not_selected_away(self):
+        rows=[fake_case(s,c) for s in SEEDS for c in COHORTS]
+        zero=next(x for x in rows if x["source_seed"]==3301 and
+                  x["source_cohort"]=="twap_45s_positive")
+        zero["posthoc_controlled_TWAP_fills"]=0
+        report=validate_source_report(rows)
+        positive=report["source_cohorts"]["twap_45s_positive"]
+        self.assertEqual(report["original_matching_engine_source_case_count"],160)
+        self.assertEqual(positive["independent_local_seed_engine_runs"],40)
+        self.assertEqual(positive["injected_TWAP_without_controlled_execution_cases"],1)
+        self.assertEqual(positive["injected_TWAP_with_controlled_execution_cases"],39)
+        self.assertEqual(positive["posthoc_controlled_TWAP_fills"],117)
+        self.assertFalse(report["physical_owner_or_real_market_FDR_calibrated"])
+        negative=next(x for x in rows if x["source_seed"]==3301 and
+                      x["source_cohort"]=="poisson_noise_null")
+        negative["posthoc_controlled_TWAP_fills"]=1
+        with self.assertRaises(ValueError):
+            validate_source_report(rows)
+
     def test_missing_duplicates_wrong_inference_or_oracle_leak_fail_closed(self):
         rows=[fake_case(s,c) for s in SEEDS for c in COHORTS]
         for broken in (rows[:-1],rows+rows[:1]):
