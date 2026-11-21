@@ -39,10 +39,13 @@ def audit_l2_public(snapshots: Any, *, max_depth: int) -> dict:
                 price = exact_int(price, "book price", positive=True)
                 qty = exact_int(qty, "book quantity", positive=True)
                 if prev_price is not None:
-                    if side == "bid" and price > prev_price:
-                        raise ValueError("Bid levels not in best-to-worst order")
-                    if side == "ask" and price < prev_price:
-                        raise ValueError("Ask levels not in best-to-worst order")
+                    # Public L2 is aggregated by *unique* price level.
+                    # A duplicate price is not a second resting level; it
+                    # would double-count displayed size in imbalance stats.
+                    if side == "bid" and price >= prev_price:
+                        raise ValueError("Bid prices must strictly decrease; duplicates invalid")
+                    if side == "ask" and price <= prev_price:
+                        raise ValueError("Ask prices must strictly increase; duplicates invalid")
                 prev_price = price
 
         max_bid_depth = max(max_bid_depth, len(bids))

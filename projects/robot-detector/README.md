@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Public aggregated L2 book: unique prices per side
+
+The public depth-five order-book parser now requires **strictly descending bid price levels** and **strictly ascending ask price levels** within each L2 snapshot. Previously the input checker could accept repeated prices on the same side and double-count displayed quantity in imbalance calculations. Repeated *snapshot timestamps* remain preserved, as they represent potentially distinct book events. This applies only to aggregated L2 data, not L3 per-order books.
+
+[Price-level validation and scope](docs/L2_UNIQUE_PRICE_LEVELS.md).
+
 ## Strict public market scalar integrity (timestamps, prices, lots)
 
 The L2 and anonymous execution pipeline now validates discrete exchange timestamp, price and quantity fields with a lossless integer-only `__index__` check rather than `int(...)`, which previously could silently truncate fractional inputs. Noninteger floats (even `100.0`), booleans, decimal/string masquerades and nonpositive sizes/prices are rejected before any model statistic is calculated. Valid integer-only ABIDES fixtures retain the same results.
