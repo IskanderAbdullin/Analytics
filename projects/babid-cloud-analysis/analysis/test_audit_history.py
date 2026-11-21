@@ -78,6 +78,27 @@ class AuditTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             run(self.root, self.root.parent / "outside", "", "")
 
+    def test_incident_cap_is_disclosed_and_total_history_still_counted(self):
+        # Small custom cap proves silent truncation cannot be mistaken for completeness.
+        with (self.root / "logs-foo" / "day.log").open("a", encoding="utf-8") as log:
+            log.write("2025-01-02 08:00:00.000 ERR RISK: Halted historical event\n")
+        output = self.root / "reports" / "cap"
+        report = run(self.root, output, "0001-01-01T00:00:00",
+                     "9999-12-31T23:59:59", incident_limit=2)
+        self.assertEqual(report["incident_events"], 2)
+        self.assertEqual(report["incident_events_total"], 3)
+        self.assertEqual(report["incident_events_omitted"], 1)
+        self.assertTrue(report["incident_timeline_truncated"])
+        # Error statistics must cover all history, including the omitted event.
+        self.assertEqual(report["error_events"], 4)
+
+    def test_invalid_incident_limit_is_rejected_without_creating_output(self):
+        dest = self.root / "reports" / "invalid-limit"
+        with self.assertRaises(ValueError):
+            run(self.root, dest, "0001-01-01T00:00:00",
+                "9999-12-31T23:59:59", incident_limit=0)
+        self.assertFalse(dest.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -60,6 +60,14 @@ class QualityGateTests(unittest.TestCase):
         result = evaluate(manifest)
         self.assertIn("missing_required_history", result["blocking_issues"])
 
+    def test_truncated_timeline_cannot_be_locally_consistent(self):
+        manifest = self.template()
+        manifest["reports"]["history"].update(
+            incident_events_total=100, incident_events=2, incident_events_omitted=98)
+        result = evaluate(manifest)
+        self.assertEqual(result["status"], "review_required")
+        self.assertIn("incident_timeline_truncated", result["review_issues"])
+
 
 if __name__ == "__main__":
     unittest.main()

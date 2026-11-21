@@ -34,6 +34,7 @@ def evaluate(manifest: dict) -> dict:
     warn_if(reconciliation.get("states", 0) == 0, "no_reconciled_states")
     history = reports.get("history") or {}
     warn_if(history.get("problems", 0) > 0, "missing_or_unreadable_history")
+    warn_if(history.get("incident_events_omitted", 0) > 0, "incident_timeline_truncated")
     warn_if((reports.get("config_epochs") or {}).get("observed_epochs", 0) == 0,
             "no_historical_config_events")
     tape = reports.get("tape_integrity") or {}

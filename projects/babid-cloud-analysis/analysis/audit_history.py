@@ -231,7 +231,8 @@ def classify(message: str) -> str:
 
 
 def audit_logs(path: Path, logdir: str, focus_start: str, focus_end: str,
-               error_counts: Counter, incident: list[dict], problems: list[dict]) -> None:
+               error_counts: Counter, incident: list[dict], problems: list[dict],
+               incident_stats: Counter, incident_limit: int) -> None:
     try:
         with path.open("r", encoding="utf-8-sig", errors="replace") as stream:
             for line_no, line in enumerate(stream, 1):
@@ -243,8 +244,10 @@ def audit_logs(path: Path, logdir: str, focus_start: str, focus_end: str,
                 if level in ("WRN", "ERR"):
                     error_counts[(day, logdir, level, classify(message))] += 1
                 if focus_start <= stamp[:19].replace(" ", "T") <= focus_end and INCIDENT.search(message):
+                    incident_stats["matched"] += 1
                     # Redact path/user-specific details; raw logs stay only at source.
-                    if len(incident) < 25000:
+                    # Every omitted event is counted, even after the storage cap.
+                    if len(incident) < incident_limit:
                         incident.append(dict(at_msk=stamp, log_dir=logdir,
                                              level=level, category=classify(message),
                                              file=path.name, line=line_no,
@@ -274,7 +277,10 @@ def audit_recording(path: Path, problems: list[dict]) -> dict:
                 first_line_preview=first, last_line_preview=last)
 
 
-def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
+def run(root: Path, output: Path, focus_start: str, focus_end: str,
+        incident_limit: int = 25000) -> dict:
+    if not 1 <= incident_limit <= 1000000:
+        raise ValueError("incident_limit must be 1..1000000")
     root, output = validate_report_output(root, output)
     problems: list[dict] = []
     configs = load_inventory(root, problems)
@@ -285,6 +291,7 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
     log_dirs.update(p.name for p in root.glob("logs*") if p.is_dir())
     fills, equity, snapshots, incidents = [], [], [], []
     errors: Counter = Counter()
+    incident_stats: Counter = Counter()
     for name in sorted(state_dirs):
         folder = safe_child(root, name)
         if folder is None or not folder.is_dir():
@@ -315,7 +322,8 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
             continue
         for log in sorted(folder.glob("*.log")):
             if log.is_file():
-                audit_logs(log, name, focus_start, focus_end, errors, incidents, problems)
+                audit_logs(log, name, focus_start, focus_end, errors, incidents,
+                           problems, incident_stats, incident_limit)
     recordings = []
     rec = root / "recordings"
     if rec.is_dir():
@@ -338,7 +346,11 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
     report = dict(source=str(root), focus_start_msk=focus_start, focus_end_msk=focus_end,
                   configurations=len(configs), states=len(snapshots), days_with_fills=len(fills),
                   equity_days=len(equity), error_events=sum(errors.values()),
-                  incident_events=len(incidents), recordings=len(recordings),
+                  incident_events=len(incidents),
+                  incident_events_total=incident_stats["matched"],
+                  incident_events_omitted=incident_stats["matched"] - len(incidents),
+                  incident_timeline_truncated=incident_stats["matched"] > len(incidents),
+                  incident_limit=incident_limit, recordings=len(recordings),
                   problems=len(problems), limitations=[
                       "Current config values are not historical config epochs",
                       "Broker-side operations, overnight charges and funding are not reconciled",
@@ -355,11 +367,13 @@ def main() -> int:
     parser.add_argument("--output", type=Path, help="New directory for reports (within root)")
     parser.add_argument("--focus-start", default="0001-01-01T00:00:00")
     parser.add_argument("--focus-end", default="9999-12-31T23:59:59")
+    parser.add_argument("--incident-limit", type=int, default=25000,
+                        help="max incident detail rows stored; all matches are counted")
     args = parser.parse_args()
     root = args.root.resolve()
     output = args.output or (root / "reports" / "history-audit")
     try:
-        result = run(root, output, args.focus_start, args.focus_end)
+        result = run(root, output, args.focus_start, args.focus_end, args.incident_limit)
     except (OSError, ValueError) as error:
         print("Audit refused/failed:", error, file=sys.stderr)
         return 1

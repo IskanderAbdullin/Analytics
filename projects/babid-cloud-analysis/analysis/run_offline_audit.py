@@ -69,7 +69,10 @@ def run(root: Path, output: Path, with_market: bool = True, *,
         markout_day: str | None = None,
         focus_start: str | None = None, focus_end: str | None = None,
         incident_state: str | None = None, incident_logs: str | None = None,
-        incident_start: str | None = None, incident_end: str | None = None) -> dict:
+        incident_start: str | None = None, incident_end: str | None = None,
+        incident_limit: int = 25000) -> dict:
+    if not 1 <= incident_limit <= 1000000:
+        raise ValueError("incident_limit must be 1..1000000")
     if bool(focus_start) != bool(focus_end):
         raise ValueError("both focus_start and focus_end are required for a narrowed history")
     if any((incident_state, incident_logs, incident_start, incident_end)) and not all(
@@ -106,7 +109,7 @@ def run(root: Path, output: Path, with_market: bool = True, *,
                                  "No auto-application of optimized settings"])
     try:
         manifest["reports"]["history"] = audit_history.run(
-            root, output / "history", selected_start, selected_end)
+            root, output / "history", selected_start, selected_end, incident_limit)
     except (OSError, ValueError) as error:
         manifest["reports"]["history_error"] = str(error)[:300]
     try:
@@ -191,6 +194,8 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
     p.add_argument("--output", type=Path)
+    p.add_argument("--incident-limit", type=int, default=25000,
+                   help="max detailed incident rows; total and omitted events are always counted")
     p.add_argument("--focus-start", help="optional start of history timeline (MSK ISO); default ALL history")
     p.add_argument("--focus-end", help="optional end of history timeline (MSK ISO); default ALL history")
     p.add_argument("--incident-state", help="explicit state folder for narrow incident review")
@@ -216,7 +221,8 @@ def main() -> int:
                      markout_day=args.markout_day,
                      focus_start=args.focus_start, focus_end=args.focus_end,
                      incident_state=args.incident_state, incident_logs=args.incident_logs,
-                     incident_start=args.incident_start, incident_end=args.incident_end)
+                     incident_start=args.incident_start, incident_end=args.incident_end,
+                     incident_limit=args.incident_limit)
     except (OSError, ValueError) as error:
         print("Offline audit refused:", error, file=sys.stderr)
         return 1
