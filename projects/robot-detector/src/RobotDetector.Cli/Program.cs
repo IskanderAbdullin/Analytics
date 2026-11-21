@@ -55,6 +55,8 @@ internal static class Program
                     return FlowFootprintCommand(options);
                 case "volume-response":
                     return VolumeResponseCommand(options);
+                case "direction-shift":
+                    return DirectionShiftCommand(options);
                 case "activity-episodes":
                     return ActivityEpisodesCommand(options);
                 case "clock-phase-audit":
@@ -469,6 +471,35 @@ internal static class Program
         return input.RejectedRowTotal > 0 ? 3 : 0;
     }
 
+    private static int DirectionShiftCommand(Dictionary<string, string> options)
+    {
+        var source = CsvTradeReader.Read(Required(options, "input"),
+            Integer(options, "max-rows", 1_000_000));
+        var report = DirectionalRegimeShiftResearch.Describe(source, new DirectionalShiftConfig
+        {
+            BinSeconds = Integer(options, "bin-seconds", 30),
+            ReferenceBins = Integer(options, "reference-bins", 6),
+            MinimumCurrentKnownLots = Integer(options, "min-current-known-lots", 100),
+            MinimumReferenceKnownLots = Integer(options, "min-reference-known-lots", 500),
+            MinimumKnownSideFraction = Double(options, "min-known-side-fraction", 0.9),
+            MinimumAbsoluteBuyShareChange = Double(options, "min-share-shift", 0.25),
+            CooldownBins = Integer(options, "cooldown-bins", 2),
+            MaximumPopulatedBinsPerGroup = Integer(options, "max-bins", 10000)
+        });
+        string json = JsonSerializer.Serialize(report, JsonOptions);
+        if (options.TryGetValue("output", out var path))
+        {
+            EnsureNewFile(path);
+            File.WriteAllText(path, json + Environment.NewLine);
+            Console.WriteLine($"Unvalidated public direction shifts saved to {path}");
+        }
+        else Console.WriteLine(json);
+        Console.Error.WriteLine($"Public prints={report.InputPublicPrints}; " +
+            $"unvalidated_shift_windows={report.CandidateShiftWindows}; " +
+            "physical_bot_count=UNKNOWN; significance=UNCALIBRATED");
+        return source.RejectedRowTotal > 0 ? 3 : 0;
+    }
+
     private static int VolumeResponseCommand(Dictionary<string, string> options)
     {
         var source = CsvTradeReader.Read(Required(options, "input"),
@@ -828,6 +859,7 @@ internal static class Program
         Console.WriteLine("variable-temporal-null --input file.csv [--mode uniform|rotate] [--trials 6] [--block-seconds 60]");
         Console.WriteLine("flow-footprint --input file.csv [--window-minutes 5] [--bin-seconds 1] [--output footprints.json]");
         Console.WriteLine("volume-response --input file.csv [--bin-seconds 30] [--min-pairs 8] [--max-bins 10000] [--output lagged.json]");
+        Console.WriteLine("direction-shift --input file.csv [--bin-seconds 30] [--reference-bins 6] [--min-share-shift 0.25] [--cooldown-bins 2] [--output shifts.json]");
         Console.WriteLine("activity-episodes --input file.csv [--reference-windows 4] [--min-count-ratio 3] [--min-lot-ratio 3] [--min-abs-imbalance 0.6]");
         Console.WriteLine("clock-phase-audit --input file.csv [--first-ms 100] [--min-prints 100] [--trials 99] [--seed 20261119] [--output clock.json]");
         Console.WriteLine("timestamp-quality --input file.csv [--output timestamp-quality.json]");
