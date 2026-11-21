@@ -105,6 +105,44 @@ class FrozenControlledContrast(unittest.TestCase):
                                x["scenario"]==cases[0]["scenario"] and
                                x["phase_seconds"]==cases[0]["phase_seconds"])["rho"])
 
+    def test_original_genuine_matching_aggregate_fixture_matches_plan(self):
+        import json
+        path=(Path(__file__).resolve().parents[1] / "fixtures"
+              / "abides_l2_twap_phase_observed_20261121.json")
+        record=json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(record["source_workflow_run_id"],44915375635)
+        self.assertEqual(record["original_aggregate_sha256"],
+                         "2391c9f223b6841f8346502282b7e099856e6feee7726cd4769967dcbcd97fa8")
+        self.assertFalse(record["source_content_authenticated_by_external_provider"])
+        self.assertFalse(record["raw_event_archive_included"])
+        report=aggregate(record["cases"])
+        self.assertEqual(report["genuine_matching_runs"],4)
+        self.assertEqual(report["non_independent_analytical_views"],12)
+        expected={
+            ("background_only",0):-0.22622645896303184,
+            ("background_only",10):-0.061293054771315636,
+            ("background_only",20):-0.47556791035051904,
+            ("twap_injected",0):-0.07113534825205306,
+            ("twap_injected",10):0.00005812601720530091,
+            ("twap_injected",20):0.10044991576826279,
+        }
+        for row in report["cohorts"]:
+            self.assertAlmostEqual(
+                row["median_descriptive_rho"],
+                expected[(row["scenario"],row["phase_seconds"])],places=12)
+        inversions=0
+        for seed in SEEDS:
+            for scenario in SCENARIOS:
+                rows=[r for r in report["cases"] if r["seed"]==seed
+                      and r["scenario"]==scenario]
+                coeff=[r["rho"] for r in rows]
+                inversions+=int(min(coeff)<0<max(coeff))
+                self.assertEqual(len({r["full_public_tape_sha256"] for r in rows}),1)
+                self.assertEqual(
+                    rows[0]["posthoc_controlled_prints"],
+                    22 if scenario=="twap_injected" else 0)
+        self.assertEqual(inversions,2)
+
     def test_illegal_scenarios_frozen_before_simulator_import(self):
         for args in ((2400,"background_only"),(2401,"twap"),(2402,"poisson")):
             with self.assertRaises(ValueError):
