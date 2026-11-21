@@ -33,6 +33,21 @@ The output records only generated counts, descriptive observed Spearman coeffici
 
 The **dedicated lightweight [public-null CI workflow](../../.github/workflows/robot-detector-public-l2-nulls.yml)** installs only Python, without ABIDES or .NET; its seven-day artifact contains aggregate summaries, no private labels or raw market data. This avoids unnecessary simulation minutes and does not retrain any previous model.
 
+## Verified deterministic counterexamples (2026-11-21)
+
+[Successful lightweight Python CI #44896188923](https://github.com/IskanderAbdullin/Analytics/actions/runs/44896188923) executed **5/5 new unit tests** and the committed synthetic public-generator script at seed 1701, 24 thirty-second bins, 144 anonymous prints and 2,400 lots per scenario.
+
+| Generated public market scenario | Spearman: previous public L2 depth imbalance → later BUY share | Rotated-bin placebo rho | Exact-time strict-join abstentions |
+|---|---:|---:|---:|
+| **Common market factor** | **1.000** | −0.263 | 0 |
+| Independently shuffled next-bin flow | −0.195 | 0.330 | 0 |
+| **Market-wide synchronized directional shock** | **1.000** | −1.000 | 0 |
+| **Synchronized quote/trade clock** | **1.000** | −0.263 | **144/144** |
+
+These are **deliberately constructed** correlations in synthetic anonymous public streams. The generator constructs **no named parent execution agent** and has no actual actor identity. A perfect `rho=1` is therefore **not sufficient evidence** of a particular market-making or execution robot; any classifier declaring one from that feature alone would make an unjustified identity claim. The clock-synchronized case shows that all exact-event quote/print comparisons may be undefined while the earlier completed-bin aggregate correlation remains perfectly defined.
+
+**Crucial limitation:** A generator that fixes a shared latent factor to make two variables perfectly monotone is an **illustrative logical counterexample, not a probability estimate**. It is *not* independent market evidence, does not establish typical false-positive frequency, and cannot validate real exchange specificity. The rotated-bin placebo likewise is not a realistic conditional-null distribution.
+
 ## Methodological decision
 
 A strong past-book/next-prints correlation, even if reproduced, cannot establish a physical trading robot if many anonymous participants share market conditions. Real market specificity would require well-validated source-conditional nulls preserving order-book updates, execution timing, spread/queue constraints, cross-instrument regime shocks, feed coverage and selection of multiple windows/features. The present four generated scenarios are **not sufficient** for that purpose.
