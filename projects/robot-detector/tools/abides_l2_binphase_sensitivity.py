@@ -160,12 +160,63 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
             group = groups[(seed, mode)]
             present = [x["descriptive_rho"] for x in group
                        if x["descriptive_rho"] is not None]
+            by_phase = {row["phase_seconds"]: row for row in group}
+            baseline = by_phase[PHASES_SECONDS[0]]["descriptive_rho"]
+            signed_deltas = {
+                str(phase): (
+                    by_phase[phase]["descriptive_rho"] - baseline
+                    if baseline is not None
+                    and by_phase[phase]["descriptive_rho"] is not None
+                    else None
+                ) for phase in PHASES_SECONDS[1:]
+            }
+            available_deltas = [d for d in signed_deltas.values() if d is not None]
+            eligibility = [row["eligible_lagged_bins"] for row in group]
             sensitivity.append({
                 "seed": seed, "background": mode, "phases_analysed": len(group),
                 "defined_correlations": len(present),
                 "rho_range": (max(present)-min(present) if len(present)>=2 else None),
+                "rho_sign_reversal_between_defined_phases": (
+                    min(present) < 0 < max(present) if len(present) >= 2 else None
+                ),
+                "signed_rho_delta_from_zero_second_origin": signed_deltas,
+                "max_abs_rho_delta_from_zero_second_origin": (
+                    max(map(abs, available_deltas)) if available_deltas else None
+                ),
+                "eligible_bin_count_range_across_phases": max(eligibility)-min(eligibility),
                 "source_public_tape_is_identical_across_phases": True,
                 "independent_evaluations_across_phases": False,
+            })
+    # Pair ORIGINAL simulations by seed; phase views are never treated as
+    # independent draws. Missing rho excludes only that seed's contrast.
+    lookup = {
+        (row["seed"], row["background"], row["phase_seconds"]): row
+        for row in rows
+    }
+    paired_cohorts = []
+    for mode in BACKGROUNDS:
+        for phase in PHASES_SECONDS[1:]:
+            deltas = []
+            for seed in SEEDS:
+                control = lookup[(seed, mode, PHASES_SECONDS[0])]["descriptive_rho"]
+                shifted = lookup[(seed, mode, phase)]["descriptive_rho"]
+                if control is not None and shifted is not None:
+                    deltas.append(shifted-control)
+            paired_cohorts.append({
+                "background": mode,
+                "comparison_origin_seconds": phase,
+                "reference_origin_seconds": PHASES_SECONDS[0],
+                "original_simulations": len(SEEDS),
+                "simulations_with_defined_paired_rho": len(deltas),
+                "median_signed_paired_delta_rho": (
+                    statistics.median(deltas) if deltas else None
+                ),
+                "median_absolute_paired_delta_rho": (
+                    statistics.median(map(abs, deltas)) if deltas else None
+                ),
+                "simulation_pairing_by_seed": True,
+                "independent_samples_across_phases": False,
+                "real_market_inference": False,
             })
     return {
         "schema_version": "abides-public-l2-clock-phase-v1",
@@ -173,6 +224,7 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "cases": sorted(rows,key=lambda x:(x["seed"],x["background"],x["phase_seconds"])),
         "cohorts": cohorts,
         "per_simulation_sensitivity": sensitivity,
+        "paired_cohort_contrasts": paired_cohorts,
         "actual_matching_engine_simulations": len(groups),
         "non_independent_analytical_views": len(rows),
         "private_truth_used": False,
@@ -184,6 +236,8 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "Origin offsets re-bin exactly the SAME anonymous simulated exchange tape.",
             "No best phase is selected; widths and phase offsets fixed before evaluation.",
             "Two seeds per background cannot estimate market specificity or p-values.",
+            "Paired rho differences reuse each simulated tape but may compare different eligible clock bins.",
+            "Signed paired deltas are descriptive; not confidence intervals or a selected best phase.",
             "Source-completeness watermark not independently verified.",
             "Controlled VWAP/POV parent agents absent but background algorithms present.",
             "No physical maker/taker owner or parent order can be inferred from rho.",

@@ -93,6 +93,61 @@ class FrozenClockPhaseTests(unittest.TestCase):
         self.assertFalse(report["physical_owner_count_known"])
         self.assertFalse(report["independent_provider_completeness_verified"])
 
+    def test_paired_deltas_and_simulation_level_sign_reversal(self):
+        result=aggregate(matrix())
+        self.assertEqual(len(result["paired_cohort_contrasts"]),4)
+        self.assertTrue(all(x["rho_sign_reversal_between_defined_phases"]
+                            for x in result["per_simulation_sensitivity"]))
+        self.assertTrue(all(x["eligible_bin_count_range_across_phases"]==0
+                            for x in result["per_simulation_sensitivity"]))
+        for case in result["per_simulation_sensitivity"]:
+            self.assertAlmostEqual(
+                case["signed_rho_delta_from_zero_second_origin"]["10"],0.4)
+            self.assertAlmostEqual(
+                case["signed_rho_delta_from_zero_second_origin"]["20"],0.9)
+            self.assertAlmostEqual(
+                case["max_abs_rho_delta_from_zero_second_origin"],0.9)
+        for contrast in result["paired_cohort_contrasts"]:
+            self.assertEqual(contrast["simulations_with_defined_paired_rho"],2)
+            self.assertAlmostEqual(
+                contrast["median_signed_paired_delta_rho"],
+                0.4 if contrast["comparison_origin_seconds"]==10 else 0.9)
+            self.assertFalse(contrast["independent_samples_across_phases"])
+            self.assertFalse(contrast["real_market_inference"])
+
+    def test_paired_contrast_requires_both_phases_on_same_seed(self):
+        cases=matrix()
+        # Both cohorts can have defined medians at 0 and 10 seconds while
+        # NO Poisson seed has both values. Difference-of-medians is invalid.
+        for row in cases:
+            if (row["seed"]==2101 and row["background"]=="poisson"
+                    and row["phase_seconds"]==0):
+                row["descriptive_rho"]=None
+            if (row["seed"]==2102 and row["background"]=="poisson"
+                    and row["phase_seconds"]==10):
+                row["descriptive_rho"]=None
+        result=aggregate(cases)
+        p10=next(c for c in result["paired_cohort_contrasts"]
+                 if c["background"]=="poisson"
+                 and c["comparison_origin_seconds"]==10)
+        self.assertEqual(p10["simulations_with_defined_paired_rho"],0)
+        self.assertIsNone(p10["median_signed_paired_delta_rho"])
+        self.assertIsNone(p10["median_absolute_paired_delta_rho"])
+        self.assertEqual(
+            result["cohorts"][0]["defined_correlation_simulations"],1)
+        self.assertEqual(
+            result["cohorts"][1]["defined_correlation_simulations"],1)
+        self.assertEqual(aggregate(list(reversed(cases))),result)
+
+    def test_all_undefined_phase_rhos_abstain_without_sign_claim(self):
+        report=aggregate(matrix({0:None,10:None,20:None}))
+        self.assertTrue(all(x["rho_sign_reversal_between_defined_phases"] is None
+                            and x["max_abs_rho_delta_from_zero_second_origin"] is None
+                            for x in report["per_simulation_sensitivity"]))
+        self.assertTrue(all(x["simulations_with_defined_paired_rho"]==0
+                            and x["median_signed_paired_delta_rho"] is None
+                            for x in report["paired_cohort_contrasts"]))
+
     def test_missing_duplicate_or_drifted_public_tape_rejected(self):
         raw=matrix()
         with self.assertRaises(ValueError):
