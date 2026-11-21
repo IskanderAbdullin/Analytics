@@ -18,10 +18,16 @@ import json
 from pathlib import Path
 from zipfile import ZipFile
 
-from lobster_public_sample_format_audit import (
-    SOURCE_URL, MAX_ZIP_BYTES, MAX_ROWS, _members, _validate_book,
-    _validate_message, audit_sample_zip, download_exact_demo, is_zipfile
-)
+if __package__:
+    from .lobster_public_sample_format_audit import (
+        SOURCE_URL, MAX_ZIP_BYTES, MAX_ROWS, _members, _validate_book,
+        _validate_message, audit_sample_zip, download_exact_demo, is_zipfile
+    )
+else:
+    from lobster_public_sample_format_audit import (
+        SOURCE_URL, MAX_ZIP_BYTES, MAX_ROWS, _members, _validate_book,
+        _validate_message, audit_sample_zip, download_exact_demo, is_zipfile
+    )
 
 # This is a LOCAL historical digest observed on a prior run; the publisher
 # supplies no signed/published SHA-256. It must never be called official.
