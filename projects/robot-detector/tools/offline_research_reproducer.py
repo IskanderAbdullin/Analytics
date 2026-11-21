@@ -65,11 +65,13 @@ FIXTURES=(
     "fixtures/abides_background_ratio_original_20261121.json",
     "fixtures/abides_split_half_momentum_observed_20261121.json",
     "fixtures/public_phase_tied_fills_observed_20261121.json",
+    "fixtures/public_cluster_conditional_toy_null_observed_20261121.json",
     "fixtures/abides_multiscale_public_l2_observed_20261121.json",
 )
 DOCS=(
     "docs/AUTONOMOUS_RESEARCH_TZ.md",
     "docs/MASTER_RESEARCH_PLAN.md",
+    "docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md",
     "docs/LOBSTER_EVENT_TIME_FEATURES_20261121.md",
     "docs/LOBSTER_CLOCK_VS_EVENT_WEIGHTING_20261121.md",
     "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md",

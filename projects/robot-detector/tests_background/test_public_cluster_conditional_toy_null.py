@@ -85,6 +85,29 @@ class ClusterConditionalNullAdversarialTests(unittest.TestCase):
         self.assertFalse(r["original_market_trading_or_broker_placement_enabled"])
         self.assertTrue(r["no_source_raw_public_timestamp_series_exported"])
 
+    def test_original_source_free_ci_aggregate_is_frozen_and_nonidentifying(self):
+        f=Path(__file__).resolve().parents[1]/"fixtures"/"public_cluster_conditional_toy_null_observed_20261121.json"
+        observed=json.loads(f.read_text(encoding="utf-8"))
+        self.assertEqual(observed["verification_source_free_ci_id"],44938416432)
+        self.assertEqual(observed["schema_version"],
+                         "public-cluster-permutation-toy-null-original-v1")
+        self.assertEqual(observed["fixed_public_unique_event_timestamps"],13)
+        self.assertEqual(observed["fixed_public_fill_count_in_every_case"],112)
+        self.assertEqual(observed["exact_exchangeable_cluster_placements"],13)
+        self.assertEqual(len(observed["all_placements"]),13)
+        self.assertEqual(observed["print_weighted_false_alarms_under_toy_no_target"],2)
+        self.assertEqual(observed["grouped_timestamp_false_alarms_under_toy_no_target"],0)
+        self.assertEqual(observed["large_cluster_position_categories"],
+                         {"20_only":11,"45_only":1,"both":1})
+        self.assertAlmostEqual(observed["toy_exchangeable_placement_alarm_frequency"],2/13)
+        self.assertTrue(observed["not_a_real_market_p_value_or_FDR"])
+        self.assertTrue(observed["no_owner_or_parent_order_identity_recovered"])
+        self.assertTrue(observed["source_constructed_not_original_market_or_ABIDES"])
+        for x in observed["all_placements"]:
+            self.assertEqual(x["unique_timestamps"],13)
+            self.assertEqual(x["public_execution_prints"],112)
+            self.assertFalse(x["source_owner_labels_known"])
+
     def test_modified_frozen_protocol_is_rejected_not_optimized(self):
         p=frozen_plan()
         cases=(
