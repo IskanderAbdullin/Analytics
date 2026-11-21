@@ -1,0 +1,115 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-continuous-research-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "44e74f80-ae5f-4e2f-8586-4973cc1f2b6f",
+    "occurred_at": "2026-11-21T00:00:00Z",
+    "type": "development",
+    "title": "Make Babid Cloud research checkpoint durable and CI-validated",
+    "summary": "Persist goal, evidence ledger, hypothesis state, blockers and one executable next action; check consistency and surface resumption pointer every six hours without invoking PC/broker or pretending to run an autonomous agent.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/AGENTS.md",
+      "action": "modified",
+      "summary": "Mandate transition, evidence, and same-commit continuity rules."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/GOAL.md",
+      "action": "added",
+      "summary": "Research-governance checkpoint and evidence state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "added",
+      "summary": "Research-governance checkpoint and evidence state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "added",
+      "summary": "Research-governance checkpoint and evidence state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "added",
+      "summary": "Research-governance checkpoint and evidence state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "added",
+      "summary": "Research-governance checkpoint and evidence state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/PROTOCOL.md",
+      "action": "added",
+      "summary": "Research-governance checkpoint and evidence state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/research_state.py",
+      "action": "added",
+      "summary": "Read-only validator and next action renderer."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_research_state.py",
+      "action": "added",
+      "summary": "Nine synthetic safety and continuity tests."
+    },
+    {
+      "path": ".github/workflows/babid-cloud-analysis.yml",
+      "action": "modified",
+      "summary": "6-hour read-only heartbeat plus validation on pushes/PRs."
+    }
+  ],
+  "checks": [
+    {
+      "id": "research-synthetic-ci",
+      "title": "Cross-platform research checkpoint unit tests",
+      "kind": "ci",
+      "status": "passed",
+      "command": "GitHub Actions run 44924815236",
+      "exit_code": 0,
+      "tested_commit": "2a2c19cd15295dbf6d8f517cefcccf9b9e496d66",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44924815236"
+        }
+      ],
+      "summary": "Ubuntu/Python 3.11 and Windows/Python 3.13 jobs succeeded; no real data."
+    },
+    {
+      "id": "watchdog-ci",
+      "title": "Heartbeat and validator workflow after merge",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending push."
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-001",
+      "title": "Real BabitCloud archive not inspected from this session",
+      "severity": "high",
+      "state": "open",
+      "description": "This public CI cannot read the private Windows copy, so the NVDA root cause remains unknown."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Inspect a frozen read-only local BabitCloud archive with separate explicit authorization",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Six-hour GitHub heartbeat does not autonomously restart ChatGPT or Work.",
+    "No original robot, other repository, live settings, private trades or broker access were modified."
+  ]
+}
