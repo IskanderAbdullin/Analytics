@@ -232,6 +232,34 @@ jobs:
               assert not c['market_false_alarm_rate_calibrated'],c
               assert c['observed_directional_shift_windows']>=0,c
           PY
+      - name: Pre-registered executed-fill baseline across TWAP VWAP POV and null
+        run: |
+          # Exact seeds/modes & default existing detector parameters were frozen
+          # in source before collecting any 1301-1304 baseline outcomes.
+          python tools/abides_execution_baseline_holdout.py \
+            --cli-dll src/RobotDetector.Cli/bin/Release/net10.0/RobotDetector.Cli.dll \
+            --output /tmp/abides_strategy_baseline_frozen.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides_strategy_baseline_frozen.json',encoding='utf-8'))
+          assert r['frozen_plan']['seeds']==[1301,1302,1303,1304],r
+          assert r['frozen_plan']['screens']==['fixed_quantity','variable_quantity'],r
+          assert r['case_count']==16 and len(r['cases'])==16,r
+          assert len(r['aggregates'])==8,r
+          assert r['private_truth_retained_in_artifact'] is False,r
+          assert r['models_tuned_on_frozen_seeds'] is False,r
+          assert r['physical_owner_count_known'] is False,r
+          assert r['real_market_accuracy_calibrated'] is False,r
+          for row in r['aggregates']:
+              assert row['cases']==4,row
+              assert row['true_positive_prints']+row['missed_controlled_prints']==row['controlled_prints'],row
+              assert row['true_positive_prints']+row['false_positive_prints']==row['attributed_public_prints'],row
+              assert not row['physical_owner_count_known'] and not row['real_market_accuracy_calibrated'],row
+              if row['mode']=='null':
+                  assert row['controlled_prints']==0 and row['pooled_event_recall'] is None,row
+              else:
+                  assert row['controlled_prints']>0,row
+          PY
       - name: Frozen-seed cross-run blinded replication
         run: |
           python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
@@ -253,6 +281,13 @@ jobs:
               if row["mode"]=="null":
                   assert row["controlled_prints"]==0 and row["micro_event_recall"] is None,row
           PY
+      - name: Upload frozen synthetic execution-strategy baseline (aggregate only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-frozen-executed-strategy-baseline
+          path: /tmp/abides_strategy_baseline_frozen.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Upload pre-registered synthetic direction-shift replication
         uses: actions/upload-artifact@v4
         with:

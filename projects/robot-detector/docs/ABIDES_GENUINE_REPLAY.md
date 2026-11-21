@@ -84,6 +84,40 @@ Both VWAP and POV controlled execution fills **actually occurred**, verified thr
 
 A second report version, `abides-blind-score-v2`, adds `postHocControlledDiagnostics`: distinct quantities, unique timestamps, collisions, median positive/nonpositive interprint intervals, all calculated using hidden controlled-truth labels strictly **after** both detectors finish. Do not feed these post-hoc statistics into the detector or reuse the same seeds as a fresh holdout after tuning new algorithms.
 
+## New independent executed-fill baseline (pre-registered 2026-11-21)
+
+The initial ABIDES TWAP/fixed-q 4-seed cohort (901–904), and individual VWAP/POV examples (43,44), have already been inspected and therefore **cannot** be treated as unused evaluation data. Public volume-response development seeds (61–63), directional-share development seeds (71–73) and independent share-shift replication (1101–1104) are likewise spent. The [direction-share replication](DIRECTIONAL_REGIME_SHIFT.md) found null 1 / VWAP 0 / POV 1 public shift windows at fixed settings, so **that feature does not provide reliable program recognition**.
+
+For the **original unchanged existing C# fixed-/variable-quantity screens**, the next execution-level test pre-registers **entirely new** ABIDES seeds `1301,1302,1303,1304`, four simulator modes `null,twap,vwap,pov`, and both existing detector default configurations. See `tools/abides_execution_baseline_holdout.py`.
+
+The protocol runs **16 genuine matching-engine simulations** with complete maker/taker per-fill attribution. Each detector sees **only public CSV prints**. The existing `benchmark-abides-blind` C# scorer reads private labels **only after the candidate detection outputs are produced**, verifies a SHA-256-linked one-to-one event mapping, and writes aggregate-only synthetic event counts TP/FP/missed by model and mode. Every private manifest and detailed public tape is stored only in an ephemeral CI directory, not in artifacts or the repository. Report metrics:
+
+- `pooled_event_recall = controlled synthetic prints detected / all controlled synthetic prints` for positive modes, **null** for zero-controlled null scenarios.
+- `pooled_event_precision = controlled prints detected / all publicly attributed prints` if any attribution, else **null**.
+- `false_positive_prints`: publicly attributed print IDs belonging to **uncontrolled synthetic agent participation**; this is not a calibrated real-market FDR.
+- `cases_with_any_attribution`: descriptive number of four simulator runs in which the screen emitted at least one public print attribution.
+
+**No detector coefficients, periods, sizes or cutoffs are changed** and no frozen-run labels are used in training. A locked seed/mode/config contract and a Python accounting-unit test are committed **before** the results. If a positive strategy fails to execute actual exchange fills, the experiment fails instead of misleadingly counting it as zero recall. The separate aggregate-only workflow artifact has 14-day retention.
+
+This test cannot establish physical traders, actual MOEX/SPB precision, a market opportunity or independent physical bots. The 1301–1304 cohort becomes **spent immediately after evaluation**; no further model tuning against it is permitted. Any future new strategy requires a new unrelated hidden evaluation set.
+
+### Verified independent execution-strategy result (frozen 1301–1304)
+
+The **unmodified detectors and frozen parameters** passed the [genuine ABIDES-NG CI run #44894042225](https://github.com/IskanderAbdullin/Analytics/actions/runs/44894042225) with 134/134 C# self-tests and 16 actual matching-engine simulations. The summary-only, 14-day artifact is named `abides-frozen-executed-strategy-baseline`. All private maker/taker attribution used strictly **post-detection** and was deleted with the temporary CI work directory.
+
+| Executed simulator strategy (4 runs each) | Public fills | Controlled fills | Fixed-q TP / FP / missed | Fixed-q recall | Variable-q TP / FP / missed |
+|---|---:|---:|---|---:|---|
+| No injected execution agent | 13,773 | 0 | 0 / 0 / 0 | Undefined | 0 / 0 / 0 |
+| TWAP | 14,028 | 183 | **98 / 0 / 85** | **53.55%** | 0 / 0 / 183 |
+| VWAP | 13,803 | 191 | **6 / 0 / 185** | **3.14%** | 0 / 0 / 191 |
+| POV | 13,581 | 66 | **0 / 0 / 66** | **0%** | 0 / 0 / 66 |
+
+The fixed-q screen had any attribution in **4/4 TWAP** cases, **1/4 VWAP** cases, **0/4 POV** and **0/4 null** cases. The variable-q screen had zero attributions in every one of these 16 simulations. Precision, where defined, was 100% *only in these simulations* because there were no uncontrolled attributed prints among emitted candidates; when no prints are attributed, event precision is **undefined rather than 0 or 100%**.
+
+**Scientific conclusion:** The existing fixed periodic-volume screen partially recognizes this particular simulated TWAP but **barely recognizes VWAP** and **misses POV entirely** in the frozen four-seed cohorts. The second periodic varying-volume screen has **no observable sensitivity** to the simulated executions tested here. These outcomes independently corroborate the earlier single-seed weakness; they are **not** market-wide sensitivity, calibrated false discovery or physical robot identities. The current market change-point and volume-lag public features also failed to establish reliable discrimination against ABIDES nulls, and therefore **none should be promoted into live robot alerts**.
+
+These frozen seeds (1301–1304) are now **spent**. A future model may be developed using entirely separate development data and evaluated only on a **new, committed-before-training** independent holdout. ABIDES-agent differences in schedules, sizes, matching, market regime and synthetic queue execution matter; this four-seed dataset is not a valid causal representation of MOEX/SPB.
+
 ## Scientific limits and release gates
 
 ABIDES-NG is a synthetic exchange simulator, not a calibrated representation of MOEX/SPB, nor an independent prediction trial on untouched real instruments/dates. One seeded scenario with an ABIDES execution agent does not prove precision, recall or model advantage on a real market. Exchange per-fill truth identifies synthetic agent participants, **not** independent physical real-world owners. The private truth is an evaluator input; tampering SHA mismatches or event records fails closed, but the scorer cannot cryptographically prove that an external manifest really originated from ABIDES unless the environment/source is independently audited.
