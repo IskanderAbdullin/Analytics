@@ -60,6 +60,26 @@ class MinutePreservingControlTests(unittest.TestCase):
         self.assertEqual(r["variants"][0]["null_one_sided_bin_count_max"],4)
         self.assertFalse(r["physical_robot_identification_validated"])
 
+    def test_pinned_real_provider_replay_scalars_never_imply_owners(self):
+        import json
+        path=(Path(__file__).resolve().parents[1]/"fixtures"
+              /"binance_spot_weak_direction_nulls_20261121.json")
+        item=json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(item["original_run_id"],44918585645)
+        self.assertEqual(item["actual_distinct_utc_market_days"],2)
+        self.assertEqual(item["shuffles_per_day"],len(NULL_SEEDS))
+        self.assertTrue(item["experiments_after_the_two_market_days_were_already_inspected"])
+        self.assertTrue(item["no_physical_bot_count_or_real_market_fdr"])
+        self.assertEqual(item["phase_offsets_seconds"],[0,10,20])
+        self.assertEqual(sum(c["source_public_prints"] for c in item["cases"]),278403)
+        for source in item["cases"]:
+            self.assertEqual(len(source["provider_zip_sha256"]),64)
+            self.assertEqual([p["origin_seconds"] for p in source["phases"]],[0,10,20])
+            for phase in source["phases"]:
+                self.assertGreater(phase["observed_one_sided"],phase["weak_null_max"])
+                self.assertLessEqual(phase["weak_null_min"],phase["weak_null_median"])
+                self.assertLessEqual(phase["weak_null_median"],phase["weak_null_max"])
+
     def test_invalid_public_payload_and_source_bounds_fail_closed(self):
         rows=example()
         for bad in (
