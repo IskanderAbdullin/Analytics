@@ -196,6 +196,54 @@ jobs:
               'calibrated':r['statisticalSignificanceEstablished']
           }))
           PY
+      - name: Public-only past-window directional regime shift smoke
+        run: |
+          python3 - <<'PY'
+          import csv,datetime,pathlib
+          header=['TRADE_TS','INSTRUMENT_UID','DIRECTION','PRICE','QUANTITY',
+                  'TRADE_SOURCE','EVENT_ID','TICKER','TRADING_MODE','SESSION_ID','DATA_KIND']
+          base=datetime.datetime(2026,11,19,7,0,tzinfo=datetime.timezone.utc)
+          for kind in ('stable','shift'):
+              with pathlib.Path(f'/tmp/shift-dev-{kind}.csv').open('w',newline='',encoding='utf-8') as f:
+                  w=csv.DictWriter(f,fieldnames=header)
+                  w.writeheader()
+                  for i in range(10 if kind=='stable' else 7):
+                      t=(base+datetime.timedelta(seconds=i*30)).isoformat().replace('+00:00','Z')
+                      change=kind=='shift' and i==6
+                      for side,lots in (('BUY',90 if change else 50),
+                                        ('SELL',10 if change else 50)):
+                          w.writerow(dict(TRADE_TS=t,INSTRUMENT_UID='PUBLIC-DEV',
+                              DIRECTION=side,PRICE='100.0',QUANTITY=lots,
+                              TRADE_SOURCE='EXCHANGE',EVENT_ID=f'{kind}-{side}-{i}',
+                              TICKER='SYNTH',TRADING_MODE='SIM',SESSION_ID='DEV',
+                              DATA_KIND='SYNTHETIC'))
+          PY
+          for kind in stable shift; do
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- direction-shift \
+              --input "/tmp/shift-dev-${kind}.csv" --bin-seconds 30 \
+              --output "/tmp/shift-dev-${kind}.json"
+          done
+          python3 - <<'PY'
+          import json
+          stable=json.load(open('/tmp/shift-dev-stable.json',encoding='utf-8'))
+          shift=json.load(open('/tmp/shift-dev-shift.json',encoding='utf-8'))
+          assert stable['candidateShiftWindows']==0 and stable['evaluatedClockBins']==4,stable
+          assert shift['candidateShiftWindows']==1 and shift['unscorableWarmupOrGapBins']==6,shift
+          x=shift['shiftWindows'][0]
+          assert x['currentPublicPrints']==2 and x['currentKnownSideLots']==100,x
+          assert abs(x['referenceReportedBuyShare']-0.5)<1e-9,x
+          assert abs(x['currentReportedBuyShare']-0.9)<1e-9,x
+          assert abs(x['signedReportedBuyShareChange']-0.4)<1e-9,x
+          for result in (stable,shift):
+              assert not result['physicalBotCountKnown'] and not result['statisticalSignificanceEstablished'],result
+              assert result['sourceCoverageVerified'] is False,result
+              assert all(not z['physicalOwnerIdentified'] and not z['significanceCalibrated']
+                         for z in result['shiftWindows']),result
+          print('DIRECTIONAL_SHIFT_DEV_PUBLIC_ONLY',json.dumps({
+              'stable_candidate_windows':stable['candidateShiftWindows'],
+              'shift_candidate_windows':shift['candidateShiftWindows'],
+              'detected_change':x['signedReportedBuyShareChange']}))
+          PY
       - name: Simple history-only activity burst smoke
         run: |
           dotnet run --project src/RobotDetector.Cli -c Release --no-build -- activity-episodes \

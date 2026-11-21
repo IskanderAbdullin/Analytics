@@ -144,6 +144,12 @@ internal static partial class Program
         Check("volume response historical observations unaffected by later prints", VolumeResponseFutureDoesNotRewritePastObservations);
         Check("volume response rejects spurious constant and cross-source correlations", VolumeResponseNullAndSeparateSource);
         Check("volume response bounds and duplicate event identities fail closed", VolumeResponseRefuseDuplicatesAndUnsafeBounds);
+        Check("directional shift compares current share to six strictly prior bins", DirectionShiftDetectsKnownChangeAfterPastBaseline);
+        Check("directional shift holds stable market null and labels common-market confounds", DirectionShiftStableAndMarketWideNull);
+        Check("directional shift resets on gaps and unknown reported side", DirectionShiftGapAndUnknownSideReset);
+        Check("directional shift is future independent, source isolated and input-order invariant", DirectionShiftAppendOnlyAndSourceIsolation);
+        Check("directional shift rejects invalid input and oversized sources", DirectionShiftRejectsInvalidAndDense);
+        Check("directional shift cooldown bounds repeated candidate windows", DirectionShiftCooldownExplicit);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;

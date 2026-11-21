@@ -184,6 +184,31 @@ jobs:
               assert not row['owner_identity_known'] and not row['significance_calibrated'],row
               assert row['mode'] in ('null','pov','vwap'),row
           PY
+      - name: Independent development ABIDES public directional-shift null survey
+        run: |
+          # New exploratory seeds 71-73; never use spent frozen 901-904 truth
+          # to choose thresholds. Private simulator labels are discarded.
+          python tools/directional_shift_dev_survey.py --dev-seeds 71 72 73 \
+            --cli-dll src/RobotDetector.Cli/bin/Release/net10.0/RobotDetector.Cli.dll \
+            --output /tmp/abides_directional_shift_dev.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides_directional_shift_dev.json',encoding='utf-8'))
+          assert r['development_seeds']==[71,72,73],r
+          assert len(r['cases'])==9 and len(r['cohorts'])==3,r
+          assert r['input_mode']=='public_only',r
+          assert r['private_truth_used_for_detection'] is False,r
+          assert r['physical_owner_count_known'] is False,r
+          assert r['statistical_significance_established'] is False,r
+          assert r['trading_enabled'] is False,r
+          for mode in ('null','vwap','pov'):
+              cohort=next(v for v in r['cohorts'] if v['mode']==mode)
+              assert cohort['simulations']==3,cohort
+              assert not cohort['robot_identity_known'],cohort
+              assert not cohort['market_false_alarm_rate_calibrated'],cohort
+              assert cohort['observed_directional_shift_windows']>=0,cohort
+              assert cohort['evaluated_bins']>=0,cohort
+          PY
       - name: Frozen-seed cross-run blinded replication
         run: |
           python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
@@ -205,6 +230,13 @@ jobs:
               if row["mode"]=="null":
                   assert row["controlled_prints"]==0 and row["micro_event_recall"] is None,row
           PY
+      - name: Upload direction-change public-only development aggregates
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-direction-shift-development
+          path: /tmp/abides_directional_shift_dev.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Upload public-only development volume summary
         uses: actions/upload-artifact@v4
         with:

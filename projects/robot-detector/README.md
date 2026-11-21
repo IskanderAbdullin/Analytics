@@ -3,6 +3,19 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 128 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Public-only directional regime shifts — experimental Stage 2
+
+Added additive, read-only `direction-shift` to inspect abrupt changes in publicly reported BUY share after a contiguous, qualified six-bin *past-only* reference window. A missing clock bin, too little known-side volume or many UNKNOWN-side prints reset the baseline. No private maker/taker labels or broker order APIs are referenced.
+
+```powershell
+dotnet run --project src/RobotDetector.Cli -- direction-shift `
+  --input fixtures/synthetic_activity_episode.csv `
+  --bin-seconds 30 --reference-bins 6 --min-share-shift 0.25 `
+  --output data/results/directional-shifts.json
+```
+
+[Full methodology and scientific limits](docs/DIRECTIONAL_REGIME_SHIFT.md). The result counts **unvalidated market-wide change windows**, not individual robots. No calibrated false alarm probability, trading signal or real-market identity is established. A new genuine ABIDES-NG development null survey contrasts null/VWAP/POV without exposing private agent truth.
+
 ## Public-only lagged volume response — experimental Stage 2
 
 The new **read-only** `volume-response` command examines whether reported BUY/SELL volume in bin `t` is associated with observable market volume in the **preceding completed** UTC clock bin `t-1`. It does not access ABIDES private labels or identify VWAP/POV orders or their owners. Missing populated bins break the lag; uniform side volume yields an undefined (null) rank correlation; source/session/data-kind boundaries are isolated.
