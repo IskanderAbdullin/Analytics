@@ -1,0 +1,60 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-cloud-offline-analysis-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "518930f6-a407-4210-9ee5-bfd821c85543",
+    "occurred_at": "2026-11-21T14:50:00.930Z",
+    "type": "development",
+    "title": "Detect copied-config collisions, misleading filenames and disabled position checks",
+    "summary": "Adds standalone read-only configuration audit, recognizing overlapping state/log folders, repeated account-instrument targets, misleading config filenames, and live position-check disabling without exposing account identifiers or token paths.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/config_audit.py",
+      "action": "added",
+      "summary": "Read-only config inventory and potential collision diagnostics with privacy-preserving CSV."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_config_audit.py",
+      "action": "added",
+      "summary": "Six synthetic config-audit regression tests."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Run config collision audit in integrated offline scan."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Describe source config collision detection."
+    }
+  ],
+  "checks": [
+    {
+      "id": "config-ci",
+      "title": "Config audit synthetic test matrix",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Tests to execute via new Analytics-only commit on GitHub Actions."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "inspect-config-ci",
+      "title": "Confirm both OS test jobs and investigate failures",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Config duplicate files are not evidence of simultaneous live robot execution; no trading state changed."
+  ]
+}

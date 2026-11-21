@@ -20,6 +20,7 @@ import position_forensics
 import reconcile_fills
 import opportunity_validation
 import audit_provenance
+import config_audit
 
 
 def checksum(path: Path) -> str:
@@ -78,6 +79,11 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
             root, output / "reconciliation")
     except (OSError, ValueError) as error:
         manifest["reports"]["reconciliation_error"] = str(error)[:300]
+    try:
+        manifest["reports"]["configs"] = config_audit.run(
+            root, output / "config-audit")
+    except (OSError, ValueError) as error:
+        manifest["reports"]["configs_error"] = str(error)[:300]
     if with_market and (root / "recordings").is_dir():
         try:
             manifest["reports"]["market"] = market_study.run(
