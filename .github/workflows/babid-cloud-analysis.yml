@@ -1,0 +1,54 @@
+name: Babid Cloud — offline analysis tests
+on:
+  push:
+    paths:
+      - "projects/babid-cloud-analysis/**"
+      - ".github/workflows/babid-cloud-analysis.yml"
+  pull_request:
+    paths:
+      - "projects/babid-cloud-analysis/**"
+      - ".github/workflows/babid-cloud-analysis.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: babid-cloud-offline-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic:
+    name: synthetic ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.11'
+          - os: windows-latest
+            python: '3.13'
+    defaults:
+      run:
+        working-directory: projects/babid-cloud-analysis/analysis
+    steps:
+      - name: Checkout Analytics only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile source modules
+        run: python -m compileall -q .
+      - name: Offline synthetic tests
+        run: python -m unittest discover -p "test_*.py" -v
+      - name: Scope evidence
+        if: always()
+        shell: bash
+        run: |
+          echo "Only Analytics project source and synthetic fixtures were tested." >> "$GITHUB_STEP_SUMMARY"
+          echo "No private repository checkout, no tokens and no trading data were used." >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.env.*
+!.env.example
+# Never include actual trading/financial source or output data.
+state*/
+logs*/
+recordings/
+config*.json
+*.csv
+*.tsv
+*.tsv.gz
+*.log
+*.wal
+*.db
+reports/
+output/
