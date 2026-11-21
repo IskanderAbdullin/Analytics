@@ -67,6 +67,26 @@ class PositionEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconcile(self.root, "../state-nvda", "logs-nvda")
 
+    def test_first_observation_transition_is_not_lost(self):
+        self.fixture()
+        positions, _, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(summary["external_changes"], 1)  # only paired endpoints
+        self.assertEqual(summary["reported_external_transitions"], 2)
+        self.assertTrue(summary["first_observation_transition_unanchored"])
+        self.assertEqual(summary["reported_prior_position_disagreements"], 0)
+        self.assertEqual(str(positions[0]["reported_transition_lots"]), "-2")
+        self.assertEqual(str(positions[1]["reported_transition_lots"]), "2")
+
+    def test_single_reported_transition_is_counted_without_any_pair(self):
+        self.fixture()
+        source = self.logs / "babid01.log"
+        source.write_text(source.read_text().splitlines(keepends=True)[0], encoding="utf-8")
+        _, intervals, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertEqual(intervals, [])
+        self.assertEqual(summary["external_changes"], 0)
+        self.assertEqual(summary["reported_external_transitions"], 1)
+        self.assertTrue(summary["first_observation_transition_unanchored"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -79,6 +79,20 @@ class QualityGateTests(unittest.TestCase):
         self.assertIn("market_hour_overlap_suspected", result["review_issues"])
 
 
+    def test_logged_position_mismatch_never_gets_clean_status(self):
+        report = self.template()
+        report["reports"]["history"]["position_mismatch_events"] = 1
+        result = evaluate(report)
+        self.assertEqual(result["status"], "review_required")
+        self.assertIn("broker_journal_position_mismatch_logged", result["review_issues"])
+
+    def test_first_position_transition_opt_in_requires_review(self):
+        report = self.template()
+        report["reports"]["position_evidence"] = {"reported_external_transitions": 1}
+        result = evaluate(report)
+        self.assertEqual(result["status"], "review_required")
+        self.assertIn("external_position_transitions_reported", result["review_issues"])
+
 
 if __name__ == "__main__":
     unittest.main()
