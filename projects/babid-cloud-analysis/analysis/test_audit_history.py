@@ -99,6 +99,37 @@ class AuditTests(unittest.TestCase):
                 "9999-12-31T23:59:59", incident_limit=0)
         self.assertFalse(dest.exists())
 
+    def test_daily_precision_does_not_silently_replace_bad_money_with_zero(self):
+        file = self.root / "state-foo" / "fills.csv"
+        file.write_text(
+            "time_msk;exchange_id;trade_id;side;lots;realized;fee_estimate\n"
+            "2026-11-20 10:00:00;ex;t1;Buy;1;0.1;0.01\n"
+            "2026-11-20 10:01:00;ex;t2;Sell;1;0.2;0.02\n"
+            "2026-11-21 10:00:00;ex;t3;Buy;1;unknown;0.01\n",
+            encoding="utf-8")
+        from audit_history import audit_fills
+        problems = []
+        rows = audit_fills(file, "state-foo", problems)
+        self.assertEqual(rows[0]["realized"], "0.3")
+        self.assertEqual(rows[0]["fee_estimate"], "0.03")
+        self.assertEqual(rows[1]["realized"], "")
+        self.assertEqual(rows[1]["fee_estimate"], "0.01")
+        self.assertEqual(rows[1]["missing_realized"], 1)
+        self.assertTrue(any(p["type"] == "fills_day_uncertain" for p in problems))
+
+    def test_duplicate_and_partial_lots_make_daily_pnl_unknown(self):
+        from audit_history import audit_fills
+        file = self.root / "state-foo" / "fills.csv"
+        with file.open("a", encoding="utf-8") as output:
+            output.write("2026-11-21 14:59:00;bad;id;Buy;invalid;0;0;0;\n")
+        problems = []
+        rows = audit_fills(file, "state-foo", problems)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["duplicate_trade_ids"], 1)
+        self.assertEqual(rows[0]["invalid_rows"], 1)
+        self.assertEqual(rows[0]["realized"], "")
+        self.assertEqual(rows[0]["fee_estimate"], "")
+
 
 if __name__ == "__main__":
     unittest.main()
