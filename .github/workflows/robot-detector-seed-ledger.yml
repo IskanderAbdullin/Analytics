@@ -20,6 +20,8 @@ on:
       - 'projects/robot-detector/fixtures/abides_l2_twap_phase_observed_20261121.json'
       - 'projects/robot-detector/tools/abides_l2_twap_separability.py'
       - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tools/binance_public_trade_archive.py'
+      - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
       - 'projects/robot-detector/tools/abides_l2_phase_review.py'
       - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
       - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
@@ -44,6 +46,8 @@ on:
       - 'projects/robot-detector/fixtures/abides_l2_twap_phase_observed_20261121.json'
       - 'projects/robot-detector/tools/abides_l2_twap_separability.py'
       - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tools/binance_public_trade_archive.py'
+      - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
       - 'projects/robot-detector/tools/abides_l2_phase_review.py'
       - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
       - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
@@ -71,6 +75,7 @@ jobs:
           python -m unittest discover -s tests_research -p 'test_*.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
           python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_phase_fragility.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_twap_phase_contrast.py' -v
