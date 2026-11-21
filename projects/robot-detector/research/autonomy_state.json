@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "8c6013abb50753f29bfa03e9a84d454dfdce88d4",
+  "last_verified_base_commit": "30e0075c33c8c1d7fe6fd131bbe811a7d4a2ef2e",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -194,7 +194,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Confirm provenance CI after checkpoint status repair; implement and test the preregistered seven-period descriptive scan with full period reporting, fixed-timestamp multiplicity-invariance negative, and lagged-L2 gate. Do not infer p-values or owner identities. Freeze any future burst-preserving timing null and its exchangeability assumptions before new ABIDES source seeds; update #97 and plan.",
-  "last_session_result": "2026-11-21: Detected failed provenance CI run 44950270121 at commit 084e8fd4: checkpoint current_stage.status ACTIVE_METHOD_DEVELOPMENT violates validator STAGE_STATES. Corrected to IN_PROGRESS without weakening validator; prior source negatives unchanged. No new source experiments or holdout.",
+  "resume_instruction": "NEXT_ACTION: Verify new GitHub provenance CI and seven committed scan tests (invoke cheap CI only if required); repair any import/discovery failure. Add strict previous-only L2 quality/coverage gate to descriptive scan, then design a separate burst-preserving timing null and adversarial falsification tests. Do not call fixed-timestamp multiplicity shuffles timing p-values. Update #97 and master plan; do not close #72.",
+  "last_session_result": "2026-11-21: Prior provenance CI #44950270121 failed due invalid current_stage.status ACTIVE_METHOD_DEVELOPMENT. Repaired to IN_PROGRESS, added preregistered seven-period descriptive scan and seven adversarial source-free tests, updated master plan. Seven analogous local scratch tests passed; committed GitHub CI verification pending. No new ABIDES sources, p-values, real-market FDR or owners.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
