@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "3a3c9503-c4bc-4c41-9972-a65dd5204370",
+    "occurred_at": "2026-11-21T15:10:33.482Z",
+    "type": "research",
+    "title": "Conservatively attribute booked realized fills to observed config epochs",
+    "summary": "Per-state offline fills ledger is time-matched to logged settings epochs, with explicit UNKNOWN buckets for stops, event-time ambiguity and log coverage gaps. Reports realized fills and estimated fees, never implying strategy profitability.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/fills_by_epoch.py",
+      "action": "added",
+      "summary": "Time-indexed attribution of realized per-fill ledger to observed log settings with unknown periods."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_fills_by_epoch.py",
+      "action": "added",
+      "summary": "Synthetic epoch boundary, stop, stale-log, duplication and no-overwrite tests."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Describe interpretation limits for per-epoch realized results."
+    }
+  ],
+  "checks": [
+    {
+      "id": "fills-epochs-ci",
+      "title": "Run cross-platform synthetic epoch attribution tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending CI run."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "epoch-quality",
+      "title": "Inspect unknown execution ratio and validate timestamp boundaries with recorded sessions",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Bookkeeping attribution cannot recover order creation-time strategy state.",
+    "No real broker operations or private trading records used."
+  ]
+}
