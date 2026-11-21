@@ -11,6 +11,7 @@ import argparse
 import csv
 import gzip
 import json
+import math
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
@@ -70,6 +71,8 @@ def scan(path: Path, thresholds=THRESHOLDS, ttl_ms: int = 2000):
                 if header and header.casefold() != ticker.casefold():
                     raise ValueError("recording header instrument differs from directory")
                 value = float(obj.get("PriceStep") or 0)
+                if not math.isfinite(value):
+                    raise ValueError("PriceStep must be finite")
                 if value > 0:
                     tick = value
             except (IndexError, ValueError, TypeError) as error:
@@ -148,11 +151,28 @@ def run(root: Path, output: Path, ttl_ms: int = 2000, thresholds=THRESHOLDS):
     rows = []
     checks = []
     errors = []
+    # A copied recorder may contain both uncompressed and compressed
+    # versions of the SAME session. Never count either without resolving
+    # the ambiguity, even if combined observed time is less than one hour.
+    sessions = defaultdict(list)
     for file in sorted((root / "recordings").glob("*/*.tsv*")):
         if not file.is_file() or file.suffix.lower() not in (".gz", ".tsv"):
             continue
         if not file.resolve().is_relative_to(root):
             continue
+        logical_name = file.name[:-3] if file.suffix.lower() == ".gz" else file.name
+        if not logical_name.lower().endswith(".tsv"):
+            continue
+        sessions[(file.parent.name, logical_name)].append(file)
+    duplicate_sessions = 0
+    for (instrument, _logical_name), variants in sorted(sessions.items()):
+        if len(variants) != 1:
+            duplicate_sessions += 1
+            for file in variants:
+                errors.append({"instrument": instrument, "file": file.name,
+                               "issue": "ambiguous TSV and compressed TSV for same recording session"})
+            continue
+        file = variants[0]
         try:
             records, quality = scan(file, thresholds, ttl_ms)
             rows.extend(records)
@@ -173,6 +193,7 @@ def run(root: Path, output: Path, ttl_ms: int = 2000, thresholds=THRESHOLDS):
         writer.writerows(checks)
     summary = dict(
         recordings=len(checks), rejected_recordings=len(errors),
+        duplicate_sessions=duplicate_sessions,
         rejected=errors, max_book_age_ms=ttl_ms,
         observed_seconds=round(sum(x["observed_ms"] for x in rows) / (1000 * len(thresholds)), 3)
             if thresholds else 0,

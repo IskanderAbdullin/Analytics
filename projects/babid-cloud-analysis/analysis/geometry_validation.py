@@ -55,6 +55,12 @@ def read_daily(path: Path):
                 if threshold < 1 or observed <= 0 or not 0 <= buy <= covered <= observed or not 0 <= sell <= covered:
                     raise ValueError("invalid book geometry durations")
                 key = (ticker, threshold, day, int(hour))
+                if key in hourly:
+                    # Two rows for a single hour cannot be assumed disjoint:
+                    # the common case is two copies of the same recording.
+                    # Never add the second row and silently double-count it.
+                    overlaps.add((ticker, threshold))
+                    continue
                 for i, number in enumerate(numbers):
                     hourly[key][i] += number
                 if hourly[key][0] > 3600000:

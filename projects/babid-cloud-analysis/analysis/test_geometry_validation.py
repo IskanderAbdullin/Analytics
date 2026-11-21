@@ -64,6 +64,18 @@ class GeometryValidationTests(unittest.TestCase):
             run(self.root, foreign, self.output)
         self.assertFalse(self.output.exists())
 
+    def test_duplicate_partial_hour_is_ambiguous_even_under_one_hour(self):
+        # Before this regression the two 1s rows were summed, reaching 2s,
+        # and silently admitted because 2s is still below the hour cap.
+        self.write(extra="FAKE,2026-11-21,14,120,1000,800,200,200,600,0.8,0.25,0.75\n")
+        report = run(self.root, self.source, self.output, min_daily_covered_ms=500000)
+        self.assertEqual(report["possible_overlapping_groups"], 1)
+        self.assertEqual(report["eligible_for_descriptive_comparison"], 0)
+        with (self.output / "held_out_book_geometry.csv").open(newline="") as f:
+            row = next(csv.DictReader(f))
+        self.assertEqual(row["test_observed_ms"], "1000000")
+        self.assertIn("possible_overlapping_hourly_recordings", row["qualifications"])
+
 
 if __name__ == "__main__":
     unittest.main()

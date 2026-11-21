@@ -80,6 +80,29 @@ class WeightedBooksTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             run(self.root, self.root / "reports" / "scan", 2000, (10,))
 
+    def test_duplicate_tsv_and_gzip_same_session_are_rejected(self):
+        compressed = self.tape(self.b(0), self.tline(1000))
+        raw = compressed.with_suffix("")
+        raw.write_text(
+            'I\t{"Ticker":"FAKE","PriceStep":1}\n'
+            + self.b(0) + self.tline(1000), encoding="utf-8")
+        report = run(self.root, self.root / "reports" / "duplicate", 2000, (10,))
+        self.assertEqual(report["duplicate_sessions"], 1)
+        self.assertEqual(report["rejected_recordings"], 2)
+        self.assertEqual(report["recordings"], 0)
+        self.assertEqual(report["observed_seconds"], 0)
+
+    def test_nonfinite_price_step_rejects_recording(self):
+        path = self.tape(self.b(0), self.tline(1000))
+        with gzip.open(path, "wt", encoding="utf-8") as f:
+            f.write('I\t{"Ticker":"FAKE","PriceStep":"NaN"}\n')
+            f.write(self.b(0) + self.tline(1000))
+        with self.assertRaises(ValueError):
+            scan(path, (10,))
+        report = run(self.root, self.root / "reports" / "nonfinite", 2000, (10,))
+        self.assertEqual(report["recordings"], 0)
+        self.assertEqual(report["rejected_recordings"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
