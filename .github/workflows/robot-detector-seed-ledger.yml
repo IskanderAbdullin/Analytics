@@ -22,6 +22,8 @@ on:
       - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
       - 'projects/robot-detector/tools/binance_public_trade_archive.py'
       - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
+      - 'projects/robot-detector/tools/public_trade_direction_null.py'
+      - 'projects/robot-detector/tests_background/test_public_trade_direction_null.py'
       - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
       - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
       - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
@@ -52,6 +54,8 @@ on:
       - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
       - 'projects/robot-detector/tools/binance_public_trade_archive.py'
       - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
+      - 'projects/robot-detector/tools/public_trade_direction_null.py'
+      - 'projects/robot-detector/tests_background/test_public_trade_direction_null.py'
       - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
       - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
       - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
@@ -84,6 +88,7 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
           python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
           python -m unittest discover -s tests_background -p 'test_real_public_trade_pair_review.py' -v
           python tools/real_public_trade_pair_review.py --output data/results/two-days-source-provenance.json
           python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
