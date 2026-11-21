@@ -1,0 +1,109 @@
+{
+  "schema_version": "abides-public-l2-phase-observed-scalar-fixture-v1",
+  "source_artifact_name": "abides-public-l2-binphase",
+  "source_run_id": 44912441330,
+  "source_artifact_id": 14709824929,
+  "full_original_json_sha256": "8db020efd034eb3870aa772785320ada62ac25a7392ffd158284b55af1eb1009",
+  "source_simulations": 4,
+  "correlated_analytic_views": 12,
+  "source_authenticity_independently_verified": false,
+  "source_completion_independently_verified": false,
+  "cases": [
+    {
+      "seed": 2101,
+      "background": "fixed_cadence",
+      "phase_seconds": 0,
+      "descriptive_rho": -0.34135338345864663,
+      "eligible_lagged_bins": 20,
+      "populated_trade_bins": 24
+    },
+    {
+      "seed": 2101,
+      "background": "fixed_cadence",
+      "phase_seconds": 10,
+      "descriptive_rho": -0.02280701754385965,
+      "eligible_lagged_bins": 19,
+      "populated_trade_bins": 24
+    },
+    {
+      "seed": 2101,
+      "background": "fixed_cadence",
+      "phase_seconds": 20,
+      "descriptive_rho": -0.6807017543859649,
+      "eligible_lagged_bins": 19,
+      "populated_trade_bins": 24
+    },
+    {
+      "seed": 2101,
+      "background": "poisson",
+      "phase_seconds": 0,
+      "descriptive_rho": 0.05087719298245614,
+      "eligible_lagged_bins": 19,
+      "populated_trade_bins": 24
+    },
+    {
+      "seed": 2101,
+      "background": "poisson",
+      "phase_seconds": 10,
+      "descriptive_rho": -0.08721804511278196,
+      "eligible_lagged_bins": 20,
+      "populated_trade_bins": 25
+    },
+    {
+      "seed": 2101,
+      "background": "poisson",
+      "phase_seconds": 20,
+      "descriptive_rho": -0.09473684210526316,
+      "eligible_lagged_bins": 19,
+      "populated_trade_bins": 25
+    },
+    {
+      "seed": 2102,
+      "background": "fixed_cadence",
+      "phase_seconds": 0,
+      "descriptive_rho": -0.0942970073404856,
+      "eligible_lagged_bins": 22,
+      "populated_trade_bins": 24
+    },
+    {
+      "seed": 2102,
+      "background": "fixed_cadence",
+      "phase_seconds": 10,
+      "descriptive_rho": -0.36645962732919257,
+      "eligible_lagged_bins": 22,
+      "populated_trade_bins": 25
+    },
+    {
+      "seed": 2102,
+      "background": "fixed_cadence",
+      "phase_seconds": 20,
+      "descriptive_rho": -0.30434782608695654,
+      "eligible_lagged_bins": 23,
+      "populated_trade_bins": 25
+    },
+    {
+      "seed": 2102,
+      "background": "poisson",
+      "phase_seconds": 0,
+      "descriptive_rho": -0.07819548872180451,
+      "eligible_lagged_bins": 20,
+      "populated_trade_bins": 24
+    },
+    {
+      "seed": 2102,
+      "background": "poisson",
+      "phase_seconds": 10,
+      "descriptive_rho": -0.23433088650479955,
+      "eligible_lagged_bins": 22,
+      "populated_trade_bins": 25
+    },
+    {
+      "seed": 2102,
+      "background": "poisson",
+      "phase_seconds": 20,
+      "descriptive_rho": -0.2670807453416149,
+      "eligible_lagged_bins": 22,
+      "populated_trade_bins": 25
+    }
+  ]
+}

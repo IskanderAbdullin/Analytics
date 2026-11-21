@@ -90,3 +90,43 @@ duplicate keys, nonstandard non-finite JSON and forged provenance flags.
 The output is never allowed to overwrite an existing file. Original source
 data/authenticity **cannot be independently established from metadata alone**.
 It does not run ABIDES, use any private identity or select a trading signal.
+
+## Verified original artifact: paired scalar analysis (2026-11-21)
+
+The seven-day **aggregate-only** artifact `abides-public-l2-binphase` from
+[successful pinned matching CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330)
+was retrieved and its **12 original case coefficients** independently
+recomputed as within-seed signed differences. Its complete original JSON
+has SHA-256 `8db020efd034eb3870aa772785320ada62ac25a7392ffd158284b55af1eb1009`.
+An immutable, compact, raw-event-free scalar fixture now lives in
+`fixtures/abides_l2_phase_observed_scalars_20261121.json`. The fixture
+contains precisely the reported rho and eligible/populated bin counts;
+it is **not** an independent authentication of the source simulator.
+
+| Original simulation (seed, noise background) | rho 0s | rho 10s | rho 20s | Δrho 10s−0s | Δrho 20s−0s |
+|---|---:|---:|---:|---:|---:|
+| 2101, Poisson | +0.0509 | −0.0872 | −0.0947 | −0.1381 | −0.1456 |
+| 2102, Poisson | −0.0782 | −0.2343 | −0.2671 | −0.1561 | −0.1889 |
+| 2101, fixed cadence | −0.3414 | −0.0228 | −0.6807 | +0.3185 | −0.3393 |
+| 2102, fixed cadence | −0.0943 | −0.3665 | −0.3043 | −0.2722 | −0.2101 |
+
+Median within-original-simulation paired changes:
+**Poisson −0.1471 (10s), −0.1672 (20s)**;
+**fixed cadence +0.0232 (10s), −0.2747 (20s)**.
+The modest fixed-cadence median at 10s conceals two opposing signed
+changes (+0.3185 and −0.2722); the median of their absolute magnitudes
+is **0.2954**. This is why simply inspecting a cohort median can hide
+phase sensitivity.
+
+**Correction of the earlier cohort-only reading:** although all six
+two-seed **cohort median** correlations remain negative, **one of four
+individual original simulations** (seed 2101 Poisson) *does* reverse
+the sign of rho at changed phase origins. These four simulations,
+rather than twelve analytical views, are the independent unit.
+The effective eligible bin counts vary across origin offsets, so
+deltas measure **whole-tape analysis sensitivity**, not a controlled
+difference on identical aligned bin observations.
+
+No rerun was launched to obtain these figures; all data came from
+the already executed study. There is no new seed or p-value, no
+identified robot, no real-market specificity and no permission to trade.

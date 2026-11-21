@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline phase review: original summaries, parser, no-simulator guards."""
 import json
+import statistics
 import sys
 import tempfile
 import unittest
@@ -86,6 +87,43 @@ class OfflineReviewTests(unittest.TestCase):
             with self.subTest(raw=raw[:20]),self.assertRaises(ValueError):
                 parse_input(raw)
         self.assertEqual(len(parse_input(json.dumps(saved_report()).encode())["cases"]),12)
+
+    def test_pinned_original_public_scalar_fixture_and_paired_changes(self):
+        fixture_path=(Path(__file__).resolve().parents[1] / "fixtures"
+                      / "abides_l2_phase_observed_scalars_20261121.json")
+        evidence=json.loads(fixture_path.read_text(encoding="utf-8"))
+        self.assertEqual(evidence["source_simulations"],4)
+        self.assertEqual(evidence["correlated_analytic_views"],12)
+        self.assertEqual(evidence["full_original_json_sha256"],
+                         "8db020efd034eb3870aa772785320ada62ac25a7392ffd158284b55af1eb1009")
+        self.assertFalse(evidence["source_authenticity_independently_verified"])
+        self.assertEqual(len(evidence["cases"]),12)
+        expected={
+            ("poisson",10):-0.14711531793911659,
+            ("poisson",20):-0.16724964585376484,
+            ("fixed_cadence",10):0.02319187296304001,
+            ("fixed_cadence",20):-0.2746995948368946,
+        }
+        sign_reversals=0
+        for mode in BACKGROUNDS:
+            for seed in SEEDS:
+                by_phase={r["phase_seconds"]:r for r in evidence["cases"]
+                          if r["background"]==mode and r["seed"]==seed}
+                self.assertEqual(set(by_phase),set(PHASES_SECONDS))
+                sign_reversals += (min(r["descriptive_rho"] for r in by_phase.values())<0
+                                   <max(r["descriptive_rho"] for r in by_phase.values()))
+                self.assertTrue(all(r["eligible_lagged_bins"]<=r["populated_trade_bins"]
+                                    for r in by_phase.values()))
+            for phase in PHASES_SECONDS[1:]:
+                deltas=[]
+                for seed in SEEDS:
+                    by_phase={r["phase_seconds"]:r for r in evidence["cases"]
+                              if r["background"]==mode and r["seed"]==seed}
+                    deltas.append(by_phase[phase]["descriptive_rho"]
+                                  -by_phase[0]["descriptive_rho"])
+                self.assertAlmostEqual(statistics.median(deltas),
+                                       expected[(mode,phase)],places=12)
+        self.assertEqual(sign_reversals,1)
 
     def test_cli_no_market_run_and_atomic_no_overwrite(self):
         with tempfile.TemporaryDirectory() as d:
