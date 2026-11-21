@@ -51,6 +51,25 @@ Five deterministic C# self-tests: controlled prior-bin association arithmetic an
 
 Separate real ABIDES runner smoke reports *public-only diagnostic coefficients* on **already spent development seeds 41–44** (TWAP/null/VWAP/POV) without reading truth during feature computation. These coefficients are illustrative, not calibrated precision or physical producer evidence. **Never use the frozen 901–904 outcomes to choose bins, cutoffs or significance thresholds.** After any model is proposed, freeze new independent simulator configurations, seeds and eventually untouched genuine source dates/instruments **before** final blind evaluation.
 
+## First genuine ABIDES public-only development observation — 2026-11-21
+
+[Successful .NET CI #44891939160](https://github.com/IskanderAbdullin/Analytics/actions/runs/44891939160) passed **128/128** C# internal checks, including no-future-leak and missing-bin controls. [Successful genuine ABIDES CI #44891939139](https://github.com/IskanderAbdullin/Analytics/actions/runs/44891939139) ran all four pre-existing **spent development** scenarios on public simulated exchange fills using 30-second bins (59 adjacent pairs each). Importantly, it did **not** use source maker/taker identities in the public lag calculation.
+
+| Synthetic scenario (one seed each) | Public prints | Spearman `previous total → next BUY` | Spearman `previous total → next SELL` |
+|---|---:|---:|---:|
+| TWAP seed 41 | 3,923 | 0.394 | 0.240 |
+| **No controlled execution agent**, seed 42 | **3,060** | **0.695** | **0.765** |
+| VWAP seed 43 | 3,788 | 0.544 | 0.584 |
+| POV seed 44 | 3,702 | 0.746 | 0.487 |
+
+**Critical negative finding:** the source with **no controlled execution agent** has stronger lagged association than the TWAP sample in both reported directions, and stronger than several of the other executed strategies. Therefore, positive `rho` cannot by itself distinguish VWAP/POV/TWAP programs from market-wide background autocorrelation. These four cases are *not* matched causal counterfactuals, and comparing their `rho` values does not establish a significance test or measure model specificity. **Do not add a candidate/bot flag based on a fixed `rho` cutoff.**
+
+## Additional independent development-seed null survey
+
+`tools/volume_response_dev_survey.py` defines an *additional* replication protocol with three untouched **development** seeds (61, 62, 63) for each of `null`, `pov` and `vwap` (nine ABIDES matching-engine runs). The script **discards private truth**, passes only the public CSV into the read-only C# descriptor and emits only public SHA fingerprints, ranks, counts and per-mode median ranks. Explicitly refuses the **spent evaluation** seeds 901–904. The workflow's aggregate artifact expires after 14 days; raw files remain ephemeral.
+
+This is descriptive reproducibility and sensitivity analysis. There is **no calibrated market FDR, confidence bound, cross-instrument out-of-sample accuracy or participant identification**. The nine-case results must not be claimed until the CI step completes successfully.
+
 ## Scientific limits
 
 - Positive lag association can be caused by general market volume autocorrelation, time-of-day seasonality, independent market makers or many unrelated traders.

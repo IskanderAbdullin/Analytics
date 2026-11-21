@@ -163,6 +163,27 @@ jobs:
                       for v in r['sideProfiles']]
               }))
           PY
+      - name: Separate development-seed public-only volume null survey
+        run: |
+          # Fresh development seeds, not the spent frozen 901..904 evaluation set.
+          # No private execution truth is passed to or read by this descriptor.
+          python tools/volume_response_dev_survey.py --dev-seeds 61 62 63 \
+            --cli-dll src/RobotDetector.Cli/bin/Release/net10.0/RobotDetector.Cli.dll \
+            --output /tmp/abides-public-volume-dev-survey.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides-public-volume-dev-survey.json',encoding='utf-8'))
+          assert r['development_seeds']==[61,62,63],r
+          assert r['case_count']==9 and len(r['public_summary'])==6,r
+          assert r['private_truth_exported'] is False,r
+          assert r['candidate_model_fitted'] is False,r
+          assert r['bot_owner_identity_known'] is False,r
+          assert r['real_market_specificity_known'] is False,r
+          for row in r['public_summary']:
+              assert row['simulated_runs']==3,row
+              assert not row['owner_identity_known'] and not row['significance_calibrated'],row
+              assert row['mode'] in ('null','pov','vwap'),row
+          PY
       - name: Frozen-seed cross-run blinded replication
         run: |
           python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
@@ -184,6 +205,13 @@ jobs:
               if row["mode"]=="null":
                   assert row["controlled_prints"]==0 and row["micro_event_recall"] is None,row
           PY
+      - name: Upload public-only development volume summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-volume-development
+          path: /tmp/abides-public-volume-dev-survey.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Upload aggregate blinded scores only (no private truth)
         uses: actions/upload-artifact@v4
         with:
