@@ -1,5 +1,29 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
+## New REAL public trade evidence — November 2026, research only
+
+**New live-provider archive downloads succeeded** through public GitHub
+Actions, not the Windows PC. Exactly **278,403 real exchange executed
+spot prints** were verified with the original provider ZIP SHA-256 files:
+LTCUSDT **116,446 on 2026-11-18 UTC** and **161,957 on 2026-11-19 UTC**.
+The observed trade IDs are strictly sequential even across the
+consecutive-day boundary; that is not independent proof of market
+archive completeness. [Scientific provenance and original actions runs](docs/REAL_PUBLIC_SPOT_TRADE_ARCHIVE_2026-11-21.md).
+
+The second predeclared UTC session was used for *descriptive*
+30-second clock-origin binning at **0/10/20 seconds**. Changing
+only the analytical bin offset changes counts of buy/sell-dominant
+and one-sided intervals; none of this identifies physical robots.
+All three phase views are correlated. **Historical full L2 is not
+included** and quote-based detection remains BLOCKED_BY_L2_DATA.
+
+The source dataset is restricted to **non-commercial CC BY-NC-SA 4.0
+research** under Binance Vision terms, not authorized for trading
+execution or commercial deployment. Raw trades are **never** committed
+or uploaded as workflow artifacts. The original source workflows
+were made manual-only immediately after successful first runs.
+
+
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 

@@ -136,3 +136,63 @@ A second compact no-raw-events fixture
 pins all source checksum and timing phase counts. Both provider
 network-fetch workflows became **manual-only after successful
 one-time executions**.
+
+## Combined two-day provenance audit and licensing guard
+
+The read-only no-network `tools/real_public_trade_pair_review.py`
+consumes the two compact source-controlled summary fixtures, rechecks
+their original provider ZIP SHA-256 identities, date/source paths,
+time boundaries, exact numeric fields, buy/sell count conservation
+and declared legal/unknown-truth constraints. It also independently
+reconciles all three UTC-day phase-bin summaries from the second day.
+
+| Real spot session | Public prints | Aggressive BUY | Aggressive SELL | BUY fraction |
+|---|---:|---:|---:|---:|
+| LTCUSDT 2026-11-18 UTC | 116,446 | 59,593 | 56,853 | 51.18% |
+| LTCUSDT 2026-11-19 UTC | 161,957 | 71,851 | 90,106 | 44.36% |
+| **Combined** | **278,403** | **131,444** | **146,959** | **47.21%** |
+
+The observed adjacent-day ID range has no internal gaps:
+608186258 through 608464660, inclusive, matching **278,403**
+prints. All first/last timestamps are contained in the requested
+UTC dates and ordered. That strengthens source continuity
+evidence but does not certify provider coverage or complete
+matching-engine origin history.
+
+```bash
+cd projects/robot-detector
+python -m unittest discover -s tests_background \
+  -p 'test_real_public_trade_pair_review.py' -v
+python tools/real_public_trade_pair_review.py \
+  --output data/results/public-two-day-provenance.json
+```
+
+This latter offline review verifies stored **metadata** and
+fails closed on simulated tampering; it **does not re-download
+or re-verify raw ZIP bytes**. Original independent provider
+checksum verification is evidenced by the successful
+two original Actions runs linked above.
+
+### MOEX historical L2 and license gate
+
+The free, public [MOEX ISS interface](https://www.moex.com/a8531)
+provides anonymous delayed market statistics and historical trade
+*results*, but those summary candles/NUMTRADES aggregates must not
+be represented as event-level historical trade prints or
+full-depth historical L2. More importantly, the
+[MOEX information-use terms](https://www.moex.com/s3503)
+identify a separate **non-display contract** for automated
+market-information processing for algorithmic trading or
+risk-management. **No automated MOEX dataset acquisition or
+commercial execution has been attempted in this project**.
+Verify legal entitlement before acquiring/training on MOEX
+non-display feeds; an HTTP endpoint being publicly accessible
+does not by itself grant unrestricted redistribution or
+commercial trading rights.
+
+**Next scientific limitation:** a real anonymous public execution
+tape can reveal activity and time-bin artifacts but cannot reveal
+parent-order or market participant counts. Validating L2-based
+robot-detection hypotheses still requires lawful full-depth
+synchronized quote snapshots and broker/source coverage evidence.
+No stage-2 real-market accuracy/release gate has been opened.

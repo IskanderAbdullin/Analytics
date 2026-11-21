@@ -346,3 +346,40 @@ be persisted in aggregate-only CI artifacts. This closes a leakage
 path where future developer code could have appended extra private
 keys to otherwise valid public summaries. All source-private analysis
 remains detached from the published public case schema.
+
+## 2026-11-21 — new real execution archives, two independent UTC sessions
+
+[Official Binance Vision raw spot trade download #44916791033](https://github.com/IskanderAbdullin/Analytics/actions/runs/44916791033)
+successfully verified **116,446 real LTCUSDT public prints** for
+**2026-11-18 UTC**, SHA-256
+`2fbf1fe2f85c813b3d5e4922d674799adced6f306effe0e5cf9add62a57e6522`.
+The second precommitted [run #44917086043](https://github.com/IskanderAbdullin/Analytics/actions/runs/44917086043)
+verified **161,957 public prints** for **2026-11-19 UTC**,
+SHA-256
+`9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a`.
+The first day is inspected development evidence, second day is a
+previously unseen *source/timing descriptive* day, not a blind
+evaluation of an unchanged bot classifier.
+
+Observed trade IDs contiguous inside and between dates:
+**608186258–608464660**, **278,403** exchange public executions.
+No missing IDs inside the downloaded intervals, no external guarantee
+that this is every matching-engine execution. Total observed aggressive
+buy/sell counts: **131,444 / 146,959**.
+
+The second day was rebinned at **0/10/20s** for one fixed 30s
+window, strict UTC-edge exclusion and preservation of all source
+trade counts. Buy/sell-dominant bin memberships and one-sided
+count change with the origin. **These are three analytic views of
+one real source day, not independent market samples.** No real L2
+book was sourced. A strict separate offline fixture pair validator
+and synthetic negative tests were added; the original new-data
+workflow is now manual-only, with the cheap research-ledger CI
+guarding all source metadata and within-day conservation.
+
+Source-license gate: Binance Vision dataset **CC BY-NC-SA 4.0**
+non-commercial research only, with separate restrictions on live
+proprietary trading, data redistribution and commercial use.
+MOEX non-display feeds for algorithmic trading require a separate
+contract; no such automated MOEX use is claimed. No raw public trade
+ZIP, private IDs, credentials or large artifacts were committed.
