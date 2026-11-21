@@ -26,6 +26,9 @@ on:
       - 'projects/robot-detector/tests_background/test_public_trade_direction_null.py'
       - 'projects/robot-detector/fixtures/binance_spot_weak_direction_nulls_20261121.json'
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
+      - 'projects/robot-detector/research/real_spot_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/real_spot_transfer_review.py'
+      - 'projects/robot-detector/tests_background/test_real_spot_transfer_review.py'
       - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
       - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
       - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
@@ -60,6 +63,9 @@ on:
       - 'projects/robot-detector/tests_background/test_public_trade_direction_null.py'
       - 'projects/robot-detector/fixtures/binance_spot_weak_direction_nulls_20261121.json'
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
+      - 'projects/robot-detector/research/real_spot_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/real_spot_transfer_review.py'
+      - 'projects/robot-detector/tests_background/test_real_spot_transfer_review.py'
       - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
       - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
       - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
@@ -94,6 +100,7 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
           python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
           python -m unittest discover -s tests_background -p 'test_real_public_trade_pair_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_spot_transfer_review.py' -v
           python tools/real_public_trade_pair_review.py --output data/results/two-days-source-provenance.json
           python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_phase_fragility.py' -v
