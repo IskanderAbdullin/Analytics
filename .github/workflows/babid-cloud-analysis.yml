@@ -9,6 +9,8 @@ on:
       - "projects/babid-cloud-analysis/**"
       - ".github/workflows/babid-cloud-analysis.yml"
   workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
 
 permissions:
   contents: read
@@ -18,7 +20,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  checkpoint:
+    name: Research state and next action
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Checkout Analytics only
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Check durable research state
+        run: python projects/babid-cloud-analysis/analysis/research_state.py validate
+      - name: Show non-executed next action
+        shell: bash
+        run: |
+          echo 'Research continuation pointer (not an agent execution):' >> "$GITHUB_STEP_SUMMARY"
+          python projects/babid-cloud-analysis/analysis/research_state.py next | tee -a "$GITHUB_STEP_SUMMARY"
+
   synthetic:
+    if: github.event_name != 'schedule'
     name: synthetic ${{ matrix.os }} / Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 12

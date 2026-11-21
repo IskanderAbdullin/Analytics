@@ -14,3 +14,26 @@ This is an analytical-only project in the **Analytics** GitHub repository.
 - Document every completed research/development step as an OsEngine Lab v2
   JSON event under the root `reports/osengine-lab/events/` of Analytics.
 - Run both OS CI jobs before representing tests as successful.
+
+
+## Continuous research and recovery (required)
+
+The terminal goal is evidence-backed resolution of the real Babid Cloud incident
+and assessment of historical trading — NOT green CI, a PR, or a code commit.
+
+Every session MUST read GOAL.md, STATE.json, NEXT_ACTION.json, EVIDENCE.md,
+BACKLOG.md and PROTOCOL.md, and run the state validator before choosing work.
+Continue the highest-priority feasible task after each milestone. Prefer the
+action that most reduces uncertainty about the incident, not easy extra tests.
+
+Before EVERY commit, update evidence, hypothesis status, current action and
+next executable action in the same commit. Commit/push only to Analytics,
+without force-push. If blocked on real files or authorization, retain
+goal_status=in_progress, mark the next action blocked_external, record exact
+missing inputs and a resumption command. Never say root cause was proven from
+synthetic tests.
+
+No private data in public GitHub, no live broker action, no bot changes.
+Computer Use / PC Agent requires separately explicit user authorization.
+GitHub Actions may run synthetic-only tests and a deterministic state checker.
+A scheduled CI run is NOT an autonomous researcher and cannot wake ChatGPT Work.
