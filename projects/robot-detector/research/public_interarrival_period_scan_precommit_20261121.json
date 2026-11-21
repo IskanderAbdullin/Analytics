@@ -1,0 +1,40 @@
+{
+  "schema_version": "public-clustered-interarrival-period-scan-preregistered-negative-v1",
+  "frozen_utc_date": "2026-11-21",
+  "scientific_stage": "RD-PUBLIC-CONDITIONAL-NULL-16",
+  "motivation_original_genuine_source_runs": [
+    44944144915,
+    44944168231
+  ],
+  "source_kind": "fully constructed public-only exact timestamp toy, no new ABIDES or real market data",
+  "source_generator": "90 unique prints on 20-second grid with no injected 45-second target; compare phase shifted global clock and unrelated 100 same-time split prints",
+  "source_unique_event_count": 90,
+  "source_period_seconds": 20,
+  "source_start_exchange_local_seconds_after_midnight": 34260,
+  "source_global_clock_shifts_ns": [
+    0,
+    1000000000
+  ],
+  "source_equal_timestamp_extra_prints_in_split_variant": 99,
+  "split_variant_45s_only_offset_seconds": 45,
+  "scan_periods_seconds": [
+    10,
+    15,
+    20,
+    30,
+    45,
+    60,
+    90
+  ],
+  "grid_anchor_exchange_local_seconds_after_midnight": 34260,
+  "grid_tolerance_ns": 250000000,
+  "consecutive_interarrival_tolerance_ns": 250000000,
+  "min_unique_event_timestamps": 10,
+  "no_source_oracle_agent_IDs_or_real_parent_orders": true,
+  "no_hidden_best_phase_or_period_selection_for_phenomenological_significance": true,
+  "all_candidate_periods_and_phase_shift_cases_output": true,
+  "no_market_FDR_p_value_or_owner_identity_claim": true,
+  "zero_interarrival_from_same_timestamp_split_prints_not_independent_events": true,
+  "pure_source_free_no_vendor_archive_or_broker_connection": true,
+  "negative_cases_not_selectively_discarded": true
+}
