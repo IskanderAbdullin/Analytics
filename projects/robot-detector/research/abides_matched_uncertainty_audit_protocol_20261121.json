@@ -1,0 +1,52 @@
+{
+  "schema_version": "abides-exact-synthetic-four-seed-retrospective-uncertainty-v1",
+  "registered_date_utc": "2026-11-21",
+  "stage": "RD-MATCHED-UNCERTAINTY-14",
+  "design_origin": "RETROSPECTIVE_UNCERTAINTY_AUDIT_AFTER_ALL_3201_3204_OUTCOMES_OBSERVED",
+  "new_source_replay": "NONE",
+  "original_source_run": 44938991772,
+  "original_source_artifact_id": 14720831681,
+  "original_source_uncompressed_json_sha256": "e75c089f023a12bddd19c2f4cf33a64470a29aeb79125024877fb4a9997885e2",
+  "source_fixture": "fixtures/abides_clustered_grid_original_20261121.json",
+  "cohorts": [
+    "poisson_noise_null",
+    "fixed_20s_noise_hard_negative",
+    "momentum_noise_hard_negative",
+    "twap_45s_positive"
+  ],
+  "source_seed_values": [
+    3201,
+    3202,
+    3203,
+    3204
+  ],
+  "per_cohort_independent_engine_runs": 4,
+  "method_pairing_key": "same seed plus same cohort plus same original source tape",
+  "source_snapshot_and_print_rows_not_independent_experimental_units": true,
+  "printed_100_fill_cluster_not_100_independent_owners": true,
+  "exact_nominal_binomial_interval": {
+    "family": "two-sided Clopper-Pearson",
+    "confidence_level": 0.95,
+    "alpha": 0.05,
+    "bounds": [
+      0,
+      1
+    ],
+    "assumptions": "hypothetical IID Bernoulli generated seed-trial draws within the same frozen ABIDES cohort; deterministic chosen seeds do not certify IID sampling",
+    "interpretation": "nominal mathematical sensitivity only; not empirical real-market coverage"
+  },
+  "metrics": [
+    "each-cohort per-print positive alarm fraction, count and nominal exact interval",
+    "each-cohort unique timestamp positive alarm fraction, count and nominal exact interval",
+    "each-cohort per-method abstentions and misses/false positives",
+    "paired source tape discordance print only, grouped only and both on each source cohort",
+    "matched pooled false alarms across all 3 background cohorts DESCRIPTIVE only (not IID pooled)",
+    "same timestamp extra prints, maximal exact timestamp cluster, public tape conservation",
+    "oracle source truths only after public inference; no actual owner IDs"
+  ],
+  "no_pvalue_or_bayesian_posterior_claim": true,
+  "no_real_market_FDR_precision_or_owner_identity_claim": true,
+  "no_threshold_selection_on_inspected_data": true,
+  "all_negative_source_cases_must_be_preserved": true,
+  "output_compact_aggregates_without_public_event_rows": true
+}
