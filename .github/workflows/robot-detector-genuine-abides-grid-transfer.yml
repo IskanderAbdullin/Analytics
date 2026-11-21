@@ -3,10 +3,9 @@ name: Robot Detector preregistered genuine ABIDES public 10s grid transfer
 # new-seed simulation. ABIDES matching engine commit pinned, 6 simulations,
 # real source-free negative tests, no raw events or private agent IDs uploaded.
 # After ONE original run convert to workflow_dispatch only.
+# Preregistered genuine original ABIDES new-seed #44928306325 succeeded.
+# Subsequent reruns require explicit workflow_dispatch, never automatic re-run.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-genuine-abides-grid-transfer.yml'
   workflow_dispatch:
 
 permissions:

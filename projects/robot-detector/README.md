@@ -2,6 +2,15 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Независимый genuine ABIDES-NG тест переносимости](
+  docs/GENUINE_ABIDES_FIXED_CLOCK_TRANSFER_20261121.md):
+  заранее зафиксированный 10-секундный детектор дал
+  **2/2 ложных тревоги** на регулярном фоне
+  и **2/2 пропуска** на genuine injected TWAP
+  (29 подтверждённых controlled executions).
+  Это отрицательный результат: clock grid не
+  идентифицирует целевого исполнителя.
+
 - [Ключевой hard-negative результат публичной
   10-секундной регулярности](
   docs/TOY_PUBLIC_EXECUTION_RHYTHM_HARD_NEGATIVE_20261121.md):

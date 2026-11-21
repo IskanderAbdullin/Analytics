@@ -1,0 +1,90 @@
+{
+  "schema_version": "genuine-abides-fixed-grid-transfer-observed-v1",
+  "original_source_run_id": 44928306325,
+  "original_compact_artifact_id": 14716637999,
+  "protocol": "research/genuine_abides_fixed_clock_transfer_precommit_20261121.json",
+  "abides_pinned_upstream_commit": "ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "source_matching_engine_runs": 6,
+  "seeds": [
+    2801,
+    2802
+  ],
+  "source_only_tested_10sec_phase_fraction_threshold": 0.22,
+  "source_only_10sec_grid_tolerance_milliseconds": 250,
+  "poisson_noise_null": {
+    "total": 2,
+    "alarms": 0,
+    "false_alarms": 0
+  },
+  "fixed_cadence_noise_hard_negative": {
+    "total": 2,
+    "alarms": 2,
+    "false_alarms": 2
+  },
+  "twap_injected_positive": {
+    "total": 2,
+    "alarms": 0,
+    "misses": 2,
+    "posthoc_controlled_trade_executions": 29
+  },
+  "original_cases": [
+    {
+      "seed": 2801,
+      "cohort": "poisson_noise_null",
+      "public_trades": 1184,
+      "public_l2": 1948,
+      "fraction_near_grid": 0.03969595,
+      "alarm": false,
+      "posthoc_twap_trades": 0
+    },
+    {
+      "seed": 2801,
+      "cohort": "fixed_cadence_noise_hard_negative",
+      "public_trades": 1102,
+      "public_l2": 1724,
+      "fraction_near_grid": 0.70961887,
+      "alarm": true,
+      "posthoc_twap_trades": 0
+    },
+    {
+      "seed": 2801,
+      "cohort": "twap_injected_positive",
+      "public_trades": 1190,
+      "public_l2": 1958,
+      "fraction_near_grid": 0.04201681,
+      "alarm": false,
+      "posthoc_twap_trades": 13
+    },
+    {
+      "seed": 2802,
+      "cohort": "poisson_noise_null",
+      "public_trades": 1021,
+      "public_l2": 1697,
+      "fraction_near_grid": 0.04211557,
+      "alarm": false,
+      "posthoc_twap_trades": 0
+    },
+    {
+      "seed": 2802,
+      "cohort": "fixed_cadence_noise_hard_negative",
+      "public_trades": 864,
+      "public_l2": 1341,
+      "fraction_near_grid": 0.67939815,
+      "alarm": true,
+      "posthoc_twap_trades": 0
+    },
+    {
+      "seed": 2802,
+      "cohort": "twap_injected_positive",
+      "public_trades": 862,
+      "public_l2": 1386,
+      "fraction_near_grid": 0.05800464,
+      "alarm": false,
+      "posthoc_twap_trades": 16
+    }
+  ],
+  "claims_real_market_owner_accuracy_or_FDR": false,
+  "claims_heldout_real_market_test": false,
+  "raw_public_market_tape_or_private_agent_ids_exported": false,
+  "conclusion": "Frozen source-public 10s-clock feature cannot distinguish fixed-cadence background from target and misses genuine 45s injected TWAP in both original ABIDES seeds; negative transfer result must be retained"
+}
