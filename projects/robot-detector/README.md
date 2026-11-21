@@ -9,6 +9,13 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Новый независимый ABIDES 16-run ratio baseline и отрицательные momentum-контроли](
+  docs/ABIDES_BACKGROUND_RATIO_HOLDOUT_20261121.md):
+  **4/4 TWAP обнаружены** при 74 posthoc-fills,
+  **0/8** ложных тревог на Poisson/fixed-20s,
+  но **2/4 ложных тревоги** на momentum-фоне.
+  Не real-market FDR. Следующий этап — #91.
+
 - [Проверено математическое aliasing 20s фоновой стратегии с 45s clock grid](
   docs/PUBLIC_CLOCK_ALIASING_NEGATIVE_20261121.md):
   при полном отсутствии TWAP **1/9** фоновых событий
@@ -88,8 +95,11 @@
 списком выше. Пререгистрированный 12-run ABIDES multiscale
 эксперимент [#89](https://github.com/IskanderAbdullin/Analytics/issues/89)
 **успешно выполнен**, его **отрицательные результаты**
-подтверждены. Следующий этап — [#90](https://github.com/IskanderAbdullin/Analytics/issues/90):
-исследование ложных ритмов и независимый holdout.
+подтверждены. Источник #90 теперь успешно проверен на исходных
+16 matching-engine runs. Следующий этап — [#91](
+https://github.com/IskanderAbdullin/Analytics/issues/91):
+проверка momentum false positives на новых, заранее
+зафиксированных симуляциях.
 
 ## Постоянная исследовательская программа и автоматическое продолжение
 

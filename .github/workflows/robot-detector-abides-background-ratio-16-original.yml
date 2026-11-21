@@ -3,10 +3,9 @@ name: Robot Detector original preregistered ABIDES 16-case background ratio
 # conditioned_ratio_precommit_20261121.json) and seeds reserved 3001-3004.
 # ORIGINAL source is genuine ABIDES-NG, only source-free public aggregates
 # uploaded. After one successful run change trigger to workflow_dispatch only.
+# The original source-only 16-case run #44936592641 PASSED.
+# Deliberate reruns only; no automatic public matching engine duplication.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-abides-background-ratio-16-original.yml'
   workflow_dispatch:
 
 permissions:
