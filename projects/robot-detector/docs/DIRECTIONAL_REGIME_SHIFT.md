@@ -19,7 +19,7 @@ Input: `TradeImportResult` parsed from public prints. Partition by instrument UI
 - `UNKNOWN_t`: all other valid public prints;
 - `K_t = BUY_t + SELL_t`, `V_t = K_t + UNKNOWN_t`.
 
-A bin is eligible only if `K_t` has at least the configured minimum and `K_t / V_t ≥ min-known-side-fraction` (default 0.9). Ineligible bins **reset** the past baseline; unknown direction is never imputed as BUY or SELL. Source gaps also reset the reference baseline. The monitor is retrospective: it may evaluate a bin **only after it completes**.
+A bin is eligible only if `K_t` has at least the configured minimum and `K_t / V_t ≥ min-known-side-fraction` (default 0.9). Ineligible bins **reset** the past baseline; unknown direction is never imputed as BUY or SELL. Source gaps also reset the reference baseline. The monitor is retrospective: it evaluates the **observed content** of the current bin after reading the file, against exclusively earlier bins. **A final archive bin may be truncated or still forming; the code does not verify a trusted end-of-bin watermark.** Do not interpret the final bin as necessarily complete or enable live alerting without an independent completeness/watermark gate.
 
 For each eligible completed current bin, compare with exactly six **earlier consecutive qualified** bins (default `--reference-bins 6`), never the current or any future bin:
 
@@ -62,6 +62,24 @@ The existing GitHub .NET CI additionally creates two truly fresh toy public CSVs
 The new `tools/directional_shift_dev_survey.py` runs genuine pinned ABIDES-NG matching-engine simulations with three **new development seeds 71, 72, 73**, each in three modes: agent-free null, VWAP and POV. It discards private maker/taker truth, feeds **only** the public exchange-projection CSV into this public-only monitor, and aggregates *counts of shift windows* by mode and public clock bin. No hidden truth is used for any feature or threshold. It explicitly refuses prior spent evaluation/development seeds 41–44, 61–63, 901–904. It uploads a small aggregate-only CI artifact with 14-day retention.
 
 The null mode is **not** an observationally equivalent controlled counterfactual for positive modes. Overlapping candidate counts across positive/null modes invalidate any inference that a shift labels a distinct robot. Even apparently fewer null candidates in three toy runs would be far too little evidence for a calibrated false positive rate or market predictive value.
+
+## Executed synthetic public-only results (2026-11-21)
+
+[GitHub .NET CI #44893110208](https://github.com/IskanderAbdullin/Analytics/actions/runs/44893110208) passed **134/134** internal C# tests and a CLI smoke: ten stable synthetic bins yielded **zero** candidate windows; six baseline bins followed by one BUY 90% vs 50% past BUY proportion yielded **exactly one** observed change of +0.4.
+
+[Real ABIDES-NG CI #44893110253](https://github.com/IskanderAbdullin/Analytics/actions/runs/44893110253) ran the actual pinned matching engine for nine **exploratory development** simulations (three seeds 71–73 for each null, VWAP and POV). All public-only source shares used fixed defaults without private-maker/taker exposure:
+
+| Synthetic cohort | Exchange prints in three runs | Evaluated clock bins | Unvalidated direction-shift windows | Cases with at least one candidate |
+|---|---:|---:|---:|---:|
+| Agent-free null | 9,526 | 162 | **1** | 1/3 |
+| VWAP agent | 9,796 | 162 | **4** | 2/3 |
+| POV agent | 9,448 | 162 | **2** | 2/3 |
+
+A null source **also** triggered. This is a genuine confounder for any claim that the change-point labels are executions by one algorithm. Per 100 evaluated clock bins the descriptive candidate counts are 0.62 (null), 2.47 (VWAP), 1.23 (POV), but **these are not calibrated market-wide false discovery or false alarm probabilities**. The cohorts are not causal counterfactuals, the sample is tiny and multiple models/settings could have been considered. Importantly, these aggregates **do not score parent-order/fill-level recall**, because the method has no event-level actor attribution.
+
+### Pre-registered independent synthetic replication
+
+A new sealed wrapper, `tools/directional_shift_frozen_replication.py`, fixes the **previously unused** seeds `1101,1102,1103,1104`, the three modes `null,vwap,pov`, and **all existing feature settings** (30 s bin, 6 earlier bins, 0.25 minimum absolute reported BUY share change, 0.9 known-side fraction, 2-bin cooldown, minimum current known lots 100, reference known lots 500). Its protocol, Python invariance tests and CI command are committed **before** collecting the outcomes. This tests *replication*, not learning or threshold optimization, and provides a separate aggregate-only expiring artifact. Do not use these results to tune a follow-up model; a later model needs another genuinely untouched holdout.
 
 ## Boundaries and next gates
 

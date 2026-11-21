@@ -208,7 +208,7 @@ public static class DirectionalRegimeShiftResearch
             new[]
             {
                 "NOT_OWNER_IDENTIFICATION: anonymous reported-side share changes do not identify metaorders, algorithms or physical bots.",
-                "ONLY_COMPLETED_BINS: each shift compares a completed current bin against strictly earlier, contiguous and qualifying bins.",
+                "RETROSPECTIVE_BINS: all windows use observed file contents; the terminal source bin might be incomplete and is not independently verified.",
                 "DIRECTION_PROVIDER_REPORTED: BUY/SELL meanings depend on the public data source.",
                 "KNOWN_SIDE_QUALITY: incomplete or unknown-side dominated clock bins reset the baseline.",
                 "MISSING_CLOCK_GAP_RESETS: absence of prints is not assumed to be a zero-volume bin or full feed coverage.",
