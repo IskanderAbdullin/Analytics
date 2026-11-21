@@ -341,6 +341,40 @@ threshold и все когорты.
 не считать одинаковый timestamp
 доказанным единым parent order.
 
+### P0 / RD-CLUSTER-MARKET-13 — подлинный исходный genuine ABIDES перенос ЗАВЕРШЁН
+
+[Оригинальный CI #44938991772](https://github.com/IskanderAbdullin/Analytics/actions/runs/44938991772)
+выполнил все **16** заранее зарегистрированных
+ABIDES matching-engine прогонов на seeds 3201–3204:
+**16 142** public prints, **14 801** уникальных
+timestamp групп и 61 подтверждённое posthoc
+исполнение TWAP. **Naive per-print**: 4/4 TWAP,
+1/4 Poisson false positive, 0/8 false positives
+на fixed20/momentum. **Exact timestamp grouping**:
+3/4 TWAP (пропуск seed 3204), **та же** 1/4
+Poisson false positive, 0/8 fixed20/momentum.
+В обоих методах 0 abstentions на этих данных.
+Следовательно, **нет доказанной пользы grouped
+score**, а один TWAP пропущен. Полные компактные
+агрегаты: [документ](ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md),
+[JSON](../fixtures/abides_clustered_grid_original_20261121.json).
+Не настоящая market FDR, не физические владельцы.
+Первоначальная workflow больше не запускается
+автоматически, чтобы не расходовать Actions повторно.
+
+### P0 / RD-MATCHED-UNCERTAINTY-14 — СЛЕДУЮЩИЙ
+
+[Issue #95](https://github.com/IskanderAbdullin/Analytics/issues/95):
+строго парный small-sample аудит 4 seeds×4 cohorts
+при исходной синтетической oracle truth.
+Нужно отдельно показать итоговые ошибки,
+paired decision discordances, интервалы
+неопределённости **только по синтетическому
+генератору**, подверженность автокорреляции
+и невозможность реальной FDR.
+Не переобучать порог на уже просмотренных
+3201–3204 и не объявлять реальные owner IDs.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -359,6 +393,8 @@ threshold и все когорты.
 | 2026-11-21 | Source-free phase/tied-fill counterexample #44937958809: 13 unique timestamps, but 100 fills at a 45s-only timestamp inflate print-weighted ratio 0.1667 → 8.4167 without any target; grouping timestamps reverses false signal; ±300ms shift leads to denominator 0/ABSTAIN | VERIFIED negative measurement artifact; cluster-aware conditional null #93 next |
 
 | 2026-11-21 | 13-placement exact toy conditional null #44938416432: naive print-weighted ratio raised alarm in 2/13 placements of one 100-fill cluster, while timestamp-grouped score was constant and 0/13 alarm. Strong toy exchangeability assumption DOES NOT calibrate market FDR. Next #94 genuine ABIDES cluster-aware control | VERIFIED exact toy-only negative; new real matching-source study NOT_STARTED |
+
+| 2026-11-21 | Genuine ABIDES original CI #44938991772 verified all 16 locally new 3201–3204 seeds; grouped timestamp score yields 3/4 TWAP vs print-based 4/4, Poisson false 1/4 in BOTH, 0/8 fixed/momentum false both. Preserve negative source outcome; paired small-N power audit next #95 | VERIFIED genuine source negative transfer; no real-market FDR |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 

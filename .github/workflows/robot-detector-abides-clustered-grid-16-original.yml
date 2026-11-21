@@ -3,10 +3,9 @@ name: Robot Detector original 16 ABIDES public print-vs-exact-timestamp-cluster 
 # Frozen protocol from earlier committed SHA; simulator pinned to vendor
 # Git revision; original source-private oracle never in features/artifacts.
 # Convert to manual-only after source success to conserve GitHub Actions.
+# Original source run #44938991772 SUCCEEDED on frozen 3201-3204.
+# Manual-only to avoid duplicate 16-case engine runs.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-abides-clustered-grid-16-original.yml'
   workflow_dispatch:
 
 permissions:

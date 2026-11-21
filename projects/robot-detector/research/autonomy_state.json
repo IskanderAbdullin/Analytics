@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "dcb06d222462e58c5371682b10383574fe2447ed",
+  "last_verified_base_commit": "da5f6fd9d5d0bdd957ab1d26c590b8aa969538e8",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-CLUSTER-MARKET-13",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44938991772",
+      "result": "16 original ABIDES matching-engine cases seeds 3201–3204, 16,142 synthetic public prints, 14,801 unique timestamps, 61 posthoc controlled TWAP fills. Per-print original 4/4 TWAP detections and 1/4 Poisson false; grouped timestamp 3/4 TWAP (miss 3204), same 1/4 Poisson false; fixed20/momentum 0/8 false in both, 0/16 abstain. No specificity improvement and sensitivity loss. Artifact 14720831681 SHA e75c089f...",
+      "status": "VERIFIED_GENUINE_ABIDES_NEGATIVE_TRANSFER_TIMESTAMP_GROUPING_NOT_MARKET_FDR"
+    },
     {
       "stage_id": "RD-CONDITIONAL-NULL-12",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44938416432",
@@ -107,30 +113,29 @@
     }
   ],
   "current_stage": {
-    "id": "RD-CLUSTER-MARKET-13",
-    "status": "SOURCE_WORKFLOW_COMMITTED_NOT_EXECUTED",
-    "title": "Genuine ABIDES matching source naive print-weighting versus same-timestamp cluster-aware clock ratio",
-    "why_next": "Frozen 3201–3204 16-case genuine ABIDES workflow committed at 902fdeb; two branch CI checks passed but no genuine ABIDES source workflow run attached to HEAD. Source results must not be inferred from successful generic CI.",
+    "id": "RD-MATCHED-UNCERTAINTY-14",
+    "status": "READY_TO_IMPLEMENT",
+    "title": "Exact finite synthetic 4-seed uncertainty and paired print/cluster source comparison",
+    "why_next": "A grouping diagnostic that solved a constructed pseudo-replication case failed to improve specificity on genuine ABIDES and missed a controlled TWAP positive. Four per-cohort independent seeds cannot establish confident error rates; matched source and correct uncertainty audit needed before further classifiers.",
     "inputs": [
-      "tools/public_cluster_conditional_toy_null.py",
-      "tools/abides_background_ratio_holdout.py",
-      "tools/abides_multiscale_public_l2.py",
-      "research/seed_registry.json",
-      "docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md"
+      "docs/ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md",
+      "fixtures/abides_clustered_grid_original_20261121.json",
+      "research/abides_clustered_grid_source_precommit_20261121.json",
+      "docs/MASTER_RESEARCH_PLAN.md"
     ],
     "deliverables": [
-      "Execute already frozen 16-case source workflow once, without changing seed/cohort/threshold",
-      "Retrieve aggregate-only source output and record all 16 negative/positive/abstain results",
-      "Compare print vs exact timestamp grouping and assess source confidence",
-      "Update plan and checkpoint; select next stage"
+      "Fixed small-sample exact binomial intervals by synthetic cohort only; no pooling incompatible backgrounds as exchange-real days",
+      "Paired same-seed decision discordance and source-independent unit count",
+      "Offline source aggregate conservation and adversarial tests",
+      "Precise limitations and next high-value scientific source decision"
     ],
     "acceptance": [
-      "All 4 background/target cohort outcomes accounted for across locally new seeds",
-      "No posthoc threshold tuning or real-market FDR/owner claims",
-      "Source-free offline tests pass; bounded original engine CI if scientifically useful",
-      "Confirmed SHA and fast-forward push, master scientific issue #72 open"
+      "No real-market FDR or parent-order ID assertion",
+      "Keep all 16 original source outcomes untouched and baseline comparison paired",
+      "No ratio phase/seeds retuning",
+      "Unit/CI evidence, fast-forward push and checkpoint after completion"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/94"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/95"
   },
   "backlog": [
     {
@@ -169,7 +174,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Check remote HEAD and all workflow runs; execute existing .github/workflows/robot-detector-abides-clustered-grid-16-original.yml once (workflow_dispatch if no push run), pinned ABIDES revision ac7a2a7. Do not change frozen protocol. Retrieve aggregate-only artifact and account for all 16 cases before declaring RD-CLUSTER-MARKET-13 verified. Keep #72 open.",
-  "last_session_result": "HEAD 902fdeb has frozen source workflow for 3201–3204, but only general CI runs 44938997233 and 44938997239 confirmed green; no ABIDES source outcome verified. This is infrastructure progress, not scientific result.",
+  "resume_instruction": "Read latest branch HEAD, AGENTS, MASTER_RESEARCH_PLAN, checkpoint, seed ledger and issue #95. Source original #44938991772 verified, full source aggregate artifact 14720831681, SHA e75c089f023a12bddd19c2f4cf33a64470a29aeb79125024877fb4a9997885e2. Compute strict small-N exact interval and paired audit from fixture, tests, CI. Do not retune or claim real-market FDR. Commit/push with evidence and choose next stage.",
+  "last_session_result": "Genuine ABIDES 16 original source run #44938991772 on locally new 3201-3204 is successful, verified from original source artifact and logs; naive 4/4 TWAP, 1/4 Poisson false, grouped 3/4 TWAP with 1 miss, same 1/4 Poisson false. 16142 public prints, 14801 unique timestamps, 61 oracle controlled fills. No grouped specificity benefit. Original source workflow now manual-only; next #95 uncertainty audit.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }

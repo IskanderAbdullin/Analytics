@@ -9,6 +9,13 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Новый genuine ABIDES 16-run эксперимент: по prints и по exact timestamp](docs/ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md):
+  **16 142** исполнений, **14 801** уникальных timestamps,
+  61 posthoc TWAP fills. Naive print 4/4 TWAP, grouped
+  3/4 TWAP, Poisson false alarm 1/4 у **обоих** методов.
+  Нет специфичностного улучшения; следующий научный
+  этап [#95](https://github.com/IskanderAbdullin/Analytics/issues/95).
+
 - [Точный conditional toy-null размера timestamp-кластера](
   docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md):
   при **13** неизменных публичных timestamps и
