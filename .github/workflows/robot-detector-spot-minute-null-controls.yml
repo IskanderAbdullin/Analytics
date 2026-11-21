@@ -3,10 +3,9 @@ name: Robot Detector bounded existing-source minute-shuffle research
 # Source dates and null-control seed set were committed BEFORE any
 # side-permutation results were observed. One original run only;
 # after success, change to manual-only to avoid repeated downloads.
+# Original genuine public-source result succeeded in Actions #44918585645.
+# Repeat network fetch of already inspected samples only on explicit dispatch.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-spot-minute-null-controls.yml'
   workflow_dispatch:
 
 permissions:

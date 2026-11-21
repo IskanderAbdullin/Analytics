@@ -196,3 +196,48 @@ parent-order or market participant counts. Validating L2-based
 robot-detection hypotheses still requires lawful full-depth
 synchronized quote snapshots and broker/source coverage evidence.
 No stage-2 real-market accuracy/release gate has been opened.
+
+## Already inspected real-market data: minute-preserving weak side controls
+
+A separate source-committed stage tests an explicitly **weak null**
+against the two already **inspected** LTCUSDT UTC days. The algorithm
+shuffles each public execution's BUY/SELL flag *within its exact UTC
+minute* using eight fixed deterministic seed values. It preserves:
+all executed event microsecond timestamps (including ordering/ties),
+per-minute exact BUY/SELL counts, market-wide print count, and
+all 0/10/20-second complete UTC-day bin boundaries. It does **not**
+preserve same-timestamp partial-fill correlation, real order
+queue effects, cross-minute side persistence, or parent-order truth.
+
+[Original successful verified-archive CI run #44918585645](https://github.com/IskanderAbdullin/Analytics/actions/runs/44918585645)
+re-read both **original** official ZIPs, matched both original
+source SHA-256 values, ran all deterministic negative tests, and
+saved ONLY compact aggregate/source JSON (artifact ID
+`14713021082`). The small observed scalar fixture is
+`fixtures/binance_spot_weak_direction_nulls_20261121.json`.
+
+| UTC source day | Predeclared origin | Actual one-sided complete 30s bins | 8 within-minute shuffle controls: min / median / max |
+|---|---:|---:|---|
+| 2026-11-18 | 0 s | 173 | 65 / 74 / 81 |
+| 2026-11-18 | 10 s | 161 | 46 / 56.5 / 68 |
+| 2026-11-18 | 20 s | 177 | 49 / 59 / 67 |
+| 2026-11-19 | 0 s | 135 | 51 / 58.5 / 67 |
+| 2026-11-19 | 10 s | 113 | 45 / 51 / 57 |
+| 2026-11-19 | 20 s | 135 | 40 / 47 / 55 |
+
+There is substantially more single-sided 30s public-print
+concentration in the observed market data than in this permissive
+toy randomization. **Do not infer real bot execution from this.**
+Execution bursts from the *same actual market order* may appear in
+several same-timestamp prints; independent per-print randomization
+breaks this real microstructure. Eight realizations provide no
+calibrated sampling distribution, p-value, market FDR or physical
+owner count. Both tapes were **already inspected development data**
+before this null protocol, so the exercise is retrospective,
+not blinded out-of-sample confirmation.
+
+A scientifically necessary follow-up is a **stronger null that
+preserves equal-timestamp execution clusters**, plus independent
+true external market validation. Source data remains under
+non-commercial CC BY-NC-SA terms and must not enter live trading.
+The original expensive workflow is now **manual-only**.
