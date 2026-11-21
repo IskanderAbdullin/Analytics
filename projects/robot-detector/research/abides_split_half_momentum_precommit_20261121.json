@@ -1,0 +1,74 @@
+{
+  "schema_version": "abides-public-two-half-ratio-momentum-negative-precommit-v1",
+  "frozen_date_utc": "2026-11-21",
+  "research_stage": "RD-MOMENTUM-NEGATIVE-10",
+  "origin": "New fixed split-half stability rule chosen AFTER observing original #44936592641 momentum false alarms 2/4; requires independent new synthetic source runs",
+  "original_previous_source_run_inspected": 44936592641,
+  "source_engine": "genuine ABIDES-NG",
+  "upstream_abides_commit": "ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "globally_blind_unseen_seed_claim": false,
+  "new_locally_unused_seed_candidates": [
+    3101,
+    3102,
+    3103,
+    3104
+  ],
+  "original_matching_engine_cases_planned": 16,
+  "cohorts": [
+    "poisson_noise_null",
+    "fixed_20s_noise_hard_negative",
+    "momentum_noise_hard_negative",
+    "twap_45s_positive"
+  ],
+  "same_simulator_cohort_configuration_as_ratio_source": true,
+  "simulator_clock_session_exchange_local": [
+    "09:30:00",
+    "09:38:00"
+  ],
+  "fixed_split_clock_exchange_local": "09:34:00",
+  "half_open_intervals_exchange_local": [
+    [
+      "09:30:00",
+      "09:34:00"
+    ],
+    [
+      "09:34:00",
+      "09:38:00"
+    ]
+  ],
+  "split_rules": "same exchange-local time grid and phase origin in both halves; 09:34 boundary belongs only to second half",
+  "public_only_feature": {
+    "period_grid_seconds": [
+      20,
+      45
+    ],
+    "fixed_phase_origin_exchange_local_seconds_after_midnight": 34260,
+    "tolerance_ns": 250000000,
+    "ratio": "hits on 45s grid divided by hits on 20s grid, not a probability",
+    "frozen_ratio_threshold_greater_or_equal": 0.6,
+    "half_positive_rule": "both half intervals independently have ratio>=0.6 once both pass minimum public coverage",
+    "half_minimum_public_execution_prints": 100,
+    "half_minimum_public_20s_hits": 4,
+    "half_minimum_eligible_previous_completed_30s_l2_bins": 2,
+    "abstain_if_any_half_unqualified": true,
+    "no_phase_or_threshold_selection_after_results": true
+  },
+  "whole_session_comparator": {
+    "rule": "original frozen 16-run ratio>=0.60, full session 200 public prints/8 hits20/5 previous completed 30s L2 bins",
+    "original_source_run_id": 44936592641
+  },
+  "primary_outputs": [
+    "TWAP true positives/false negatives/abstentions by seed",
+    "momentum false positives/true negatives/abstentions by seed",
+    "Poisson/fixed cadence false positives",
+    "per-half coverage & ratio",
+    "whole-session baseline comparison",
+    "posthoc controlled injected TWAP fills"
+  ],
+  "no_real_market_owner_labels_available": true,
+  "no_market_FDR_pvalue_or_significance_claim": true,
+  "synthetic_oracle_agent_ids_only_accessible_after_all_public_feature_scoring": true,
+  "raw_source_trade_snapshots_or_agent_ids_must_not_be_exported": true,
+  "original_16_case_results_must_all_be_retained": true,
+  "one_bounded_source_workflow_then_manual_only": true
+}
