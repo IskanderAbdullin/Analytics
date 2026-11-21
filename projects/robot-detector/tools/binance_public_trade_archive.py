@@ -69,17 +69,22 @@ def _decimal(value: str, label: str, *, positive: bool = False) -> Decimal:
 
 
 def analyze_verified_zip(
-    raw_zip: bytes, checksum_text: str, *, symbol: str, day: str
+    raw_zip: bytes, checksum_text: str, *, symbol: str, day: str,
+    clock_origin_study: bool = False
 ) -> dict:
     """Process bounded real or synthetic ZIP entirely in memory; no raw export.
 
     File SHA verifies byte-level identity with provider published CHECKSUM,
     NOT whether exchange captured all trades or timestamps accurately.
     """
+    if type(clock_origin_study) is not bool:
+        raise ValueError("Clock-origin study must be a strict research-only boolean")
     name, trading_day, url, checksum_url = frozen_source(symbol, day)
     digest = verify_checksum(raw_zip, checksum_text, name)
     min_us = int(datetime.combine(trading_day,time(),timezone.utc).timestamp()) * 1_000_000
     max_us = min_us + 86_400_000_000
+    phase_buckets = {phase: {} for phase in (0, 10, 20)} if clock_origin_study else None
+    excluded_edges = {phase: 0 for phase in (0, 10, 20)} if clock_origin_study else None
     with zipfile.ZipFile(io.BytesIO(raw_zip)) as archive:
         files = archive.infolist()
         expected_csv = name[:-4] + ".csv"
@@ -133,6 +138,18 @@ def analyze_verified_zip(
                     buyer_taker_count += 1
                     buy_qty += q
                 minutes[(ts-min_us)//60_000_000] += 1
+                if phase_buckets is not None:
+                    for phase in (0, 10, 20):
+                        origin = phase * 1_000_000
+                        full_ns = (86_400_000_000 - origin) // 30_000_000
+                        last_edge = origin + full_ns * 30_000_000
+                        local = ts - min_us
+                        if local < origin or local >= last_edge:
+                            excluded_edges[phase] += 1
+                        else:
+                            slot = (local-origin)//30_000_000
+                            counts = phase_buckets[phase].setdefault(slot, [0, 0])
+                            counts[0 if not maker else 1] += 1
                 count += 1
                 if count > MAX_TRADES:
                     raise ValueError("Archive exceeds approved bounded research sample")
@@ -144,7 +161,7 @@ def analyze_verified_zip(
         raise ValueError("Empty or nonconserved official execution archive")
     active = [x for x in minutes if x]
     ordered = sorted(active)
-    return {
+    report = {
         "schema_version": PROTOCOL,
         "source": "Binance Vision, official daily SPOT raw trades",
         "source_url": url, "checksum_url": checksum_url,
@@ -187,6 +204,48 @@ def analyze_verified_zip(
             "Dataset license restricts use to non-commercial research absent separate license.",
         ],
     }
+    if phase_buckets is not None:
+        variants = []
+        for phase in (0, 10, 20):
+            groups = list(phase_buckets[phase].values())
+            included = sum(buy+sell for buy, sell in groups)
+            excluded = excluded_edges[phase]
+            if included + excluded != count:
+                raise AssertionError("Clock-origin sample conservation violated")
+            bins = (86_400_000_000 - phase*1_000_000)//30_000_000
+            one_sided = sum((buy == 0) != (sell == 0) for buy, sell in groups)
+            buy_dominant = sum(buy > sell for buy, sell in groups)
+            sell_dominant = sum(buy < sell for buy, sell in groups)
+            tied = sum(buy == sell for buy, sell in groups)
+            if one_sided > len(groups) or buy_dominant+sell_dominant+tied != len(groups):
+                raise AssertionError("Public directional bin totals do not reconcile")
+            variants.append({
+                "origin_seconds": phase,
+                "bin_width_seconds": 30,
+                "fully_contained_utc_day_bins": bins,
+                "eligible_nonempty_bins": len(groups),
+                "empty_complete_bins": bins-len(groups),
+                "public_prints_in_full_bins": included,
+                "boundary_trades_excluded": excluded,
+                "strictly_buy_one_sided_bins_or_sell_one_sided_bins": one_sided,
+                "buy_dominant_bins": buy_dominant,
+                "sell_dominant_bins": sell_dominant,
+                "equal_buy_sell_print_count_bins": tied,
+                "has_public_orderbook_l2": False,
+                "physical_bot_identification": False,
+            })
+        report["clock_origin_descriptive_v1"] = {
+            "source": "public_spot_executed_prints_only",
+            "predeclared_origin_seconds": [0,10,20],
+            "case_count_not_independent_market_days": 3,
+            "clock_bins_are_complete_inside_utc_day": True,
+            "source_event_count": count,
+            "variants": variants,
+            "all_source_prints_accounted_for_each_phase": True,
+            "threshold_or_best_phase_selected": False,
+            "real_world_bot_calibration_claimed": False,
+        }
+    return report
 
 
 def _download_bounded(url: str, limit: int) -> bytes:
@@ -202,6 +261,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--symbol",default="LTCUSDT")
     parser.add_argument("--date",default="2026-11-18")
+    parser.add_argument("--clock-origin-study",action="store_true",
+                        help="Three preregistered 30s public-print phases; never L2")
     parser.add_argument("--output",type=Path,required=True)
     args = parser.parse_args()
     name, _, url, checksum_url = frozen_source(args.symbol,args.date)
@@ -209,7 +270,8 @@ def main() -> None:
         parser.error("Never overwrite prior read-only research evidence")
     checksum = _download_bounded(checksum_url, 250).decode("ascii")
     raw = _download_bounded(url, MAX_ZIP_BYTES)
-    summary = analyze_verified_zip(raw,checksum,symbol=args.symbol,day=args.date)
+    summary = analyze_verified_zip(raw,checksum,symbol=args.symbol,day=args.date,
+                                   clock_origin_study=args.clock_origin_study)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     with args.output.open("x",encoding="utf-8") as file:
         json.dump(summary,file,sort_keys=True,indent=2,allow_nan=False)
