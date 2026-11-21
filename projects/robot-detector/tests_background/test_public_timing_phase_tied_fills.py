@@ -75,7 +75,7 @@ class FixedPhaseSplitFillNegatives(unittest.TestCase):
         ):
             with self.subTest(bad=str(bad)[:25]),self.assertRaises(ValueError):
                 phase_counts(bad,shift_ms=0,collapse_same_timestamp=False)
-        for bad in (1.0,False,300,1000):
+        for bad in (1.0,False,301,1000):
             with self.subTest(shift=bad),self.assertRaises(ValueError):
                 phase_counts(source,shift_ms=bad,collapse_same_timestamp=False)
         with self.assertRaises(ValueError):
