@@ -1,0 +1,66 @@
+name: Robot Detector second independent day real spot print origin audit
+
+# Precommitted independent source *day* for DESCRIPTIVE real prints,
+# no quote book, no detection thresholds, not an evaluated robot holdout.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-real-spot-clockphase-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  second-source-date-development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Frozen pure UTC clock-phase/source negative checks
+        run: |
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+      - name: Acquire previously uninspected 2026-11-19 UTC LTCUSDT spot executions
+        run: |
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-19 \
+            --clock-origin-study \
+            --output /tmp/real-ltcusdt-20261119-public-clockphase.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/real-ltcusdt-20261119-public-clockphase.json').read_text())
+          s=r['clock_origin_descriptive_v1']
+          assert r['symbol']=='LTCUSDT' and r['utc_date']=='2026-11-19'
+          assert r['provider_published_checksum_matched']
+          assert s['predeclared_origin_seconds']==[0,10,20]
+          assert s['source_event_count']==r['public_trade_count']>0
+          assert [x['fully_contained_utc_day_bins'] for x in s['variants']]==[2880,2879,2879]
+          assert all(x['public_prints_in_full_bins']+x['boundary_trades_excluded']==r['public_trade_count'] for x in s['variants'])
+          assert s['all_source_prints_accounted_for_each_phase']
+          assert not r['l2_orderbook_present']
+          assert not r['real_world_owner_count_known']
+          assert not r['market_specific_false_alarm_rate_estimated']
+          assert not s['threshold_or_best_phase_selected']
+          assert not r['commercial_use_allowed_without_license']
+          print('REAL_PRINT_PHASE_ARCHIVE_VERIFIED',json.dumps({
+              'symbol':r['symbol'],'utc_date':r['utc_date'],
+              'public_trades':r['public_trade_count'],
+              'sha256':r['source_zip_sha256'],
+              'origin_records':s['variants'],
+              'new_real_market_owner_accuracy':False
+          },sort_keys=True))
+          PY
+      - name: Retain only source and descriptive counts, not raw trades
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-spot-clockphase-20261119
+          path: /tmp/real-ltcusdt-20261119-public-clockphase.json
+          retention-days: 7
+          if-no-files-found: error
