@@ -113,6 +113,36 @@ class MinutePreservingControlTests(unittest.TestCase):
                 evaluate_public_side_null(rows,utc_day_start_us=0,
                     preserve_same_timestamp_clusters=wrong)
 
+    def test_original_real_provider_whole_cluster_null_fixture_is_bounded(self):
+        import json
+        path=(Path(__file__).resolve().parents[1]/"fixtures"
+              /"binance_spot_cluster_preserving_nulls_20261121.json")
+        study=json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(study["original_run_id"],44919058627)
+        self.assertEqual(study["actual_distinct_market_days"],2)
+        self.assertEqual(study["origin_seconds"],[0,10,20])
+        self.assertEqual(study["shuffles_per_day"],len(NULL_SEEDS))
+        self.assertTrue(study["same_timestamp_side_vectors_preserved_in_controls"])
+        self.assertTrue(study["sample_is_previously_inspected_development_not_new_heldout"])
+        self.assertFalse(study["statistical_FDR_calibrated"])
+        self.assertFalse(study["physical_owner_identified"])
+        self.assertFalse(study["commercial_trading_permitted"])
+        self.assertEqual(sum(row["public_trades"] for row in study["cases"]),278403)
+        expected={"2026-11-18":[136.5,128,132],
+                  "2026-11-19":[105,92.5,97]}
+        for case in study["cases"]:
+            self.assertEqual(
+                [p["cluster_control_median"] for p in case["phases"]],
+                expected[case["utc_date"]])
+            self.assertEqual([p["origin_seconds"] for p in case["phases"]],[0,10,20])
+            for phase in case["phases"]:
+                self.assertGreater(phase["observed_one_sided"],
+                                   phase["cluster_control_max"])
+                self.assertLessEqual(phase["cluster_control_min"],
+                                     phase["cluster_control_median"])
+                self.assertLessEqual(phase["cluster_control_median"],
+                                     phase["cluster_control_max"])
+
     def test_invalid_public_payload_and_source_bounds_fail_closed(self):
         rows=example()
         for bad in (
