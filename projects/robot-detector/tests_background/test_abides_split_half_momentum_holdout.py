@@ -27,8 +27,8 @@ def fake_book():
     t=tuple(BEGIN_NS+i*5*NS for i in range(96))
     return SimpleNamespace(
         times_ns=t,
-        bids=tuple([[(100_000,100)]] for _ in t),
-        asks=tuple([[(100_200,120)]] for _ in t)
+        bids=tuple([(100_000,100)] for _ in t),
+        asks=tuple([(100_200,120)] for _ in t)
     )
 
 
