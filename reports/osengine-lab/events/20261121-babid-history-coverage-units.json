@@ -1,0 +1,97 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-history-coverage-clarity-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "8719d593-7508-439d-b73f-8b62cf23496d",
+    "occurred_at": "2026-11-21T17:58:00Z",
+    "type": "research",
+    "title": "Disambiguate Babid history calendar coverage and warning/error severity",
+    "summary": "Local read-only five-day aggregate audit showed legacy 22 fill-days and 11 equity-days are state/date report rows, not unique calendar dates. Actual local coverage is five fill calendar days, three equity calendar days. Error total 23192 is WRN+ERR (22312 warnings, 880 errors), not failed orders. Add explicit summary fields and synthetic test; private full report remains on Windows.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_history.py",
+      "action": "modified",
+      "summary": "Preserve old fields but add state-day/calendar-day distinctions and severity counts"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_audit_history.py",
+      "action": "modified",
+      "summary": "Synthetic multi-state same-date and WRN/ERR regression test"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-037/038 and private source hash, no financial numbers"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "M-018 and H-008, P0 still unresolved"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Keep P0 and add coverage prerequisites"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Disclose legacy ambiguity"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Follow-up on 30059 unique order outcomes"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-ci",
+      "title": "Ubuntu/Windows synthetic tests and research checkpoint",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending GitHub Actions, no private data"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-007",
+      "title": "Independent broker history unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "Cannot independently verify profitability or whether warnings caused failed trades."
+    },
+    {
+      "id": "B-008",
+      "title": "Local script target not in pinned PC sandbox",
+      "state": "open",
+      "severity": "high",
+      "description": "Further private order trace requires permitted pinned sandbox or an already prepared local manual run."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Confirm Cancel->Prune late Fill versus FilledByState through locally authorized evidence",
+      "state": "blocked",
+      "priority": "high"
+    },
+    {
+      "id": "A-008",
+      "title": "Correlate API30059 warnings with unique order outcomes and true fills",
+      "state": "blocked",
+      "priority": "medium"
+    }
+  ],
+  "limitations": [
+    "No P&L totals, account IDs, trade IDs, or original logs in public repository.",
+    "Calendar-days are coverage in available local copy, not proof of exhaustive live history."
+  ]
+}

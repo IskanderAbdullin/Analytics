@@ -457,9 +457,23 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
     table(output / "recordings.csv", ["instrument", "filename", "records",
           "recovered_or_gap_markers", "first_line_preview", "last_line_preview"], recordings)
     table(output / "issues.csv", ["type", "file", "detail"], problems)
+    # A row of daily fills/equity is one (state,date) pair, not one unique date.
+    # Legacy counts remain for compatibility but explicit coverage is added.
+    fill_calendar_days = {row["day"] for row in fills}
+    equity_calendar_days = {row["day"] for row in equity}
+    error_calendar_days = {key[0] for key in errors}
+    warning_events = sum(count for (_day, _dir, level, _category), count in errors.items()
+                         if level == "WRN")
+    error_level_events = sum(count for (_day, _dir, level, _category), count in errors.items()
+                             if level == "ERR")
     report = dict(source=str(root), focus_start_msk=focus_start, focus_end_msk=focus_end,
-                  configurations=len(configs), states=len(snapshots), days_with_fills=len(fills),
-                  equity_days=len(equity), error_events=sum(errors.values()),
+                  configurations=len(configs), states=len(snapshots),
+                  days_with_fills=len(fills), equity_days=len(equity),
+                  fill_state_days=len(fills), fill_calendar_days=len(fill_calendar_days),
+                  equity_state_days=len(equity), equity_calendar_days=len(equity_calendar_days),
+                  error_calendar_days=len(error_calendar_days),
+                  error_events=sum(errors.values()),
+                  warning_events=warning_events, error_level_events=error_level_events,
                   position_mismatch_events=sum(
                       amount for (_day, _log, _level, category), amount in errors.items()
                       if category == "position_mismatch"),
@@ -472,6 +486,8 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
                   incident_timeline_truncated=incident_stats["matched"] > len(incidents),
                   incident_limit=incident_limit, recordings=len(recordings),
                   problems=len(problems), limitations=[
+                      "Legacy days_with_fills and equity_days mean (state,date) rows, not distinct calendar days",
+                      "Legacy error_events counts WRN plus ERR messages, not individual failed orders; consult warning_events and error_level_events",
                       "Current config values are not historical config epochs",
                       "Broker-side operations, overnight charges and funding are not reconciled",
                       "Live journal snapshots can be changing while the audit runs",

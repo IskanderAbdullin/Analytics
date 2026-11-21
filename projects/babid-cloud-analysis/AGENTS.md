@@ -50,3 +50,7 @@ CURRENT main; preserve both independent evidence sets with unique IDs.
 The checkpoint validator must reject duplicate evidence and milestone IDs.
 Real observed data always take precedence over older speculative checkpoints,
 and green CI is not evidence of the historical root cause.
+
+## Evidence coverage units
+
+Always distinguish (state,calendar-day) aggregate report rows from unique calendar dates. `error_events` includes WRN+ERR log messages; it is never the number of unique failing broker orders. Do not infer strategy performance from short overlapping historical windows or from unsynchronized broker statements. Preserve private financial aggregates only in private local project reports.
