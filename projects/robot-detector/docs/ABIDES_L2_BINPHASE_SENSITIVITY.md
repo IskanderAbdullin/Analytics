@@ -73,3 +73,20 @@ This is a scientific **robustness/fragility diagnostic only**: with merely
 two seeds per background, no confidence interval, real-market error rate,
 private actor attribution or live release gate is justified. The additional
 tests use constructed software fixtures, not new independent market data.
+
+## Offline retrospective review: no new ABIDES runs
+
+Use a downloaded **original full result JSON** from the earlier pinned study:
+
+```bash
+cd projects/robot-detector
+python tools/abides_l2_phase_review.py --input /path/to/old_full_result.json --output /path/to/new_paired_review.json
+python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
+```
+
+The offline converter checks the exact frozen plan, case matrix, previous
+two-seed cohort medians and historical per-simulation fields, and rejects
+duplicate keys, nonstandard non-finite JSON and forged provenance flags.
+The output is never allowed to overwrite an existing file. Original source
+data/authenticity **cannot be independently established from metadata alone**.
+It does not run ABIDES, use any private identity or select a trading signal.
