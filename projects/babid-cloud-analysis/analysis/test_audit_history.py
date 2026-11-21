@@ -130,6 +130,38 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(rows[0]["realized"], "")
         self.assertEqual(rows[0]["fee_estimate"], "")
 
+    def test_equity_decimal_precision_and_daily_drawdown(self):
+        from audit_history import audit_equity
+        source = self.root / "state-foo" / "pnl-curve.csv"
+        source.write_text(
+            "1795165200000;0.2\n"
+            "1795165201000;0.3\n"
+            "1795165202000;0.1\n", encoding="utf-8")
+        problems = []
+        rows = audit_equity(source, "state-foo", problems)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["change"], "-0.1")
+        self.assertEqual(rows[0]["max_drawdown"], "0.2")
+        self.assertEqual(rows[0]["quality"], "observed_samples")
+        self.assertEqual(problems, [])
+
+    def test_equity_out_of_order_and_corrupt_value_deny_daily_certification(self):
+        from audit_history import audit_equity
+        source = self.root / "state-foo" / "pnl-curve.csv"
+        source.write_text(
+            "1795165200000;0.2\n"
+            "1795165201000;NaN\n"
+            "1795165199000;0.3\n", encoding="utf-8")
+        problems = []
+        rows = audit_equity(source, "state-foo", problems)
+        self.assertEqual(rows[0]["samples"], 2)
+        self.assertEqual(rows[0]["invalid_samples"], 1)
+        self.assertEqual(rows[0]["out_of_order_samples"], 1)
+        self.assertEqual(rows[0]["change"], "")
+        self.assertEqual(rows[0]["max_drawdown"], "")
+        self.assertEqual(rows[0]["quality"], "unverified")
+        self.assertTrue(any(p["type"] == "equity_day_unverified" for p in problems))
+
 
 if __name__ == "__main__":
     unittest.main()
