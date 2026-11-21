@@ -210,6 +210,33 @@ class FrozenClockPhaseTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 aggregate(bad_matrix)
 
+    def test_book_digest_detects_corrupted_or_mixed_phase_views(self):
+        old=matrix()
+        self.assertFalse(aggregate(old)["full_public_tape_digest_available_all_phases"])
+        fresh=[dict(row,public_tape_sha256=("a" if row["seed"]==2101 else "b")*64)
+               for row in old]
+        self.assertTrue(aggregate(fresh)["full_public_tape_digest_available_all_phases"])
+        corrupted=[dict(row) for row in fresh]
+        corrupted[0]["public_tape_sha256"]="c"*64
+        with self.assertRaises(ValueError):
+            aggregate(corrupted)
+        corrupted=[dict(row) for row in fresh]
+        del corrupted[0]["public_tape_sha256"]
+        with self.assertRaises(ValueError):
+            aggregate(corrupted)
+        corrupted=[dict(row) for row in fresh]
+        corrupted[0]["public_tape_sha256"]="x"*64
+        with self.assertRaises(ValueError):
+            aggregate(corrupted)
+
+    def test_defined_rho_requires_five_eligible_bins(self):
+        cases=[dict(x) for x in matrix()]
+        cases[0].update(eligible_lagged_bins=4,abstained_bins=11,descriptive_rho=0.3)
+        with self.assertRaises(ValueError):
+            aggregate(cases)
+        cases[0]["descriptive_rho"]=None
+        self.assertIsNone(aggregate(cases)["cases"][0]["descriptive_rho"])
+
     def test_undefined_rho_and_false_evidence_claims_fail_closed(self):
         r=aggregate(matrix({0:None,10:-0.1,20:None}))
         self.assertEqual(len(r["cohorts"]),6)

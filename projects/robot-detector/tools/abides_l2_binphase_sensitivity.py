@@ -21,6 +21,7 @@ from abides_export import UPSTREAM_COMMIT
 from l2_trade_context import public_projection
 from lagged_l2_bin import summarize_lagged_book
 from public_numeric import exact_nonnegative_integer as exact_int
+from public_tape_fingerprint import fingerprint_public_tape
 
 SEEDS = (2101, 2102)
 BACKGROUNDS = ("poisson", "fixed_cadence")
@@ -90,6 +91,10 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     required_fields = set(integer_fields) | set(forbidden_claims) | {
         "background", "public_sha256", "descriptive_rho",
     }
+    with_digest = ["public_tape_sha256" in row for row in rows]
+    if any(with_digest) and not all(with_digest):
+        raise ValueError("Mixed old and full-tape study provenance")
+    full_digest = all(with_digest)
     for row in rows:
         if not required_fields.issubset(row):
             raise ValueError("Incomplete public phase case")
@@ -101,6 +106,11 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
         if (type(digest) is not str or len(digest) != 64
                 or any(ch not in "0123456789abcdef" for ch in digest)):
             raise ValueError("Invalid public SHA-256 hex digest")
+        if full_digest:
+            h = row["public_tape_sha256"]
+            if (type(h) is not str or len(h) != 64
+                    or any(c not in "0123456789abcdef" for c in h)):
+                raise ValueError("Malformed full public tape SHA-256")
         if any(type(row[key]) is not bool or row[key] for key in forbidden_claims):
             raise ValueError("Forbidden or malformed evidence claim")
     expected = {
@@ -128,13 +138,14 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
             type(rho) not in (int, float)
             or not (-1 <= rho <= 1)
             or not math.isfinite(rho)
-            or row["eligible_lagged_bins"] < 2
+            or row["eligible_lagged_bins"] < 5
         ):
             raise ValueError("Invalid or non-finite rho")
         groups.setdefault((row["seed"], row["background"]), []).append(row)
     for key, group in groups.items():
         if (len(group) != len(PHASES_SECONDS)
             or len({x["public_sha256"] for x in group}) != 1
+            or (full_digest and len({x["public_tape_sha256"] for x in group}) != 1)
             or len({x["public_prints"] for x in group}) != 1
             or len({x["public_lots"] for x in group}) != 1
             or len({x["l2_snapshots"] for x in group}) != 1):
@@ -227,6 +238,8 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "paired_cohort_contrasts": paired_cohorts,
         "actual_matching_engine_simulations": len(groups),
         "non_independent_analytical_views": len(rows),
+        "full_public_tape_digest_available_all_phases": full_digest,
+        "raw_feed_authenticity_independently_verified": False,
         "private_truth_used": False,
         "independent_provider_completeness_verified": False,
         "real_market_accuracy_calibrated": False,
@@ -274,9 +287,15 @@ def run_case(seed: int, mode: str) -> list[dict[str, Any]]:
     for p in public:
         h.update(f"{p.time_ns}|{p.price_cents}|{p.quantity}|{p.reported_aggressor_side}\n".encode())
     source_digest=h.hexdigest()
+    source_tape=fingerprint_public_tape(market.l2_series,public,maximum_depth=DEPTH)
     rows = []
     for phase in PHASES_SECONDS:
         shifted_book, shifted_prints = shift_public_clock(market.l2_series,public,phase)
+        same_tape=fingerprint_public_tape(
+            shifted_book,shifted_prints,restore_clock_ns=phase*1_000_000_000,
+            maximum_depth=DEPTH)
+        if same_tape["public_tape_sha256"] != source_tape["public_tape_sha256"]:
+            raise RuntimeError("Public book/print content changed with clock phase")
         rep = summarize_lagged_book(
             shifted_book,shifted_prints,bin_seconds=BIN_SECONDS,
             maximum_quote_age_seconds=BIN_SECONDS,maximum_depth=DEPTH)
@@ -288,6 +307,7 @@ def run_case(seed: int, mode: str) -> list[dict[str, Any]]:
         rows.append({
             "seed":seed, "background":mode, "phase_seconds":phase,
             "public_sha256":source_digest,
+            "public_tape_sha256":same_tape["public_tape_sha256"],
             "public_prints":rep["public_execution_prints"],
             "public_lots":rep["public_execution_lots"],
             "l2_snapshots":rep["source_l2_snapshot_count"],
