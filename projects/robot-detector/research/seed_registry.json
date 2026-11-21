@@ -1,7 +1,7 @@
 {
   "schema_version": "market-robot-detector-seed-ledger-v1",
   "scope": "locally_known_studies_only_not_global_novelty_proof",
-  "description": "Project-local known-spent seed sets, including two precommitted development seeds 2401/2402 for controlled public L2 TWAP-vs-background. No global novelty attestation; registered seeds cannot be called unused blind holdouts.; synthetic fixed-grid toy development and holdout seeds 2601-2604 and 2701-2704 are now spent, not genuine ABIDES or real-market holdouts.",
+  "description": "Project-local known-spent seed sets, including two precommitted development seeds 2401/2402 for controlled public L2 TWAP-vs-background. No global novelty attestation; registered seeds cannot be called unused blind holdouts.; synthetic fixed-grid toy development and holdout seeds 2601-2604 and 2701-2704 are now spent, not genuine ABIDES or real-market holdouts.; preregistered genuine 10-second public-only ABIDES transfer seeds 2801/2802 (not globally certified blind).",
   "studies": [
     {
       "id": "initial_execution_development",
@@ -164,6 +164,17 @@
       ],
       "source_file": "tools/toy_public_execution_rhythm.py",
       "source_constant": "SEEDS_HOLDOUT"
+    },
+    {
+      "id": "genuine_fixed_grid_public_transfer",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        2801,
+        2802
+      ],
+      "source_file": "tools/abides_fixed_clock_transfer.py",
+      "source_constant": "SEEDS"
     }
   ],
   "replays": [
