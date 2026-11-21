@@ -58,9 +58,15 @@ class FullPipelineTests(unittest.TestCase):
                 out.write("T\t1795260000050\t1795260000050\t101\t1\tB\n")
 
             output = root / "reports" / "complete-audit-synthetic"
-            result = run(root, output, with_market=True)
+            result = run(
+                root, output, with_market=True,
+                incident_state="state-nvda-iis-live",
+                incident_logs="logs-nvda-iis-live",
+                incident_start="2026-11-21 14:40:00",
+                incident_end="2026-11-21 15:10:00",
+            )
             for section in ("history", "reconciliation", "configs", "market",
-                            "opportunity_validation", "nvda"):
+                            "opportunity_validation", "incident"):
                 self.assertIn(section, result["reports"], msg=str(result))
                 self.assertNotIn(section + "_error", result["reports"])
             manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
@@ -69,7 +75,7 @@ class FullPipelineTests(unittest.TestCase):
             self.assertEqual(manifest["reports"]["reconciliation"]["local_journal_matches"], 1)
             self.assertEqual(manifest["reports"]["market"]["files"], 1)
             self.assertEqual(manifest["reports"]["configs"]["configs"], 1)
-            self.assertEqual(manifest["reports"]["nvda"]["fill_rows"], 2)
+            self.assertEqual(manifest["reports"]["incident"]["fill_rows"], 2)
 
             # Sensitive configuration and journal identifiers must not leak to
             # the synthesized config inventory.

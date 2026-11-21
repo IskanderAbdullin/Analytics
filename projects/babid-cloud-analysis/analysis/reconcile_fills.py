@@ -17,7 +17,7 @@ from pathlib import Path
 from report_safety import validate_report_output
 
 COLUMNS = ("state", "mode", "account_hash", "snapshot_day", "fill_rows", "fill_lots",
-           "duplicates", "continuity_gaps", "out_of_order", "bad_rows",
+           "duplicates", "continuity_gaps", "out_of_order", "bad_rows", "truncated_rows",
            "snapshot_fills", "snapshot_lots", "snapshot_net", "snapshot_realized",
            "snapshot_fees", "last_fill_net", "last_fill_realized", "last_fill_fees",
            "sources_stable", "status", "flags")
@@ -42,6 +42,7 @@ def stamp(file: Path):
 def scan_fills(path: Path, state: str, anomalies: list[dict], cap: int = 5000) -> dict:
     total = {"fill_rows": 0, "fill_lots": 0, "duplicates": 0,
              "continuity_gaps": 0, "out_of_order": 0, "bad_rows": 0,
+             "truncated_rows": 0,
              "last_fill_net": "", "last_fill_realized": "", "last_fill_fees": ""}
     previous_net = None
     previous_time = None
@@ -59,8 +60,13 @@ def scan_fills(path: Path, state: str, anomalies: list[dict], cap: int = 5000) -
         if not reader.fieldnames or not required.issubset(reader.fieldnames):
             raise ValueError("fills.csv is missing required columns: " + ",".join(sorted(required)))
         for line, row in enumerate(reader, 2):
-            # Babid may append an unfinished last line while live; do not count it as a fill.
+            # A partially copied CSV must NOT silently reconcile with its
+            # journal, even if all complete rows happen to match totals.
             if not row.get("time_msk") or not row.get("lots") or not row.get("net_lots"):
+                total["truncated_rows"] += 1
+                total["bad_rows"] += 1
+                note(line, row, "truncated_row",
+                     "execution row lacks required values; data copy may be incomplete")
                 continue
             try:
                 lots_dec = decimal(row["lots"])
@@ -146,11 +152,14 @@ def reconcile_state(folder: Path, root: Path, anomalies: list[dict]) -> dict:
                                   ("fees", p["last_fill_fees"], result["snapshot_fees"])):
             if str(left) != "" and str(right) != "" and decimal(left) != decimal(right):
                 flags.append("journal_diff_" + what)
-        for what in ("duplicates", "continuity_gaps", "bad_rows", "out_of_order"):
+        for what in ("duplicates", "continuity_gaps", "bad_rows", "out_of_order",
+                     "truncated_rows"):
             if p[what]:
                 flags.append(what)
         result["flags"] = ";".join(flags)
-        result["status"] = "unverified" if not stable else "review" if flags else "matches_local_journal"
+        result["status"] = ("unverified" if not stable else
+                            "incomplete" if p["truncated_rows"] else
+                            "review" if flags else "matches_local_journal")
     except (OSError, ValueError, TypeError, InvalidOperation, csv.Error, json.JSONDecodeError) as error:
         result["flags"] = "read_error: " + str(error)[:200]
         result["status"] = "incomplete"

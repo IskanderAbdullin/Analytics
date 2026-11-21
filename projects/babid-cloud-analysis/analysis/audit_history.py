@@ -15,6 +15,7 @@ import re
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from report_safety import validate_report_output
 
@@ -26,7 +27,8 @@ INCIDENT = re.compile(
     r"FILL |SYNTHETIC|replac|cancel|resync|stream|order \d+:", re.I
 )
 FIELDNAMES = ("day", "state", "fills", "lots", "realized", "fee_estimate",
-              "synthetic", "duplicate_trade_ids", "last_net_lots")
+              "synthetic", "duplicate_trade_ids", "last_net_lots",
+              "invalid_rows", "missing_realized", "missing_fees")
 
 
 def read_jsonc(path: Path) -> dict:
@@ -100,11 +102,13 @@ def account_fingerprint(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()[:12] if value else ""
 
 
-def fnum(value: str | None) -> float:
-    try:
-        return float(value or 0)
-    except (ValueError, TypeError, OverflowError):
-        return 0.0
+def strict_decimal(value: str | None) -> Decimal:
+    if value is None or not str(value).strip():
+        raise InvalidOperation("numeric field is absent")
+    amount = Decimal(str(value))
+    if not amount.is_finite():
+        raise InvalidOperation("numeric field is not finite")
+    return amount
 
 
 def table(path: Path, fields: list[str], rows: list[dict]) -> None:
@@ -147,35 +151,74 @@ def load_inventory(root: Path, problems: list[dict]) -> list[dict]:
 
 
 def audit_fills(path: Path, state: str, problems: list[dict]) -> list[dict]:
-    days = defaultdict(lambda: dict(fills=0, lots=0, realized=0.0, fee_estimate=0.0,
-                                     synthetic=0, duplicate_trade_ids=0, last_net_lots=""))
+    """Retain only financially complete daily totals, using exact decimals.
+
+    Unknown/malformed accounting is NOT zero. Duplicate and incomplete rows
+    mean realized results cannot be certified from this source copy.
+    """
+    days = defaultdict(lambda: dict(
+        fills=0, lots=0, realized=Decimal(0), fee_estimate=Decimal(0),
+        synthetic=0, duplicate_trade_ids=0, last_net_lots="",
+        invalid_rows=0, missing_realized=0, missing_fees=0))
     seen: set[tuple[str, str]] = set()
+    undated_bad_rows = 0
     try:
         with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as stream:
             reader = csv.DictReader(stream, delimiter=";")
             if not reader.fieldnames or not {"time_msk", "trade_id", "lots"}.issubset(reader.fieldnames):
                 raise ValueError("missing required fills.csv columns")
             for row in reader:
-                if not row.get("time_msk") or not row.get("lots"):
-                    continue  # possible incomplete last line of active file
-                day = row["time_msk"][:10]
-                if not re.fullmatch(r"\d{4}-\d\d-\d\d", day):
+                timestamp = row.get("time_msk") or ""
+                day = timestamp[:10]
+                try:
+                    datetime.strptime(day, "%Y-%m-%d")
+                except ValueError:
+                    undated_bad_rows += 1
                     continue
                 stat = days[day]
+                try:
+                    volume = strict_decimal(row.get("lots"))
+                    if volume <= 0 or volume != volume.to_integral_value():
+                        raise ValueError("invalid positive integer lot count")
+                    lots = int(volume)
+                except (InvalidOperation, ValueError, TypeError, OverflowError):
+                    stat["invalid_rows"] += 1
+                    continue
+
                 stat["fills"] += 1
-                stat["lots"] += int(fnum(row.get("lots")))
-                stat["realized"] += fnum(row.get("realized"))
-                stat["fee_estimate"] += fnum(row.get("fee_estimate"))
-                stat["synthetic"] += row.get("synthetic") == "1"
+                stat["lots"] += lots
+                stat["synthetic"] += int(row.get("synthetic") == "1")
                 stat["last_net_lots"] = row.get("net_lots", "")
                 key = (row.get("exchange_id", ""), row.get("trade_id", ""))
                 if key[1]:
                     if key in seen:
                         stat["duplicate_trade_ids"] += 1
                     seen.add(key)
+                for source, target, missing in (
+                    ("realized", "realized", "missing_realized"),
+                    ("fee_estimate", "fee_estimate", "missing_fees"),
+                ):
+                    try:
+                        stat[target] += strict_decimal(row.get(source))
+                    except (InvalidOperation, ValueError, TypeError):
+                        stat[missing] += 1
     except (OSError, ValueError, csv.Error) as error:
-        problems.append(dict(type="fills_read_error", file=str(path), detail=str(error)[:180]))
-    return [dict(day=day, state=state, **v) for day, v in sorted(days.items())]
+        problems.append(dict(type="fills_read_error", file=path.name, detail=str(error)[:180]))
+
+    if undated_bad_rows:
+        problems.append(dict(type="fills_undated_rows", file=path.name,
+                             detail=f"{undated_bad_rows} rows have no valid Moscow date"))
+    results = []
+    for day, stat in sorted(days.items()):
+        partial = bool(stat["invalid_rows"] or stat["duplicate_trade_ids"])
+        if partial or stat["missing_realized"] or stat["missing_fees"]:
+            problems.append(dict(type="fills_day_uncertain", file=path.name,
+                                 detail=f"{state}:{day} has incomplete financial coverage"))
+        realized = "" if partial or stat["missing_realized"] else str(stat["realized"])
+        fees = "" if partial or stat["missing_fees"] else str(stat["fee_estimate"])
+        results.append(dict(day=day, state=state,
+                            **(stat | {"realized": realized, "fee_estimate": fees})))
+    return results
 
 
 def audit_equity(path: Path, state: str, problems: list[dict]) -> list[dict]:
@@ -231,7 +274,8 @@ def classify(message: str) -> str:
 
 
 def audit_logs(path: Path, logdir: str, focus_start: str, focus_end: str,
-               error_counts: Counter, incident: list[dict], problems: list[dict]) -> None:
+               error_counts: Counter, incident: list[dict], problems: list[dict],
+               incident_stats: Counter, incident_limit: int) -> None:
     try:
         with path.open("r", encoding="utf-8-sig", errors="replace") as stream:
             for line_no, line in enumerate(stream, 1):
@@ -243,8 +287,10 @@ def audit_logs(path: Path, logdir: str, focus_start: str, focus_end: str,
                 if level in ("WRN", "ERR"):
                     error_counts[(day, logdir, level, classify(message))] += 1
                 if focus_start <= stamp[:19].replace(" ", "T") <= focus_end and INCIDENT.search(message):
+                    incident_stats["matched"] += 1
                     # Redact path/user-specific details; raw logs stay only at source.
-                    if len(incident) < 25000:
+                    # Every omitted event is counted, even after the storage cap.
+                    if len(incident) < incident_limit:
                         incident.append(dict(at_msk=stamp, log_dir=logdir,
                                              level=level, category=classify(message),
                                              file=path.name, line=line_no,
@@ -274,7 +320,10 @@ def audit_recording(path: Path, problems: list[dict]) -> dict:
                 first_line_preview=first, last_line_preview=last)
 
 
-def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
+def run(root: Path, output: Path, focus_start: str, focus_end: str,
+        incident_limit: int = 25000) -> dict:
+    if not 1 <= incident_limit <= 1000000:
+        raise ValueError("incident_limit must be 1..1000000")
     root, output = validate_report_output(root, output)
     problems: list[dict] = []
     configs = load_inventory(root, problems)
@@ -285,6 +334,7 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
     log_dirs.update(p.name for p in root.glob("logs*") if p.is_dir())
     fills, equity, snapshots, incidents = [], [], [], []
     errors: Counter = Counter()
+    incident_stats: Counter = Counter()
     for name in sorted(state_dirs):
         folder = safe_child(root, name)
         if folder is None or not folder.is_dir():
@@ -315,7 +365,8 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
             continue
         for log in sorted(folder.glob("*.log")):
             if log.is_file():
-                audit_logs(log, name, focus_start, focus_end, errors, incidents, problems)
+                audit_logs(log, name, focus_start, focus_end, errors, incidents,
+                           problems, incident_stats, incident_limit)
     recordings = []
     rec = root / "recordings"
     if rec.is_dir():
@@ -338,7 +389,11 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str) -> dict:
     report = dict(source=str(root), focus_start_msk=focus_start, focus_end_msk=focus_end,
                   configurations=len(configs), states=len(snapshots), days_with_fills=len(fills),
                   equity_days=len(equity), error_events=sum(errors.values()),
-                  incident_events=len(incidents), recordings=len(recordings),
+                  incident_events=len(incidents),
+                  incident_events_total=incident_stats["matched"],
+                  incident_events_omitted=incident_stats["matched"] - len(incidents),
+                  incident_timeline_truncated=incident_stats["matched"] > len(incidents),
+                  incident_limit=incident_limit, recordings=len(recordings),
                   problems=len(problems), limitations=[
                       "Current config values are not historical config epochs",
                       "Broker-side operations, overnight charges and funding are not reconciled",
@@ -353,13 +408,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True, help="Copy of Babid01-TInvest")
     parser.add_argument("--output", type=Path, help="New directory for reports (within root)")
-    parser.add_argument("--focus-start", default="2026-11-21T14:40:00")
-    parser.add_argument("--focus-end", default="2026-11-21T15:10:00")
+    parser.add_argument("--focus-start", default="0001-01-01T00:00:00")
+    parser.add_argument("--focus-end", default="9999-12-31T23:59:59")
+    parser.add_argument("--incident-limit", type=int, default=25000,
+                        help="max incident detail rows stored; all matches are counted")
     args = parser.parse_args()
     root = args.root.resolve()
     output = args.output or (root / "reports" / "history-audit")
     try:
-        result = run(root, output, args.focus_start, args.focus_end)
+        result = run(root, output, args.focus_start, args.focus_end, args.incident_limit)
     except (OSError, ValueError) as error:
         print("Audit refused/failed:", error, file=sys.stderr)
         return 1

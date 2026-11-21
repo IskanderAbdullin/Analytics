@@ -89,6 +89,30 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(summary["incomplete_or_unverified"], 1)
         self.assertEqual(row["status"], "incomplete")
 
+    def test_partially_written_final_row_cannot_match_snapshot(self):
+        self.write(self.rows())
+        with self.fills.open("a", encoding="utf-8") as file:
+            file.write("2026-11-21 14:53:00;3;ex3;tr3;Buy;open;100;")
+        summary, row = self.report()
+        self.assertEqual(summary["local_journal_matches"], 0)
+        self.assertEqual(summary["incomplete_or_unverified"], 1)
+        self.assertEqual(row["truncated_rows"], "1")
+        self.assertEqual(row["bad_rows"], "1")
+        self.assertIn("truncated_rows", row["flags"])
+        with (self.root / "reports" / "one" / "anomalies.csv").open(newline="") as file:
+            issues = list(csv.DictReader(file))
+        self.assertEqual(issues[0]["kind"], "truncated_row")
+
+    def test_partial_row_in_middle_still_blocks_success(self):
+        valid = self.rows()
+        broken = "2026-11-21 14:50:15;bad;ex;tr;Buy;open;100;;0;0;;\n"
+        self.write([valid[0], broken, valid[1]])
+        summary, row = self.report()
+        self.assertEqual(summary["local_journal_matches"], 0)
+        self.assertEqual(summary["incomplete_or_unverified"], 1)
+        self.assertEqual(row["fill_rows"], "2")
+        self.assertEqual(row["truncated_rows"], "1")
+
 
 if __name__ == '__main__':
     unittest.main()
