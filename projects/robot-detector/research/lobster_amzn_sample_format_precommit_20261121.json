@@ -1,0 +1,58 @@
+{
+  "schema_version": "robot-detector-vendor-public-sample-format-precommit-v1",
+  "freeze_date_utc": "2026-11-21",
+  "origin_official_page": "https://php.lobsterdata.com/info/DataSamples.php",
+  "exact_source_url": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip",
+  "ticker": "AMZN",
+  "market": "NASDAQ Historical TotalView-ITCH vendor-reconstructed",
+  "utc_calendar_date": "2012-06-21",
+  "levels": 10,
+  "source_type": "vendor-expressly-downloadable public demonstration sample only",
+  "source_licence_status": "NO_PUBLIC_STANDALONE_LICENCE; Academic subscription terms supplied by vendor only with contract",
+  "source_terms_url": "https://php.lobsterdata.com/termsAndConditions.php",
+  "allowed_activity_assumed": "format and data-integrity demonstration only; no ML training, trading, redistribution, derived pricing product, private identities",
+  "full_data_training_authorized": false,
+  "commercial_use_authorized": false,
+  "source_published_sha256_available": false,
+  "download_checks": "https only; exact official hostname/source path; <=40MB compressed; <=300MB uncompressed; no ZIP traversal; two aligned CSV and optional readme; at most 600000 original message/book row pairs; 6 and 40 CSV columns; exact 10-occupied-level schema; seconds-after-midnight with >= milliseconds and likely nanoseconds",
+  "message_columns": [
+    "time_seconds_after_midnight",
+    "event_type",
+    "reference_ID",
+    "size_shares",
+    "price_x10000",
+    "resting_limit_order_side"
+  ],
+  "message_event_types": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "message_direction_not_market_aggressor": "Direction is RESTING limit order side: -1 sell limit, +1 buy limit; visible type4 passive sell implies aggressive buyer",
+  "book_columns_repeating_per_level": [
+    "ask_price_x10000",
+    "ask_size_shares",
+    "bid_price_x10000",
+    "bid_size_shares"
+  ],
+  "dummy_ask_price_x10000": 9999999999,
+  "dummy_bid_price_x10000": -9999999999,
+  "dummy_quote_size": 0,
+  "sample_duration": "09:30:00 to 16:00:00 seconds after exchange local midnight, not UTC timestamps",
+  "main_metric": "number of exactly aligned event/message and 10-level book states, event-type counts, best bid/ask positive non-dummy validity and spread-crossed/locked anomalous snapshot counts",
+  "limitations": [
+    "2012 historical demo, not modern market and no labelled bots",
+    "event ID in sample is a vendor/NASDAQ order reference, not a person",
+    "10 occupied levels are not full depth",
+    "no provider-signed or published SHA256 verification",
+    "vendor sample rights for ML/trading/commercial use not demonstrated",
+    "book may contain true historical quote anomalies; count rather than silently cleaning"
+  ],
+  "no_raw_archive_or_events_in_repository_or_artifacts": true,
+  "no_full_depth_or_live_market_bot_detection_claims": true,
+  "missing_or_denied_source_handling": "stop; never substitute another sample after observing output"
+}
