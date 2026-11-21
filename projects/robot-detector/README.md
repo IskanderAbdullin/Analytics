@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Adversarial common-market public-book null controls
+
+The new strictly synthetic, read-only `tools/l2_common_factor_null.py` demonstrates that **market-wide common conditions** can generate very high correlation between previous book imbalance and later aggregate directional trades **without identifying any single parent execution order**. Four transparent families—common factor, independent flow, synchronized quote/trade clock and broad market regime shock—are tested in an inexpensive, no-ABIDES Python CI. The results are **educational counterexamples, not realistic calibrated market nulls**; do not convert a high public `rho` to a bot count or real false-positive probability.
+
+[Protocol, actual CI results and limitations](docs/L2_COMMON_FACTOR_NULLS.md). [Lightweight CI #44896188923](https://github.com/IskanderAbdullin/Analytics/actions/runs/44896188923) passed all five tests: two constructed common-state/shock backgrounds yielded **Spearman rho=1.000 with no identified parent order**, while independently permuted flow yielded **−0.195**; clock synchronization forced **144/144** strict-event join abstentions. **These are deliberately synthetic counterexamples, not market FDR estimates.** No trading APIs, account access or hidden actor labels.
+
 ## Lagged completed-book L2 versus next-bin public executions
 
 The new **read-only** `tools/lagged_l2_bin.py` describes depth-five order-book imbalance in an **entirely completed previous 30-second bin** versus BUY share in the **next completed** bin of anonymous executed prints. It avoids the intra-timestamp sequencing impossibility seen in the strict per-fill join (all 2,630 prints were ambiguous) and explicitly abstains if the prior clock bin has no valid fresh two-sided book. Five or more eligible observations with changing ranks are needed to report a *descriptive*, ties-aware Spearman correlation; otherwise the coefficient is undefined. It **cannot** identify VWAP/POV agents, infer queue position or supply a calibrated market FDR. The public-bin outcome is retrospective, not a forecast available at bin open.
