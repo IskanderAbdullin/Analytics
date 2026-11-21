@@ -87,6 +87,29 @@ class AuditTests(unittest.TestCase):
         self.assertNotIn("SECRET", data)
         self.assertNotIn("t1", data)
 
+    def test_multi_state_history_reports_distinct_calendar_days(self):
+        second = self.root / "state-second"
+        second.mkdir()
+        (second / "fills.csv").write_text(
+            "time_msk;exchange_id;trade_id;side;lots;realized;fee_estimate\n"
+            "2026-11-21 11:00:00;other;mock-2;Buy;1;0;0\n",
+            encoding="utf-8")
+        (second / "pnl-curve.csv").write_text(
+            "1795260000000;2\n1795260010000;3\n", encoding="utf-8")
+        output = self.root / "reports" / "coverage"
+        summary = run(self.root, output, "2026-11-21T00:00:00",
+                      "2026-11-21T23:59:59")
+        self.assertEqual(summary["days_with_fills"], 2)  # legacy state-days
+        self.assertEqual(summary["fill_state_days"], 2)
+        self.assertEqual(summary["fill_calendar_days"], 1)
+        self.assertEqual(summary["equity_state_days"], 2)
+        self.assertEqual(summary["equity_calendar_days"], 1)
+        self.assertEqual(summary["error_calendar_days"], 1)
+        self.assertEqual(summary["error_events"], 3)
+        self.assertEqual(summary["warning_events"], 1)
+        self.assertEqual(summary["error_level_events"], 2)
+        self.assertIn("WRN plus ERR", " ".join(summary["limitations"]))
+
     def test_output_is_never_replaced(self):
         output = self.root / "reports" / "audit-1"
         run(self.root, output, "2026-11-21T14:40:00", "2026-11-21T15:10:00")

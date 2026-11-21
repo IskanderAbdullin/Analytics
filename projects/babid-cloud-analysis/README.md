@@ -348,3 +348,9 @@ python run_offline_audit.py --root "<COPY>" --incident-state state-nvda-iis-live
 При локальном офлайн-аудите обновлённый `analysis/audit_history.py` создаёт `history/accounting_alignments.csv` из сообщений `Income accounting position (...) differs from the journal (...)`. Читается потоково; поля — время, относительный каталог логов, номер строки, net P&L до коррекции, net журнала и их разница. Исходные сообщения и trade IDs в этот CSV не копируются.
 
 Сводка `history/summary.json` содержит `accounting_alignment_notices`, `accounting_alignment_rows` и `accounting_alignment_rows_omitted`: отчет ограничен 2000 событиями, обрезку нельзя считать полнотой истории. Событие свидетельствует о внутренней бухгалтерской коррекции, но НЕ о брокерском исполнении или причине NVDA. Отчёт предназначен только для приватной замороженной копии, не загружать его в публичный GitHub.
+
+## Корректная единица измерения истории и ошибок
+
+`analysis/audit_history.py` теперь сохраняет совместимость с legacy `days_with_fills` и `equity_days`, но эти поля — число строк `(state, day)`, не длительность реальной истории. Используйте `fill_state_days`, `fill_calendar_days`, `equity_state_days`, `equity_calendar_days` и `error_calendar_days`. Два инструмента, торговавшие в один календарный день, дают два state-days, но один calendar day. Отсутствие исторической записи не означает отсутствие торговли.
+
+Legacy `error_events` включает оба уровня `WRN + ERR`; используйте новые `warning_events` и `error_level_events`. Ошибочный ответ отмены, гонка исполнения и повторное предупреждение могут относиться к одной сделке; нельзя превращать количество строк лога в процент неудачных ордеров. Даже пять дней местного покрытия не достаточны для статистического доказательства доходности торговой стратегии; брокерские комиссии и external исполнение должны быть сверены отдельно.
