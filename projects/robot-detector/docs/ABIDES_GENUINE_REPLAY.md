@@ -43,6 +43,29 @@ dotnet run --project src/RobotDetector.Cli -- benchmark-abides-blind --public /t
 
 `--public`/`--truth` must be **different, previously nonexistent paths**. Never add private truth or market archives to the repository. The upstream project is pinned by exact SHA because its config API has had breaking changes. The dedicated CI workflow `.github/workflows/robot-detector-abides-real.yml` runs Python unit tests, installs this exact upstream source, simulates positive and negative scenarios, runs C# self-tests, scores the real ABIDES matching-execution projection, checks print conservation and asserts that controlled prints actually executed in the positive run.
 
+## First executed genuine ABIDES result (2026-11-21)
+
+**[Successful GitHub Actions #44890531080](https://github.com/IskanderAbdullin/Analytics/actions/runs/44890531080)** installed the pinned upstream ABIDES source and ran the matching engine, exported its executed fills and privately scored the two C# detectors. Local Windows and standard .NET CI also passed **123/123** offline checks.
+
+| ABIDES case | Public exchange fills | Privately controlled fills | Fixed-q model | Variable-q model |
+|---|---:|---:|---|---|
+| TWAP agent, seed 41 | 3,923 | 44 | TP 30, FP 0, FN 14 | TP 0, FP 0, FN 44 |
+| No controlled agent, seed 42 | 3,060 | 0 | No attributed prints; recall undefined | No attributed prints; recall undefined |
+
+The fixed-q screen's **30/44 = 68.18% controlled-print recall** in the one observed TWAP run reflects this *particular* ABIDES scenario only. Precision=30/30 for these attributed prints is likewise an in-sample synthetic observation, **not** a measured real-market precision bound. One null seed with no detections establishes no real exchange false discovery rate.
+
+## Frozen-seed replication (separate from tuning)
+
+After the initial smoke, the next protocol freezes untouched synthetic seeds **901, 902, 903, 904**. `tools/abides_batch.py` runs both a TWAP and matched agent-free null for each seed (8 full ABIDES simulations). It serialises only the public CSV fingerprints and aggregate detector scores; the private maker/taker manifest stays in an ephemeral temporary directory and is deleted after scoring. All default detector thresholds remain unchanged. This is a *synthetic held-out seed* study, not truly held-out real market data or a statistically calibrated release gate.
+
+```bash
+python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
+  --cli-dll src/RobotDetector.Cli/bin/Release/net10.0/RobotDetector.Cli.dll \
+  --output /tmp/abides_holdout_4seeds.json
+```
+
+The CI must compare event conservation and null recall semantics across all eight cases. Do not cite batch results until the batch actually runs successfully.
+
 ## Scientific limits and release gates
 
 ABIDES-NG is a synthetic exchange simulator, not a calibrated representation of MOEX/SPB, nor an independent prediction trial on untouched real instruments/dates. One seeded scenario with an ABIDES execution agent does not prove precision, recall or model advantage on a real market. Exchange per-fill truth identifies synthetic agent participants, **not** independent physical real-world owners. The private truth is an evaluator input; tampering SHA mismatches or event records fails closed, but the scorer cannot cryptographically prove that an external manifest really originated from ABIDES unless the environment/source is independently audited.

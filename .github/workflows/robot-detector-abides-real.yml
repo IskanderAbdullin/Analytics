@@ -90,6 +90,27 @@ jobs:
                   'models':report['models'],'upstream':private['simulator_revision']
               }))
           PY
+      - name: Frozen-seed cross-run blinded replication
+        run: |
+          python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
+            --cli-dll src/RobotDetector.Cli/bin/Release/net10.0/RobotDetector.Cli.dll \
+            --output /tmp/abides_holdout_4seeds.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/abides_holdout_4seeds.json",encoding="utf-8"))
+          assert r["holdout_seeds"]==[901,902,903,904],r
+          assert r["case_count"]==8 and len(r["cases"])==8,r
+          assert len(r["aggregates"])==4,r
+          assert r["physical_owner_count_known"] is False,r
+          assert r["market_accuracy_calibrated"] is False,r
+          for row in r["aggregates"]:
+              assert row["cases"]==4,row
+              assert row["true_positive_prints"]+row["missed_controlled_prints"]==row["controlled_prints"],row
+              assert row["true_positive_prints"]+row["false_positive_prints"]==row["attributed_public_prints"],row
+              assert not row["market_accuracy_calibrated"],row
+              if row["mode"]=="null":
+                  assert row["controlled_prints"]==0 and row["micro_event_recall"] is None,row
+          PY
       - name: Keep original and private broker data off the repository
         run: |
           test ! -e data/raw/abides_twap_truth.json
