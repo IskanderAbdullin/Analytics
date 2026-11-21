@@ -267,8 +267,9 @@ def validate_source_report(rows:list[dict])->dict:
                 (False,"per_print",n),
                 (True,"per_unique",unique)
             ):
-                h20=x[prefix+"_hits20"]
-                h45=x[prefix+"_hits45"]
+                hit_prefix="per_unique_timestamp" if grouped else "per_print"
+                h20=x[hit_prefix+"_hits20"]
+                h45=x[hit_prefix+"_hits45"]
                 ratio=x[prefix+"_ratio_45_over_20"]
                 if (any(type(y) is not int or not 0<=y<=count for y in (h20,h45))
                     or ratio!=(round(h45/h20,8) if h20 else None)):
