@@ -21,6 +21,7 @@ from research_seed_registry import read_ledger
 
 ROOT=Path(__file__).resolve().parents[1]
 PLAN=ROOT/"research"/"abides_public_grid_160case_precommit_20261121.json"
+ORACLE_ZERO_ADDENDUM=ROOT/"research"/"abides_160_zero_execution_oracle_handling_addendum_20261121.json"
 SEEDS=(3301,3302,3303,3304,3305,3306,3307,3308,3309,3310,3311,3312,3313,3314,3315,3316,3317,3318,3319,3320,3321,3322,3323,3324,3325,3326,3327,3328,3329,3330,3331,3332,3333,3334,3335,3336,3337,3338,3339,3340)
 COHORTS=("poisson_noise_null","fixed_20s_noise_hard_negative",
          "momentum_noise_hard_negative","twap_45s_positive")
@@ -111,6 +112,28 @@ def frozen_protocol()->dict:
             t.get("twap_direction"),t.get("twap_style"),t.get("twap_offset_seconds"))!=
             (45,1200,"BID","market",60)):
         raise ValueError("Frozen source agent cadence, momentum or TWAP changed")
+    a=json.loads(ORACLE_ZERO_ADDENDUM.read_text(encoding="utf-8"))
+    if (set(a)!={"schema_version","stage","registered_utc_date","classification",
+            "frozen_parent_protocol","frozen_parent_blob_sha",
+            "original_matching_engine_runs_observed_at_addendum","seeds_unchanged",
+            "source_cohorts_unchanged","public_grid_phase_thresholds_unchanged",
+            "hypothesis","operational_decision","outcomes_required",
+            "original_frozen_thresholds_not_refitted",
+            "oracle_never_exposed_to_public_features","synthetic_only_not_real_market_FDR"}
+        or a.get("schema_version")!="abides-160-zero-execution-source-inclusion-addendum-v1"
+        or a.get("classification")!="PRE_SOURCE_CORRECTION_TO_AVOID_CENSORING"
+        or a.get("stage")!="RD-ABIDES-POWER-15"
+        or a.get("original_matching_engine_runs_observed_at_addendum")!=0
+        or a.get("frozen_parent_blob_sha")!="124f1700d403d731190cb628355ac8fb3fc6e87a"
+        or a.get("frozen_parent_protocol")!="research/abides_public_grid_160case_precommit_20261121.json"
+        or a.get("seeds_unchanged")!="3301..3340"
+        or a.get("source_cohorts_unchanged")!=4
+        or any(a.get(k) is not True for k in (
+            "public_grid_phase_thresholds_unchanged",
+            "original_frozen_thresholds_not_refitted",
+            "oracle_never_exposed_to_public_features",
+            "synthetic_only_not_real_market_FDR"))):
+        raise ValueError("Unfrozen oracle-zero execution inclusion addendum")
     return p
 
 
@@ -201,8 +224,10 @@ def simulate_source_case(seed:int,cohort:str)->dict:
         raise RuntimeError("Frozen positive/negative simulator agent ID unexpected")
     fills=sum(t.passive_agent_id in controlled or
               t.aggressive_agent_id in controlled for t in market.trades)
-    if (fills>0)!=target:
-        raise RuntimeError("Injected TWAP did not execute according to posthoc oracle")
+    # An injected TWAP with no executions is still an ORIGINAL source case.
+    # Censoring it would condition the evaluation on posthoc oracle success.
+    if not target and fills != 0:
+        raise RuntimeError("Negative source unexpectedly contains controlled TWAP fills")
     x={
         "source_seed":seed,"source_cohort":cohort,
         "synthetic_target_present_posthoc":target,
@@ -282,7 +307,8 @@ def validate_source_report(rows:list[dict])->dict:
             old,new=x["per_print_decision"],x["per_unique_decision"]
             if (x["synthetic_target_present_posthoc"] is not target
                 or type(x["posthoc_controlled_TWAP_fills"]) is not int
-                or (x["posthoc_controlled_TWAP_fills"]>0)!=target
+                or x["posthoc_controlled_TWAP_fills"]<0
+                or (not target and x["posthoc_controlled_TWAP_fills"]!=0)
                 or x["per_print_false_alarm"] is not (not target and old=="TARGET_PATTERN")
                 or x["per_unique_false_alarm"] is not (not target and new=="TARGET_PATTERN")
                 or x["per_print_missed_TWAP"] is not (target and old=="NO_TARGET_PATTERN")
@@ -301,6 +327,10 @@ def validate_source_report(rows:list[dict])->dict:
             "source_executions":sum(x["public_prints"] for x in sub),
             "source_unique_timestamps":sum(x["unique_execution_timestamps"] for x in sub),
             "posthoc_controlled_TWAP_fills":sum(x["posthoc_controlled_TWAP_fills"] for x in sub),
+            "injected_TWAP_without_controlled_execution_cases":sum(
+                target and x["posthoc_controlled_TWAP_fills"]==0 for x in sub),
+            "injected_TWAP_with_controlled_execution_cases":sum(
+                target and x["posthoc_controlled_TWAP_fills"]>0 for x in sub),
             "per_print_positive_alarms":sum(x["per_print_decision"]=="TARGET_PATTERN" for x in sub),
             "per_unique_positive_alarms":sum(x["per_unique_decision"]=="TARGET_PATTERN" for x in sub),
             "per_print_false_alarms":sum(x["per_print_false_alarm"] for x in sub),
@@ -341,7 +371,8 @@ def validate_source_report(rows:list[dict])->dict:
             "The .60 ratio originally chosen after earlier development data, but not reoptimized on these 40 new seeds.",
             "Unique timestamps may represent different orders; split fills are not independent actors.",
             "Statistical confidence bounds assume hypothetical IID simulator seed trials; source pseudorandomness does not independently certify IID.",
-            "All original background false alarms, abstentions, misses and non-target sources are retained."
+            "All original background false alarms, abstentions, misses and non-target sources are retained.",
+            "Injected TWAP with zero posthoc controlled executions is retained and reported separately; an injected agent without execution is not independently observable from public prints."
         ]
     }
 
