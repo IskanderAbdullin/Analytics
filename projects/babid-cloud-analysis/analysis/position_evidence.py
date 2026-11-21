@@ -31,7 +31,8 @@ RESTART = re.compile(r"position outside the robot was\s+([+-]?\d+(?:\.\d+)?)\s+l
                      r"\bis\s+([+-]?\d+(?:\.\d+)?)\s+now", re.I)
 OBS_FIELDS = ("at_msk", "kind", "broker_lots", "journal_lots", "external_lots",
               "previous_external_lots", "reported_external_lots",
-              "reported_consistent", "source_file", "source_line")
+              "reported_transition_lots", "reported_consistent",
+              "source_file", "source_line")
 DELTA_FIELDS = (
     "from_msk", "to_msk", "broker_delta_lots", "journal_delta_lots",
     "external_delta_lots", "fill_net_lots_in_window", "fills_in_window",
@@ -84,6 +85,8 @@ def observations(folder: Path):
                                    journal_lots=journal, external_lots=external,
                                    previous_external_lots=prev,
                                    reported_external_lots=reported,
+                                   reported_transition_lots=(reported - prev)
+                                       if kind != "baseline" else "",
                                    reported_consistent=(external == reported),
                                    source_file=file.name, source_line=line_no))
     result.sort(key=lambda x: (x["at_msk"], x["source_file"], x["source_line"]))
@@ -170,14 +173,29 @@ def reconcile(root: Path, state: str, logs: str):
         row["journal_fill_delta_consistent"] = (
             row["journal_delta_lots"] == row["fill_net_lots_in_window"])
         row["sample_trade_ids"] = ",".join(row["sample_trade_ids"])
+    transition_reports = [p for p in positions
+                          if p["kind"] in ("changed", "restart_comparison")
+                          and p["reported_transition_lots"] != 0]
+    prior_position_disagreements = 0
+    for previous, current in zip(positions, positions[1:], strict=False):
+        if (current["kind"] != "baseline" and
+                current["previous_external_lots"] != previous["external_lots"]):
+            prior_position_disagreements += 1
     summary = dict(state=state, logs=logs, observations=len(positions),
                    comparison_intervals=len(intervals),
                    external_changes=sum(x["outside_position_changed"] for x in intervals),
+                   reported_external_transitions=len(transition_reports),
+                   first_observation_transition_unanchored=bool(
+                       positions and positions[0]["kind"] != "baseline"),
+                   reported_prior_position_disagreements=prior_position_disagreements,
                    journal_fill_mismatches=sum(not x["journal_fill_delta_consistent"] for x in intervals),
                    inconsistent_observation_arithmetic=sum(not x["reported_consistent"] for x in positions),
                    duplicate_fill_ids=duplicate, invalid_fills=bad,
                    fills_outside_observed_windows=unseen, fills_on_timestamp_boundaries=boundary,
                    limitations=[
+                       "A first 'changed from ... to ...' log is a reported transition even without a prior broker snapshot.",
+                       "external_changes counts paired observed endpoints; reported_external_transitions counts log notices.",
+                       "A mismatch between a logged prior value and an earlier sample may reflect skipped checks or stale responses.",
                        "Broker position samples are sparse and may be stale or delayed.",
                        "Fills use exchange timestamps, logs use robot observation timestamps.",
                        "Net change in external lots does not prove manual trades, missing executions or a software bug.",

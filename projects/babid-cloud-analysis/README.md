@@ -294,3 +294,19 @@ python run_offline_audit.py --root "<COPY>" --incident-state state-nvda-iis-live
 не превышает 60 минут. Флаг `possible_overlapping_groups`
 не означает доказанную идентичность записей — нужна проверка источника.
 Нечисловой или бесконечный PriceStep отклоняется.
+
+## Первое изменение внешней позиции — самостоятельное доказательство
+
+`position_evidence.py` теперь отдельно фиксирует число сообщений о
+**заявленных переходах** `position outside ... changed from ... to ...`,
+включая первый такой переход в архиве. Прежнее поле
+`external_changes` отражает только изменения *между двумя наблюдаемыми*
+снимками брокера; оно не заменяет `reported_external_transitions`.
+
+Новые поля `first_observation_transition_unanchored`,
+`reported_transition_lots` и `reported_prior_position_disagreements`
+обозначают отсутствие более раннего снимка и несогласованность
+последовательности сообщений, а не причину сбоя. Даже если итоговый
+`journal.json` совпадает с журналом исполнений, событие
+`position outside` в логах переводит общий аудит в
+`review_required`; зелёный CI не означает отсутствия инцидентов.

@@ -65,6 +65,7 @@ class AuditTests(unittest.TestCase):
             incident = list(csv.DictReader(f))
         self.assertEqual(len(incident), 3)
         self.assertEqual(result["recordings"], 1)
+        self.assertEqual(result["position_mismatch_events"], 2)
         self.assertNotIn("SECRET", (output / "configs.csv").read_text())
         self.assertNotIn("C://not-a-token", (output / "configs.csv").read_text())
 

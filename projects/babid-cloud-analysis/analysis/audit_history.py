@@ -435,6 +435,9 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
     report = dict(source=str(root), focus_start_msk=focus_start, focus_end_msk=focus_end,
                   configurations=len(configs), states=len(snapshots), days_with_fills=len(fills),
                   equity_days=len(equity), error_events=sum(errors.values()),
+                  position_mismatch_events=sum(
+                      amount for (_day, _log, _level, category), amount in errors.items()
+                      if category == "position_mismatch"),
                   incident_events=len(incidents),
                   incident_events_total=incident_stats["matched"],
                   incident_events_omitted=incident_stats["matched"] - len(incidents),
