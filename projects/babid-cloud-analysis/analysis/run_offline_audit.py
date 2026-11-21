@@ -23,6 +23,7 @@ import audit_provenance
 import config_audit
 import tape_integrity
 import time_weighted_books
+import config_epochs
 
 
 def checksum(path: Path) -> str:
@@ -86,6 +87,11 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
             root, output / "config-audit")
     except (OSError, ValueError) as error:
         manifest["reports"]["configs_error"] = str(error)[:300]
+    try:
+        manifest["reports"]["config_epochs"] = config_epochs.run(
+            root, output / "config-epochs")
+    except (OSError, ValueError) as error:
+        manifest["reports"]["config_epochs_error"] = str(error)[:300]
     if with_market and (root / "recordings").is_dir():
         try:
             manifest["reports"]["time_weighted"] = time_weighted_books.run(
