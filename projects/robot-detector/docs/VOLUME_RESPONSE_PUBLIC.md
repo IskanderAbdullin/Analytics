@@ -68,7 +68,24 @@ Separate real ABIDES runner smoke reports *public-only diagnostic coefficients* 
 
 `tools/volume_response_dev_survey.py` defines an *additional* replication protocol with three untouched **development** seeds (61, 62, 63) for each of `null`, `pov` and `vwap` (nine ABIDES matching-engine runs). The script **discards private truth**, passes only the public CSV into the read-only C# descriptor and emits only public SHA fingerprints, ranks, counts and per-mode median ranks. Explicitly refuses the **spent evaluation** seeds 901–904. The workflow's aggregate artifact expires after 14 days; raw files remain ephemeral.
 
-This is descriptive reproducibility and sensitivity analysis. There is **no calibrated market FDR, confidence bound, cross-instrument out-of-sample accuracy or participant identification**. The nine-case results must not be claimed until the CI step completes successfully.
+The nine-case development-only experiment **completed successfully** in [ABIDES CI #44892179775](https://github.com/IskanderAbdullin/Analytics/actions/runs/44892179775). The corresponding expiring artifact is `abides-public-volume-development`, containing only public fingerprints and aggregates. Each row below is the **median Spearman rho across three real ABIDES matching-engine simulations**, with the same 30-second bin and historical defaults for every scenario:
+
+| Synthetic scenario | Median rho, reported BUY | Median rho, reported SELL |
+|---|---:|---:|
+| **Null (no controlled execution agent)** | **0.510** | **0.548** |
+| POV | 0.538 | 0.501 |
+| VWAP | 0.511 | 0.596 |
+
+These associations overlap substantially. In these development simulations the null is slightly stronger than POV for SELL; null BUY nearly equals VWAP BUY. This fails to establish useful discrimination of controlled VWAP/POV programs by public lagged volume correlation. **No threshold was selected and no event-level classification was added**. This is descriptive reproducibility and sensitivity analysis: no calibrated market FDR, confidence bound, cross-instrument out-of-sample accuracy or participant identification. The previously frozen 901–904 truth outcomes were **not** used to design or select this diagnostic.
+
+## Independent scientific references informing the null-first design
+
+- [*Intraday periodicity in algorithmic trading* (2014)](https://www.sciencedirect.com/science/article/pii/S1042443114000274) describes intraday transaction and volume periodicity, including a possible market-wide coordination mechanism. Periodicity therefore need not identify a single physical algorithm.
+- [*Does trade clustering reduce trading costs?* (2022)](https://onlinelibrary.wiley.com/doi/10.1111/fima.12405) reports periodicities and uses trading-activity lag controls. It motivates explicitly checking autocorrelation and fixed-clock confounders instead of claiming independent actor evidence from a pattern.
+- [*Online learning of order flow and market impact with Bayesian change-point detection methods* (2024)](https://www.tandfonline.com/doi/full/10.1080/14697688.2024.2337300) discusses why anonymous metaorders cannot easily be directly recovered from public trade data; change-point segmentation is a possible **future** model but is **not** implemented by this feature.
+- [*Volume autocorrelation, information, and investor trading* (2003)](https://www.sciencedirect.com/science/article/pii/S0378426603002310) describes serial correlation in observed market volume; a positive observed lag association is not sufficient identification of a specific participant.
+
+These references support **experimental design and caution**, not calibrated predictive performance or participant attribution for this codebase. In particular, running a null test only after seeing a positive association is insufficient to claim confirmatory significance.
 
 ## Scientific limits
 
