@@ -3,6 +3,18 @@
 **Версия проекта:** 0.2 (исследовательская) · **Обновлено:** 2026-11-19 · **Статус:** исторический прототип с подтверждённым импортом 121 920 реальных обезличенных сделок SBER (17.11.2026); статистическая точность распознавания не установлена.
 
 
+## Genuine ABIDES-NG exchange execution — blind validation
+
+A new **optional** research pipeline uses the genuine ABIDES-NG exchange/order-book matching engine with controlled TWAP, VWAP or POV execution, independent background agents and a matching-engine null scenario. Only the anonymous public CSV is shown to either detector; maker/taker agent IDs stay in a separate private manifest used **after detection** for exact print-level scoring. Source pinned to upstream commit `ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242`.
+
+```powershell
+# Python 3.12 with pinned ABIDES-NG installed, from this subproject directory
+python tools/abides_export.py --mode twap --seed 41 --public data/raw/abides-public.csv --truth data/raw/abides-truth.json
+dotnet run --project src/RobotDetector.Cli -- benchmark-abides-blind --public data/raw/abides-public.csv --truth data/raw/abides-truth.json --output data/results/abides-score.json
+```
+
+[Full setup, data contract, null protocol and limitations](docs/ABIDES_GENUINE_REPLAY.md). [Verified ABIDES CI #44890937246](https://github.com/IskanderAbdullin/Analytics/actions/runs/44890937246) includes **123/123** offline C# checks, four frozen-seed TWAP/null simulations each, and real VWAP/POV execution tests. In four frozen TWAP runs the fixed-q detector recovered 101 of 197 controlled prints; the variable-q screen recovered none. On single VWAP (50 controlled) and POV (14 controlled) runs **both screens recovered zero**. Dedicated GitHub Actions workflow runs the real simulator without touching a trading account. Results are **not** real-market calibrated precision or a count of real physical robots; Stage 2 scientific gate stays closed.
+
 ## Adversarial common-clock null experiment — 2026-11-21
 
 New read-only command `benchmark-clock-null` constructs market-wide periodic **background** prints (zero controlled execution agents) with opaque IDs and private independent producer labels. Both detectors see only the identical public tape; any claimed controlled-execution evidence is counted as a synthetic false attribution. Two independent profiles are available: fixed 100-lot prints and variable 25/50/75/100-lot market-wide clocked prints (`--clip-mode variable`). Both have **zero** controlled program ground truth. Aggregated per-trial alarms are **not** calibrated real-market FPR or proof of physical robot identities.
