@@ -1,0 +1,75 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-late-fill-prune-hypothesis-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "d6b7de09-9706-490c-b4a6-9f02445f9952",
+    "occurred_at": "2026-11-21T17:15:00Z",
+    "type": "research",
+    "title": "Late fill after Cancel/0 and unverified archived-order mechanism",
+    "summary": "Read a private 65-line forensic report; late Sell2 after Cancel/0 was booked without Journal position movement. Source code contains a prune/late-fill hazard but a prior FilledByState remains an alternative; no independent broker evidence yet.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Add supported H-006 and competing H-007 without claiming final RCA."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Advance to bounded private log extraction and independent brokerage comparison."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Record sanitized local source/log findings and limitations."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Keep P0 focused on real incident."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Add safe late-canceled-fill requirements and T17-T19."
+    }
+  ],
+  "checks": [
+    {
+      "id": "checkpoint-ci",
+      "title": "Validate checkpoint and synthetic tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending."
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "Prune vs prebooked status not yet distinguished",
+      "state": "open",
+      "severity": "high",
+      "description": "No direct archive event, original broker execution data not independently reconciled."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Inspect local late-fill context and independent broker evidence",
+      "priority": "high",
+      "state": "blocked"
+    }
+  ],
+  "limitations": [
+    "No private order IDs or trade rows written to public GitHub.",
+    "No trading operation or original bot code change.",
+    "Root cause not yet proven."
+  ]
+}
