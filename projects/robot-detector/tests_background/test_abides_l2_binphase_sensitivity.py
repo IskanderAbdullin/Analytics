@@ -235,7 +235,11 @@ class FrozenClockPhaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             aggregate(cases)
         cases[0]["descriptive_rho"]=None
-        self.assertIsNone(aggregate(cases)["cases"][0]["descriptive_rho"])
+        observed=next(x for x in aggregate(cases)["cases"]
+                      if (x["seed"],x["background"],x["phase_seconds"]) ==
+                      (cases[0]["seed"],cases[0]["background"],
+                       cases[0]["phase_seconds"]))
+        self.assertIsNone(observed["descriptive_rho"])
 
     def test_undefined_rho_and_false_evidence_claims_fail_closed(self):
         r=aggregate(matrix({0:None,10:-0.1,20:None}))
