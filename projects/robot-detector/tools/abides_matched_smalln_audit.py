@@ -29,6 +29,46 @@ STATUSES=("TARGET_PATTERN","NO_TARGET_PATTERN","ABSTAIN")
 EXPECTED_SOURCE_SHA="e75c089f023a12bddd19c2f4cf33a64470a29aeb79125024877fb4a9997885e2"
 
 
+ROOT_FIELDS = frozenset((
+    "schema_version", "scientific_scope", "original_genuine_matching_engine_ci_run",
+    "source_commit", "original_source_artifact_id", "original_source_artifact_name",
+    "original_artifact_uncompressed_json_sha256", "source_precommit",
+    "engine_revision", "local_seeds", "cohort_names", "independent_simulations",
+    "totals", "original_cohort_aggregates", "original_all_16_case_public_summary",
+    "source_only_public_negative_outcomes_preserved",
+    "real_market_fdr_or_owner_accuracy_known",
+    "original_raw_print_tapes_l2_or_agent_IDs_in_repo",
+    "timestamp_grouping_does_not_identify_parent_order",
+    "no_posthoc_threshold_or_phase_change"
+))
+CASE_FIELDS = frozenset((
+    "cohort", "grouped_classification", "grouped_ratio",
+    "max_same_timestamp_cluster", "naive_classification",
+    "naive_per_print_ratio", "posthoc_TWAP_fills", "prints",
+    "real_market_FDR_known", "seed", "source_L2", "unique_time_groups"
+))
+COHORT_FIELDS = frozenset((
+    "extra_same_timestamp_prints_total", "grouped_timestamp_abstentions",
+    "grouped_timestamp_false_alarms", "grouped_timestamp_missed_TWAP",
+    "grouped_timestamp_positive_alarms",
+    "independent_original_matching_engine_runs",
+    "original_print_based_abstentions", "original_print_based_false_alarms",
+    "original_print_based_missed_TWAP", "original_print_based_positive_alarms",
+    "posthoc_controlled_TWAP_fills", "public_prints_total",
+    "unique_event_timestamp_clusters_total"
+))
+TOTAL_FIELDS = frozenset((
+    "public_execution_prints", "public_L2_snapshots",
+    "unique_exchange_timestamps", "oracle_controlled_TWAP_executions"
+))
+
+
+def _exact_fields(value: dict, expected: frozenset, scope: str) -> None:
+    """Fail closed on extra fields, including private IDs and raw source rows."""
+    if type(value) is not dict or set(value) != expected:
+        raise ValueError(f"Unexpected or missing source-only aggregate keys in {scope}")
+
+
 def frozen_protocol()->dict:
     p=json.loads(PLAN.read_text(encoding="utf-8"))
     interval=p.get("exact_nominal_binomial_interval",{})
@@ -109,9 +149,14 @@ def clopper_pearson(successes:int,trials:int,confidence:float=CONFIDENCE)->dict:
 
 
 def validate_original_source_fixture(raw:dict)->list[dict]:
+    _exact_fields(raw, ROOT_FIELDS, 'root')
+    _exact_fields(raw.get('totals'), TOTAL_FIELDS, 'totals')
     if (type(raw) is not dict
         or raw.get("schema_version")!="genuine-abides-public-cluster-source-reconciled-v1"
         or raw.get("original_genuine_matching_engine_ci_run")!=44938991772
+        or raw.get("source_commit")!="902fdeb30e1548ab3722aa97718947cd9a9468fd"
+        or raw.get("engine_revision")!="ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242"
+        or raw.get("original_source_artifact_name")!="robot-detector-genuine-abides-16-timestamp-grouping-source-only"
         or raw.get("original_source_artifact_id")!=14720831681
         or raw.get("original_artifact_uncompressed_json_sha256")!=EXPECTED_SOURCE_SHA
         or raw.get("source_precommit")!="research/abides_clustered_grid_source_precommit_20261121.json"
@@ -135,6 +180,7 @@ def validate_original_source_fixture(raw:dict)->list[dict]:
     if type(cohort_aggregates) is not dict or set(cohort_aggregates)!=set(COHORTS):
         raise ValueError("Source original cohort aggregates missing")
     for x in cases:
+        _exact_fields(x, CASE_FIELDS, "per-seed source case")
         s,c=x["seed"],x["cohort"]
         label=c=="twap_45s_positive"
         n=x.get("prints")
@@ -172,6 +218,7 @@ def validate_original_source_fixture(raw:dict)->list[dict]:
     for c in COHORTS:
         rows=[x for x in cases if x["cohort"]==c]
         q=cohort_aggregates[c]
+        _exact_fields(q, COHORT_FIELDS, "cohort aggregate")
         if (
             q.get("independent_original_matching_engine_runs")!=4
             or q.get("public_prints_total")!=sum(x["prints"] for x in rows)
@@ -187,7 +234,15 @@ def validate_original_source_fixture(raw:dict)->list[dict]:
             or q.get("original_print_based_abstentions")!=
                sum(x["naive_classification"]=="ABSTAIN" for x in rows)
             or q.get("grouped_timestamp_abstentions")!=
-               sum(x["grouped_classification"]=="ABSTAIN" for x in rows)):
+               sum(x["grouped_classification"]=="ABSTAIN" for x in rows)
+            or q.get("original_print_based_false_alarms") !=
+               sum(c!="twap_45s_positive" and x["naive_classification"]=="TARGET_PATTERN" for x in rows)
+            or q.get("grouped_timestamp_false_alarms") !=
+               sum(c!="twap_45s_positive" and x["grouped_classification"]=="TARGET_PATTERN" for x in rows)
+            or q.get("original_print_based_missed_TWAP") !=
+               sum(c=="twap_45s_positive" and x["naive_classification"]=="NO_TARGET_PATTERN" for x in rows)
+            or q.get("grouped_timestamp_missed_TWAP") !=
+               sum(c=="twap_45s_positive" and x["grouped_classification"]=="NO_TARGET_PATTERN" for x in rows)):
             raise ValueError("Cohort original outcome/count conservation failed")
     return cases
 
