@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "39f6f2e233f142f80e4d021cf0aef4a5b50336f0",
+  "last_verified_base_commit": "7c045f33671b64d8d41cc23c7516ae801c0b30dd",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-SYNTHETIC-BLIND-03",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926352634",
+      "result": "Constructive synthetic owner-count nonidentifiability: same 6 public market messages and 10-level books, SHA 565b03387e80..., but distinct private oracle owner counts 1 vs 3. No real actor identity or market FDR claim.",
+      "status": "VERIFIED_CONSTRUCTIVE_COUNTEREXAMPLE_NOT_REAL_MARKET_VALIDATION"
+    },
     {
       "stage_id": "RD-L2-RESEARCH-02",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926012965",
@@ -41,35 +47,31 @@
     }
   ],
   "current_stage": {
-    "id": "RD-SYNTHETIC-BLIND-03",
+    "id": "RD-ROBUSTNESS-04",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Constructive nonidentifiability proof for owner count given identical public order tape and L2",
-    "why_next": "Both L2 archives and spot source prints lack real physical owner identity. Explicit synthetic oracle counterexample prevents later agent from making unjustified owner-count/FDR claims.",
+    "title": "Coverage and abstention gate under missing/misaligned/stale public L2 events",
+    "why_next": "No physical owner labels and public archive checksum are not evidence that all exchange events or matching L2 updates were observed. Need enforce abstention under missing sequence/book coverage before any performance claim.",
     "inputs": [
       "tools/lobster_event_time_features.py",
-      "docs/LOBSTER_CLOCK_VS_EVENT_WEIGHTING_20261121.md"
+      "tools/l2_duration_weighting.py",
+      "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md"
     ],
     "deliverables": [
-      "Public-only projection with strict schema and stable fingerprint excluding synthetic oracle owners",
-      "Two oracle-world assignments with different actual synthetic owner counts producing exactly same market-visible tape",
-      "Negative tests that any deterministic public-only estimator returns identical output and cannot identify both truths",
-      "Scientific report with scope of identifiable observable rhythms separated from hidden actors"
+      "Offline public event/L2 observability gate with explicit UNKNOWN state absent provider sequence completeness proof",
+      "Source-free missing, duplicate, reversed, stale and misaligned event/book scenarios",
+      "No inference of real-market FDR from a pass on synthetic contiguous sequence",
+      "Scientific documentation and reproducible tests"
     ],
     "acceptance": [
-      "No source oracle owner ID ever passes into market-visible feature extraction",
-      "The two latent truths are demonstrably different while public fingerprints are identical",
-      "Negative tests under source-free cheap CI",
-      "Commit/push verified, checkpoint and next scientific stage selected"
+      "Missing gap/duplicate/stale book causes abstention, not score inference",
+      "Unknown provider source completeness remains UNKNOWN not falsely certified",
+      "Coverage denominators only reported if trusted expected counts exist",
+      "No raw vendor data nor owners/real trading in output",
+      "CI, commit/push and next checkpoint"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/78"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/79"
   },
   "backlog": [
-    {
-      "id": "RD-ROBUSTNESS-04",
-      "status": "QUEUED",
-      "priority": 2,
-      "title": "Evaluate missing L2, feed gaps, event-time ties, exchange-specific quote semantics, and bin phase sensitivity"
-    },
     {
       "id": "RD-REPRO-05",
       "status": "QUEUED",
@@ -107,5 +109,5 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "RD-L2-RESEARCH-02 genuine historical AMZN clock-weighted 269748-event study passed, original run #44926012965; now immediately starting synthetic ownership-nonidentifiability stage #78. Science master issue remains open."
+  "last_session_result": "RD-SYNTHETIC-BLIND-03 verified: identical source-visible full 10-level L2 can have 1 vs 3 hidden owner truth in two synthetic worlds; CI #44926352634 successful. Next RD-ROBUSTNESS-04 abstention under data-feed gaps chosen; master goal remains unfinished."
 }

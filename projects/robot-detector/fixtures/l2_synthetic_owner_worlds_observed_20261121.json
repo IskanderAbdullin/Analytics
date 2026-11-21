@@ -1,0 +1,16 @@
+{
+  "schema_version": "synthetic-public-l2-owner-ambiguity-pinned-v1",
+  "verified_research_ci_run": 44926352634,
+  "source_model": "tools/public_l2_ownership_nonidentifiability.py",
+  "synthetic_public_messages": 6,
+  "synthetic_distinct_exchange_order_refs": 3,
+  "synthetic_private_oracle_owner_truth_world_a": 1,
+  "synthetic_private_oracle_owner_truth_world_b": 3,
+  "source_visible_fingerprint_sha256_equal_between_worlds": "565b03387e8052533f1b44e47d625da52fd0d82508bc9edac04881e330926464",
+  "identical_complete_10level_market_visible_tapes": true,
+  "public_only_classifier_cannot_be_correct_for_both_oracle_truths": true,
+  "ownership_oracle_labels_passed_to_market_observer": false,
+  "claims_real_physical_owner_inference": false,
+  "claims_general_impossibility_of_observable_algorithmic_patterns": false,
+  "original_real_market_raw_data_used": false
+}
