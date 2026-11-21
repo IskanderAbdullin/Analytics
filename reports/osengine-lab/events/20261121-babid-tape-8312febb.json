@@ -1,0 +1,60 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "8312febb-9136-4fd4-a110-c23517a39021",
+    "occurred_at": "2026-11-21T15:00:28.673Z",
+    "type": "development",
+    "title": "Introduce streaming market recorder integrity audit",
+    "summary": "Recorded exchange and receive timestamps, stale/interrupted data quality, crossed books, clock skew and repeated disconnects are analyzed separately from trading P&L. All code and synthetic fixtures remain inside Analytics.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/tape_integrity.py",
+      "action": "added",
+      "summary": "Streaming market recorder integrity scanner with conservative quality metrics."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_tape_integrity.py",
+      "action": "added",
+      "summary": "Four synthetic tests for malformed book, clock, gap and corrupt-tail handling."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Integrate tape quality pass into the read-only full analysis."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Explain recorder format and limits to interpreting sparse unchanged-book data."
+    }
+  ],
+  "checks": [
+    {
+      "id": "ci-stage1",
+      "title": "Linux/Windows synthetic CI",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Run after this stage is pushed."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "test-tape",
+      "title": "Run and verify new tape quality tests on both GitHub runners",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Recorder-only data quality checks, not execution replay or broker reconciliation."
+  ]
+}

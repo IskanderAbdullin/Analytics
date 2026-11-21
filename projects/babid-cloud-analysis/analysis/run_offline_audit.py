@@ -21,6 +21,7 @@ import reconcile_fills
 import opportunity_validation
 import audit_provenance
 import config_audit
+import tape_integrity
 
 
 def checksum(path: Path) -> str:
@@ -85,6 +86,11 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
     except (OSError, ValueError) as error:
         manifest["reports"]["configs_error"] = str(error)[:300]
     if with_market and (root / "recordings").is_dir():
+        try:
+            manifest["reports"]["tape_integrity"] = tape_integrity.run(
+                root, output / "tape-integrity")
+        except (OSError, ValueError) as error:
+            manifest["reports"]["tape_integrity_error"] = str(error)[:300]
         try:
             manifest["reports"]["market"] = market_study.run(
                 root, output / "market", market_study.DEFAULT_LEVELS, None)
