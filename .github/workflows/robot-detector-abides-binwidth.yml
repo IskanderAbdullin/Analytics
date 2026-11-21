@@ -1,0 +1,77 @@
+name: Robot Detector ABIDES public L2 clock-width sensitivity
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binwidth_sensitivity.py'
+      - '.github/workflows/robot-detector-abides-binwidth.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binwidth_sensitivity.py'
+      - '.github/workflows/robot-detector-abides-binwidth.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-public-binwidth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline frozen design and identical-tape tests
+        run: python -m unittest discover -s tests_background -p 'test_abides_l2_binwidth_sensitivity.py' -v
+      - name: Install pinned genuine ABIDES matching engine
+        run: |
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run four actual exchange simulations and three public widths per tape
+        run: |
+          python tools/abides_l2_binwidth_sensitivity.py \
+            --output /tmp/abides-l2-binwidth-sensitivity.json
+          python - <<'PY'
+          import json
+          with open('/tmp/abides-l2-binwidth-sensitivity.json',encoding='utf-8') as f:
+              r=json.load(f)
+          p=r['frozen_plan']
+          assert p['development_seeds']==[1901,1902],p
+          assert p['backgrounds']==['poisson','fixed_cadence'],p
+          assert p['widths_seconds']==[10,30,60],p
+          assert r['actual_matching_engine_simulations']==4,r
+          assert len(r['cases'])==12 and len(r['cohorts'])==6,r
+          assert len(r['per_simulation_sensitivity'])==4,r
+          assert not r['independent_simulations_across_widths'],r
+          assert not r['private_truth_exported'],r
+          assert not r['model_threshold_selected'],r
+          assert not r['individual_bot_identified'],r
+          assert not r['real_market_calibration_known'],r
+          assert not r['trading_enabled'],r
+          for case in r['cases']:
+              assert case['eligible_lagged_bins']+case['abstained_lagged_bins']==case['populated_public_trade_bins'],case
+              assert case['source_completion_verified'] is False,case
+              assert case['threshold_selected'] is False,case
+              assert case['private_agent_identified'] is False,case
+              v=case['lagged_spearman']
+              assert v is None or -1<=v<=1,case
+          for cohort in r['cohorts']:
+              assert cohort['simulations']==2,cohort
+              assert cohort['market_false_discovery_rate'] is None,cohort
+              print('PUBLIC_L2_WIDTH_SENSITIVITY',json.dumps(cohort,sort_keys=True))
+          PY
+      - name: Upload public-only aggregate sensitivity study
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-l2-binwidth-sensitivity
+          path: /tmp/abides-l2-binwidth-sensitivity.json
+          retention-days: 7
+          if-no-files-found: error
