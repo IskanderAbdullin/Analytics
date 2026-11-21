@@ -342,3 +342,9 @@ python run_offline_audit.py --root "<COPY>" --incident-state state-nvda-iis-live
 ## Непрерывность исследования
 
 Главная цель, проверенные факты и точка продолжения зафиксированы в GOAL.md, STATE.json, NEXT_ACTION.json, EVIDENCE.md, BACKLOG.md и PROTOCOL.md. Каждый этап обновляет эти файлы в одном коммите. GitHub Actions может проверить их, но не возобновляет модель автоматически.
+
+## Компактные бухгалтерские события без trade IDs
+
+При локальном офлайн-аудите обновлённый `analysis/audit_history.py` создаёт `history/accounting_alignments.csv` из сообщений `Income accounting position (...) differs from the journal (...)`. Читается потоково; поля — время, относительный каталог логов, номер строки, net P&L до коррекции, net журнала и их разница. Исходные сообщения и trade IDs в этот CSV не копируются.
+
+Сводка `history/summary.json` содержит `accounting_alignment_notices`, `accounting_alignment_rows` и `accounting_alignment_rows_omitted`: отчет ограничен 2000 событиями, обрезку нельзя считать полнотой истории. Событие свидетельствует о внутренней бухгалтерской коррекции, но НЕ о брокерском исполнении или причине NVDA. Отчёт предназначен только для приватной замороженной копии, не загружать его в публичный GitHub.

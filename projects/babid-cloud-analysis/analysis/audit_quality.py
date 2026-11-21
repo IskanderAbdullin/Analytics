@@ -37,6 +37,10 @@ def evaluate(manifest: dict) -> dict:
     warn_if(history.get("incident_events_omitted", 0) > 0, "incident_timeline_truncated")
     warn_if(history.get("position_mismatch_events", 0) > 0,
             "broker_journal_position_mismatch_logged")
+    warn_if(history.get("accounting_alignment_notices", 0) > 0,
+            "income_accounting_alignment_logged")
+    warn_if(history.get("accounting_alignment_rows_omitted", 0) > 0,
+            "accounting_alignment_report_truncated")
     warn_if((reports.get("position_evidence") or {}).get(
         "reported_external_transitions", 0) > 0, "external_position_transitions_reported")
     warn_if((reports.get("position_evidence") or {}).get(

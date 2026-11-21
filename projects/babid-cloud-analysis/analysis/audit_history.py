@@ -24,7 +24,11 @@ LOG = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d(?:\.\d+)?)\s+([A-Z]{3})\s+(.
 CODE = re.compile(r"(?<!\d)(?:30042|30049|30059|80006|80005|80001|30032)(?!\d)")
 INCIDENT = re.compile(
     r"position outside|position check|broker position|RISK:|risk manager|"
-    r"FILL |SYNTHETIC|replac|cancel|resync|stream|order \d+:", re.I
+    r"Income accounting position|FILL |SYNTHETIC|replac|cancel|resync|stream|order \d+:", re.I
+)
+# PnL correction messages represent LOCAL ACCOUNTING, never broker trades.
+ACCOUNTING_ALIGNMENT = re.compile(
+    r"Income accounting position \(([+-]?\d+)\) differs from the journal \(([+-]?\d+)\)", re.I
 )
 FIELDNAMES = ("day", "state", "fills", "lots", "realized", "fee_estimate",
               "synthetic", "duplicate_trade_ids", "last_net_lots",
@@ -299,6 +303,8 @@ def audit_equity(path: Path, state: str, problems: list[dict]) -> list[dict]:
 
 def classify(message: str) -> str:
     low = message.lower()
+    if "income accounting position" in low:
+        return "accounting_alignment"
     if "position outside" in low or "position check:" in low:
         return "position_mismatch"
     if "synthetic" in low or "without trades" in low:
@@ -319,7 +325,8 @@ def classify(message: str) -> str:
 
 def audit_logs(path: Path, logdir: str, focus_start: str, focus_end: str,
                error_counts: Counter, incident: list[dict], problems: list[dict],
-               incident_stats: Counter, incident_limit: int) -> None:
+               incident_stats: Counter, incident_limit: int,
+               accounting: list[dict], accounting_stats: Counter) -> None:
     try:
         with path.open("r", encoding="utf-8-sig", errors="replace") as stream:
             for line_no, line in enumerate(stream, 1):
@@ -330,6 +337,17 @@ def audit_logs(path: Path, logdir: str, focus_start: str, focus_end: str,
                 day = stamp[:10]
                 if level in ("WRN", "ERR"):
                     error_counts[(day, logdir, level, classify(message))] += 1
+                notice = ACCOUNTING_ALIGNMENT.search(message)
+                if notice:
+                    accounting_stats["total"] += 1
+                    # Retain only bounded local numeric evidence, without trade IDs.
+                    if len(accounting) < 2000:
+                        pnl_net, journal_net = map(int, notice.groups())
+                        accounting.append(dict(at_msk=stamp, log_dir=logdir,
+                            source_file=path.name, source_line=line_no,
+                            pnl_net_before=pnl_net, journal_net=journal_net,
+                            delta_lots=journal_net-pnl_net,
+                            verified_broker_trade=False))
                 if focus_start <= stamp[:19].replace(" ", "T") <= focus_end and INCIDENT.search(message):
                     incident_stats["matched"] += 1
                     # Redact path/user-specific details; raw logs stay only at source.
@@ -377,6 +395,8 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
     state_dirs.update(p.name for p in root.glob("state*") if p.is_dir())
     log_dirs.update(p.name for p in root.glob("logs*") if p.is_dir())
     fills, equity, snapshots, incidents = [], [], [], []
+    accounting: list[dict] = []
+    accounting_stats: Counter = Counter()
     errors: Counter = Counter()
     incident_stats: Counter = Counter()
     for name in sorted(state_dirs):
@@ -410,7 +430,8 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
         for log in sorted(folder.glob("*.log")):
             if log.is_file():
                 audit_logs(log, name, focus_start, focus_end, errors, incidents,
-                           problems, incident_stats, incident_limit)
+                           problems, incident_stats, incident_limit,
+                           accounting, accounting_stats)
     recordings = []
     rec = root / "recordings"
     if rec.is_dir():
@@ -429,6 +450,10 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
           [dict(zip(["day", "log_dir", "level", "category"], k, strict=True), count=v) for k, v in sorted(errors.items())])
     table(output / "incident_timeline.csv", ["at_msk", "log_dir", "level", "category", "file", "line", "message"],
           sorted(incidents, key=lambda x: x["at_msk"]))
+    table(output / "accounting_alignments.csv",
+          ["at_msk", "log_dir", "source_file", "source_line", "pnl_net_before",
+           "journal_net", "delta_lots", "verified_broker_trade"],
+          sorted(accounting, key=lambda x: (x["at_msk"], x["log_dir"], x["source_line"])))
     table(output / "recordings.csv", ["instrument", "filename", "records",
           "recovered_or_gap_markers", "first_line_preview", "last_line_preview"], recordings)
     table(output / "issues.csv", ["type", "file", "detail"], problems)
@@ -439,6 +464,9 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
                       amount for (_day, _log, _level, category), amount in errors.items()
                       if category == "position_mismatch"),
                   incident_events=len(incidents),
+                   accounting_alignment_notices=accounting_stats["total"],
+                   accounting_alignment_rows=len(accounting),
+                   accounting_alignment_rows_omitted=accounting_stats["total"]-len(accounting),
                   incident_events_total=incident_stats["matched"],
                   incident_events_omitted=incident_stats["matched"] - len(incidents),
                   incident_timeline_truncated=incident_stats["matched"] > len(incidents),
@@ -447,7 +475,9 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
                       "Current config values are not historical config epochs",
                       "Broker-side operations, overnight charges and funding are not reconciled",
                       "Live journal snapshots can be changing while the audit runs",
-                      "Paper execution is a model, not evidence of exchange fills"])
+                      "Paper execution is a model, not evidence of exchange fills",
+                       "Accounting alignment log messages are not broker executions or proof of historical causality",
+                       "The compact accounting CSV has a cap of 2000; check omitted count"])
     (output / "summary.json").write_text(json.dumps(report, indent=2, ensure_ascii=False),
                                          encoding="utf-8")
     return report

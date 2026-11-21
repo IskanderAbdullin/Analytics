@@ -109,6 +109,14 @@ class QualityGateTests(unittest.TestCase):
         self.assertEqual(result["status"], "review_required")
         self.assertIn("opportunity_validation_input_corrupt_or_duplicated",
                       result["review_issues"])
+    def test_accounting_alignment_stays_review_required(self):
+        manifest = self.template()
+        manifest["reports"]["history"]["accounting_alignment_notices"] = 1
+        manifest["reports"]["history"]["accounting_alignment_rows_omitted"] = 2
+        result = evaluate(manifest)
+        self.assertEqual(result["status"], "review_required")
+        self.assertIn("income_accounting_alignment_logged", result["review_issues"])
+        self.assertIn("accounting_alignment_report_truncated", result["review_issues"])
 
 
 if __name__ == "__main__":
