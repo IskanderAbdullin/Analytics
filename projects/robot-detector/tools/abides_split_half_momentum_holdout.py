@@ -327,7 +327,7 @@ def validate_source_cases(cases:list[dict])->dict:
                         "HALF_PUBLIC_PRINTS_BELOW_100" if n<HALF_MIN_PRINTS else
                         "HALF_20S_GRID_HITS_BELOW_4" if a<HALF_MIN_HITS20 else
                         "HALF_PREVIOUS_L2_BINS_BELOW_2" if elig<HALF_MIN_ELIGIBLE_LAG else None)
-                if h["abstain_reason"]!=reason or
+                if (h["abstain_reason"]!=reason or
                     h["passes_minimum_observability"] is not (reason is None)):
                     raise ValueError("Time-half minimum gates changed after source")
                 if reason:
