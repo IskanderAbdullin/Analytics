@@ -37,6 +37,11 @@ def dec(raw):
     return result
 
 
+def tick_text(value):
+    """Normalize signed Decimal zero to 0, including short-sale markouts."""
+    return str(value) if value else "0"
+
+
 def time_msk(raw):
     dt = datetime.fromisoformat(raw.strip().replace(" ", "T"))
     if dt.tzinfo is not None:
@@ -151,12 +156,12 @@ def analyze(root: Path, state: str, instrument: str, day: str,
             row["_epoch"] = book_epoch
             row["_mid"] = mid
             row["reference_age_ms"] = age
-            row["spread_ticks"] = str(spread / tick)
-            row["entry_edge_ticks"] = str(direction * (mid - row["fill_price"]) / tick)
+            row["spread_ticks"] = tick_text(spread / tick)
+            row["entry_edge_ticks"] = tick_text(direction * (mid - row["fill_price"]) / tick)
         else:
             suffix = "5s" if kind == "h5" else "30s"
-            row["markout_" + suffix + "_ticks"] = str(direction * (mid - row["fill_price"]) / tick)
-            row["mid_move_" + suffix + "_ticks"] = str(direction * (mid - row["_mid"]) / tick)
+            row["markout_" + suffix + "_ticks"] = tick_text(direction * (mid - row["fill_price"]) / tick)
+            row["mid_move_" + suffix + "_ticks"] = tick_text(direction * (mid - row["_mid"]) / tick)
         row[field] = "ok"
 
     opener = gzip.open if tape.suffix == ".gz" else open
