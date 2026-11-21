@@ -10,6 +10,8 @@ Run **the actual ABIDES-NG discrete-event matching-engine simulator**, not our e
 
 `tools/abides_export.py` performs the simulation. Two modes: `--mode twap` (one exchange-executed TWAP plus background agents) and `--mode null` (same family of independent background agents, without any controlled TWAP). Both use a 30-minute simulated session, a real ABIDES matching engine, an agent-populated order book, deterministic seeds, and a low-overhead trade-attribution result profile.
 
+The exporter supports four ABIDES strategies: `twap` (fixed-ish slices), `vwap` (volume-profile-weighted slices), `pov` (participation-of-volume), and `null` (independent background). The source implementation uses genuine ABIDES matching execution records, not scheduled parent order requests. Each controlled strategy's private agent name is identified only by its simulation-registered prefix, never by public event IDs.
+
 A deterministic projector builds `public.csv`, containing strictly:
 `TRADE_TS,INSTRUMENT_UID,DIRECTION,PRICE,QUANTITY,TRADE_SOURCE,EVENT_ID,TICKER,TRADING_MODE,SESSION_ID,DATA_KIND`.
 
@@ -64,7 +66,23 @@ python tools/abides_batch.py --holdout-seeds 901 902 903 904 \
   --output /tmp/abides_holdout_4seeds.json
 ```
 
-The CI must compare event conservation and null recall semantics across all eight cases. Do not cite batch results until the batch actually runs successfully.
+The [executed frozen-seed CI #44890937246](https://github.com/IskanderAbdullin/Analytics/actions/runs/44890937246) confirmed exactly eight cases with 123/123 C# self-tests, Python projector tests and complete source/truth reconciliation:
+
+| Frozen simulation (4 seeds, 901–904) | Public exchange fills | Executed controlled prints | Fixed-q detector | Variable-q detector |
+|---|---:|---:|---|---|
+| TWAP execution | 14,761 | 197 | TP 101, FP 0, missed 96 (51.27% controlled-print recall) | TP 0, FP 0, missed 197 |
+| Background-only null | 14,639 | 0 | No attributions; recall undefined | No attributions; recall undefined |
+
+**Additional genuine execution strategies (development probes, NOT in the frozen TWAP cohort):**
+
+| Strategy and seed | Public exchange fills | Controlled prints | Fixed-q model | Variable-q model |
+|---|---:|---:|---|---|
+| VWAP, 43 | 3,788 | 50 | 0 controlled prints recovered | 0 controlled prints recovered |
+| POV, 44 | 3,702 | 14 | 0 controlled prints recovered | 0 controlled prints recovered |
+
+Both VWAP and POV controlled execution fills **actually occurred**, verified through matching-engine private maker/taker attribution. Their complete missed detection is a limitation of the present detector models on these synthetic examples, NOT evidence that these market executions are non-algorithmic. Zero false positive attributions in four toy null runs establishes no real-market specificity and cannot be extrapolated to MOEX/SPB.
+
+A second report version, `abides-blind-score-v2`, adds `postHocControlledDiagnostics`: distinct quantities, unique timestamps, collisions, median positive/nonpositive interprint intervals, all calculated using hidden controlled-truth labels strictly **after** both detectors finish. Do not feed these post-hoc statistics into the detector or reuse the same seeds as a fresh holdout after tuning new algorithms.
 
 ## Scientific limits and release gates
 

@@ -67,6 +67,13 @@ internal static partial class Program
             Assert(!report.PhysicalOwnerIdentityKnown &&
                    !report.RealMarketAccuracyCalibrated && !report.LiveTradingEnabled,
                 "private synthetic identities must not be marketed as real identities");
+            Assert(report.PostHocControlledDiagnostics.PrintCount == 8 &&
+                   report.PostHocControlledDiagnostics.DistinctQuantityCount == 1 &&
+                   report.PostHocControlledDiagnostics.UniqueExecutionTimestampCount == 8 &&
+                   report.PostHocControlledDiagnostics.PrintsSharingTimestamp == 0 &&
+                   report.PostHocControlledDiagnostics.MedianQuantity == 100 &&
+                   report.PostHocControlledDiagnostics.MedianInterprintGapMs == 5000,
+                "private post-hoc diagnostics must preserve exact controlled-fill timing");
             Assert(report.Models.Count == 2 &&
                    report.Models.All(m => m.TruePositivePrints + m.FalsePositivePrints ==
                        m.AttributedPublicPrints &&
@@ -82,6 +89,10 @@ internal static partial class Program
         try
         {
             var result = AbidesBlindEvaluation.Score(x.Public, x.Truth);
+            Assert(result.PostHocControlledDiagnostics.PrintCount == 0 &&
+                   result.PostHocControlledDiagnostics.MedianQuantity is null &&
+                   result.PostHocControlledDiagnostics.MedianInterprintGapMs is null,
+                "null source has no private controlled timing diagnostics");
             Assert(result.ControlledPrints == 0 &&
                    result.ConfiguredControlledAgents == 0 &&
                    result.Models.All(m => m.TruePositivePrints == 0 &&

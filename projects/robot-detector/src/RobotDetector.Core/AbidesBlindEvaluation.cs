@@ -32,6 +32,20 @@ public static class AbidesBlindEvaluation
         IReadOnlyList<int> ControlledAgentIds,
         IReadOnlyList<PrivateExecution> Events);
 
+    /// <summary>
+    /// Post-hoc PRIVATE truth diagnostics. Never passed to any candidate detector.
+    /// These numbers describe executed fills, not order submission scheduling.
+    /// </summary>
+    public sealed record ControlledPrintDiagnostics(
+        int PrintCount,
+        int DistinctQuantityCount,
+        int UniqueExecutionTimestampCount,
+        int PrintsSharingTimestamp,
+        double? MedianQuantity,
+        double? MedianInterprintGapMs,
+        double? MedianPositiveInterprintGapMs
+    );
+
     public sealed record Report(
         string SchemaVersion,
         string Simulator,
@@ -43,6 +57,7 @@ public static class AbidesBlindEvaluation
         int BackgroundPrints,
         int ConfiguredControlledAgents,
         int ObservedControlledAgents,
+        ControlledPrintDiagnostics PostHocControlledDiagnostics,
         IReadOnlyList<BlindedModelResult> Models,
         bool PhysicalOwnerIdentityKnown,
         bool RealMarketAccuracyCalibrated,
@@ -123,10 +138,42 @@ public static class AbidesBlindEvaluation
         var fixture = new BlindedMarketFixture(
             tape, truth, seenControl.Count, controlled, "abides-execution");
         var score = BlindExecutionBenchmark.Evaluate(fixture, manifest.Seed);
-        return new Report("abides-blind-score-v1", manifest.Simulator,
+        var controlledTrades = tape.Trades
+            .Where(t => truth[t.EventId].StartsWith("controlled-", StringComparison.Ordinal))
+            .OrderBy(t => t.ExchangeTimeUtc)
+            .ThenBy(t => t.ArrivalSequence)
+            .ToArray();
+
+        static double? Median(double[] sortedValues)
+        {
+            if (sortedValues.Length == 0) return null;
+            Array.Sort(sortedValues);
+            int middle = sortedValues.Length / 2;
+            return sortedValues.Length % 2 == 1
+                ? sortedValues[middle]
+                : (sortedValues[middle - 1] + sortedValues[middle]) / 2.0;
+        }
+
+        var gaps = controlledTrades.Skip(1)
+            .Zip(controlledTrades, (later, earlier) =>
+                (later.ExchangeTimeUtc - earlier.ExchangeTimeUtc).TotalMilliseconds)
+            .ToArray();
+        int uniqueTimes = controlledTrades.Select(t => t.ExchangeTimeUtc)
+            .Distinct().Count();
+        var diagnostics = new ControlledPrintDiagnostics(
+            controlledTrades.Length,
+            controlledTrades.Select(t => t.QuantityLots).Distinct().Count(),
+            uniqueTimes,
+            controlledTrades.GroupBy(t => t.ExchangeTimeUtc)
+                .Where(group => group.Count() > 1).Sum(group => group.Count()),
+            Median(controlledTrades.Select(t => (double)t.QuantityLots).ToArray()),
+            Median(gaps),
+            Median(gaps.Where(value => value > 0).ToArray()));
+
+        return new Report("abides-blind-score-v2", manifest.Simulator,
             manifest.SimulatorRevision, manifest.Seed, tape.FileSha256,
             tape.Trades.Count, controlled, tape.Trades.Count - controlled,
-            control.Count, seenControl.Count, score.Models,
+            control.Count, seenControl.Count, diagnostics, score.Models,
             false, false, false,
             new[]
             {
@@ -134,6 +181,7 @@ public static class AbidesBlindEvaluation
                 "PRIVATE_TRUTH: maker/taker agent identifiers were not passed to the detectors.",
                 "PUBLIC_SIDE: simulated aggressor direction derived from passive-order side; do not assume real vendor semantics.",
                 "PRINT_METRICS_ONLY: event precision and recall are not parent-order or physical owner accuracy.",
+                "POST_HOC_DIAGNOSTICS: controlled-fill sizes and timing are private truth diagnostics calculated strictly after the detector outputs.",
                 "NULL_TRUTH: when zero controlled prints exist, event recall is null.",
                 "NO_MARKET_CALIBRATION: this simulation is not a calibrated MOEX/SPB false-discovery rate.",
                 "NO_TRADING: analysis only; neither broker connection nor order placement is supported."

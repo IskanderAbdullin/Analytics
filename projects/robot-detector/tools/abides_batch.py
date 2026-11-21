@@ -115,6 +115,7 @@ def run_batch(seeds: list[int], cli_dll: Path) -> dict[str, Any]:
                     "public_sha256": truth["public_sha256"],
                     "public_prints": report["publicPrints"],
                     "controlled_prints": expected_controlled,
+                    "post_hoc_controlled_diagnostics": report["postHocControlledDiagnostics"],
                     "models": report["models"],
                 })
     return summarize(cases, seeds)

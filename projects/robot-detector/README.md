@@ -5,7 +5,7 @@
 
 ## Genuine ABIDES-NG exchange execution — blind validation
 
-A new **optional** research pipeline uses the genuine ABIDES-NG exchange/order-book matching engine with controlled TWAP execution, independent background agents and a matching-engine null scenario. Only the anonymous public CSV is shown to either detector; maker/taker agent IDs stay in a separate private manifest used **after detection** for exact print-level scoring. Source pinned to upstream commit `ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242`.
+A new **optional** research pipeline uses the genuine ABIDES-NG exchange/order-book matching engine with controlled TWAP, VWAP or POV execution, independent background agents and a matching-engine null scenario. Only the anonymous public CSV is shown to either detector; maker/taker agent IDs stay in a separate private manifest used **after detection** for exact print-level scoring. Source pinned to upstream commit `ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242`.
 
 ```powershell
 # Python 3.12 with pinned ABIDES-NG installed, from this subproject directory
@@ -13,7 +13,7 @@ python tools/abides_export.py --mode twap --seed 41 --public data/raw/abides-pub
 dotnet run --project src/RobotDetector.Cli -- benchmark-abides-blind --public data/raw/abides-public.csv --truth data/raw/abides-truth.json --output data/results/abides-score.json
 ```
 
-[Full setup, data contract, null protocol and limitations](docs/ABIDES_GENUINE_REPLAY.md). Dedicated GitHub Actions workflow can run the real simulator without touching a trading account. Results are **not** real-market calibrated precision or a count of real physical robots; Stage 2 scientific gate stays closed.
+[Full setup, data contract, null protocol and limitations](docs/ABIDES_GENUINE_REPLAY.md). [Verified ABIDES CI #44890937246](https://github.com/IskanderAbdullin/Analytics/actions/runs/44890937246) includes **123/123** offline C# checks, four frozen-seed TWAP/null simulations each, and real VWAP/POV execution tests. In four frozen TWAP runs the fixed-q detector recovered 101 of 197 controlled prints; the variable-q screen recovered none. On single VWAP (50 controlled) and POV (14 controlled) runs **both screens recovered zero**. Dedicated GitHub Actions workflow runs the real simulator without touching a trading account. Results are **not** real-market calibrated precision or a count of real physical robots; Stage 2 scientific gate stays closed.
 
 ## Adversarial common-clock null experiment — 2026-11-21
 
