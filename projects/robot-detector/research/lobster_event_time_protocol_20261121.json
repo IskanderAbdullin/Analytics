@@ -1,0 +1,46 @@
+{
+  "schema_version": "lobster-event-time-10level-public-demo-retrospective-v1",
+  "date_frozen": "2026-11-21",
+  "source": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip",
+  "source_local_sha256_known_from_previous_format_audit": "5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f",
+  "source_digest_is_provider_published_or_signed": false,
+  "dataset_historical_date": "2012-06-21",
+  "sample_known_before_new_feature_protocol": true,
+  "hypothesis_experiment_status": "RETROSPECTIVE_DESCRIPTIVE_NOT_OUT_OF_SAMPLE",
+  "source_level_count_each_side": 10,
+  "message_book_alignment": "one message row then one post-event book snapshot, previous post-state is only a pre-event proxy",
+  "event_type_4_aggressor_opposite_resting_side": true,
+  "hidden_event_type_5_aggressor_not_assumed": true,
+  "timestamp_measurement": "vendor seconds after US/Eastern exchange-local midnight, not UTC unix time",
+  "binned_summary_seconds": 1800,
+  "binned_summary_bins": 13,
+  "expected_source_event_rows_from_prior_qa": 269748,
+  "expected_visible_execution_events_from_prior_qa": 8974,
+  "primary_descriptive_outputs": [
+    "event_type_counts",
+    "half_hour_event_counts",
+    "mean_event_weighted_spread_x10000",
+    "mean_event_weighted_top_depth_shares",
+    "mean_event_weighted_top_imbalance",
+    "top_bid_ask_price_change_after_event",
+    "top_bid_ask_size_change_after_event",
+    "visible_execution_prepost_quote_price_change",
+    "same_timestamp_repeated_event_pairs"
+  ],
+  "dataset_rights_scope": "Publicly offered LOBSTER demo; noncommercial scientific analysis and independent code/aggregates; no raw redistribution or commercial authorization assumed",
+  "output_policy": "ONLY exact allowed aggregate JSON keys, no event rows, snapshot series, quote-level time series, raw IDs or raw ZIP to GitHub",
+  "external_validity_limits": [
+    "2012 vendor demo",
+    "10 levels not full depth",
+    "no actual participants/owner labels",
+    "event-weighted measurements not time-weighted",
+    "no provider signed checksum",
+    "no p-values or calibrated market FDR"
+  ],
+  "negative_result_handling": "Record all counts, absence or presence of hypothesized dynamics; never optimize after observing metrics",
+  "next_hypotheses_without_using_results": [
+    "compare type4 quote changes against ordinary events under deterministic count-controlled null",
+    "quantify event-time vs calendar-time weighting bias",
+    "synthetic oracle truth no agent ID leakage"
+  ]
+}
