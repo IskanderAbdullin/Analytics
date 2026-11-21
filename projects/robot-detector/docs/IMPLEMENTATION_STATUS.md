@@ -298,3 +298,38 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 - Live trading, physical bot identification, independent source
   completeness and real-market phase false-alarm estimates remain
   **CLOSED / UNKNOWN**, not silently inferred.
+
+## Executed controlled public L2 TWAP contrast and phase-choice diagnostic (2026-11-21)
+
+- [ABIDES CI #44915375635](https://github.com/IskanderAbdullin/Analytics/actions/runs/44915375635)
+  succeeded on the **source-preregistered** 2401/2402 development seed
+  cohort: 4 actual matching-engine market simulations and 12 dependent
+  public phase-origin views; true controlled TWAP execution participation
+  was verified *after* public feature computation (22 printed fills on
+  each injected-TWAP original market).
+- The two-seed median descriptive rho for **background only** at
+  0/10/20s was **−0.2262/−0.0613/−0.4756**; with **injected TWAP**
+  **−0.0711/+0.000058/+0.1004**. Exactly **2 of 4** original runs change
+  rho sign across fixed phases, and eligible book/trade bin counts
+  change across phases for all 4 originals. The raw event tape was
+  NOT committed; complete aggregate-only original SHA-256 is
+  `2391c9f223b6841f8346502282b7e099856e6feee7726cd4769967dcbcd97fa8`.
+- Deterministic, source-only `abides_l2_twap_separability.py` reveals
+  the **post-hoc phase-choice trap**: apparent strict ordering
+  (injected rho range entirely above background range) is **false
+  at 0s**, **true at 10/20s**, but **false across all origins**.
+  It explicitly does not select a threshold, use statistical
+  classification accuracy, or open the scientific or trading gates.
+  A matching new CLI can reprocess saved full JSON or the 12-row
+  committed scalar fixture without ABIDES.
+- The old L2 experiment used a print-only SHA; this new study checks
+  **combined exact ordered public L2 plus public trade SHA** across
+  every phase before retaining case summaries. That prevents silent
+  L2-content drift within a simulated source but cannot authenticate
+  independent real provider archives.
+- Expensive source-controlled ABIDES workflow changed to **manual
+  dispatch only after the successful original run**; the cheap
+  research-ledger workflow tests the source, retrospective case
+  fixture, non-identifiability and all provenance gates. Seeds
+  2401/2402 are now **spent**, and no real market owner-count claim
+  or out-of-sample significance is supported.

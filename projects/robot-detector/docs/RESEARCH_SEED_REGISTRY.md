@@ -87,3 +87,21 @@ across each set of phase views. No real-market identity or false
 discovery probability is inferred.
 
 [Prospective protocol](ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+
+## Source-controlled TWAP-versus-background execution verification
+
+[Original frozen matching-engine CI #44915375635](https://github.com/IskanderAbdullin/Analytics/actions/runs/44915375635)
+successfully exercised 2401 and 2402 across background-only and
+one injected TWAP configurations, with three dependent clock-origin
+views of each original tape. Both seeds are **now spent for any
+future independent holdout claim**. The new full-depth public L2/trade
+fingerprint is coherent across phase views within the four simulations,
+but cannot attest real exchange tape provenance. The total canonical
+ledger is **13 study entries / 33 locally registered seed values /
+6 literal-frozen source constant checks**.
+
+A later retrospective phase-choice separability audit consumes the
+**same** simulation results and does not constitute any new independent
+market replication or unspent seed observation. Keeping the source
+analysis and source simulation in distinct records avoids hidden
+double-counting.

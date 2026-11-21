@@ -171,3 +171,22 @@ physical bot count, market false-positive claim or live trading.
 The cheap research-ledger CI now verifies this counterexample
 with the immutable observed fixture and explicit null/undefined
 negative tests. No additional ABIDES simulations are run.
+
+## Reproduce the sample-only separation diagnostic without ABIDES
+
+```bash
+cd projects/robot-detector
+python tools/abides_l2_twap_separability.py \
+  --input fixtures/abides_l2_twap_phase_observed_20261121.json \
+  --output data/results/twap-phase-choice-review.json
+python -m unittest discover -s tests_background \
+  -p 'test_abides_l2_twap_separability.py' -v
+```
+
+The command also accepts a downloaded **full original aggregate JSON**,
+rejects malformed or nonstandard numeric JSON, requires the exact
+preregistered protocol, rechecks the source case matrix and saved
+cohort medians, refuses to overwrite output, and hashes its entire
+input file for traceability. It **cannot independently authenticate
+the simulated exchange feed** from a JSON file. No private truth,
+new matching run, threshold optimization or trading API is involved.
