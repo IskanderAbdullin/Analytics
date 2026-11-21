@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Independent L2-book and trade-feed coverage claims (read-only)
+
+Added a conservative optional **two-stream metadata gate**: the previous completed L2 clock bin and the next observed trade bin must each be covered by their own **caller-declared** feed time range, with explicit non-overlapping missing-data intervals. Declared instrument, venue and session must match across book and trade metadata; absent or mismatched coverage causes a recorded abstention rather than filling gaps. A raw ABIDES book/trade tuple **cannot verify the caller's provider identity or coverage claim**, so the output continues to explicitly report real-market completeness as **unverified**.
+
+[Source-coverage specification and limitations](docs/L2_DUAL_STREAM_COVERAGE.md). No broker API, secrets, execution orders or new bot classifier.
+
 ## Research seed provenance / known-holdout reuse guard
 
 The new **read-only** `research/seed_registry.json` records already inspected ABIDES and deliberately constructed toy seeds, including explicit **non-independent replays**. `tools/research_seed_registry.py` checks the historical seed list against four frozen experiment scripts using Python AST, **without importing or running those experiments**, rejects source-plan drift and flags any proposed seed that has already been spent. A previously *unlisted* seed is **not automatically proven globally new or a valid blind holdout**. A lightweight Python-only CI audit runs when relevant source constants or ledger entries change.

@@ -1,0 +1,49 @@
+name: Robot Detector public dual feed coverage gate
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/tools/public_stream_coverage.py'
+      - 'projects/robot-detector/tools/lagged_l2_bin.py'
+      - 'projects/robot-detector/tests_l2/test_public_stream_coverage.py'
+      - 'projects/robot-detector/tests_l2/test_lagged_l2_watermark.py'
+      - '.github/workflows/robot-detector-dual-feed-coverage.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/tools/public_stream_coverage.py'
+      - 'projects/robot-detector/tools/lagged_l2_bin.py'
+      - 'projects/robot-detector/tests_l2/test_public_stream_coverage.py'
+      - 'projects/robot-detector/tests_l2/test_lagged_l2_watermark.py'
+      - '.github/workflows/robot-detector-dual-feed-coverage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-public-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test dual stream coverage and archive watermark fail-closed semantics
+        run: |
+          python -m unittest discover -s tests_l2 -p 'test_public_stream_coverage.py' -v
+          python -m unittest discover -s tests_l2 -p 'test_lagged_l2_watermark.py' -v
+          python - <<'PY'
+          from tools.public_stream_coverage import PublicStreamClaim, DualPublicStreamClaim, disclose_claim
+          book=PublicStreamClaim('book','SIM','ABM','2026-11-21','L2',0,30000000000)
+          trades=PublicStreamClaim('trades','SIM','ABM','2026-11-21','prints',30000000000,60000000000)
+          pair=DualPublicStreamClaim(book,trades)
+          assert pair.is_pair_covered(0,30000000000,60000000000)==(True,True)
+          a=disclose_claim(pair)
+          assert a['market_completeness_certified'] is False
+          assert a['raw_tape_labels_independently_verified'] is False
+          print('DUAL_PUBLIC_STREAM_CLAIM_GUARD_OK')
+          PY
