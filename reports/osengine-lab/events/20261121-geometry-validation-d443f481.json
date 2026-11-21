@@ -1,0 +1,61 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-geometry-validation-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "d443f481-4258-4fb3-a7f0-a7d47647b826",
+    "occurred_at": "2026-11-21T15:45:00Z",
+    "type": "research",
+    "title": "Validate held-out time-weighted book geometry before comparing levels",
+    "summary": "Add prior-day versus held-out-day geometry tests with minimum coverage, duration and sample-day requirements; reject invalid rows and suspected overlapping hourly recordings. Not a P&L optimizer.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/geometry_validation.py",
+      "action": "added",
+      "summary": "Time-weighted quote geometry day holdout and strict input/data quality gates."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_geometry_validation.py",
+      "action": "added",
+      "summary": "Five synthetic eligibility, invalid, leakage and no-overwrite tests."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Add one isolated descriptive geometry validation stage."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_quality.py",
+      "action": "modified",
+      "summary": "Surface source corruption or overlaps in overall audit quality gate."
+    }
+  ],
+  "checks": [
+    {
+      "id": "geometry-ci",
+      "title": "Synthetic matrix",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "CI on push."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "verified-fill-model",
+      "title": "Calibrate hypothetical execution using real broker evidence before any strategy ranking",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No original trading program, live config or real trade files were modified.",
+    "Descriptive opportunity share never equals expected return."
+  ]
+}
