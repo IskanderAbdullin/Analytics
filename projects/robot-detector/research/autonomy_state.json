@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "6850f542b64c876fedf720ae3a2d80321d453c59",
+  "last_verified_base_commit": "93c3ad45db7c8ab08c738e14b5b1b86fa236ec79",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-L2-RESEARCH-01",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44925498585",
+      "result": "Real historical LOBSTER 10-level paired event-time research passed: 269748 event/book states, 27557 BBO price changes, 4239 following visible type4 executions, mean event-weighted spread 1308.61693136 (price*10000), imbalance 0.10299666; no robot ground truth or raw output.",
+      "status": "VERIFIED_SOURCE_RESEARCH_RETROSPECTIVE_NOT_REAL_ROBOT_CLASSIFICATION"
+    },
     {
       "stage_id": "AUTONOMY-OPERATING-CONTRACT-01",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44924357143",
@@ -29,37 +35,31 @@
     }
   ],
   "current_stage": {
-    "id": "RD-L2-RESEARCH-01",
+    "id": "RD-L2-RESEARCH-02",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Reproducible event-time ten-level research replay and synthetic controls",
-    "why_next": "Missing event-time robust L2 features; format validated but actual scientific hypothesis tests on event-book dynamics not yet performed",
+    "title": "Correct event-weighted vs interval-duration-weighted 10-level book statistics",
+    "why_next": "Real source replay showed 13 half-hour event counts 12441..33518; event-weighted BBO metrics bias time-averages and must be contrasted with actual forward-held quote durations, without extrapolating past last event",
     "inputs": [
-      "tools/lobster_public_sample_format_audit.py",
-      "research/lobster_amzn_sample_format_precommit_20261121.json",
-      "docs/LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md"
+      "tools/lobster_event_time_features.py",
+      "fixtures/lobster_amzn_event_time_observed_20261121.json",
+      "docs/LOBSTER_EVENT_TIME_FEATURES_20261121.md"
     ],
     "deliverables": [
-      "Read-only event-time feature definitions: spread/depth/imbalance/quote transition counts, respecting paired post-event snapshots",
-      "Synthetic paired 10-level L2/message tests with malformed/negative cases",
-      "Optional research-only public vendor demo execution that returns ONLY allowed small aggregate metrics, not original messages/book rows",
-      "Methodology note distinguishing source-observed patterns from physical robot identity"
+      "Bounded time-weighted spread/depth/imbalance over observed first-to-last event intervals",
+      "Synthetic counterexample where same events but different dwell-time yields different time-weighted mean",
+      "Explicit tied-timestamp and missing top quote time-coverage accounting",
+      "Optional original source research-only aggregate replay and adverse tests"
     ],
     "acceptance": [
-      "Public source file or API never committed as raw events",
-      "No real participant identity/FDR claim",
-      "Deterministic offline unit tests pass",
-      "Evidence and next-stage selection recorded",
-      "Verified non-force push"
+      "No future lookahead or extrapolation beyond last event",
+      "Time-weighted zero-duration events contribute no quote-time weight",
+      "Negative tests including giant inactivity gap and repeated timestamps",
+      "No original vendor event/book rows or raw order IDs exported",
+      "Commit/push and next checkpoint stage chosen"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/73"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/76"
   },
   "backlog": [
-    {
-      "id": "RD-L2-RESEARCH-02",
-      "status": "QUEUED",
-      "priority": 1,
-      "title": "Compare event-time quote/depth rhythms to realistic count/volume/null baselines; preregister observation/evaluation protocol"
-    },
     {
       "id": "RD-SYNTHETIC-BLIND-03",
       "status": "QUEUED",
@@ -109,5 +109,5 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "Created permanent autonomous project execution TZ, GitHub master issue #72, durable state/AGENTS contract and offline checkpoint validation. CI 44924357143 passed. Next research stage #73 selected for implementation; final scientific release is still open."
+  "last_session_result": "RD-L2-RESEARCH-01 original real sample scientific event-time replay verified in Actions #44925498585; stage #76 selected immediately for time-weighting and synthetic negative controls. The master scientific goal remains open."
 }

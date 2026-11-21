@@ -3,10 +3,9 @@ name: Robot Detector historical LOBSTER event-time features - original demo
 # Single source audit only, no re-publication of source events or quotes.
 # Switch to manual-only on first success. Underlying historical demo
 # was previously inspected for structure, NOT a new independent holdout.
+# Original event-time real L2 sample replay succeeded in Actions #44925498585.
+# Subsequent re-fetches require intentional manual dispatch.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-lobster-event-time-research.yml'
   workflow_dispatch:
 
 permissions:
