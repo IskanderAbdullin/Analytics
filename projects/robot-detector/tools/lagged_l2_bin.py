@@ -16,6 +16,7 @@ import math
 from l2_probe import audit_l2_public
 from l2_trade_context import PublicExecution, MAX_FILLS, MAX_SNAPSHOTS
 from public_stream_coverage import DualPublicStreamClaim, disclose_claim
+from public_numeric import exact_nonnegative_integer as exact_int
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,13 +72,16 @@ def summarize_lagged_book(
     complete_through_ns: int | None = None,
     source_coverage: DualPublicStreamClaim | None = None
 ) -> dict:
-    # Defaults must remain valid when the caller chooses shorter clock bins.
+    # Use lossless integer-only clock/depth settings: float tick counts
+    # (even 10.0) cannot be silently accepted as exchange clock units.
+    bin_seconds = exact_int(bin_seconds, "bin seconds", positive=True)
     if maximum_quote_age_seconds is None:
         maximum_quote_age_seconds = bin_seconds
-    if (bin_seconds < 1 or bin_seconds > 3600 or
-        maximum_quote_age_seconds < 1 or
-        maximum_quote_age_seconds > bin_seconds or
-        maximum_depth < 1 or maximum_depth > 20):
+    maximum_quote_age_seconds = exact_int(
+        maximum_quote_age_seconds, "max quote age seconds", positive=True)
+    maximum_depth = exact_int(maximum_depth, "maximum depth", positive=True)
+    if (bin_seconds > 3600 or
+        maximum_quote_age_seconds > bin_seconds or maximum_depth > 20):
         raise ValueError("Invalid bounded previous-completed-bin settings")
     if complete_through_ns is not None and (
         type(complete_through_ns) is not int or complete_through_ns < 0
@@ -103,9 +107,11 @@ def summarize_lagged_book(
 
     fills_by_bin: dict[int, dict] = {}
     for fill in executions:
-        if (fill.time_ns < 0 or fill.price_cents <= 0 or fill.quantity <= 0 or
-            fill.reported_aggressor_side not in ("BUY", "SELL")):
-            raise ValueError("Invalid public execution fields")
+        exact_int(fill.time_ns, "public fill time ns")
+        exact_int(fill.price_cents, "public fill price", positive=True)
+        exact_int(fill.quantity, "public fill lots", positive=True)
+        if fill.reported_aggressor_side not in ("BUY", "SELL"):
+            raise ValueError("Invalid public execution direction")
         ordinal = fill.time_ns // duration
         counts = fills_by_bin.setdefault(ordinal, {
             "buy": 0, "sell": 0, "count": 0
