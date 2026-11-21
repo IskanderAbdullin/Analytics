@@ -1,5 +1,6 @@
 """No-network integrity tests: 40 locally new seeds x four ABIDES cohorts."""
 from copy import deepcopy
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -122,6 +123,15 @@ class Frozen160SourceTests(unittest.TestCase):
             mutated[0][k]=v
             with self.subTest(field=k),self.assertRaises(ValueError):
                 validate_source_report(mutated)
+
+    def test_generated_private_simulator_agent_ids_not_in_future_public_logs(self):
+        # This is a static log-privacy regression; source engine not rerun.
+        from abides_grid_replication_160 import simulate_source_case
+        src=inspect.getsource(simulate_source_case)
+        self.assertIn("logging.disable(logging.INFO)",src)
+        self.assertLess(src.index("logging.disable(logging.INFO)"),
+                        src.index("simulation=run_simulation"))
+        self.assertIn("private_oracle_agent_IDs_entered_public_features",src)
 
     def test_original_source_precommit_rejects_posthoc_edit(self):
         p=frozen_protocol()
