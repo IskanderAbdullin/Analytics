@@ -143,6 +143,18 @@ class FrozenControlledContrast(unittest.TestCase):
                     22 if scenario=="twap_injected" else 0)
         self.assertEqual(inversions,2)
 
+    def test_no_private_or_unrecognized_fields_in_aggregate_artifact(self):
+        for label in ("passive_agent_id","controlled_agent_ids",
+                      "hidden_order_id","raw_l2_events"):
+            rows=[dict(x) for x in sample()]
+            rows[0][label]=12345
+            with self.subTest(label=label),self.assertRaises(ValueError):
+                aggregate(rows)
+        rows=[dict(x) for x in sample()]
+        del rows[0]["private_identity_used_for_feature"]
+        with self.assertRaises(ValueError):
+            aggregate(rows)
+
     def test_illegal_scenarios_frozen_before_simulator_import(self):
         for args in ((2400,"background_only"),(2401,"twap"),(2402,"poisson")):
             with self.assertRaises(ValueError):

@@ -95,7 +95,10 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if any(with_digest) and not all(with_digest):
         raise ValueError("Mixed old and full-tape study provenance")
     full_digest = all(with_digest)
+    allowed_fields = required_fields | {"public_tape_sha256"}
     for row in rows:
+        if set(row) - allowed_fields:
+            raise ValueError("Unexpected public case fields may disclose private source data")
         if not required_fields.issubset(row):
             raise ValueError("Incomplete public phase case")
         if any(type(row[key]) is not int for key in integer_fields):

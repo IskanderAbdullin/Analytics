@@ -241,6 +241,14 @@ class FrozenClockPhaseTests(unittest.TestCase):
                        cases[0]["phase_seconds"]))
         self.assertIsNone(observed["descriptive_rho"])
 
+    def test_private_identity_payload_cannot_enter_aggregate_artifact(self):
+        for label in ("passive_agent_id","private_event_manifest",
+                      "raw_order_book","physical_owner_identifier"):
+            cases=[dict(x) for x in matrix()]
+            cases[0][label]="never-serialize-this"
+            with self.subTest(label=label),self.assertRaises(ValueError):
+                aggregate(cases)
+
     def test_undefined_rho_and_false_evidence_claims_fail_closed(self):
         r=aggregate(matrix({0:None,10:-0.1,20:None}))
         self.assertEqual(len(r["cohorts"]),6)

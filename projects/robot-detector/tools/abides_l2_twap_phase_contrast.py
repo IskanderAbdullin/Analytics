@@ -56,8 +56,17 @@ def aggregate(rows: list[dict[str, Any]]) -> dict:
     expected={(s,m,p) for s in SEEDS for m in SCENARIOS for p in PHASES_SECONDS}
     if type(rows) is not list or any(type(x) is not dict for x in rows):
         raise ValueError("Cases must be a list of public run summaries")
+    allowed_fields={
+        "seed","scenario","phase_seconds","full_public_tape_sha256",
+        "public_prints","public_lots","l2_snapshots","eligible_lagged_bins",
+        "populated_trade_bins","abstained_bins","rho",
+        "posthoc_controlled_prints","private_identity_used_for_feature",
+        "best_phase_selected","real_market_calibrated",
+    }
     keys=[]
     for row in rows:
+        if set(row)!=allowed_fields:
+            raise ValueError("Missing or unexpected case fields: private data must not leak")
         keys.append((row.get("seed"),row.get("scenario"),row.get("phase_seconds")))
         for field in ("seed","phase_seconds","public_prints","public_lots",
                       "l2_snapshots","eligible_lagged_bins","populated_trade_bins",
