@@ -3,6 +3,14 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Genuine matching-engine background-only public L2 nulls
+
+Added `tools/abides_l2_background_nulls.py` with **six frozen genuine ABIDES-NG simulations**: two new development seeds across a baseline Poisson background, fixed-cadence noise-agent background, and heterogeneous noise-plus-momentum background. **No separately injected TWAP/VWAP/POV parent execution agent** is introduced. This is not a claim that these markets have no other algorithmic participants.
+
+The output compares the last valid L2 state of a *fully completed previous* 30-second bin against the next completed bin's aggregate public BUY fraction. Exact-time fill/quote joins remain intentionally unclassified. The study reports only public counts, source fingerprints and *descriptive* correlation, without physical owner labels, real-market statistical significance or live trading. Seeds, parameters and study cohorts were frozen before running any results; no tuning on these seeds.
+
+[Methodology and experimental limitations](docs/ABIDES_BACKGROUND_L2_NULLS.md).
+
 ## Adversarial common-market public-book null controls
 
 The new strictly synthetic, read-only `tools/l2_common_factor_null.py` demonstrates that **market-wide common conditions** can generate very high correlation between previous book imbalance and later aggregate directional trades **without identifying any single parent execution order**. Four transparent families—common factor, independent flow, synchronized quote/trade clock and broad market regime shock—are tested in an inexpensive, no-ABIDES Python CI. The results are **educational counterexamples, not realistic calibrated market nulls**; do not convert a high public `rho` to a bot count or real false-positive probability.
