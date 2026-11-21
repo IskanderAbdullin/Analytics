@@ -23,7 +23,7 @@ class ReportPathTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_report_output(self.root, self.root.parent / 'reports' / 'audit')
         dest = self.root / 'reports' / 'audit-1'
-        self.assertEqual(reserve_report_output(self.root, dest), dest)
+        self.assertEqual(reserve_report_output(self.root, dest).resolve(), dest.resolve())
         with self.assertRaises(ValueError):
             reserve_report_output(self.root, dest)
 

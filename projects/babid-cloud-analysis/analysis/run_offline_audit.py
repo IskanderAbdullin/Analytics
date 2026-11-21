@@ -32,6 +32,7 @@ def checksum(path: Path) -> str:
 
 def inventory(root: Path) -> list[dict]:
     """Hash inputs before a scan, with before/after sizes for live-file detection."""
+    root = root.resolve(strict=True)
     names = set()
     for pattern in audit_provenance.SOURCE_PATTERNS:
         names.update(root.glob(pattern))
@@ -43,13 +44,13 @@ def inventory(root: Path) -> list[dict]:
             before = p.stat()
             digest = checksum(p)
             after = p.stat()
-            records.append(dict(path=str(p.relative_to(root)), sha256=digest,
+            records.append(dict(path=p.relative_to(root).as_posix(), sha256=digest,
                                 size_before=before.st_size, size_after=after.st_size,
                                 mtime_ns_after=after.st_mtime_ns,
                                 stable_during_hash=(before.st_size == after.st_size and
                                     before.st_mtime_ns == after.st_mtime_ns)))
         except OSError as error:
-            records.append(dict(path=str(p.relative_to(root)),
+            records.append(dict(path=p.relative_to(root).as_posix(),
                                 error=str(error)[:150]))
     return records
 

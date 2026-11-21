@@ -16,7 +16,7 @@ SOURCE_PATTERNS = ("config*.json", "state*/journal.json", "state*/risk.json",
 def changes_since_inventory(root: Path, inventory: list[dict]) -> list[dict]:
     root = Path(root).resolve(strict=True)
     changes = []
-    known = {item.get("path") for item in inventory}
+    known = {str(item.get("path", "")).replace("\\", "/") for item in inventory}
     for entry in inventory:
         name = entry.get("path", "")
         if not name:
@@ -46,7 +46,7 @@ def changes_since_inventory(root: Path, inventory: list[dict]) -> list[dict]:
         for path in root.glob(pattern):
             if not path.is_file():
                 continue
-            relative = str(path.relative_to(root))
+            relative = path.relative_to(root).as_posix()
             if relative in known or relative in added:
                 continue
             added.add(relative)
