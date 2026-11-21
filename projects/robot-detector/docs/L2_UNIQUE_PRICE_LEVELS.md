@@ -19,3 +19,9 @@ The existing L2 CI runs the full `tests_l2` set and its pinned genuine ABIDES ma
 ## Limits
 
 This validator assumes provider/source semantics match *aggregated L2 price levels*. It must **not** be applied unchanged to a raw per-order L3 stream, where multiple resting orders may genuinely share a price. It cannot authenticate an exchange provider or detect incomplete feed delivery. The research remains read-only, with no bot identity, real-market FDR or trading orders. Stage-2 release gate CLOSED.
+
+## Executed regression (2026-11-21)
+
+[Successful real ABIDES L2 CI #44911604350](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911604350) completed **47 Python tests**, including all six new unique-level tests, before running the pinned ABIDES matching-engine quote/print simulations. The real ABIDES depth-five source continued to produce **1,152 valid book snapshots and 709 exchange fills** in the original feasibility case; stricter duplicate-price validation did not alter this known-good reference output.
+
+No source authenticity, real feed completeness, market-wide false-positive rate or actual trader identity is inferred by these passing checks.

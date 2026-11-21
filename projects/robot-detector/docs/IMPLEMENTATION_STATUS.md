@@ -247,3 +247,5 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 
 - Strengthened `l2_probe.audit_l2_public`: duplicate or reversed prices inside one aggregated L2 side now fail closed (bid prices strictly decreasing; ask prices strictly increasing), preventing double-counting at the same level in the previous-bin public imbalance. Repeated timestamps across separate snapshots are **still preserved**.
 - Added six deterministic no-ABIDES tests in `tests_l2/test_l2_level_uniqueness.py`, including source-level rejection in both public join and lagged-L2 analytics. Document: [L2_UNIQUE_PRICE_LEVELS.md](L2_UNIQUE_PRICE_LEVELS.md). Must not apply this aggregated-L2 rule directly to per-order L3 feeds. Real feed provenance and bot-identity claims remain unverified.
+
+- **Verified strict unique-price L2 source check:** [successful pinned ABIDES CI #44911604350](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911604350) passed **47 Python tests**, including six new duplicate-level checks, while genuine 1,152-snapshot / 709-fill feasibility output remained unchanged. Research/market release gate stays CLOSED.
