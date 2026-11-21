@@ -27,6 +27,7 @@ import config_epochs
 import audit_quality
 import fills_by_epoch
 import execution_markout
+import position_evidence
 
 
 def checksum(path: Path) -> str:
@@ -135,6 +136,11 @@ def run(root: Path, output: Path, with_market: bool = True, *,
         except (OSError, ValueError) as error:
             manifest["reports"]["nvda_error"] = str(error)[:300]
     if epoch_state and epoch_logs:
+        try:
+            manifest["reports"]["position_evidence"] = position_evidence.run(
+                root, output / "position-evidence", epoch_state, epoch_logs)
+        except (OSError, ValueError) as error:
+            manifest["reports"]["position_evidence_error"] = str(error)[:300]
         try:
             manifest["reports"]["epoch_attribution"] = fills_by_epoch.run(
                 root, output / "epoch-attribution", epoch_state, epoch_logs)
