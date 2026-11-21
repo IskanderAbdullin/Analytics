@@ -28,6 +28,7 @@ import audit_quality
 import fills_by_epoch
 import execution_markout
 import position_evidence
+import geometry_validation
 
 
 def checksum(path: Path) -> str:
@@ -143,6 +144,13 @@ def run(root: Path, output: Path, with_market: bool = True, *,
                 root, output / "market", market_study.DEFAULT_LEVELS, None)
         except (OSError, ValueError) as error:
             manifest["reports"]["market_error"] = str(error)[:300]
+    if with_market and (output / "time-weighted" / "time_weighted_geometry.csv").is_file():
+        try:
+            manifest["reports"]["geometry_validation"] = geometry_validation.run(
+                root, output / "time-weighted" / "time_weighted_geometry.csv",
+                output / "geometry-validation")
+        except (OSError, ValueError) as error:
+            manifest["reports"]["geometry_validation_error"] = str(error)[:300]
     if with_market and (output / "market" / "opportunities.csv").is_file():
         try:
             manifest["reports"]["opportunity_validation"] = opportunity_validation.run(

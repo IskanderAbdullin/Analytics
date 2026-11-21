@@ -41,6 +41,9 @@ def evaluate(manifest: dict) -> dict:
     warn_if(tape.get("malformed_books", 0) > 0, "invalid_order_books")
     warn_if(tape.get("unreadable_rows", 0) > 0, "unreadable_market_tape")
     warn_if(tape.get("negative_exchange_age", 0) > 0, "exchange_clock_skew")
+    geometry = reports.get("geometry_validation") or {}
+    warn_if(geometry.get("invalid_source_rows", 0) > 0, "geometry_input_rows_invalid")
+    warn_if(geometry.get("possible_overlapping_groups", 0) > 0, "market_hour_overlap_suspected")
     weighted = reports.get("time_weighted") or {}
     critical_if(weighted.get("rejected_recordings", 0) > 0, "market_recorder_rejected_files")
 
