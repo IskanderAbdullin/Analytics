@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Genuine ABIDES public L2 30-second clock-origin sensitivity
+
+The new **pre-registered** `tools/abides_l2_binphase_sensitivity.py` evaluates the same anonymous ABIDES depth-five book/trade tape at three **30-second clock origins (0, 10 and 20 seconds)**. Exactly **four new genuine market simulations** (seeds 2101/2102 × Poisson/fixed-cadence backgrounds) produce twelve **correlated** views. Relative public event times, quantities and reported sides are conserved; no phase is selected as a best model and no private execution actor is identified. The two new seeds are registered as spent in the research provenance ledger.
+
+[Precommitted source, tests and scientific limits](docs/ABIDES_L2_BINPHASE_SENSITIVITY.md).
+
 ## Reproducible public-feed invariant stress tests
 
 Added a cheap **read-only** deterministic metamorphic suite for lagged public L2/trade analytics. It checks that appending future public events cannot rewrite completed past observations, that more source book/trade gaps cannot increase eligible intervals, that an earlier exclusive watermark only removes a future tail, and that complete-bin accounting conserves every observed public trade bin. Generated tapes are **software fixtures, not real ABIDES experiments, new blind research holdouts or market performance evidence**.
@@ -31,7 +37,7 @@ Added a conservative optional **two-stream metadata gate**: the previous complet
 
 The new **read-only** `research/seed_registry.json` records already inspected ABIDES and deliberately constructed toy seeds, including explicit **non-independent replays**. `tools/research_seed_registry.py` checks the historical seed list against four frozen experiment scripts using Python AST, **without importing or running those experiments**, rejects source-plan drift and flags any proposed seed that has already been spent. A previously *unlisted* seed is **not automatically proven globally new or a valid blind holdout**. A lightweight Python-only CI audit runs when relevant source constants or ledger entries change.
 
-[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **29 known spent seeds across 11 canonical studies**, **4 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
+[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **31 known spent seeds across 12 canonical studies**, **5 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
 
 ## Genuine ABIDES public-L2 time-bin robustness experiment
 

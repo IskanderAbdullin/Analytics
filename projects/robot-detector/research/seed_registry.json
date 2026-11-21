@@ -1,7 +1,7 @@
 {
   "schema_version": "market-robot-detector-seed-ledger-v1",
   "scope": "locally_known_studies_only_not_global_novelty_proof",
-  "description": "Previously evaluated development, validation and constructed toy seeds. All are spent for fresh blinded evaluation; reproducibility replays allowed only with explicit non-independent labels.",
+  "description": "Previously evaluated development, validation and constructed toy seeds. Includes the source-precommitted 2101–2102 clock-phase study; all listed values are spent for fresh blinded evaluation.",
   "studies": [
     {
       "id": "initial_execution_development",
@@ -115,6 +115,17 @@
         1902
       ],
       "source_file": "tools/abides_l2_binwidth_sensitivity.py",
+      "source_constant": "SEEDS"
+    },
+    {
+      "id": "l2_clock_phase_sensitivity",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        2101,
+        2102
+      ],
+      "source_file": "tools/abides_l2_binphase_sensitivity.py",
       "source_constant": "SEEDS"
     }
   ],

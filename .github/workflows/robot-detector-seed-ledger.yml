@@ -10,6 +10,7 @@ on:
       - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   pull_request:
     paths:
@@ -20,6 +21,7 @@ on:
       - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   workflow_dispatch:
 
