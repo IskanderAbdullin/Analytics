@@ -1,0 +1,105 @@
+name: Robot Detector precommitted unseen LTC BCH occupancy controls
+
+# Exact symbols, 2026-11-17 UTC date, >=5-bin condition,
+# original 8 RNG seeds and 0s primary frozen in c64303eac0aa
+# BEFORE this first genuine provider archive execution.
+# Scientific noncommercial source-only analysis, not bot calibration.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-spot-occupancy-frozen-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unseen-day-fixed-occupancy-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm all frozen protocol and no-network source negative tests
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests_background -p 'test_real_spot_occupancy_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+      - name: Exact unseen LTCUSDT session 2026-11-17, official raw trades/checksum
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-17 \
+            --clock-origin-study --cluster-preserving-null-study \
+            --output /tmp/nov17-ltc-occupancy-summary.json
+      - name: Exact unseen BCHUSDT session 2026-11-17, official raw trades/checksum
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol BCHUSDT --date 2026-11-17 \
+            --clock-origin-study --cluster-preserving-null-study \
+            --output /tmp/nov17-bch-occupancy-summary.json
+      - name: Audit fixed-bin occupancy conditioning and BOTH outcomes
+        run: |
+          set -euo pipefail
+          python tools/real_spot_occupancy_review.py \
+            --ltc-report /tmp/nov17-ltc-occupancy-summary.json \
+            --bch-report /tmp/nov17-bch-occupancy-summary.json \
+            --output /tmp/nov17-frozen-occupancy-transfer-review.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/nov17-frozen-occupancy-transfer-review.json').read_text())
+          assert r['schema_version']=='real-public-spot-occupancy-conditioned-transfer-v1'
+          assert r['distinct_instruments']==2 and r['distinct_market_utc_days']==1
+          assert len(r['cases'])==2 and r['source_public_trades_total']>0
+          assert r['occupancy_primary_min_trades_per_30s_bin']==5
+          assert r['predeclared_primary_phase_origin_seconds']==0
+          assert r['not_prospective_forward_time_validation']
+          assert r['not_independently_labelled_real_robot_detection']
+          assert not r['statistically_calibrated_p_value_or_false_discovery_rate']
+          assert not r['physical_market_actor_count_known']
+          assert not r['has_full_exchange_l2_book']
+          assert not r['commercial_use_permitted_without_provider_license']
+          for c in r['cases']:
+              assert c['utc_day']=='2026-11-17'
+              assert c['symbol'] in ('LTCUSDT','BCHUSDT')
+              assert c['published_zip_sha256_verified']
+              assert len(c['provider_source_zip_sha256'])==64
+              assert [p['origin_seconds'] for p in c['phases']]==[0,10,20]
+              print('FROZEN_REAL_PUBLIC_OCCUPANCY_CASE',json.dumps({
+                  'symbol':c['symbol'],
+                  'public_trades':c['public_trade_count'],
+                  'source_zip_sha256':c['provider_source_zip_sha256'],
+                  'all_one_sided_phase0':c['phases'][0]['one_sided_unconditional'],
+                  'eligible_5plus_phase0':c['phases'][0]['qualifying_bins_with_5_or_more_prints'],
+                  'observed_one_sided_5plus_phase0':c['phases'][0]['one_sided_bins_with_5_or_more_prints'],
+                  'strong_null_5plus_median_phase0':c['phases'][0]['cluster_null_5plus_median'],
+                  'strong_null_5plus_max_phase0':c['phases'][0]['cluster_null_5plus_max'],
+                  'primary_precommitted_pass':c['primary_phase0_5plus_exceeds_null_max'],
+                  'market_owner_FDR_known':False
+              },sort_keys=True))
+          print('FROZEN_REAL_PUBLIC_OCCUPANCY_SUMMARY',json.dumps({
+              'cases':2,'same_utc_market_day':True,
+              'source_real_trades_total':r['source_public_trades_total'],
+              'all_cases_positive':r['all_predeclared_sources_exceeded_null_max'],
+              'scientific_significance_established':False,
+              'commercial_trading_allowed':False
+          },sort_keys=True))
+          PY
+      - name: Upload only compact public-source provenance/aggregate counts
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-real-occupancy-preregistered-20261117
+          path: |
+            /tmp/nov17-frozen-occupancy-transfer-review.json
+            /tmp/nov17-ltc-occupancy-summary.json
+            /tmp/nov17-bch-occupancy-summary.json
+          retention-days: 7
+          if-no-files-found: error
