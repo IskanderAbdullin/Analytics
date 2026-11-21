@@ -8,7 +8,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
 from abides_l2_twap_separability import (
     assess_descriptive_separation,reanalyse_frozen_json,main
 )
-from abides_l2_twap_phase_contrast import SEEDS,SCENARIOS,PHASES_SECONDS
+from abides_l2_twap_phase_contrast import SEEDS,SCENARIOS,PHASES_SECONDS,aggregate
 
 def observed():
     path=Path(__file__).resolve().parents[1]/"fixtures"/"abides_l2_twap_phase_observed_20261121.json"
@@ -91,6 +91,24 @@ class PhaseChoiceTrapTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 reanalyse_frozen_json(broken)
+
+    def test_original_full_aggregate_json_compatibility_and_cohort_tampering(self):
+        genuine_shape=aggregate(observed())
+        result=reanalyse_frozen_json(genuine_shape)
+        self.assertEqual(result["original_simulation_runs"],4)
+        self.assertTrue(result["apparent_separation_changes_with_phase_choice"])
+        changed=json.loads(json.dumps(genuine_shape))
+        changed["cohorts"][0]["median_descriptive_rho"]=0.99
+        with self.assertRaises(ValueError):
+            reanalyse_frozen_json(changed)
+        changed=json.loads(json.dumps(genuine_shape))
+        changed["frozen_plan"]["development_seeds_local_only"]=[2401,2403]
+        with self.assertRaises(ValueError):
+            reanalyse_frozen_json(changed)
+        changed=json.loads(json.dumps(genuine_shape))
+        changed["private_truth_exported"]=True
+        with self.assertRaises(ValueError):
+            reanalyse_frozen_json(changed)
 
     def test_bad_source_matrix_and_forged_attribution_fail_closed(self):
         with self.assertRaises(ValueError):
