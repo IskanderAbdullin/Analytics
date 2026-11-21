@@ -81,3 +81,57 @@ to avoid repeated expensive runs of already spent synthetic seeds.
 
 No user accounts, broker APIs, live orders, secrets or raw market files
 are created or modified.
+
+## Executed genuine simulation (2026-11-21)
+
+[Successful pinned ABIDES CI #44915375635](https://github.com/IskanderAbdullin/Analytics/actions/runs/44915375635)
+ran all source-only preregistration tests, installed the exact pinned
+matching-engine revision, generated **four real synthetic exchange market
+simulations** and examined exactly **12 dependent public time-origin
+views**. The aggregate-only result artifact is
+`abides-public-l2-twap-phase-contrast` (artifact ID
+`14711182500`), full original JSON SHA-256:
+
+```text
+2391c9f223b6841f8346502282b7e099856e6feee7726cd4769967dcbcd97fa8
+```
+
+The compact source-controlled
+`fixtures/abides_l2_twap_phase_observed_20261121.json` records all
+twelve resulting case summaries, exact full-public-tape hashes and
+post-hoc counts, not the raw events or private agent IDs.
+
+| Scenario | Seed | rho 0s | rho 10s | rho 20s | TWAP controlled execution prints |
+|---|---:|---:|---:|---:|---:|
+| Background only | 2401 | +0.3123 | −0.0583 | −0.3687 | 0 |
+| Background only | 2402 | −0.7647 | −0.0643 | −0.5824 | 0 |
+| Injected TWAP | 2401 | +0.3981 | +0.0148 | +0.1937 | 22 |
+| Injected TWAP | 2402 | −0.5404 | −0.0147 | +0.0072 | 22 |
+
+| Cohort median (two original runs per mode) | rho 0s | rho 10s | rho 20s |
+|---|---:|---:|---:|
+| Background only | −0.2262 | −0.0613 | −0.4756 |
+| With TWAP | −0.0711 | +0.000058 | +0.1004 |
+
+**Interpretation and limits:** two of four original simulations reverse
+the sign of the descriptive rho between the three fixed clock phases:
+one background-only, one with injected TWAP. All four original
+simulations have phase-dependent eligible-bin counts. Both backgrounds
+and injected scenarios show large shifts in rho without selecting a
+best phase. In the TWAP cohort at 10s, the near-zero median comes from
+individual values +0.014822 and −0.014706, not a stable zero across
+seeds. Likewise changing the market by adding a TWAP changes overall
+prices, quantities, book snapshots and executed prints; seed-level
+comparison is not a matched-print causal estimate.
+
+This confirms the programmatic manipulation check and **fails to
+validate rho as a phase-invariant individual-robot identifier**.
+The original seed pair (2401/2402) is now spent in this project,
+not an untouched future holdout. Neither the synthetic controlled
+execution count nor a correlation coefficient can establish
+the number of real-world parent orders, owner identities, predictive
+market signal value, or the true market false-alarm rate.
+
+After the successful original run, the expensive workflow is
+**manual-dispatch only**. Lightweight CI continues to validate
+preregistration, the frozen observed scalar fixture and source tests.

@@ -2,10 +2,9 @@ name: Robot Detector genuine L2 controlled TWAP clock-origin contrast
 
 # This single preregistered developmental run is followed by manual-only
 # reproducibility. Never treat already registered seeds as new holdouts.
+# Original prospective genuine experiment succeeded. Replays use spent
+# development seeds and no longer automatically run on every push.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-abides-l2-twap-phase-contrast.yml'
   workflow_dispatch:
 
 permissions:
