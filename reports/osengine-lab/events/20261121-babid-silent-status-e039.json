@@ -1,0 +1,87 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-latefill-status-silent-audit-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "d5a94760-3109-4f46-b97d-53a1730ce039",
+    "occurred_at": "2026-11-21T20:06:00Z",
+    "type": "research",
+    "title": "Silent status and archived late-fill source-contract audit",
+    "summary": "Read source contracts and saved private forensic extracts: status-only FilledByState is not necessarily logged and late fill on terminal Cancel lacks Restore. Private Windows report saved; pc_script endpoint returned 404; independent root cause still unverified.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Refresh E-039/M-019, caveats and next action without exposing trade data"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Refresh E-039/M-019, caveats and next action without exposing trade data"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Refresh E-039/M-019, caveats and next action without exposing trade data"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Refresh E-039/M-019, caveats and next action without exposing trade data"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Refresh E-039/M-019, caveats and next action without exposing trade data"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261121-babid-silent-status-e039.json",
+      "action": "created",
+      "summary": "Sanitized source audit checkpoint"
+    }
+  ],
+  "checks": [
+    {
+      "id": "source-contract-inspection",
+      "title": "Read-only inspection of five local source files and saved private extract",
+      "kind": "manual",
+      "status": "passed",
+      "summary": "Source member and source SHA-256 documented privately. No execution tests performed."
+    },
+    {
+      "id": "pc-script",
+      "title": "Attempt to execute private late-fill extractor",
+      "kind": "manual",
+      "status": "failed",
+      "summary": "PC_AGENT_HTTP_404; script not run."
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-010",
+      "title": "PC script endpoint unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "Cannot execute private prepared script; frozen-copy provenance still required."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Verify archived-order state sequence on frozen private copy and independent broker history",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No private IDs/trade rows in public GitHub.",
+    "No historical root-cause confirmation, synthetic CI not yet executed.",
+    "No bot changes or live trading."
+  ]
+}
