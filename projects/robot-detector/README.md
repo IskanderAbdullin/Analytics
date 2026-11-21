@@ -9,6 +9,15 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [16-run genuine ABIDES split-half momentum robustness](
+  docs/ABIDES_SPLIT_HALF_MOMENTUM_20261121.md):
+  **3/4 TWAP alarms** и 1/4 abstain, во всех
+  трёх фонах 0 false alarms, но по одному abstain.
+  По сравнению с исходным ratio на тех же
+  seeds улучшение специфичности не показано;
+  произошло **снижение покрытия**.
+  Следующая задача [#92](https://github.com/IskanderAbdullin/Analytics/issues/92).
+
 - [Новый независимый ABIDES 16-run ratio baseline и отрицательные momentum-контроли](
   docs/ABIDES_BACKGROUND_RATIO_HOLDOUT_20261121.md):
   **4/4 TWAP обнаружены** при 74 posthoc-fills,
@@ -96,10 +105,11 @@
 эксперимент [#89](https://github.com/IskanderAbdullin/Analytics/issues/89)
 **успешно выполнен**, его **отрицательные результаты**
 подтверждены. Источник #90 теперь успешно проверен на исходных
-16 matching-engine runs. Следующий этап — [#91](
-https://github.com/IskanderAbdullin/Analytics/issues/91):
-проверка momentum false positives на новых, заранее
-зафиксированных симуляциях.
+16 matching-engine runs. Исходные проверки #90 и #91 завершены с сохранением
+отрицательных результатов. Следующий этап —
+[public phase/split-fill robustness #92](
+https://github.com/IskanderAbdullin/Analytics/issues/92).
+Фактический current_stage всегда в checkpoint.
 
 ## Постоянная исследовательская программа и автоматическое продолжение
 

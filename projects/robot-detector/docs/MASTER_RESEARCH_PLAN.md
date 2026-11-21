@@ -251,6 +251,34 @@ momentum**, ни одного abstain, 74 oracle-confirmed
 проверки, сохранить все ложные срабатывания и пропуски,
 не делать выводов о реальных владельцах.
 
+### P0 / RD-MOMENTUM-NEGATIVE-10 — исходная проверка завершена
+
+Независимый source experiment [#44937478576](
+https://github.com/IskanderAbdullin/Analytics/actions/runs/44937478576):
+**3/4 TWAP** обнаружены, **1/4 TWAP abstain**;
+во всех трёх отрицательных когортах
+**0 ложных тревог, но по 1/4 abstain**.
+Исходный цельносессионный baseline на тех же
+новых seeds тоже дал 0 ложных тревог, но
+4/4 TWAP обнаружений. Split-half gate **не
+показал прироста специфичности**, при этом
+снизил coverage. Отрицательный результат
+и исправление механической ошибки
+`absolute timestamp vs exchange local clock`
+[зафиксированы](ABIDES_SPLIT_HALF_MOMENTUM_20261121.md).
+
+### P0 / RD-PHASE-ROBUSTNESS-11 — следующий научный приоритет
+
+[Issue #92](https://github.com/IskanderAbdullin/Analytics/issues/92):
+зафиксировать независимые проверки
+чувствительности временного детектора
+к fixed phase shifts, ±250ms краям,
+зависимым split fills и группированию
+одинаковых timestamps. Не называть разные
+фазы одной ленты независимыми источниками,
+не использовать частичные исполнения
+для вывода о количестве владельцев.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -263,5 +291,7 @@ momentum**, ни одного abstain, 74 oracle-confirmed
 | 2026-11-21 | После original negative #44935340284 доказано точное фоновое aliasing 20s→45s (1/9 при нулевом TWAP); создана НОВАЯ ratio-гипотеза из просмотренной выборки с порогом 0,60 и abstention, назначено 16 независимых simulation cases 3001–3004 | source-free negative VERIFIED; ratio = FROZEN до нового исходного прогона, ещё НЕ подтверждено |
 
 | 2026-11-21 | Независимый 16-run source experiment #44936592641: ratio>=0.60 обнаружил 4/4 TWAP, избежал fixed-20s и Poisson ложных тревог (0/8), но дал 2/4 ложных тревог momentum; научный приоритет — независимый тест внутри-сессионной устойчивости без переобучения на 3001–3004 | VERIFIED limited synthetic transfer; hard-negative momentum specificity NOT established; #91 открыт |
+
+| 2026-11-21 | Split-half original 16 case source #44937478576: 3/4 TWAP alarm, 1/4 positive abstain, 0 false alarms in each of three negative cohorts but 1/4 abstain per cohort. Original full-session ratio on same new seeds had 4/4 positives and 0/12 background false positives; split-half no specificity improvement, only coverage loss | Negative scientific result VERIFIED; investigate phase/timestamp-cluster pseudo-replication in #92 |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.

@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "f447595055ea6a6f08e21fcab86cec80386caaad",
+  "last_verified_base_commit": "5eb6a346b17411531a1600967cc9cf7ff61c7762",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-MOMENTUM-NEGATIVE-10",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44937478576",
+      "result": "Original 16 genuine ABIDES engine cases 3101..3104: 3/4 injected TWAP alarms and 1/4 TWAP abstain (72 oracle fills). Each negative cohort Poisson/fixed-20s/momentum had 0/4 false alarms but 1/4 abstain. Same-seed original full session ratio: 4/4 positives and 0/12 false alarms. New split-half reduces coverage without observed specificity gain.",
+      "status": "VERIFIED_SPLIT_HALF_NONIMPROVEMENT_WITH_SOURCE_ABSTAINS"
+    },
     {
       "stage_id": "RD-SYNTHETIC-HOLDOUT-09.B",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44936592641",
@@ -89,31 +95,30 @@
     }
   ],
   "current_stage": {
-    "id": "RD-MOMENTUM-NEGATIVE-10",
+    "id": "RD-PHASE-ROBUSTNESS-11",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Preregister split-half robustness against genuine ABIDES momentum false positives",
-    "why_next": "Frozen source ratio 0.60 on seeds 3001-3004 detected 4/4 injected TWAP but falsely alarmed for momentum in 2/4 cases. Need independently test whether time-local score stability separates random coincidental grid hits from 45s injected execution behavior.",
+    "title": "Public clock phase and same-timestamp split-fill pseudo-replication diagnostics",
+    "why_next": "Original split-half source 16 cases produced abstentions without specificity gain over whole-session ratio. Need attack false confidence from fixed-grid phase and dependent partial-fill timestamps; do not optimize previous inspected thresholds posthoc.",
     "inputs": [
+      "tools/abides_split_half_momentum_holdout.py",
       "tools/abides_background_ratio_holdout.py",
-      "projects/robot-detector/docs/ABIDES_BACKGROUND_RATIO_HOLDOUT_20261121.md",
-      "projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json",
-      "research/seed_registry.json",
+      "projects/robot-detector/docs/ABIDES_SPLIT_HALF_MOMENTUM_20261121.md",
+      "projects/robot-detector/fixtures/abides_split_half_momentum_observed_20261121.json",
       "docs/MASTER_RESEARCH_PLAN.md"
     ],
     "deliverables": [
-      "Source-free public clock half-split counterexamples, no oracle agent IDs in features",
-      "New frozen two-half source protocol with locally unused ABIDES seeds and 4 cohorts",
-      "Per-half abstentions and print-level vs timestamp-cluster diagnostic, no posthoc threshold tuning",
-      "Original bounded source run with all negatives/positives retained, compact aggregate evidence",
-      "Update stage #91, master issue #72, checkpoint and next stage"
+      "Frozen source-free public phase-shift/tie-cluster sensitivity design with integer nanosecond timestamps",
+      "A constructive negative where many split prints share one timestamp and inflate grid score without independent owners",
+      "Detailed distinction: per-print vs per-unique-timestamp occupancy and no physical owner truth",
+      "One-command offline adversarial CI, compact aggregate report, follow-on preregistration if original new ABIDES sources scientifically needed"
     ],
     "acceptance": [
-      "New source seeds registered before original ABIDES run",
-      "Threshold/time splits fixed in new protocol, not retuned after seeing new data",
-      "All momentum null false alarms and any TWAP misses/abstentions preserved",
-      "CI/fast-forward push with source/seed evidence and no real owner claims"
+      "No best-phase selection or false independent-replay claim",
+      "Strict owner/oracle field exclusion from public features",
+      "Negative results from #44936592641 and #44937478576 remain visible",
+      "Commit/push verified, checkpoint and next scientific stage chosen"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/91"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/92"
   },
   "backlog": [
     {
@@ -152,7 +157,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Read actual GitHub HEAD, project AGENTS.md, docs/MASTER_RESEARCH_PLAN.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this checkpoint, seed registry and stage issue. Next #91: freeze public-only two 4-minute halves and hard-negative momentum experiment BEFORE new source runs; do not retune ratio 0.60 on already seen seeds 3001-3004. Run tests, commit and push, update evidence/checkpoint. Never claim real-market owner FDR.",
-  "last_session_result": "RD-SYNTHETIC-HOLDOUT-09.B completed: 16 source engine runs, 15949 public prints/25727 public L2 snapshots, 4/4 TWAP hits (74 controlled fills), 2/4 momentum FALSE alarms, 0/8 other background false alarms, 0 abstain, original run #44936592641. One-time workflow switched manual-only. Current #91 next; master #72 open.",
+  "resume_instruction": "Read remote GitHub HEAD, AGENTS.md, MASTER_RESEARCH_PLAN.md, AUTONOMOUS_RESEARCH_TZ.md, seed registry, issue #72, #92, current_stage. Source #44937478576 (split-half 16) succeeded, no real-market FDR. Implement public-only deterministic phase and same-timestamp cluster negative controls, keep 3001-3104 spent and existing thresholds unchanged. Reconcile tests, commit/push, choose next high information stage.",
+  "last_session_result": "RD-MOMENTUM-NEGATIVE-10 original 16 genuine ABIDES on seeds 3101-3104 verified in CI #44937478576: split-half 3/4 TWAP alarms+1 abstain, background 0 false alarms with one abstain each; full baseline 4/4 TWAP, 0/12 background false alarms. Split-half no specificity gain, coverage lost. First run #44937339312 aborted from day-clock bug before scientific source output, fixed without protocol change. Next #92 source-free phase/tied-fill sensitivity.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }

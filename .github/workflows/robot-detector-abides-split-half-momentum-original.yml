@@ -7,10 +7,9 @@ name: Robot Detector original ABIDES 16-case split-half momentum control
 # One bounded genuine matching-engine replay, no real broker access,
 # no source raw tape/order or private agent labels in artifact.
 # Switch to workflow_dispatch only after first successful source run.
+# Original source replay #44937478576 SUCCEEDED, all 16 cases retained.
+# Manual-only from now on to avoid duplicate expensive simulations.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-abides-split-half-momentum-original.yml'
   workflow_dispatch:
 
 permissions:
