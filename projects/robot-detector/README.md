@@ -23,6 +23,13 @@ plus executed prints** under known clock shifts. Earlier ABIDES phase
 archives fingerprinted only prints, so historical book content equality
 cannot be independently reconstructed from those aggregate-only results.
 
+The executed controlled TWAP-versus-background study provides a
+**phase-choice overfitting counterexample**: the two synthetic cohorts
+are perfectly separated by observed rho ranges at **10s and 20s**,
+but **not at 0s** and not across all origins. No threshold is fitted,
+no real-market recognition accuracy follows.
+[Observed data and scientific limitations](docs/ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+
 ## Genuine ABIDES public L2 30-second clock-origin sensitivity
 
 The new **pre-registered** `tools/abides_l2_binphase_sensitivity.py` evaluates the same anonymous ABIDES depth-five book/trade tape at three **30-second clock origins (0, 10 and 20 seconds)**. Exactly **four new genuine market simulations** (seeds 2101/2102 × Poisson/fixed-cadence backgrounds) produce twelve **correlated** views. Relative public event times, quantities and reported sides are conserved; no phase is selected as a best model and no private execution actor is identified. The two new seeds are registered as spent in the research provenance ledger.

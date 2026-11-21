@@ -135,3 +135,39 @@ market signal value, or the true market false-alarm rate.
 After the successful original run, the expensive workflow is
 **manual-dispatch only**. Lightweight CI continues to validate
 preregistration, the frozen observed scalar fixture and source tests.
+
+## Follow-up: the clock-phase separation trap
+
+The source-only `abides_l2_twap_separability.py` reads all **twelve
+already executed** public L2 coefficients, with strict case and
+provenance validation. This checks a mathematically simple **in-sample
+range ordering**: is the lowest injected-TWAP rho above the *highest*
+background-only rho at the same origin? It is a warning about data
+snooping, **not** a fitted model, a tuned threshold or out-of-sample
+detection probability.
+
+| Pre-registered 30-second origin | Strict observed rho range separation? | TWAP minimum rho − background maximum rho |
+|---|---|---:|
+| 0 seconds | **No** | −0.8526 |
+| 10 seconds | **Yes** | +0.0436 |
+| 20 seconds | **Yes** | +0.3759 |
+| All three origins considered together | **No** | Negative |
+
+These are *two* development background runs versus *two* injected
+development runs at each origin, not a statistically powered train/test
+benchmark. Changing nothing except the analytical clock origin can
+turn apparent perfect separation **on or off** in this tiny sample.
+Precommitting a single preferred origin from these results would
+be post-hoc model selection; no such choice is made.
+
+On the same nominal seeds, injected-TWAP rho was higher than the
+background-only rho at all three origins; those are six **descriptive**
+seed-aligned scenario differences, not six independent causal effects.
+Injected TWAP changes the market endogenously and all views share
+few original simulations. Without new truly blinded market validation,
+neither this observation nor the positive at 10s/20s licenses a
+physical bot count, market false-positive claim or live trading.
+
+The cheap research-ledger CI now verifies this counterexample
+with the immutable observed fixture and explicit null/undefined
+negative tests. No additional ABIDES simulations are run.
