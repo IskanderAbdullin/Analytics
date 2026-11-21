@@ -5,6 +5,7 @@ on:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
       - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_background_ratio_holdout.py'
       - 'projects/robot-detector/research/abides_background_conditioned_ratio_precommit_20261121.json'
       - 'projects/robot-detector/AGENTS.md'
@@ -91,6 +92,7 @@ on:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
       - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_background_ratio_holdout.py'
       - 'projects/robot-detector/research/abides_background_conditioned_ratio_precommit_20261121.json'
       - 'projects/robot-detector/AGENTS.md'

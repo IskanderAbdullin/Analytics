@@ -163,6 +163,40 @@ class FrozenABIDESBackgroundRatioStudyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_all_cases(bad)
 
+    def test_all_original_sixteen_source_results_and_false_alarm_integrity(self):
+        source=Path(__file__).resolve().parents[1]/"fixtures"/"abides_background_ratio_original_20261121.json"
+        original=json.loads(source.read_text(encoding="utf-8"))
+        self.assertEqual(original["original_genuine_abides_run_id"],44936592641)
+        self.assertEqual(original["source_aggregate_artifact_id"],14720095531)
+        self.assertEqual(original["independent_matching_engine_runs"],16)
+        self.assertEqual(original["local_seeds"],list(SEEDS))
+        cases=original["original_anonymous_case_aggregates"]
+        self.assertEqual(len(cases),16)
+        self.assertEqual(sum(x["prints"] for x in cases),15949)
+        self.assertEqual(sum(x["L2"] for x in cases),25727)
+        self.assertEqual(sum(x["posthoc_target_fills"] for x in cases),74)
+        self.assertEqual({(x["seed"],x["cohort"]) for x in cases},
+                         {(s,c) for s in SEEDS for c in COHORTS})
+        for row in cases:
+            self.assertGreaterEqual(row["prints"],MIN_PRINTS)
+            self.assertGreaterEqual(row["20s_hits"],MIN_20S_GRID_HITS)
+            self.assertGreaterEqual(row["eligible_prev_l2_bins"],MIN_LAGGED_L2_BINS)
+            self.assertEqual(row["ratio"],round(row["45s_hits"]/row["20s_hits"],8))
+            self.assertEqual(row["decision"],
+                "TARGET_PATTERN" if row["45s_hits"]/row["20s_hits"]>=THRESHOLD
+                else "NO_TARGET_PATTERN")
+            self.assertIsNone(row["abstain_reason"])
+            self.assertFalse(row["real_market_FDR_known"])
+        cohorts=original["source_cohorts"]
+        self.assertEqual(cohorts["twap_45s_positive"]["alarms"],4)
+        self.assertEqual(cohorts["twap_45s_positive"]["posthoc_controlled_fills"],74)
+        self.assertEqual(cohorts["fixed_20s_noise_hard_negative"]["false_alarms"],0)
+        self.assertEqual(cohorts["poisson_noise_null"]["false_alarms"],0)
+        self.assertEqual(cohorts["momentum_noise_hard_negative"]["false_alarms"],2)
+        self.assertEqual(original["source_abstention_total"],0)
+        self.assertFalse(original["real_market_actor_ownership_and_FDR_calibrated"])
+        self.assertTrue(original["ratio_is_not_calibrated_market_probability"])
+
     def test_posthoc_threshold_rewrite_detected_in_frozen_plan(self):
         cfg=frozen_plan()
         for field,value in (
