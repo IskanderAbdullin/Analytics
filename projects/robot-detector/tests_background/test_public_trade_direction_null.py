@@ -143,6 +143,46 @@ class MinutePreservingControlTests(unittest.TestCase):
                 self.assertLessEqual(phase["cluster_control_median"],
                                      phase["cluster_control_max"])
 
+    def test_occupancy_class_partition_and_five_print_conservation(self):
+        from public_trade_direction_null import occupancy_class, OCCUPANCY_CLASSES
+        self.assertEqual(list(OCCUPANCY_CLASSES),["1","2","3-4","5-9","10+"])
+        for count,kind in ((1,"1"),(2,"2"),(3,"3-4"),(4,"3-4"),
+                           (5,"5-9"),(9,"5-9"),(10,"10+"),(500,"10+")):
+            self.assertEqual(occupancy_class(count),kind)
+        for bad in (-1,0,1.1,True,None):
+            with self.assertRaises(ValueError):
+                occupancy_class(bad)
+        rows=[]
+        for i,n in enumerate((1,2,3,4,5,10)):
+            timestamp=(i*31+1)*1_000_000
+            for j in range(n):
+                side=(
+                    False if i in (0,2) else
+                    True if i==4 else
+                    bool(j%2)
+                )
+                rows.append((timestamp+100*j,side))
+        report=evaluate_public_side_null(
+            rows,utc_day_start_us=0,preserve_same_timestamp_clusters=True)
+        phase=report["variants"][0]
+        self.assertEqual(phase["observed_complete_nonempty_bins"],6)
+        self.assertEqual(phase["observed_prints_in_full_bins"],25)
+        data=phase["one_sided_bins_by_public_print_occupancy"]
+        self.assertEqual([x["class"] for x in data],list(OCCUPANCY_CLASSES))
+        self.assertEqual([x["eligible_complete_bins"] for x in data],[1,1,2,1,1])
+        self.assertEqual([x["observed_one_sided_bins"] for x in data],[1,0,1,1,0])
+        self.assertEqual(phase["qualifying_bins_with_at_least_five_prints"],2)
+        self.assertEqual(phase["one_sided_bins_with_at_least_five_prints"],1)
+        self.assertEqual(sum(x["observed_one_sided_bins"] for x in data),
+                         phase["observed_one_sided_bins"])
+        self.assertEqual(sum(x["eligible_complete_bins"] for x in data),
+                         phase["observed_complete_nonempty_bins"])
+        self.assertEqual(data[0]["null_one_sided_min"],1)
+        self.assertEqual(data[0]["null_one_sided_max"],1)
+        self.assertGreaterEqual(phase["null_ge5_one_sided_median"],0)
+        self.assertLessEqual(phase["null_ge5_one_sided_max"],2)
+        self.assertFalse(phase["statistical_p_value_or_FDR_calibrated"])
+
     def test_invalid_public_payload_and_source_bounds_fail_closed(self):
         rows=example()
         for bad in (

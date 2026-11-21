@@ -185,6 +185,22 @@ class RealTradeArchiveTests(unittest.TestCase):
                          if "real_world_owner_count_known" in strong else
                          strong["physical_robot_identification_validated"])
 
+    def test_verified_archive_occupancy_threshold_five_has_zero_if_no_bin_qualifies(self):
+        raw,checksum=archive()
+        result=analyze_verified_zip(raw,checksum,symbol=SYMBOL,day=DAY,
+                                    clock_origin_study=True,
+                                    cluster_preserving_null_study=True)
+        study=result["public_within_minute_cluster_direction_null_v1"]
+        self.assertEqual(study["bin_occupancy_classes"],["1","2","3-4","5-9","10+"])
+        self.assertEqual(study["primary_conditioned_bin_occupancy_minimum"],5)
+        for variant in study["variants"]:
+            self.assertEqual(variant["qualifying_bins_with_at_least_five_prints"],0)
+            self.assertEqual(variant["one_sided_bins_with_at_least_five_prints"],0)
+            self.assertEqual(variant["null_ge5_one_sided_min"],0)
+            self.assertEqual(variant["null_ge5_one_sided_median"],0)
+            self.assertEqual(variant["null_ge5_one_sided_max"],0)
+            self.assertFalse(variant["observed_ge5_one_sided_above_all_eight_nulls"])
+
     def test_rejects_nonboolean_null_flag(self):
         raw,check=archive()
         for value in (1,0,"yes",None):
