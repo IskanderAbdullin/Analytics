@@ -333,3 +333,16 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
   fixture, non-identifiability and all provenance gates. Seeds
   2401/2402 are now **spent**, and no real market owner-count claim
   or out-of-sample significance is supported.
+
+## Aggregate-only privacy hardening
+
+The public-phase aggregate serializers for the original background study
+and new controlled-TWAP experiment now reject **every unrecognized row
+field**, in addition to enforcing numeric exactness, frozen row matrices
+and source hash consistency. Synthetic tests inject
+`passive_agent_id`, `controlled_agent_ids`, `hidden_order_id`,
+`private_event_manifest` and raw book fields and verify they cannot
+be persisted in aggregate-only CI artifacts. This closes a leakage
+path where future developer code could have appended extra private
+keys to otherwise valid public summaries. All source-private analysis
+remains detached from the published public case schema.
