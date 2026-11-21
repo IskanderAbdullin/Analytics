@@ -1,0 +1,64 @@
+name: Robot Detector one-time official public exchange trade research
+
+# One frozen research sample only. After the first successful execution,
+# remove push trigger; never spend runner on repeated identical downloads.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-binance-research.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-real-spot-executions:
+    name: 2026-11-18 UTC LTCUSDT checksum-verified spot prints
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run deterministic negative tests before any external network
+        run: |
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+      - name: Download only two provider URLs, verify official checksum and audit every public execution
+        run: |
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-18 \
+            --output /tmp/robot-detector-ltcusdt-20261118-aggregate-only.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/robot-detector-ltcusdt-20261118-aggregate-only.json').read_text())
+          assert report['symbol']=='LTCUSDT'
+          assert report['utc_date']=='2026-11-18'
+          assert report['public_trade_count']>0
+          assert report['provider_published_checksum_matched'] is True
+          assert report['time_unit']=='microseconds'
+          assert report['l2_orderbook_present'] is False
+          assert report['real_world_owner_count_known'] is False
+          assert report['market_specific_false_alarm_rate_estimated'] is False
+          assert report['commercial_use_allowed_without_license'] is False
+          print('NEW_REAL_TRADES_SOURCE_AUDIT',json.dumps({
+              'symbol':report['symbol'],
+              'utc_date':report['utc_date'],
+              'trades':report['public_trade_count'],
+              'missing_id_count':report['missing_ids_inside_observed_range'],
+              'zip_sha256':report['source_zip_sha256'],
+              'complete_verified':report['all_exchange_trades_independently_verified'],
+              'has_l2':report['l2_orderbook_present']
+          },sort_keys=True))
+          PY
+      - name: Upload compact source-only metadata, NEVER raw exchange archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-new-public-spot-trades-20261118
+          path: /tmp/robot-detector-ltcusdt-20261118-aggregate-only.json
+          if-no-files-found: error
+          retention-days: 7
