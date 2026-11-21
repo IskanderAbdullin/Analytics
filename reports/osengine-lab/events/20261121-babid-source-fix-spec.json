@@ -1,0 +1,93 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-distinct-notices-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "e07049fd-65ec-4f62-a251-08f23704a9c1",
+    "occurred_at": "2026-11-21T16:56:23.702Z",
+    "type": "research",
+    "title": "Read-only PC-Agent source review and original Babid01 source-fix specification",
+    "summary": "Source-level position response correlation gap and provisional synthetic fill reconciliation issue documented with risk-safe remediation and acceptance tests; root cause of NVDA two-lot incident remains unknown.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "added",
+      "summary": "Detailed source-fix design and synthetic acceptance matrix"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Update evidence/checkpoint while preserving unresolved incident"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Update evidence/checkpoint while preserving unresolved incident"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Update evidence/checkpoint while preserving unresolved incident"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Update evidence/checkpoint while preserving unresolved incident"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/AGENTS.md",
+      "action": "modified",
+      "summary": "Update evidence/checkpoint while preserving unresolved incident"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-ci",
+      "title": "Analytics synthetic CI and state validation",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending PR actions; no private data"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-001",
+      "title": "frozen_input_unproven",
+      "state": "open",
+      "severity": "high",
+      "description": "Рабочая копия через PC-Agent обнаружена, но неизменяемая копия с SHA-256 манифестом и полной историей пока не подтверждена."
+    },
+    {
+      "id": "B-003",
+      "title": "streaming_audit_channel_unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "Доступный PC-Agent MCP имеет pc_read ограниченных UTF-8 файлов и фиксированные диагностические команды, но не предоставляет Python streaming scanner больших журналов."
+    },
+    {
+      "id": "B-004",
+      "title": "broker_evidence_unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "Разрешение на PC-Agent не включает брокерские запросы; независимые отчёты исполнений не доступны через этот разрешённый источник."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Frozen read-only audit and first broker-journal divergence",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No original source edits, broker call, live robot, or log upload.",
+    "Static source bugs are not proven historical cause."
+  ]
+}

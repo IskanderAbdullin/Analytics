@@ -10,13 +10,18 @@
   "blockers": [
     {
       "id": "B-001",
-      "kind": "private_input_unavailable",
-      "description": "Копия workspace/projects/BabitCloud не проверена через разрешённый доступ"
+      "kind": "frozen_input_unproven",
+      "description": "Рабочая копия через PC-Agent обнаружена, но неизменяемая копия с SHA-256 манифестом и полной историей пока не подтверждена."
     },
     {
-      "id": "B-002",
-      "kind": "explicit_authorization",
-      "description": "Для Computer Use / PC Agent требуется отдельное разрешение"
+      "id": "B-003",
+      "kind": "streaming_audit_channel_unavailable",
+      "description": "Доступный PC-Agent MCP имеет pc_read ограниченных UTF-8 файлов и фиксированные диагностические команды, но не предоставляет Python streaming scanner больших журналов."
+    },
+    {
+      "id": "B-004",
+      "kind": "broker_evidence_unavailable",
+      "description": "Разрешение на PC-Agent не включает брокерские запросы; независимые отчёты исполнений не доступны через этот разрешённый источник."
     }
   ],
   "prerequisites": [
@@ -25,13 +30,15 @@
     "Не публиковать финансовые журналы, реальные trade_id и приватные конфигурации",
     "При анализе локальных логов использовать версию position_evidence.py с сохранением различимых baseline/changed и reported-from сообщений при одинаковом timestamp; проверить по реальным исходным строкам",
     "Не трактовать одновременные позиционные снимки как упорядоченные дельты и не классифицировать boundary fills как вне окна",
-    "Проверять first transition anchor только по наблюдению со строго более ранним timestamp; не использовать соседние same-time notices как доказательство предыдущей позиции"
+    "Проверять first transition anchor только по наблюдению со строго более ранним timestamp; не использовать соседние same-time notices как доказательство предыдущей позиции",
+    "Подтвердить неизменяемость входов и SHA-256 манифест до и после чтения, не считать workspace копию frozen по одному наличию каталогов"
   ],
   "next_command": "python analysis/run_offline_audit.py --root \"<FROZEN_BABITCLOUD_COPY>\"",
   "expected_artifacts": [
     "Локальный отчёт о полноте входов",
     "Хронология первого расхождения",
-    "Проверка fills.csv, journal.json, risk.json и логов"
+    "Проверка fills.csv, journal.json, risk.json и логов",
+    "Сверка исторических доказательств с SOURCE_FIX_SPEC.md, подтверждение/опровержение H-001…H-005 без изменения робота"
   ],
   "completion_criteria": [
     "Выполнена инвентаризация и проверка полноты исходных записей",
@@ -40,6 +47,6 @@
   ],
   "on_completion": "A-002",
   "public_ci_allowed": false,
-  "fallback": "Сохранить blocked_external; не объявлять инцидент завершённым и не заменять анализ реальных данных абстрактной оптимизацией.",
-  "access_scope": "После отдельного явного одобрения допустимо только чтение замороженной копии BabitCloud или согласованных брокерских отчётов; без разрешения статус остаётся blocked_external."
+  "fallback": "Без frozen source и разрешённого исполняемого потокового анализа оставить blocked_external; разрешён source-only аудит и уточнение ТЗ, но не выводы о корне инцидента.",
+  "access_scope": "Для текущего исследования пользователь дал разрешение на PC-Agent: workspace read-only, без live-торговли, без записи в робот и без доступа к брокеру. Требуются отдельный frozen архив и технически доступный потоковый локальный анализ."
 }

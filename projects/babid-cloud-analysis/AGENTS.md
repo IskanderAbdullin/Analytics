@@ -37,3 +37,12 @@ No private data in public GitHub, no live broker action, no bot changes.
 Computer Use / PC Agent requires separately explicit user authorization.
 GitHub Actions may run synthetic-only tests and a deterministic state checker.
 A scheduled CI run is NOT an autonomous researcher and cannot wake ChatGPT Work.
+
+## Source-fix specification
+
+Every newly verified original-source weakness relevant to G-001 must update
+`SOURCE_FIX_SPEC.md` with exact C# location/member, evidence confidence,
+uncertainty about historical causation, remediation, and offline acceptance tests.
+A static source finding is NOT proof of real NVDA root cause. This Analytics
+research must not modify, compile, run or deploy the original trading robot;
+no private source code, trade logs, broker IDs or secrets in public GitHub.
