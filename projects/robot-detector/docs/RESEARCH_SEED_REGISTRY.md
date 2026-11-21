@@ -44,6 +44,10 @@ python tools/research_seed_registry.py --candidate-seeds 1801 1901
 
 The last command intentionally **fails** with a known-spent seed collision. A proposal not in the ledger is reported only as **"not previously listed in this project ledger"**, *never* as globally fresh, unused or valid for blind evaluation. An independent provenance record and precommitted evaluation procedure are still required.
 
+## Executed provenance guard (2026-11-21)
+
+[Successful lightweight source audit CI #44903479712](https://github.com/IskanderAbdullin/Analytics/actions/runs/44903479712) passed **7/7 pure-Python tests**, scanned **11 canonical research records** covering **29 known spent canonical seed values**, checked **four exact frozen-script seed constants**, and recognized **one explicit non-independent 1501 replay**. It rejected simulated seed drift/duplications and did **not** declare any globally unused seed. This run never launches a matching engine or accesses private agent truth.
+
 ## CI and boundaries
 
 The lightweight [`robot-detector-seed-ledger.yml`](../../.github/workflows/robot-detector-seed-ledger.yml) workflow runs only Python source checks and seven deterministic tests. It triggers on changes to the registry, validator, tests, or any of the four mapped frozen scripts. **No simulated markets are rerun by this job**, preserving GitHub Actions minutes.

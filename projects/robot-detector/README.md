@@ -7,7 +7,7 @@
 
 The new **read-only** `research/seed_registry.json` records already inspected ABIDES and deliberately constructed toy seeds, including explicit **non-independent replays**. `tools/research_seed_registry.py` checks the historical seed list against four frozen experiment scripts using Python AST, **without importing or running those experiments**, rejects source-plan drift and flags any proposed seed that has already been spent. A previously *unlisted* seed is **not automatically proven globally new or a valid blind holdout**. A lightweight Python-only CI audit runs when relevant source constants or ledger entries change.
 
-[Known seed list, provenance, limitations and reproduction](docs/RESEARCH_SEED_REGISTRY.md). No private agent truth, real market data, GUI or orders.
+[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **29 known spent seeds across 11 canonical studies**, **4 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
 
 ## Genuine ABIDES public-L2 time-bin robustness experiment
 
