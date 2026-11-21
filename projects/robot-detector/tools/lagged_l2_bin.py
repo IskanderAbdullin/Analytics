@@ -65,9 +65,12 @@ def summarize_lagged_book(
     snapshots: Any,
     public_executions: Iterable[PublicExecution],
     *, bin_seconds: int = 30,
-    maximum_quote_age_seconds: int = 30,
+    maximum_quote_age_seconds: int | None = None,
     maximum_depth: int = 5
 ) -> dict:
+    # Defaults must remain valid when the caller chooses shorter clock bins.
+    if maximum_quote_age_seconds is None:
+        maximum_quote_age_seconds = bin_seconds
     if (bin_seconds < 1 or bin_seconds > 3600 or
         maximum_quote_age_seconds < 1 or
         maximum_quote_age_seconds > bin_seconds or
