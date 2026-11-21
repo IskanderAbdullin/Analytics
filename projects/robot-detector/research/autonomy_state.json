@@ -1,0 +1,106 @@
+{
+  "schema_version": "robot-detector-autonomous-state-v1",
+  "updated_utc_date": "2026-11-21",
+  "repository": "IskanderAbdullin/Analytics",
+  "project_root": "projects/robot-detector",
+  "branch": "agent/robot-detector-l2-binphase-20261121",
+  "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
+  "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
+  "status": "ACTIVE_RESEARCH_NOT_RELEASED",
+  "last_verified_base_commit": "c759eadc378da83e9e6c52f4e5a821a06b1282c0",
+  "last_known_verified_results": [
+    {
+      "stage_id": "SOURCE-BINANCE-8",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/blob/agent/robot-detector-l2-binphase-20261121/projects/robot-detector/docs/BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md",
+      "result": "Eight original exchange spot archives across LTC/BCH and four UTC days, 776007 prints; cross-market single-sided concentration has repeated negative results",
+      "status": "VERIFIED_RESEARCH_EVIDENCE_NOT_OWNER_TRUTH"
+    },
+    {
+      "stage_id": "SOURCE-LOBSTER-SAMPLE-10",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44922750898",
+      "result": "Original publicly downloadable LOBSTER AMZN 2012-06-21 10-level sample format audit, 269748 aligned message/book rows; research performance not yet tested",
+      "status": "VERIFIED_FORMAT_ONLY"
+    }
+  ],
+  "current_stage": {
+    "id": "RD-L2-RESEARCH-01",
+    "status": "READY_TO_IMPLEMENT",
+    "title": "Reproducible event-time ten-level research replay and synthetic controls",
+    "why_next": "Missing event-time robust L2 features; format validated but actual scientific hypothesis tests on event-book dynamics not yet performed",
+    "inputs": [
+      "tools/lobster_public_sample_format_audit.py",
+      "research/lobster_amzn_sample_format_precommit_20261121.json",
+      "docs/LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md"
+    ],
+    "deliverables": [
+      "Read-only event-time feature definitions: spread/depth/imbalance/quote transition counts, respecting paired post-event snapshots",
+      "Synthetic paired 10-level L2/message tests with malformed/negative cases",
+      "Optional research-only public vendor demo execution that returns ONLY allowed small aggregate metrics, not original messages/book rows",
+      "Methodology note distinguishing source-observed patterns from physical robot identity"
+    ],
+    "acceptance": [
+      "Public source file or API never committed as raw events",
+      "No real participant identity/FDR claim",
+      "Deterministic offline unit tests pass",
+      "Evidence and next-stage selection recorded",
+      "Verified non-force push"
+    ]
+  },
+  "backlog": [
+    {
+      "id": "RD-L2-RESEARCH-02",
+      "status": "QUEUED",
+      "priority": 1,
+      "title": "Compare event-time quote/depth rhythms to realistic count/volume/null baselines; preregister observation/evaluation protocol"
+    },
+    {
+      "id": "RD-SYNTHETIC-BLIND-03",
+      "status": "QUEUED",
+      "priority": 1,
+      "title": "Independent held-out synthetic oracle truth study, no synthetic agent ID leakage into features"
+    },
+    {
+      "id": "RD-ROBUSTNESS-04",
+      "status": "QUEUED",
+      "priority": 2,
+      "title": "Evaluate missing L2, feed gaps, event-time ties, exchange-specific quote semantics, and bin phase sensitivity"
+    },
+    {
+      "id": "RD-REPRO-05",
+      "status": "QUEUED",
+      "priority": 2,
+      "title": "One-command reproducer, consolidated JSON scientific paper/limitations and end-to-end CI evidence"
+    },
+    {
+      "id": "RD-READONLY-06",
+      "status": "QUEUED",
+      "priority": 3,
+      "title": "Optional research-only real-time read-only connector and OsEngine integration after offline validity gates"
+    }
+  ],
+  "blockers": [
+    {
+      "scope": "Real physical owner identification and market false-discovery rate",
+      "status": "UNIDENTIFIABLE_FROM_AVAILABLE_ANONYMOUS_PUBLIC_DATA",
+      "safe_workaround": "Synthetic oracle-labelled evaluation and descriptive real market robustness"
+    },
+    {
+      "scope": "Further paid/vendor market datasets",
+      "status": "REQUIRES_SEPARATE_SOURCE_ACCESS_RIGHTS",
+      "safe_workaround": "Use openly offered sample for noncommercial scientific study, never redistribute original vendor files"
+    }
+  ],
+  "operational_constraints": {
+    "continue_to_next_stage_without_intermediate_reply_within_active_run": true,
+    "do_not_promise_execution_between_chats_without_scheduler": true,
+    "no_force_push": true,
+    "no_live_broker_orders": true,
+    "no_github_actions_in_private_repositories": true,
+    "only_small_bounded_one_time_real_market_data_workflows": true,
+    "no_raw_proprietary_market_archives_in_repo": true,
+    "pc_agent_only_with_explicit_user_approval": true,
+    "do_not_close_master_issue_after_single_stage": true
+  },
+  "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
+  "last_session_result": "Autonomous research execution technical assignment and GitHub master tracking issue created; scientific end-goal is not yet finished"
+}
