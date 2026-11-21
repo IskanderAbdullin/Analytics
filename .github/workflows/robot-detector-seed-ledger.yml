@@ -9,6 +9,10 @@ on:
       - 'projects/robot-detector/tools/public_timing_phase_tied_fills.py'
       - 'projects/robot-detector/tools/public_cluster_conditional_toy_null.py'
       - 'projects/robot-detector/tools/abides_clustered_grid_holdout.py'
+      - 'projects/robot-detector/tools/abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/tests_background/test_abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/research/abides_matched_uncertainty_audit_protocol_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_clustered_grid_original_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_clustered_grid_holdout.py'
       - 'projects/robot-detector/research/abides_clustered_grid_source_precommit_20261121.json'
       - 'projects/robot-detector/fixtures/public_cluster_conditional_toy_null_observed_20261121.json'
@@ -111,6 +115,10 @@ on:
       - 'projects/robot-detector/tools/public_timing_phase_tied_fills.py'
       - 'projects/robot-detector/tools/public_cluster_conditional_toy_null.py'
       - 'projects/robot-detector/tools/abides_clustered_grid_holdout.py'
+      - 'projects/robot-detector/tools/abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/tests_background/test_abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/research/abides_matched_uncertainty_audit_protocol_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_clustered_grid_original_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_clustered_grid_holdout.py'
       - 'projects/robot-detector/research/abides_clustered_grid_source_precommit_20261121.json'
       - 'projects/robot-detector/fixtures/public_cluster_conditional_toy_null_observed_20261121.json'
@@ -247,6 +255,8 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_public_timing_phase_tied_fills.py' -v
           python -m unittest discover -s tests_background -p 'test_public_cluster_conditional_toy_null.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_clustered_grid_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_matched_smalln_audit.py' -v
+          python tools/abides_matched_smalln_audit.py --output data/results/abides-matched-uncertainty.json
           python tools/public_cluster_conditional_toy_null.py --output data/results/public-cluster-conditional-toy-null.json
           python tools/public_timing_phase_tied_fills.py --output data/results/public-phase-tied-fill-diagnostic.json
           python -m unittest discover -s tests_background -p 'test_public_clock_aliasing_negative.py' -v

@@ -43,6 +43,7 @@ SUITES=(
     "test_public_timing_phase_tied_fills.py",
     "test_public_cluster_conditional_toy_null.py",
     "test_abides_clustered_grid_holdout.py",
+    "test_abides_matched_smalln_audit.py",
     "test_public_clock_aliasing_negative.py",
     "test_binance_public_trade_archive.py",
     "test_public_trade_direction_null.py",
@@ -67,12 +68,14 @@ FIXTURES=(
     "fixtures/abides_split_half_momentum_observed_20261121.json",
     "fixtures/public_phase_tied_fills_observed_20261121.json",
     "fixtures/public_cluster_conditional_toy_null_observed_20261121.json",
+    "fixtures/abides_clustered_grid_original_20261121.json",
     "fixtures/abides_multiscale_public_l2_observed_20261121.json",
 )
 DOCS=(
     "docs/AUTONOMOUS_RESEARCH_TZ.md",
     "docs/MASTER_RESEARCH_PLAN.md",
     "docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md",
+    "docs/ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md",
     "docs/LOBSTER_EVENT_TIME_FEATURES_20261121.md",
     "docs/LOBSTER_CLOCK_VS_EVENT_WEIGHTING_20261121.md",
     "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md",
