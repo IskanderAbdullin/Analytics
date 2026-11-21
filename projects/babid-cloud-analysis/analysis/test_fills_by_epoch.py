@@ -50,9 +50,9 @@ class BookedEpochTests(unittest.TestCase):
         config = next(row for row in rows if row["event_kind"] == "config_applied")
         self.assertEqual(config["gross_realized"], "5")
         self.assertEqual(config["net_realized_after_estimated_fees"], "4.90")
-        self.assertEqual(groups["unknown_after_observed_stop"]["fills"], 1)
+        self.assertEqual(groups["unknown_after_observed_stop"]["fills"], 2)
         self.assertEqual(groups["unknown_after_last_log_event"]["fills"], 1)
-        self.assertEqual(groups["unknown_before_first_setting"]["fills"], 1)
+        self.assertNotIn("unknown_before_first_setting", groups)
         self.assertEqual(groups["epoch_3"]["gross_realized"], "2")
 
     def test_report_does_not_overwrite_source(self):

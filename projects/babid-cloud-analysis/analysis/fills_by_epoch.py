@@ -142,7 +142,9 @@ def run_analysis(root: Path, state: str, logs: str) -> tuple[list[dict], dict]:
             }
             warning = "Booked while observed log settings were effective; order may have been created earlier."
         else:
-            desc = {name: "" for name in FIELDS}
+            desc = {name: "" for name in ("epoch_start_msk", "epoch_end_msk", "event_kind", "confidence",
+                                         "settings_digest", "regime", "buy_min_level_lots",
+                                         "sell_min_level_lots", "max_position_lots")}
             warning = "UNKNOWN: execution has no verified active configuration evidence."
         results.append(dict(
             group_id=key, **desc,
