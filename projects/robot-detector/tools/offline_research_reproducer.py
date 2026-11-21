@@ -63,6 +63,7 @@ FIXTURES=(
     "fixtures/toy_public_rhythm_hard_negative_holdout_20261121.json",
     "fixtures/abides_background_ratio_original_20261121.json",
     "fixtures/abides_split_half_momentum_observed_20261121.json",
+    "fixtures/public_phase_tied_fills_observed_20261121.json",
     "fixtures/abides_multiscale_public_l2_observed_20261121.json",
 )
 DOCS=(

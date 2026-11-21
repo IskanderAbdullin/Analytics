@@ -115,6 +115,33 @@ class FixedPhaseSplitFillNegatives(unittest.TestCase):
                 self.assertNotIn("time_ns",row)
                 self.assertNotIn("owner_id",row)
 
+    def test_saved_original_source_free_aggregate_preserves_every_declared_shift(self):
+        f=Path(__file__).resolve().parents[1]/"fixtures"/"public_phase_tied_fills_observed_20261121.json"
+        report=json.loads(f.read_text(encoding="utf-8"))
+        self.assertEqual(report["verification_ci_run"],44937958809)
+        self.assertEqual(report["unique_event_timestamps_in_both_worlds"],13)
+        self.assertEqual(report["single_fill_public_trades"],13)
+        self.assertEqual(report["split_fill_public_trades"],112)
+        self.assertEqual(report["extra_public_trades_at_one_tied_timestamp"],99)
+        self.assertEqual(report["original_periods_seconds"],[20,45])
+        self.assertEqual(report["fixed_ratio_alarm_threshold"],0.6)
+        self.assertEqual(len(report["exact_all_predeclared_shifts"]),5)
+        for row in report["exact_all_predeclared_shifts"]:
+            sh=row["shift_ms"]
+            if abs(sh)<=250:
+                self.assertEqual(row["print_weighted_20sec_hits"],12)
+                self.assertEqual(row["hundred_fill_45sec_hits"],101)
+                self.assertEqual(row["single_fill_45sec_hits"],2)
+                self.assertAlmostEqual(row["one_hundred_tied_fills_print_score"],101/12)
+                self.assertAlmostEqual(row["hundred_fills_collapsed_unique_timestamp_score"],2/12)
+                self.assertFalse(row["zero_denominator_abstain"])
+            else:
+                self.assertEqual(row["print_weighted_20sec_hits"],0)
+                self.assertIsNone(row["one_hundred_tied_fills_print_score"])
+                self.assertTrue(row["zero_denominator_abstain"])
+        self.assertFalse(report["no_real_market_precision_FDR_or_bot_owner_claims"] is False)
+        self.assertFalse(report["source_market_actual_vendor_or_abides_data_used"])
+
     def test_frozen_protocol_drift_is_detected_before_counterexample(self):
         d=frozen_plan()
         for key,val in (
