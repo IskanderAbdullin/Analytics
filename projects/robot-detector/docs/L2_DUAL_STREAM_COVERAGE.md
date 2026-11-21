@@ -42,3 +42,9 @@ The cheap Python-only [dual-stream workflow](../../.github/workflows/robot-detec
 A *real* dual-feed collector would need a provider-verified raw event sequence, authenticated source identity, continuity checks after reconnection, independent book/trade delivery progress, clock drift monitoring and a source-specific trusted completeness policy. The present immutable `PublicStreamClaim` objects are **untrusted declarations** and cannot replace these requirements.
 
 No physical parent-order, single robot, real market false-discovery rate, p-value or price prediction can be obtained from this gate. The scientific release gate remains CLOSED.
+
+## Verified implementation results — 2026-11-21
+
+[Lightweight dual-feed CI #44911006336](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911006336) passed **seven independent dual-coverage tests plus six previous watermark tests** (13 Python tests). It verified separate, explicitly declared book/trade gaps, source label matching, half-open coverage, prior/current bin boundaries, immutability of closed observations under incomplete appended trades, and conservative reporting of unverified source provenance.
+
+[Real pinned ABIDES L2 CI #44911006251](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911006251) also succeeded. It is a *backward-compatibility check* against existing public-only L2 scenarios, not a measurement of actual T-Invest provider coverage. None of the registered experiments supplies independently proven raw feed metadata; this stage does **not** retroactively validate those published correlations.
