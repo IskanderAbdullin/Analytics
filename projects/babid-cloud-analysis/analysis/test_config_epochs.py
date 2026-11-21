@@ -1,7 +1,6 @@
 """Historical setting timeline fixtures from the documented logger format."""
 from __future__ import annotations
 
-import csv
 import tempfile
 import unittest
 from pathlib import Path

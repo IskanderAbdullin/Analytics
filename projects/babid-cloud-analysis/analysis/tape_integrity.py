@@ -157,10 +157,10 @@ def summarize(path: Path) -> dict:
                         max_outage = max(max_outage, duration)
                     down_at = None
                     previous_book = None
-            except (IndexError, ValueError, TypeError, OverflowError) as error:
+            except (IndexError, ValueError, TypeError, OverflowError):
                 counts["recording_errors"] += 1
                 issues["parse_error_" + kind] += 1
-    except (OSError, EOFError, UnicodeError) as error:
+    except (OSError, EOFError, UnicodeError):
         counts["recording_errors"] += 1
         issues["stream_read_error"] += 1
     return dict(
