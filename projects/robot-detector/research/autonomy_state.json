@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "c759eadc378da83e9e6c52f4e5a821a06b1282c0",
+  "last_verified_base_commit": "6850f542b64c876fedf720ae3a2d80321d453c59",
   "last_known_verified_results": [
+    {
+      "stage_id": "AUTONOMY-OPERATING-CONTRACT-01",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44924357143",
+      "result": "Permanent multi-stage research TZ, master issue #72, project AGENTS and README references, machine-readable checkpoint, autonomous offline validation; first research stage #73 queued",
+      "status": "CHECKPOINT_VALIDATED_ON_CI"
+    },
     {
       "stage_id": "SOURCE-BINANCE-8",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/blob/agent/robot-detector-l2-binphase-20261121/projects/robot-detector/docs/BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md",
@@ -44,7 +50,8 @@
       "Deterministic offline unit tests pass",
       "Evidence and next-stage selection recorded",
       "Verified non-force push"
-    ]
+    ],
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/73"
   },
   "backlog": [
     {
@@ -102,5 +109,5 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "Autonomous research execution technical assignment and GitHub master tracking issue created; scientific end-goal is not yet finished"
+  "last_session_result": "Created permanent autonomous project execution TZ, GitHub master issue #72, durable state/AGENTS contract and offline checkpoint validation. CI 44924357143 passed. Next research stage #73 selected for implementation; final scientific release is still open."
 }
