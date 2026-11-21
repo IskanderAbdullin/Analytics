@@ -87,7 +87,7 @@ class RealL2EventTimeSyntheticTests(unittest.TestCase):
     def test_size_and_quote_change_independent(self):
         rows=[book_row().split(",") for _ in MSG]
         rows[1][1]="150"   # top ask grows with unchanged price
-        rows[2][0]="1186100"  # top ask price moves while ask depth remains 150
+        rows[2][0]="1186050"  # top ask changes without breaking ten-level quote order
         rows[2][1]="150"
         rows[3]=rows[2].copy()
         rows[4]=rows[2].copy()
@@ -148,7 +148,7 @@ class RealL2EventTimeSyntheticTests(unittest.TestCase):
 
     def test_empty_malformed_wrong_row_count_and_size_cap_fail_closed(self):
         for raw in (
-            b"", b"not zip",archive(messages=MSG[:1]),
+            b"", b"not zip",archive(messages=MSG[:1]+["34200.003,4"]),
             archive(messages=MSG[:1],books=[book_row(),book_row()]),
         ):
             with self.subTest(size=len(raw)),self.assertRaises(ValueError):
