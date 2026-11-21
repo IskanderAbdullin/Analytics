@@ -1,10 +1,11 @@
 name: Robot Detector preregistered original genuine ABIDES 160-case study
 # Original seeds 3301-3340, 4 cohorts, fixed thresholds. Aggregate only.
 # One push-triggered original run; switch manual-only after success.
+# Original frozen 160-source jobs #44944144915 and #44944168231 passed.
+# Their original 217888-byte source JSONs have identical SHA256.
+# Replay is not an independent 320-case source sample.
+# Manual-only to prevent unnecessary matching-engine reruns.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-abides-160-original.yml'
   workflow_dispatch:
 
 permissions:

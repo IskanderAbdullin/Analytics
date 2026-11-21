@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "e1c70fa23f3efe79958fe025faacf610769d284e",
+  "last_verified_base_commit": "56211df8cb1d3eef5e871b917671401cf48f5586",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-ABIDES-POWER-15",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44944144915",
+      "result": "Original 160 genuine ABIDES seed/cohort cases (40 local seeds 3301–3340), repeated identical replay #44944168231; source SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62. 156234 executions, 144908 unique timestamps, 253386 L2 snapshots, 617 oracle TWAP fills. Poisson FP naive 7/40 grouped 6/40; momentum FP 7/40 both; fixed 0/40 both +1 abstain; injected TWAP naive alarms 39/40, grouped 32/40 (7 extra misses)+1 abstain. Synthetic only, no market FDR.",
+      "status": "VERIFIED_GENUINE_ABIDES_160_NEGATIVE_TRANSFER_NO_REAL_MARKET_FDR"
+    },
     {
       "stage_id": "RD-MATCHED-UNCERTAINTY-14",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44943333914",
@@ -119,30 +125,30 @@
     }
   ],
   "current_stage": {
-    "id": "RD-ABIDES-POWER-15",
+    "id": "RD-PUBLIC-CONDITIONAL-NULL-16",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Preregister and execute wider 40 local seeds × four genuine ABIDES cohorts with unchanged public-only per-print and timestamp-cluster scores",
-    "why_next": "The genuine 3201-3204 matched source showed grouped one missed TWAP, same Poisson false alarm; with only 4 trials per cohort CP uncertainty is too broad. An additional larger local independent simulator source matrix can test synthetic robustness without pretending to know market FDR.",
+    "title": "Source-domain gap audit and new period-agnostic timestamp-cluster/lagged-L2 conditional null",
+    "why_next": "Frozen 160-source ABIDES study shows Poisson and momentum false alarms remain and exact-time grouping loses 7 additional TWAP positives. Tuning threshold 0.60 after seeing 3301-3340 cannot establish independent validation; we need a source-free measurement-limit audit and new period-agnostic public null.",
     "inputs": [
-      "tools/abides_clustered_grid_holdout.py",
-      "research/abides_clustered_grid_source_precommit_20261121.json",
-      "docs/ABIDES_MATCHED_UNCERTAINTY_20261121.md",
-      "research/seed_registry.json",
+      "docs/ABIDES_160_ORIGINAL_SOURCE_AUDIT_20261121.md",
+      "fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json",
+      "tools/abides_160_original_audit.py",
       "docs/MASTER_RESEARCH_PLAN.md"
     ],
     "deliverables": [
-      "Separate immutable fresh 40-seed x 4-cohort protocol with matching-engine revision, methods, thresholds and coverage frozen",
-      "One bounded public source workflow and 160 original source-only results, all negative outcomes retained",
-      "Synthetic confidence intervals per cohort, paired decision accounting and abstentions without posthoc tuning",
-      "Next stage scientific plan and checkpoint with full source provenance"
+      "Source-free domain gap negative cases (timestamp resolution, split fills, missing prior L2, periodic/momentum nulls, non-identifiability)",
+      "Freeze candidate period-agnostic public conditional-null family with occupancy and cluster preservation",
+      "Strict public feature/oracle separation and no posthoc threshold/source selection",
+      "New separate source-holdout protocol only after sufficient adversarial tests",
+      "Checkpoint, tests, CI, push and next scientific stage"
     ],
     "acceptance": [
-      "New local source seeds not present in canonical registry and frozen before run",
-      "No retroactive edits to 3201-3204 protocol, no power claims about real markets",
-      "All 160 cases produce source-anonymous aggregate or fail loudly, no selecting favorable seeds",
-      "Offline and genuine original CI, commit/push without force, master #72 stays open"
+      "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
+      "No real market actor count/FDR or seed rebranding as new",
+      "No one timestamp equals one parent/owner assumption",
+      "Source-free negative tests, bounded action and review of subsequent independent source"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/96"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/97"
   },
   "backlog": [
     {
@@ -181,7 +187,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Check remote HEAD then AGENTS.md, MASTER_RESEARCH_PLAN, checkpoint and issue #96. First commit separate frozen new source protocol with 40 locally unused seeds × 4 cohorts, unchanged 20s/45s fixed ratio .60, lagged L2 coverage and original ABIDES version. Implement original 160-case runner and negative tests, no raw source; bounded GH Action only public repo, manual-only after success. Update source evidence/checkpoint and continue. Integrity follow-up 2026-11-21: offline source-aggregate schema strict allowlists, source revision pins, cohort false-alarm/miss conservation and adversarial injections committed as separate small updates; requires cheap CI verification. No new ABIDES source or owner/FDR claim. Continue active stage per current_stage. Before any 160 original ABIDES source run, respect separate immutable research/abides_160_zero_execution_oracle_handling_addendum_20261121.json: include injected TWAP cases even when posthoc controlled fills=0, report zero-execution separately, never replacement-select seeds. Source runner e9295ab + negative test 24a98c, cheap CI must be green. Original 160 source outcomes not yet confirmed.",
-  "last_session_result": "Original 16 ABIDES #44938991772 reconciled; retrospective 4-per-cohort matched uncertainty audit source-free CI #44943333914 passed 25 suites/190 tests. 0/4 errors nominal 95% upper=.6024; 4/4 successes lower=.3976 conditional on IID synthetic seed trials, no real market calibration. Next #96 preregister 40 locally new seeds ×4 genuine ABIDES cohorts and perform bounded original source.",
+  "resume_instruction": "Read remote GitHub HEAD, AGENTS.md, MASTER_RESEARCH_PLAN.md, checkpoint, original source audit, source seed masks and issue #97. Do not rerun 160 source; source runs #44944144915 and #44944168231 exact repeat SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62, 160 independent cases total. First domain gap/source-free negative controls, then freeze a new period-agnostic public null before any new simulator/source runs. No real actor/FDR claims, fast-forward commit/push.",
+  "last_session_result": "RD-ABIDES-POWER-15 original run #44944144915 and deterministic replay #44944168231 succeeded. Same raw JSON SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62; not double the sample. 156234 prints, 144908 unique timestamps, 253386 L2, 617 oracle TWAP fills. False alarms 7/40 Poisson and 7/40 momentum naive, grouped 6/40 and 7/40; grouped missed 7 injected TWAP. Source masks/CP audit persisted. Next #97 period-agnostic public conditional null.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }

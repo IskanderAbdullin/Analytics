@@ -414,6 +414,49 @@ L2/coverage abstention и 4 семьи сценариев.
 Даже 160 synthetic прогонов не
 калибруют real-market FDR.
 
+### RD-ABIDES-POWER-15 — все 160 genuine ABIDES source cases проверены
+
+[Оригинальный исходный run #44944144915](https://github.com/IskanderAbdullin/Analytics/actions/runs/44944144915)
+и [повтор #44944168231](https://github.com/IskanderAbdullin/Analytics/actions/runs/44944168231)
+имеют **одинаковый** JSON SHA256 `55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62`.
+Это **160** независимых локальных комбинаций
+seed×cohort, **НЕ 320**; source повторные
+запуски служат только воспроизводимости.
+**156 234 prints / 144 908 timestamps /
+253 386 L2**, 617 контролируемых TWAP fills.
+По старому замороженному ratio 0,60:
+Poisson **7/40** ложных per-print и **6/40**
+grouped; momentum **7/40** ложных у обоих;
+fixed20 **0/40** ложных и 1 ABSTAIN;
+injected TWAP **39/40** naive против **32/40**
+grouped (7 дополнительный grouped misses
+и один abstain). Описание настоящего
+source, все seed-маски и точные CP интервалы
+сохранены в [отчёте](ABIDES_160_ORIGINAL_SOURCE_AUDIT_20261121.md),
+[долговременном компактном fixture](
+../fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json)
+и [исходном исходном CI](https://github.com/IskanderAbdullin/Analytics/actions/runs/44944144915).
+Оба source workflows manual-only.
+Реальные владельцы и market FDR **неизвестны**.
+
+### RD-PUBLIC-CONDITIONAL-NULL-16 — активная следующая научная задача
+
+[Issue #97](https://github.com/IskanderAbdullin/Analytics/issues/97).
+Сначала выполнить domain-gap/source-free
+adversarial audit: изменения точности clock,
+разбиение partial fills, неполнота L2,
+непериодический momentum/Poisson null,
+non-identifiability нескольких владельцев.
+Затем исследовать публичный **period-agnostic**
+conditional null с блоками event-rate/
+timestamp cluster, previous-completed L2,
+сильным abstention. Новый метод, source
+seeds и thresholds фиксировать **ДО**
+новых исходных симуляций. Старые 3301–3340
+нельзя объявлять свежими holdout или
+ретроспективно оптимизировать.
+Master #72 открытый.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -440,6 +483,8 @@ L2/coverage abstention и 4 семьи сценариев.
 | 2026-11-21 | RD-MATCHED-UNCERTAINTY-14: additional source-fixture integrity hardening — exact allowlist for top-level/case/cohort/totals, original source and ABIDES revision pins, false-alarm/missed-TWAP conservation; adversarial private-ID/count tampering cases. No new simulations, no new threshold, no increase in claimed confidence. | Implementation committed; cheap CI required for verification |
 
 | 2026-11-21 | PRE-SOURCE уточнение RD-ABIDES-POWER-15: исходный frozen 40×4 протокол оставлен неизменным; [отдельное addendum](../research/abides_160_zero_execution_oracle_handling_addendum_20261121.json) предотвращает отбрасывание source-сценариев, где injected TWAP агент не получил ни одного фактического исполнения; сохраняются все 160 seed×cohort, отдельно считаются zero-execution positives. Не считать их подтверждёнными публично наблюдаемыми execution patterns, не менять seed/порог/фазу и не включать oracle в public scoring. | PRE-SOURCE methodological guard; original 160 engine runs not yet verified |
+
+| 2026-11-21 | Frozen 40-seed × 4-cohort original genuine ABIDES #44944144915 and exact replay #44944168231 (same source SHA, not 320 independent): per-print FP Poisson 7/40, momentum 7/40; grouped FP Poisson 6/40, momentum 7/40; injected TWAP per-print 39/40, grouped 32/40 (7 additional misses), fixed20/TWAP 1 abstain each. Pivot to period-agnostic conditional null #97 | VERIFIED source negative result, no real market FDR |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 

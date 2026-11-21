@@ -9,6 +9,17 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [160 настоящих ABIDES matching-engine запусков на 40 новых seeds](docs/ABIDES_160_ORIGINAL_SOURCE_AUDIT_20261121.md):
+  156 234 prints, 144 908 временных кластеров,
+  253 386 L2 snapshots, 617 posthoc TWAP fills.
+  **Poisson false alarms 7/40 vs 6/40** и
+  **momentum 7/40 vs 7/40** (per-print vs grouped);
+  **TWAP 39/40 vs 32/40**, 7 дополнительных
+  пропусков grouped и 1 abstain.
+  Два CI прогона побайтово совпали — **это
+  проверка воспроизводимости, не 320 новых
+  случаев**. Продолжение [#97](https://github.com/IskanderAbdullin/Analytics/issues/97).
+
 - [Аудит малой мощности и парного сравнения двух классификаторов](
   docs/ABIDES_MATCHED_UNCERTAINTY_20261121.md):
   при четырёх синтетических seeds на одну
