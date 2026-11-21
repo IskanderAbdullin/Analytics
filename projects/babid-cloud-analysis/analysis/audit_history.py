@@ -222,35 +222,79 @@ def audit_fills(path: Path, state: str, problems: list[dict]) -> list[dict]:
 
 
 def audit_equity(path: Path, state: str, problems: list[dict]) -> list[dict]:
+    """Stream daily marked-P&L changes with exact decimal arithmetic.
+
+    Non-monotonic timestamps or malformed samples make whole-day changes and
+    drawdowns unverified, rather than silently using misleading file order.
+    """
     days: dict[str, dict] = {}
+    prev_time = None
+    missing_date = 0
     try:
         with path.open("r", encoding="utf-8-sig", errors="replace") as stream:
             for line in stream:
                 parts = line.strip().split(";")
                 if len(parts) != 2:
+                    missing_date += 1
                     continue
                 try:
-                    ts, value = float(parts[0]), float(parts[1])
-                    if ts < 1e12:
-                        continue
+                    raw_ts = strict_decimal(parts[0])
+                    if raw_ts < 1000000000000 or raw_ts != raw_ts.to_integral_value():
+                        raise ValueError("timestamp not in Unix milliseconds")
+                    ts = int(raw_ts)
                     day = datetime.fromtimestamp(ts / 1000, MSK).strftime("%Y-%m-%d")
-                except (ValueError, OverflowError, OSError):
+                except (InvalidOperation, ValueError, OverflowError, OSError):
+                    missing_date += 1
                     continue
                 if day not in days:
-                    days[day] = dict(day=day, state=state, samples=0, first=value,
-                                     last=value, minimum=value, maximum=value,
-                                     peak=value, max_drawdown=0.0)
+                    days[day] = dict(day=day, state=state, samples=0, first="",
+                                     last="", minimum="", maximum="", peak="",
+                                     max_drawdown=Decimal(0), invalid_samples=0,
+                                     out_of_order_samples=0)
                 row = days[day]
+                if prev_time is not None and ts < prev_time:
+                    row["out_of_order_samples"] += 1
+                prev_time = ts
+                try:
+                    value = strict_decimal(parts[1])
+                except (InvalidOperation, ValueError, TypeError):
+                    row["invalid_samples"] += 1
+                    continue
+                if row["samples"] == 0:
+                    row.update(first=value, last=value, minimum=value,
+                               maximum=value, peak=value)
+                else:
+                    row["last"] = value
+                    row["minimum"] = min(row["minimum"], value)
+                    row["maximum"] = max(row["maximum"], value)
+                    row["peak"] = max(row["peak"], value)
+                    row["max_drawdown"] = max(row["max_drawdown"], row["peak"] - value)
                 row["samples"] += 1
-                row["last"] = value
-                row["minimum"] = min(row["minimum"], value)
-                row["maximum"] = max(row["maximum"], value)
-                row["peak"] = max(row["peak"], value)
-                row["max_drawdown"] = max(row["max_drawdown"], row["peak"] - value)
     except OSError as error:
-        problems.append(dict(type="equity_read_error", file=str(path), detail=str(error)[:180]))
-    return [dict((k, v) for k, v in row.items() if k != "peak") |
-            {"change": row["last"] - row["first"]} for row in days.values()]
+        problems.append(dict(type="equity_read_error", file=path.name, detail=str(error)[:180]))
+
+    if missing_date:
+        problems.append(dict(type="equity_unlocated_samples", file=path.name,
+                             detail=f"{missing_date} invalid rows have no valid date"))
+    result = []
+    for day, row in sorted(days.items()):
+        incomplete = bool(row["invalid_samples"] or row["out_of_order_samples"])
+        if incomplete or not row["samples"]:
+            problems.append(dict(type="equity_day_unverified", file=path.name,
+                                 detail=f"{state}:{day} has missing or out-of-order samples"))
+        result.append(dict(
+            day=day, state=state, samples=row["samples"],
+            first=str(row["first"]) if row["samples"] and not incomplete else "",
+            last=str(row["last"]) if row["samples"] and not incomplete else "",
+            minimum=str(row["minimum"]) if row["samples"] and not incomplete else "",
+            maximum=str(row["maximum"]) if row["samples"] and not incomplete else "",
+            max_drawdown=str(row["max_drawdown"]) if row["samples"] and not incomplete else "",
+            change=str(row["last"] - row["first"]) if row["samples"] and not incomplete else "",
+            invalid_samples=row["invalid_samples"],
+            out_of_order_samples=row["out_of_order_samples"],
+            quality="unverified" if incomplete or not row["samples"] else "observed_samples",
+        ))
+    return result
 
 
 def classify(message: str) -> str:
@@ -378,7 +422,9 @@ def run(root: Path, output: Path, focus_start: str, focus_end: str,
     table(output / "snapshots.csv", list(snapshots[0]) if snapshots else ["state"], snapshots)
     table(output / "fills_daily.csv", list(FIELDNAMES), fills)
     table(output / "pnl_daily.csv",
-          ["day", "state", "samples", "first", "last", "minimum", "maximum", "max_drawdown", "change"], equity)
+          ["day", "state", "samples", "first", "last", "minimum", "maximum",
+           "max_drawdown", "change", "invalid_samples", "out_of_order_samples",
+           "quality"], equity)
     table(output / "errors_daily.csv", ["day", "log_dir", "level", "category", "count"],
           [dict(zip(["day", "log_dir", "level", "category"], k, strict=True), count=v) for k, v in sorted(errors.items())])
     table(output / "incident_timeline.csv", ["at_msk", "log_dir", "level", "category", "file", "line", "message"],
