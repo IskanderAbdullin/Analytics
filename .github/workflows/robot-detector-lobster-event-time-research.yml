@@ -35,6 +35,9 @@ jobs:
           from tools.lobster_event_time_features import (
               LOCALLY_PINNED_SAMPLE_SHA256, SOURCE_URL
           )
+          # Ensure import works both as a Python package and direct CLI
+          from tools.lobster_event_time_features import OUTPUT_ALLOWED_TOP_FIELDS
+          assert len(OUTPUT_ALLOWED_TOP_FIELDS)>35
           p=json.loads(Path('research/lobster_event_time_protocol_20261121.json').read_text())
           assert p['schema_version']=='lobster-event-time-10level-public-demo-retrospective-v1'
           assert p['source']==SOURCE_URL
