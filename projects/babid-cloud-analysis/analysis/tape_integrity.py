@@ -47,7 +47,7 @@ def good_book(raw_bid: str, raw_ask: str) -> bool:
             lots = int(lots_text)
             if not math.isfinite(price) or price <= 0 or lots <= 0:
                 return None
-            if result and (price >= result[-1] if not descending else price <= result[-1]):
+            if result and ((descending and price >= result[-1]) or (not descending and price <= result[-1])):
                 return None
             result.append(price)
         return result or None
