@@ -397,6 +397,37 @@ jobs:
                       "isABides":False
                   }))
           PY
+      - name: Market-wide common-clock negative-control smoke
+        run: |
+          dotnet run --project src/RobotDetector.Cli -c Release --no-build -- benchmark-clock-null \
+            --trials 3 --background-prints 60 --cycles 12 --period-ms 5000 \
+            --output /tmp/clocked-null-stress.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open("/tmp/clocked-null-stress.json",encoding="utf-8"))
+          assert r["trials"]==3 and len(r["cases"])==3 and len(r["models"])==2, r
+          assert not r["identifiesRealRobotOwners"] and not r["isExchangeCalibrated"], r
+          for case in r["cases"]:
+              assert case["kind"]=="market_clock_null", case
+              assert case["publicPrints"]==60, case
+              assert case["trueSyntheticProducerCount"]==0, case
+              assert case["injectedExecutionPrints"]==0, case
+              for m in case["models"]:
+                  assert m["truePositivePrints"]==0, m
+                  assert m["missedInjectedPrints"]==0, m
+                  assert m["eventRecall"] is None, m
+                  assert m["falsePositivePrints"]==m["attributedPublicPrints"], m
+                  assert not m["physicalProducerCountInferred"], m
+          for row in r["models"]:
+              records=[next(m for m in c["models"] if m["model"]==row["model"])
+                       for c in r["cases"]]
+              assert row["trials"]==3, row
+              assert row["falseAlarmTrials"]==sum(m["attributedPublicPrints"]>0 for m in records), row
+              assert row["falsePositivePublicPrints"]==sum(m["falsePositivePrints"] for m in records), row
+              assert row["trialFalseAlarmFraction"]==row["falseAlarmTrials"]/3, row
+              assert not row["calibratedMarketFalsePositiveRate"], row
+              print("CLOCK_NULL_SUMMARY",json.dumps(row))
+          PY
       - name: Ensure no trade/order API dependency
         run: |
           if grep -REn 'PostOrder|CancelOrder|ReplaceOrder|OrdersService' src/; then
