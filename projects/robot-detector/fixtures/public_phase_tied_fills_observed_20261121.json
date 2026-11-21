@@ -1,0 +1,78 @@
+{
+  "schema_version": "public-clock-phase-split-fills-scientific-negative-v1",
+  "verification_ci_run": 44937958809,
+  "frozen_protocol": "research/public_phase_tied_fills_precommit_20261121.json",
+  "source_code": "tools/public_timing_phase_tied_fills.py",
+  "only_constructed_synthetic_source": true,
+  "source_market_actual_vendor_or_abides_data_used": false,
+  "source_private_agent_ids_available": false,
+  "unique_event_timestamps_in_both_worlds": 13,
+  "single_fill_public_trades": 13,
+  "split_fill_public_trades": 112,
+  "extra_public_trades_at_one_tied_timestamp": 99,
+  "original_periods_seconds": [
+    20,
+    45
+  ],
+  "tolerance_milliseconds": 250,
+  "fixed_ratio_alarm_threshold": 0.6,
+  "exact_all_predeclared_shifts": [
+    {
+      "shift_ms": -300,
+      "single_fill_print_score": null,
+      "one_hundred_tied_fills_print_score": null,
+      "hundred_fills_collapsed_unique_timestamp_score": null,
+      "print_weighted_20sec_hits": 0,
+      "single_fill_45sec_hits": 0,
+      "hundred_fill_45sec_hits": 0,
+      "zero_denominator_abstain": true
+    },
+    {
+      "shift_ms": -250,
+      "single_fill_print_score": 0.16666667,
+      "one_hundred_tied_fills_print_score": 8.41666667,
+      "hundred_fills_collapsed_unique_timestamp_score": 0.16666667,
+      "print_weighted_20sec_hits": 12,
+      "single_fill_45sec_hits": 2,
+      "hundred_fill_45sec_hits": 101,
+      "zero_denominator_abstain": false
+    },
+    {
+      "shift_ms": 0,
+      "single_fill_print_score": 0.16666667,
+      "one_hundred_tied_fills_print_score": 8.41666667,
+      "hundred_fills_collapsed_unique_timestamp_score": 0.16666667,
+      "print_weighted_20sec_hits": 12,
+      "single_fill_45sec_hits": 2,
+      "hundred_fill_45sec_hits": 101,
+      "zero_denominator_abstain": false
+    },
+    {
+      "shift_ms": 250,
+      "single_fill_print_score": 0.16666667,
+      "one_hundred_tied_fills_print_score": 8.41666667,
+      "hundred_fills_collapsed_unique_timestamp_score": 0.16666667,
+      "print_weighted_20sec_hits": 12,
+      "single_fill_45sec_hits": 2,
+      "hundred_fill_45sec_hits": 101,
+      "zero_denominator_abstain": false
+    },
+    {
+      "shift_ms": 300,
+      "single_fill_print_score": null,
+      "one_hundred_tied_fills_print_score": null,
+      "hundred_fills_collapsed_unique_timestamp_score": null,
+      "print_weighted_20sec_hits": 0,
+      "single_fill_45sec_hits": 0,
+      "hundred_fill_45sec_hits": 0,
+      "zero_denominator_abstain": true
+    }
+  ],
+  "print_weighted_score_changed_only_due_to_split_fills": true,
+  "event_unique_timestamps_constant": true,
+  "clock_grid_alarm_inflates_without_injected_target": true,
+  "per_timestamp_group_cannot_prove_single_parent_owner": true,
+  "no_best_phase_selection_or_significance_calibration": true,
+  "no_real_market_precision_FDR_or_bot_owner_claims": true,
+  "original_raw_timestamp_series_never_exported": true
+}

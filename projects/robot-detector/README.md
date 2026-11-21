@@ -9,6 +9,16 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Фиксированные фазы и псевдорепликация частичных исполнений](
+  docs/PUBLIC_PHASE_TIED_FILLS_NEGATIVE_20261121.md):
+  **13** уникальных timestamps; после 100 prints
+  с одним timestamp naïve ratio вырос
+  **0,1667 → 8,4167** без target. Grouped
+  timestamps возвращают исходный результат;
+  ±300 ms нарушают 250 ms допуск (ABSTAIN).
+  Следующий conditional null [#93](
+  https://github.com/IskanderAbdullin/Analytics/issues/93).
+
 - [16-run genuine ABIDES split-half momentum robustness](
   docs/ABIDES_SPLIT_HALF_MOMENTUM_20261121.md):
   **3/4 TWAP alarms** и 1/4 abstain, во всех
@@ -16,7 +26,7 @@
   По сравнению с исходным ratio на тех же
   seeds улучшение специфичности не показано;
   произошло **снижение покрытия**.
-  Следующая задача [#92](https://github.com/IskanderAbdullin/Analytics/issues/92).
+  Этап #92 подтверждён source-free CI, текущая задача — #93.
 
 - [Новый независимый ABIDES 16-run ratio baseline и отрицательные momentum-контроли](
   docs/ABIDES_BACKGROUND_RATIO_HOLDOUT_20261121.md):

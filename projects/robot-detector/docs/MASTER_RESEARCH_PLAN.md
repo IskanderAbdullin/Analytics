@@ -279,6 +279,35 @@ https://github.com/IskanderAbdullin/Analytics/actions/runs/44937478576):
 не использовать частичные исполнения
 для вывода о количестве владельцев.
 
+### P0 / RD-PHASE-ROBUSTNESS-11 — source-free завершён
+
+Пререгистрированный по всем пяти фазам синтетический
+контрпример [CI #44937958809](https://github.com/IskanderAbdullin/Analytics/actions/runs/44937958809):
+при **13 уникальных timestamps** изменение числа
+public trade prints с **13 до 112** (100 fills
+в одном timestamp вместо одного) подняло
+`hits45/hits20` **0,1667 → 8,4167**,
+создав ложный clock-grid alarm без target.
+После collapse exact timestamp ratio
+вернулся к **0,1667**. Сдвиг ±300ms
+уничтожил знаменатель: **ABSTAIN**.
+Это [отрицательный научный результат](
+PUBLIC_PHASE_TIED_FILLS_NEGATIVE_20261121.md),
+а не калибровка вероятности на реальной бирже.
+
+### P0 / RD-CONDITIONAL-NULL-12 — следующий научный приоритет
+
+[Issue #93](https://github.com/IskanderAbdullin/Analytics/issues/93):
+исследовать условные timestamp-cluster-preserving nulls,
+которые сохраняют число и размер кластеров
+partial fills и сессионную активность,
+и заранее фиксировать временные фазы и
+критерии проверки. Нельзя выдавать сами
+кластеры за физические parent orders,
+случайные фазы одной source tape за
+независимые репликации или synthetic
+oracle за real-market FDR.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -293,5 +322,7 @@ https://github.com/IskanderAbdullin/Analytics/actions/runs/44937478576):
 | 2026-11-21 | Независимый 16-run source experiment #44936592641: ratio>=0.60 обнаружил 4/4 TWAP, избежал fixed-20s и Poisson ложных тревог (0/8), но дал 2/4 ложных тревог momentum; научный приоритет — независимый тест внутри-сессионной устойчивости без переобучения на 3001–3004 | VERIFIED limited synthetic transfer; hard-negative momentum specificity NOT established; #91 открыт |
 
 | 2026-11-21 | Split-half original 16 case source #44937478576: 3/4 TWAP alarm, 1/4 positive abstain, 0 false alarms in each of three negative cohorts but 1/4 abstain per cohort. Original full-session ratio on same new seeds had 4/4 positives and 0/12 background false positives; split-half no specificity improvement, only coverage loss | Negative scientific result VERIFIED; investigate phase/timestamp-cluster pseudo-replication in #92 |
+
+| 2026-11-21 | Source-free phase/tied-fill counterexample #44937958809: 13 unique timestamps, but 100 fills at a 45s-only timestamp inflate print-weighted ratio 0.1667 → 8.4167 without any target; grouping timestamps reverses false signal; ±300ms shift leads to denominator 0/ABSTAIN | VERIFIED negative measurement artifact; cluster-aware conditional null #93 next |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.

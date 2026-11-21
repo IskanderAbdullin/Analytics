@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "5eb6a346b17411531a1600967cc9cf7ff61c7762",
+  "last_verified_base_commit": "0bc564a93ed22ed6ec6b65f5d7b2466a96a352c0",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-PHASE-ROBUSTNESS-11",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44937958809",
+      "result": "Precommitted source-free public timestamp counterexample: same 13 unique timestamps, splitting one 45s-only print into 100 raises hits45/hits20 0.16666667→8.41666667 without target, grouping exact timestamps restores 0.16666667. ±300ms shift vs tolerance 250ms yields 0 denominator ABSTAIN. Offline 22 suites/168 passed tests.",
+      "status": "VERIFIED_SYNTHETIC_PSEUDOREPLICATION_NEGATIVE_NOT_REAL_BOT_FDR"
+    },
     {
       "stage_id": "RD-MOMENTUM-NEGATIVE-10",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44937478576",
@@ -95,30 +101,30 @@
     }
   ],
   "current_stage": {
-    "id": "RD-PHASE-ROBUSTNESS-11",
+    "id": "RD-CONDITIONAL-NULL-12",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Public clock phase and same-timestamp split-fill pseudo-replication diagnostics",
-    "why_next": "Original split-half source 16 cases produced abstentions without specificity gain over whole-session ratio. Need attack false confidence from fixed-grid phase and dependent partial-fill timestamps; do not optimize previous inspected thresholds posthoc.",
+    "title": "Timestamp-cluster-conditioned public clock null preserving split-fill dependence",
+    "why_next": "The source-free 13-timestamp background can create false ratio 8.4167 from 100 dependent prints at one 45s timestamp. Need a conditional matched null that treats grouped timestamps and occupancy as nuisance before next classification claims.",
     "inputs": [
-      "tools/abides_split_half_momentum_holdout.py",
-      "tools/abides_background_ratio_holdout.py",
-      "projects/robot-detector/docs/ABIDES_SPLIT_HALF_MOMENTUM_20261121.md",
-      "projects/robot-detector/fixtures/abides_split_half_momentum_observed_20261121.json",
-      "docs/MASTER_RESEARCH_PLAN.md"
+      "tools/public_timing_phase_tied_fills.py",
+      "projects/robot-detector/docs/PUBLIC_PHASE_TIED_FILLS_NEGATIVE_20261121.md",
+      "projects/robot-detector/fixtures/public_phase_tied_fills_observed_20261121.json",
+      "docs/MASTER_RESEARCH_PLAN.md",
+      "research/seed_registry.json"
     ],
     "deliverables": [
-      "Frozen source-free public phase-shift/tie-cluster sensitivity design with integer nanosecond timestamps",
-      "A constructive negative where many split prints share one timestamp and inflate grid score without independent owners",
-      "Detailed distinction: per-print vs per-unique-timestamp occupancy and no physical owner truth",
-      "One-command offline adversarial CI, compact aggregate report, follow-on preregistration if original new ABIDES sources scientifically needed"
+      "Frozen cluster-size-preserving clock-rhythm control and source-free adversarial tests",
+      "Separate original public print counts vs timestamp-cluster grouped signal; no parent owner inference",
+      "Strong negative/null against periodic background and split fills with explicit abstention",
+      "Reproducible compact scientific report, CI evidence, checkpoint and next stage selection"
     ],
     "acceptance": [
-      "No best-phase selection or false independent-replay claim",
-      "Strict owner/oracle field exclusion from public features",
-      "Negative results from #44936592641 and #44937478576 remain visible",
-      "Commit/push verified, checkpoint and next scientific stage chosen"
+      "No posthoc best-phase or threshold tuning on inspected source datasets",
+      "All synthetic source clusters and owner field exclusions validated",
+      "Null preservation/violation contract explicitly documented",
+      "Offline tests and fast-forward push; master issue #72 remains open"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/92"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/93"
   },
   "backlog": [
     {
@@ -157,7 +163,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Read remote GitHub HEAD, AGENTS.md, MASTER_RESEARCH_PLAN.md, AUTONOMOUS_RESEARCH_TZ.md, seed registry, issue #72, #92, current_stage. Source #44937478576 (split-half 16) succeeded, no real-market FDR. Implement public-only deterministic phase and same-timestamp cluster negative controls, keep 3001-3104 spent and existing thresholds unchanged. Reconcile tests, commit/push, choose next high information stage.",
-  "last_session_result": "RD-MOMENTUM-NEGATIVE-10 original 16 genuine ABIDES on seeds 3101-3104 verified in CI #44937478576: split-half 3/4 TWAP alarms+1 abstain, background 0 false alarms with one abstain each; full baseline 4/4 TWAP, 0/12 background false alarms. Split-half no specificity gain, coverage lost. First run #44937339312 aborted from day-clock bug before scientific source output, fixed without protocol change. Next #92 source-free phase/tied-fill sensitivity.",
+  "resume_instruction": "Read actual GitHub HEAD, AGENTS, MASTER_RESEARCH_PLAN, current checkpoint, seed registry, issue #72/#93, CI #44937958809. Implement cluster-size-preserving source-free matched timing nulls; source-free artifacts and provenance. No posthoc phase tuning or assumption that timestamp cluster=owner. Commit/push, select/start next research stage in same active session.",
+  "last_session_result": "RD-PHASE-ROBUSTNESS-11 passed original source-free CI #44937958809: 22 suites/168 tests, 13 synthetic unique times and 100 tied 45s-only fills drive print ratio .1667→8.4167 (false alarm), unique timestamp aggregation restores .1667, ±300ms gives denominator zero/abstain. No real source or owners. Next #93 conditional cluster-preserving null.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
