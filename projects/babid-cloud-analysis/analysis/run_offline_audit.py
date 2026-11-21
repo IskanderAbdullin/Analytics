@@ -22,6 +22,7 @@ import opportunity_validation
 import audit_provenance
 import config_audit
 import tape_integrity
+import time_weighted_books
 
 
 def checksum(path: Path) -> str:
@@ -86,6 +87,11 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
     except (OSError, ValueError) as error:
         manifest["reports"]["configs_error"] = str(error)[:300]
     if with_market and (root / "recordings").is_dir():
+        try:
+            manifest["reports"]["time_weighted"] = time_weighted_books.run(
+                root, output / "time-weighted", 2000)
+        except (OSError, ValueError) as error:
+            manifest["reports"]["time_weighted_error"] = str(error)[:300]
         try:
             manifest["reports"]["tape_integrity"] = tape_integrity.run(
                 root, output / "tape-integrity")

@@ -1,0 +1,60 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "cf7e1f22-1a19-4507-bba1-15f0ff0fd1d8",
+    "occurred_at": "2026-11-21T15:05:53.860Z",
+    "type": "research",
+    "title": "Time-weight eligible order-book geometry with strict staleness cap",
+    "summary": "Prevent interpreting a high fraction of changed book snapshots as persistent quote opportunity by measuring known-coverage milliseconds, splitting Moscow hours and invalidating stale or disconnected spans.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/time_weighted_books.py",
+      "action": "added",
+      "summary": "O(1)-memory streaming market book geometry weighted by receipt-time durations."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_time_weighted_books.py",
+      "action": "added",
+      "summary": "Four synthetic tests for sparse books, TTL, D/U, hour boundary and nonmonotonic times."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Run time-weighted book coverage as a new isolated audit pass."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Explain time-weighted geometry and missing-data warnings."
+    }
+  ],
+  "checks": [
+    {
+      "id": "weighted-ci",
+      "title": "Cross-platform synthetic market timing tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Needs Actions run."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "validate-market",
+      "title": "Verify full synthetic matrix and mixed-signal consistency",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Unknown time is not counted as quote opportunity; not a fill probability or P&L estimate."
+  ]
+}
