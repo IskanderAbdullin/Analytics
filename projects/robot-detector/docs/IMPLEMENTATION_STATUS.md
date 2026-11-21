@@ -249,3 +249,8 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 - Added six deterministic no-ABIDES tests in `tests_l2/test_l2_level_uniqueness.py`, including source-level rejection in both public join and lagged-L2 analytics. Document: [L2_UNIQUE_PRICE_LEVELS.md](L2_UNIQUE_PRICE_LEVELS.md). Must not apply this aggregated-L2 rule directly to per-order L3 feeds. Real feed provenance and bot-identity claims remain unverified.
 
 - **Verified strict unique-price L2 source check:** [successful pinned ABIDES CI #44911604350](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911604350) passed **47 Python tests**, including six new duplicate-level checks, while genuine 1,152-snapshot / 709-fill feasibility output remained unchanged. Research/market release gate stays CLOSED.
+
+## 2026-11-21 — append-only and separate-feed-gap metamorphic invariants
+
+- Added `tools/public_feed_metamorphic.py` generating purely synthetic public L2/anonymous print fixture tapes and checking six correctness properties: append-only closed-prefix stability, monotone decreases under book-feed gaps, independent trades-feed gaps and combined gaps, exclusive watermark tightening, and explicit eligible/abstained trade-bin conservation.
+- Five Python offline tests plus independent lightweight `.github/workflows/robot-detector-feed-metamorphic.yml` run 64 deterministic source-only fixtures without a genuine ABIDES matching-engine simulation. No hidden maker/taker IDs, real broker market data or trading. [L2_PUBLIC_METAMORPHIC.md](L2_PUBLIC_METAMORPHIC.md). Test seed labels are not scientific held-out real simulations.

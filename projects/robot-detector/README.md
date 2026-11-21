@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Reproducible public-feed invariant stress tests
+
+Added a cheap **read-only** deterministic metamorphic suite for lagged public L2/trade analytics. It checks that appending future public events cannot rewrite completed past observations, that more source book/trade gaps cannot increase eligible intervals, that an earlier exclusive watermark only removes a future tail, and that complete-bin accounting conserves every observed public trade bin. Generated tapes are **software fixtures, not real ABIDES experiments, new blind research holdouts or market performance evidence**.
+
+[Metamorphic correctness protocol and limits](docs/L2_PUBLIC_METAMORPHIC.md).
+
 ## Public aggregated L2 book: unique prices per side
 
 The public depth-five order-book parser now requires **strictly descending bid price levels** and **strictly ascending ask price levels** within each L2 snapshot. Previously the input checker could accept repeated prices on the same side and double-count displayed quantity in imbalance calculations. Repeated *snapshot timestamps* remain preserved, as they represent potentially distinct book events. This applies only to aggregated L2 data, not L3 per-order books.
