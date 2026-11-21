@@ -15,6 +15,7 @@ import math
 
 from l2_probe import audit_l2_public
 from l2_trade_context import PublicExecution, MAX_FILLS, MAX_SNAPSHOTS
+from public_stream_coverage import DualPublicStreamClaim, disclose_claim
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,7 +68,8 @@ def summarize_lagged_book(
     *, bin_seconds: int = 30,
     maximum_quote_age_seconds: int | None = None,
     maximum_depth: int = 5,
-    complete_through_ns: int | None = None
+    complete_through_ns: int | None = None,
+    source_coverage: DualPublicStreamClaim | None = None
 ) -> dict:
     # Defaults must remain valid when the caller chooses shorter clock bins.
     if maximum_quote_age_seconds is None:
@@ -81,6 +83,8 @@ def summarize_lagged_book(
         type(complete_through_ns) is not int or complete_through_ns < 0
     ):
         raise ValueError("Completion watermark must be a nonnegative nanosecond integer")
+    if source_coverage is not None and not isinstance(source_coverage, DualPublicStreamClaim):
+        raise ValueError("Source coverage must be a valid dual public stream claim")
     if snapshots is None or len(snapshots.times_ns) > MAX_SNAPSHOTS:
         raise ValueError("Missing or excessive L2 snapshots")
     source = audit_l2_public(snapshots, max_depth=maximum_depth)
@@ -120,6 +124,21 @@ def summarize_lagged_book(
             (ordinal + 1) * duration > complete_through_ns):
             abstain["current_bin_not_closed_by_watermark"] += 1
             continue
+        if source_coverage is not None:
+            prior_start = (ordinal - 1) * duration
+            current_start = ordinal * duration
+            current_end = (ordinal + 1) * duration
+            if ordinal < 1:
+                abstain["declared_previous_book_stream_uncovered"] += 1
+                continue
+            book_covered, trade_covered = source_coverage.is_pair_covered(
+                prior_start, current_start, current_end)
+            if not trade_covered:
+                abstain["declared_current_trade_stream_uncovered"] += 1
+                continue
+            if not book_covered:
+                abstain["declared_previous_book_stream_uncovered"] += 1
+                continue
         prev_idx = last_prior_by_bin.get(ordinal - 1)
         if prev_idx is None:
             abstain["missing_immediately_previous_book_bin"] += 1
@@ -184,7 +203,9 @@ def summarize_lagged_book(
             "prior_quote_too_old",
             "one_sided_or_empty_prior_book",
             "locked_or_crossed_prior_book",
-            "current_bin_not_closed_by_watermark"
+            "current_bin_not_closed_by_watermark",
+            "declared_current_trade_stream_uncovered",
+            "declared_previous_book_stream_uncovered"
         )},
         "observations": [
             {
@@ -208,6 +229,12 @@ def summarize_lagged_book(
         "archive_completion_watermark_supplied": complete_through_ns is not None,
         "complete_through_ns": complete_through_ns,
         "completion_watermark_independently_verified": False,
+        "dual_public_source_claim_supplied": source_coverage is not None,
+        "dual_public_source_claim": (
+            disclose_claim(source_coverage) if source_coverage is not None else None
+        ),
+        "stream_coverage_independently_verified": False,
+        "raw_stream_source_identity_verified": False,
         "terminal_bin_may_be_partial_without_watermark": complete_through_ns is None,
         "private_agent_identifiers_used": False,
         "individual_robot_detected": False,
@@ -220,6 +247,11 @@ def summarize_lagged_book(
             "complete. Set a trustworthy exclusive completion watermark and "
             "the tool abstains for any trade-bin ending after that watermark. "
             "The source itself cannot verify the caller attestation.",
+            "Optional dual public stream metadata separately gates previous "
+            "book and current trade clock bins and excludes declared gaps. "
+            "Raw quote/trade records do not carry independently verified "
+            "instrument, session or source labels; matching caller claims "
+            "are not proof of actual source completeness.",
             "Markets with many participants can show the same correlation.",
             "Rotated-bin placebo is NOT a market-preserving conditional null.",
             "ABIDES source book sequence is not proof of real broker L2 ordering.",
