@@ -1,0 +1,34 @@
+{
+  "schema_version": "lobster-public-demo-right-censored-clock-bbo-study-v1",
+  "design_date_utc": "2026-11-21",
+  "original_source": "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip",
+  "previously_inspected_retrospective_sample": true,
+  "source_locally_pinned_sha256": "5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f",
+  "source_provider_signed_sha256_available": false,
+  "original_research_stage1_run_id": 44925498585,
+  "known_prior_source_rows": 269748,
+  "clock_semantics": "market exchange-local seconds since midnight, not UTC epoch",
+  "book_semantics": "Book state after event i persists on [timestamp_i,timestamp_i+1); same-time updates have zero duration, last event censored",
+  "excluded_time_regions": [
+    "before first original message",
+    "after last original message",
+    "missing/one-sided/crossed price states excluded from numeric BBO means but duration accounted"
+  ],
+  "numeric_outputs": [
+    "time_weighted_spread_x10000",
+    "time_weighted_top_depth_shares",
+    "time_weighted_top_depth_imbalance",
+    "valid_two_sided_non_crossed_quote_seconds",
+    "missing_quote_seconds",
+    "locked_or_crossed_quote_seconds",
+    "zero_duration_same_timestamp_intervals",
+    "intervals_exceeding_30_seconds"
+  ],
+  "do_not_treat_large_inactivity_gap_as_invalid_without_evidence": true,
+  "stale_gap_diagnostic_seconds": 30,
+  "no_model_selection_on_original_observed_metrics": true,
+  "no_actual_physical_market_agent_or_trading_accuracy_labels": true,
+  "raw_derived_event_level_results_forbidden": true,
+  "noncommercial_research_public_demo_no_vendor_raw_redistribution": true,
+  "no_statistical_significance_p_values_or_market_FDR_claims": true
+}
