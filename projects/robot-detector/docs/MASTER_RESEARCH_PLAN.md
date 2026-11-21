@@ -361,3 +361,8 @@ threshold и все когорты.
 | 2026-11-21 | 13-placement exact toy conditional null #44938416432: naive print-weighted ratio raised alarm in 2/13 placements of one 100-fill cluster, while timestamp-grouped score was constant and 0/13 alarm. Strong toy exchangeability assumption DOES NOT calibrate market FDR. Next #94 genuine ABIDES cluster-aware control | VERIFIED exact toy-only negative; new real matching-source study NOT_STARTED |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
+
+
+### RD-CLUSTER-MARKET-13 — source execution verification checkpoint (2026-11-21)
+
+Commit [`902fdeb`](https://github.com/IskanderAbdullin/Analytics/commit/902fdeb30e1548ab3722aa97718947cd9a9468fd) adds a **precommitted** original ABIDES 16-case source workflow for local seeds 3201–3204, four cohorts, threshold 0.60 and minimum 8 hits20. At this checkpoint the two observed HEAD workflow runs [44938997233](https://github.com/IskanderAbdullin/Analytics/actions/runs/44938997233) and [44938997239](https://github.com/IskanderAbdullin/Analytics/actions/runs/44938997239) passed provenance/.NET checks, **not** the new original ABIDES 16-case job. Therefore **no original source results or negative-control outcomes are yet verified**. Next action: execute the already-frozen original source workflow once, collect the short aggregate-only artifact, account for all 16 cases and abstentions, and only then update the scientific conclusion. Do not alter frozen seeds or threshold to fit outcomes.
