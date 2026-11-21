@@ -1,17 +1,8 @@
 name: Robot Detector genuine ABIDES public L2 clock-origin phase sensitivity
 
+# Retrospective reproducibility only. These already-spent seeds do not
+# become independent trials when automatically rerun on every PR or push.
 on:
-  push:
-    paths:
-      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
-      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
-      - 'projects/robot-detector/research/seed_registry.json'
-      - '.github/workflows/robot-detector-abides-binphase.yml'
-  pull_request:
-    paths:
-      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
-      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
-      - '.github/workflows/robot-detector-abides-binphase.yml'
   workflow_dispatch:
 
 permissions:

@@ -130,3 +130,17 @@ difference on identical aligned bin observations.
 No rerun was launched to obtain these figures; all data came from
 the already executed study. There is no new seed or p-value, no
 identified robot, no real-market specificity and no permission to trade.
+
+## GitHub Actions cost gate after original research
+
+The genuine four-market `robot-detector-abides-binphase.yml` experiment is
+now **manual-only** (`workflow_dispatch`). Repeated automatically triggered
+runs on a previously inspected pair of seeds are **not independent evidence**
+and waste matching-engine CI minutes. The prior successful artifact and
+scalar fixture preserve the historical output.
+
+The lightweight research provenance workflow instead validates the two
+standard-library-only Python phase/review test suites, including
+the original aggregate-only numeric fixture, without starting ABIDES.
+A future manual matching-engine rerun may check reproducibility, but
+cannot be advertised as a fresh holdout.

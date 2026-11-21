@@ -11,6 +11,10 @@ on:
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
       - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_phase_review.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
+      - 'projects/robot-detector/fixtures/abides_l2_phase_observed_scalars_20261121.json'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   pull_request:
     paths:
@@ -22,6 +26,10 @@ on:
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
       - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_phase_review.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
+      - 'projects/robot-detector/fixtures/abides_l2_phase_observed_scalars_20261121.json'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   workflow_dispatch:
 
@@ -43,6 +51,8 @@ jobs:
       - name: Validate known spent seeds and no source constant drift
         run: |
           python -m unittest discover -s tests_research -p 'test_*.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
           python tools/research_seed_registry.py
           python - <<'PY'
           from tools.research_seed_registry import read_ledger, audit_sources, assess_proposed_seeds
