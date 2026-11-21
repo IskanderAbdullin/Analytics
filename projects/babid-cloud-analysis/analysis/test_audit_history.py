@@ -69,6 +69,24 @@ class AuditTests(unittest.TestCase):
         self.assertNotIn("SECRET", (output / "configs.csv").read_text())
         self.assertNotIn("C://not-a-token", (output / "configs.csv").read_text())
 
+    def test_accounting_alignment_extracted_without_claiming_broker_trade(self):
+        with (self.root / "logs-foo" / "day.log").open("a", encoding="utf-8") as log:
+            log.write("2026-11-21 13:08:19.500 ERR Income accounting position (34) differs from the journal (36); the accounting is aligned\n")
+        output = self.root / "reports" / "accounting"
+        result = run(self.root, output, "0001-01-01T00:00:00",
+                     "9999-12-31T23:59:59")
+        self.assertEqual(result["accounting_alignment_notices"], 1)
+        self.assertEqual(result["accounting_alignment_rows_omitted"], 0)
+        with (output / "accounting_alignments.csv").open(newline="", encoding="utf-8") as f:
+            row = next(csv.DictReader(f))
+        self.assertEqual(row["pnl_net_before"], "34")
+        self.assertEqual(row["journal_net"], "36")
+        self.assertEqual(row["delta_lots"], "2")
+        self.assertEqual(row["verified_broker_trade"], "False")
+        data = (output / "accounting_alignments.csv").read_text(encoding="utf-8")
+        self.assertNotIn("SECRET", data)
+        self.assertNotIn("t1", data)
+
     def test_output_is_never_replaced(self):
         output = self.root / "reports" / "audit-1"
         run(self.root, output, "2026-11-21T14:40:00", "2026-11-21T15:10:00")

@@ -1,0 +1,101 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-accounting-event-trace-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "597c59f9-7cb8-41fc-adf5-2af3b91a398c",
+    "occurred_at": "2026-11-21T17:15:00Z",
+    "type": "research",
+    "title": "Add compact accounting-alignment log evidence to unblock NVDA +2 audit",
+    "summary": "History auditor previously omitted Income accounting position from incident regex. It now extracts bounded numeric-only accounting alignment events, counts omitted entries, warns in the quality gate, and has synthetic acceptance tests. Source logs never enter public CI.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_history.py",
+      "action": "modified",
+      "summary": "Extract accounting alignments into compact local report with truncation counters"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_quality.py",
+      "action": "modified",
+      "summary": "Require review for accounting adjustments and truncated focus report"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_audit_history.py",
+      "action": "modified",
+      "summary": "Synthetic +2 accounting adjustment evidence test"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_audit_quality.py",
+      "action": "modified",
+      "summary": "Synthetic gate test"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "M-015 checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-027 verified parser omission and conditional investigation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Preserve actual 13:08 P0 objective and precise tool limitations"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Conditional P0-S5 test around accounting rebasing"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Document bounded private output and scope"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-ci",
+      "title": "Cross-platform Babid synthetic tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "After push, no private data in CI"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-004",
+      "title": "Missing access to full large log",
+      "severity": "high",
+      "state": "open",
+      "description": "PC-Agent direct text reads are size-bounded; running revised local audit remains separate."
+    },
+    {
+      "id": "B-006",
+      "title": "Primary accounting line not yet observed",
+      "severity": "high",
+      "state": "open",
+      "description": "There is no verified 13:08 accounting notice extracted from the original log."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Run private frozen-source extraction and correlate with +2 discrepancy",
+      "priority": "high",
+      "state": "blocked"
+    }
+  ],
+  "limitations": [
+    "Parser capability and synthetic test do not prove a cause of NVDA divergence.",
+    "Do not upload real reports or modify the trading robot."
+  ]
+}
