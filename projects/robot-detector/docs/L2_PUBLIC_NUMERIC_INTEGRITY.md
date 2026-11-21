@@ -23,3 +23,7 @@ The existing pinned-ABIDES public L2 workflow runs the expanded `tests_l2` colle
 ## Scientific limits
 
 Type-correctness is a **necessary source quality invariant**, not a proof that the data is complete, that exchange event timing is causally ordered, that physical robot identities are known, or that a signal is predictive. The strict previous-bin study remains retrospective. Real-account orders, token access, GUI changes and trading remain out of scope. Scientific release gate CLOSED.
+
+## Executed result (2026-11-21)
+
+[Successful real ABIDES L2 CI #44911366203](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911366203) ran **41 Python tests**, including all eight strict-scalar cases, and the pinned ABIDES source-generated L2 and anonymous-trade simulations. Valid integer input fixtures preserved the published 1,152 snapshots / 709 fills in the L2 feasibility probe and all previous public quote/flow aggregations. Floats, booleans, Decimal/text and invalid nonpositive discrete fields were rejected as intended. This is input-validation success, **not** verification of real provider source typing or real market accuracy.
