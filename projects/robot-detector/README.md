@@ -3,6 +3,18 @@
 **Версия проекта:** 0.2 (исследовательская) · **Обновлено:** 2026-11-19 · **Статус:** исторический прототип с подтверждённым импортом 121 920 реальных обезличенных сделок SBER (17.11.2026); статистическая точность распознавания не установлена.
 
 
+## Public-only lagged volume response — experimental Stage 2
+
+The new **read-only** `volume-response` command examines whether reported BUY/SELL volume in bin `t` is associated with observable market volume in the **preceding completed** UTC clock bin `t-1`. It does not access ABIDES private labels or identify VWAP/POV orders or their owners. Missing populated bins break the lag; uniform side volume yields an undefined (null) rank correlation; source/session/data-kind boundaries are isolated.
+
+```powershell
+dotnet run --project src/RobotDetector.Cli -- volume-response `
+  --input fixtures/synthetic_variable_clip_5s.csv `
+  --bin-seconds 5 --min-pairs 8 --output data/results/volume-response.json
+```
+
+[Method, safety and reproducibility](docs/VOLUME_RESPONSE_PUBLIC.md). Existing fixed-q and variable-q detectors are unchanged. This is a **descriptive diagnostic**, not an additional validated physical robot detector, and does not establish predictive edge or significance.
+
 ## Genuine ABIDES-NG exchange execution — blind validation
 
 A new **optional** research pipeline uses the genuine ABIDES-NG exchange/order-book matching engine with controlled TWAP, VWAP or POV execution, independent background agents and a matching-engine null scenario. Only the anonymous public CSV is shown to either detector; maker/taker agent IDs stay in a separate private manifest used **after detection** for exact print-level scoring. Source pinned to upstream commit `ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242`.

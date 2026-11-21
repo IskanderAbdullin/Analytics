@@ -28,7 +28,7 @@ public sealed class SelfTestBridge
         int passedCount = (int)passed.GetValue(null)!;
         int failedCount = (int)failed.GetValue(null)!;
         Assert.AreEqual(0, failedCount, "Upstream deterministic tests failed.");
-        Assert.IsTrue(passedCount >= 123,
-            $"Expected at least 123 registered upstream checks but only {passedCount} passed.");
+        Assert.IsTrue(passedCount >= 128,
+            $"Expected at least 128 registered upstream checks but only {passedCount} passed.");
     }
 }

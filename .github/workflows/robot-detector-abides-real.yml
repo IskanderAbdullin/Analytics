@@ -121,6 +121,48 @@ jobs:
               print("ABIDES_ALT_EXECUTION",json.dumps({"mode":kind,"public_prints":report["publicPrints"],
                    "controlled_prints":controlled,"models":report["models"]}))
           PY
+      - name: Public-only volume-response diagnostics on spent development seeds
+        run: |
+          # Only pre-existing development seeds 41/42/43/44. Do not fit thresholds
+          # or inspect the frozen 901..904 private truth for model selection.
+          for kind in twap null vwap pov; do
+            case "$kind" in
+              twap) public=/tmp/abides_twap_public.csv ;;
+              null) public=/tmp/abides_null_public.csv ;;
+              vwap) public=/tmp/abides_vwap.csv ;;
+              pov) public=/tmp/abides_pov.csv ;;
+            esac
+            dotnet run --project src/RobotDetector.Cli -c Release --no-build -- volume-response \
+              --input "$public" --bin-seconds 30 --min-pairs 8 \
+              --output "/tmp/abides_public_volume_${kind}.json"
+          done
+          python3 - <<'PY'
+          import json,math
+          for kind in ('twap','null','vwap','pov'):
+              r=json.load(open(f'/tmp/abides_public_volume_{kind}.json',encoding='utf-8'))
+              assert r['inputPublicPrints']>0 and r['evaluatedSourceGroups']>0,r
+              assert r['skippedDenseGroups']==0,r
+              assert not r['physicalBotCountKnown'] and not r['statisticalSignificanceEstablished'],r
+              assert r['sourceCoverageVerified'] is False,r
+              assert len(r['sideProfiles'])==2*r['evaluatedSourceGroups'],r
+              assert all(not v['ownerIdentityKnown'] and not v['significanceCalibrated']
+                         for v in r['sideProfiles']),r
+              assert all(o['previousTotalMarketLots']>0 and o['currentTotalMarketLots']>0
+                         for o in r['observations']),r
+              assert all(v['spearmanPreviousMarketLotsToCurrentSideLots'] is None or
+                         -1.000001<=v['spearmanPreviousMarketLotsToCurrentSideLots']<=1.000001
+                         for v in r['sideProfiles']),r
+              # Public-only associations are descriptive, not synthetic-actor scores.
+              print('ABIDES_PUBLIC_VOLUME_DEV',json.dumps({
+                  'kind':kind,'public':r['inputPublicPrints'],
+                  'adjacent_observations':len(r['observations']),
+                  'side_associations':[
+                      {'direction':v['reportedDirection'],
+                       'rho_lag':v['spearmanPreviousMarketLotsToCurrentSideLots'],
+                       'pairs':v['eligibleAdjacentPairs']}
+                      for v in r['sideProfiles']]
+              }))
+          PY
       - name: Frozen-seed cross-run blinded replication
         run: |
           python tools/abides_batch.py --holdout-seeds 901 902 903 904 \

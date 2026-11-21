@@ -139,6 +139,11 @@ internal static partial class Program
         Check("ABIDES public/private execution truth scoring", AbidesPrivateTruthScoring);
         Check("ABIDES background-only recall denominator remains undefined", AbidesNullRecallUndefined);
         Check("ABIDES public and private tampering rejected", AbidesIntegrityRejectsTampering);
+        Check("volume response accurately measures public past-bin lag", VolumeResponsePerfectLagAndConservation);
+        Check("volume response never treats missing populated bins as quiet zeros", VolumeResponseMissingBinsNotZeroImputed);
+        Check("volume response historical observations unaffected by later prints", VolumeResponseFutureDoesNotRewritePastObservations);
+        Check("volume response rejects spurious constant and cross-source correlations", VolumeResponseNullAndSeparateSource);
+        Check("volume response bounds and duplicate event identities fail closed", VolumeResponseRefuseDuplicatesAndUnsafeBounds);
 
         Console.WriteLine($"SelfTests: passed={_passed}, failed={_failed}");
         if (_failed != 0) Environment.ExitCode = 1;
