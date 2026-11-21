@@ -437,6 +437,8 @@ L2/coverage abstention и 4 семьи сценариев.
 
 | 2026-11-21 | Source-free small-N CI #44943333914: exact nominal 95% CP bounds 0/4 upper 0.6024, 4/4 lower 0.3976 conditional on hypothetical IID synthetic seeds; matched same source tapes show one extra grouped TWAP miss and unchanged Poisson FP. No real-market FDR. New 40-seed ×4 source replication frozen before running next | VERIFIED offline statistical audit only; #96 source NOT_RUN |
 
+| 2026-11-21 | RD-MATCHED-UNCERTAINTY-14: additional source-fixture integrity hardening — exact allowlist for top-level/case/cohort/totals, original source and ABIDES revision pins, false-alarm/missed-TWAP conservation; adversarial private-ID/count tampering cases. No new simulations, no new threshold, no increase in claimed confidence. | Implementation committed; cheap CI required for verification |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
