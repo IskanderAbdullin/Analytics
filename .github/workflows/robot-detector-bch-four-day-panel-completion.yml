@@ -1,0 +1,112 @@
+name: Robot Detector frozen BCH Nov18 19 four-day public print panel
+
+# Before ANY new BCH Nov18/19 provider download, protocol pinned at
+# commits a71958e59f and e2a7114799. BCH20 is an ALREADY INSPECTED
+# replay to complete occupancy comparability, not fresh evaluation.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-bch-four-day-panel-completion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  four-public-bch-utc-days-source-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deterministic no-network protocol and source tamper tests
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests_background -p 'test_real_bch_four_day_panel_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_spot_occupancy_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
+      - name: New provider checksum verified BCH Nov18 source
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol BCHUSDT --date 2026-11-18 \
+            --clock-origin-study --cluster-preserving-null-study \
+            --output /tmp/bch-20261118-original-new-source.json
+      - name: New provider checksum verified BCH Nov19 source
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol BCHUSDT --date 2026-11-19 \
+            --clock-origin-study --cluster-preserving-null-study \
+            --output /tmp/bch-20261119-original-new-source.json
+      - name: Previously inspected BCH Nov20 reproducibility re-run, NOT new
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol BCHUSDT --date 2026-11-20 \
+            --clock-origin-study --cluster-preserving-null-study \
+            --output /tmp/bch-20261120-seen-source-recompute.json
+      - name: Strict precommitted 4-day panel with Nov17 source fixture
+        run: |
+          set -euo pipefail
+          python tools/real_bch_four_day_panel_review.py \
+            --bch18 /tmp/bch-20261118-original-new-source.json \
+            --bch19 /tmp/bch-20261119-original-new-source.json \
+            --bch20 /tmp/bch-20261120-seen-source-recompute.json \
+            --output /tmp/bch-four-day-occupancy-panel-reviewed.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/bch-four-day-occupancy-panel-reviewed.json').read_text())
+          assert r['schema_version']=='bch-public-real-spot-four-day-occupancy-panel-v1'
+          assert r['all_observed_dates_in_UTC_order']==[
+            '2026-11-17','2026-11-18','2026-11-19','2026-11-20']
+          assert r['frozen_new_archive_dates']==['2026-11-18','2026-11-19']
+          assert len(r['all_cases'])==4
+          assert r['sum_original_public_trade_prints']>0
+          assert r['uninspected_source_phase0_5plus_cases_total']==2
+          assert not r['calibrated_real_actor_p_values_or_FDR']
+          assert not r['independent_real_market_actor_labels_available']
+          assert not r['commercial_or_live_trading_authorized']
+          assert not r['full_depth_exchange_l2_available']
+          for c in r['all_cases']:
+             assert c['symbol']=='BCHUSDT'
+             assert c['public_trade_count']>0
+             assert len(c['provider_zip_sha256'])==64
+             assert [v['phase_seconds'] for v in c['phases']]==[0,10,20]
+             print('FOUR_DAY_BCH_PUBLIC_SPOT_CASE',json.dumps({
+                'utc_day':c['utc_day'],
+                'new_precommitted_source':c['utc_day'] in ('2026-11-18','2026-11-19'),
+                'public_trades':c['public_trade_count'],
+                'provider_zip_sha256':c['provider_zip_sha256'],
+                'one_sided_5plus':c['phases'][0]['five_plus_one_sided'],
+                'strong_null_5plus_median':c['phases'][0]['strong_null_five_plus_median'],
+                'strong_null_5plus_max':c['phases'][0]['strong_null_five_plus_max'],
+                'precommitted_primary_pass':c['phase0_conditioned_primary_met'],
+                'not_bot_identity_claim':True
+             },sort_keys=True))
+          print('FOUR_DAY_BCH_PUBLIC_SPOT_COMPLETE',json.dumps({
+             'source_trades':r['sum_original_public_trade_prints'],
+             'unseen_dates':r['frozen_new_archive_dates'],
+             'unseen_primary_pass_count':r['uninspected_source_phase0_5plus_cases_passed'],
+             'observed_adjacent_day_id_boundaries':r['full_bch_public_tape_observed_trade_id_adjacent_boundaries'],
+             'provider_completeness_independently_verified':False
+          },sort_keys=True))
+          PY
+      - name: Retain only source aggregate and provenance JSON, no raw tape
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-four-day-bch-occupancy-panel
+          path: |
+            /tmp/bch-four-day-occupancy-panel-reviewed.json
+            /tmp/bch-20261118-original-new-source.json
+            /tmp/bch-20261119-original-new-source.json
+            /tmp/bch-20261120-seen-source-recompute.json
+          retention-days: 7
+          if-no-files-found: error
