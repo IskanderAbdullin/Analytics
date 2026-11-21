@@ -2,6 +2,15 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Воспроизводимость одним offline-командным запуском](
+  docs/OFFLINE_REPRODUCIBILITY_20261121.md):
+  **14 наборов / 113 synthetic/offline tests**
+  по оригинальным исходникам плюс 8 агрегатных
+  source/provenance fixtures без скачивания рынка.
+  Отдельный network replay нужен только для
+  оригинальных vendor файлов; offline CI не
+  является независимой real-market валидацией.
+
 - [Проверка качества source/L2 и запрет недоказанной полноты](
   docs/EXCHANGE_L2_COVERAGE_ABSTENTION_20261121.md):
   абсолютная нумерация сообщений требуется для покрытия;

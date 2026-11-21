@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "907918fb6c78238c716e798f73c5561d7a52692c",
+  "last_verified_base_commit": "6d51cbc304fc84b02ca2acda00578f5e828407a4",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-REPRO-05",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44927111552",
+      "result": "One-command offline repro covers 14 explicit negative/unit suites, 113 passed source-free tests, 8 pinned aggregate provenance fixtures, no network or vendor raw data. Not a scientific detector release.",
+      "status": "VERIFIED_OFFLINE_ONLY_NOT_ORIGINAL_MARKET_SOURCE_REAUTHENTICATION"
+    },
     {
       "stage_id": "RD-ROBUSTNESS-04",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926821602",
@@ -53,32 +59,28 @@
     }
   ],
   "current_stage": {
-    "id": "RD-REPRO-05",
+    "id": "RD-SYNTHETIC-TEMPORAL-06",
     "status": "READY_TO_IMPLEMENT",
-    "title": "One-command offline reproducibility and machine-readable scientific evidence manifest",
-    "why_next": "The research methods and original source provenance are spread across 5 completed stages. A single source-free replay is needed so future agents never confuse repeatability of unit tests with independent access/ground truth.",
+    "title": "Precommitted public-only fixed-clock synthetic rhythm vs periodic-noise hard negative",
+    "why_next": "Existing real market timing results on LTC/BCH are heterogeneous; need a source-free blind-seed toy experiment where identical periodic *background* activity can mimic an injected algorithm. Preserve hard false positives.",
     "inputs": [
-      "docs/AUTONOMOUS_RESEARCH_TZ.md",
-      "research/autonomy_state.json",
-      "tools/autonomy_checkpoint.py",
-      "tests_background/test_lobster_event_time_features.py",
-      "tests_background/test_l2_duration_weighting.py",
-      "tests_background/test_public_l2_ownership_nonidentifiability.py",
-      "tests_background/test_public_l2_feed_coverage_gate.py"
+      "tools/public_l2_ownership_nonidentifiability.py",
+      "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md",
+      "research/seed_registry.json"
     ],
     "deliverables": [
-      "Single command to run core deterministic negative/offline suites, fail closed on missing tests",
-      "Compact JSON evidence manifest with tests/suites and source-scoped original run URLs",
-      "Clear distinction between source-free reproduction and paid/demo source network replays",
-      "Adversarial tests for omitted suite and changed checkpoint"
+      "Strict seed and threshold protocol frozen before generation of holdout scenarios",
+      "Public-only projected executed print phase-grid feature with no oracle agent labels",
+      "Independent synthetic null, periodic-noise hard negative, and target-positive cohorts, evaluated on unseen local ledger seeds",
+      "Full negative results, fixed threshold and clear toy-only accuracy statement"
     ],
     "acceptance": [
-      "All required unit suites run and CI passes",
-      "No source network fetch or raw archive needed",
-      "Machine-readable output includes unresolved real-actor FDR and data completeness limitations",
-      "Commit/push and following science stage selected"
+      "No target/source ID leaks into features",
+      "Three scenarios per seed; hard false-positive remains visible",
+      "All frozen holdout scenarios accounted for, no posthoc threshold selection",
+      "Cheap CI, commit/push, checkpoint and next research task"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/80"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/82"
   },
   "backlog": [
     {
@@ -86,6 +88,18 @@
       "status": "QUEUED",
       "priority": 3,
       "title": "Optional research-only real-time read-only connector and OsEngine integration after offline validity gates"
+    },
+    {
+      "id": "RD-ABIDES-INDEPENDENT-07",
+      "status": "QUEUED",
+      "priority": 1,
+      "title": "Compare fixed-clock toy feature with genuine ABIDES independent holdout and realistic cadence-only background negatives, preserving synthetic source privacy"
+    },
+    {
+      "id": "RD-SCIENCE-AUDIT-08",
+      "status": "QUEUED",
+      "priority": 2,
+      "title": "Cross-source identifiability, calibration/coverage, limitations and coherent science manuscript release gate"
     }
   ],
   "blockers": [
@@ -112,5 +126,5 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "RD-ROBUSTNESS-04 source-free L2 coverage/abstention gate passed adversarial tests in CI #44926821602, with unknown real source completeness preserved. RD-REPRO-05 #80 selected and continuing immediately; master goal remains open."
+  "last_session_result": "RD-REPRO-05 one-command research offline reproduction verified (14 suites/113 tests) in CI #44927111552. Next source-free preregistered synthetic hard-negative timing study #82 selected; master goal remains active."
 }
