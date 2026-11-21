@@ -12,6 +12,9 @@ on:
       - 'projects/robot-detector/tools/abides_matched_smalln_audit.py'
       - 'projects/robot-detector/tools/abides_grid_replication_160.py'
       - 'projects/robot-detector/tests_background/test_abides_grid_replication_160.py'
+      - 'projects/robot-detector/tools/abides_160_original_audit.py'
+      - 'projects/robot-detector/tests_background/test_abides_160_original_audit.py'
+      - 'projects/robot-detector/fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json'
       - 'projects/robot-detector/research/abides_public_grid_160case_precommit_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_matched_smalln_audit.py'
       - 'projects/robot-detector/research/abides_matched_uncertainty_audit_protocol_20261121.json'
@@ -121,6 +124,9 @@ on:
       - 'projects/robot-detector/tools/abides_matched_smalln_audit.py'
       - 'projects/robot-detector/tools/abides_grid_replication_160.py'
       - 'projects/robot-detector/tests_background/test_abides_grid_replication_160.py'
+      - 'projects/robot-detector/tools/abides_160_original_audit.py'
+      - 'projects/robot-detector/tests_background/test_abides_160_original_audit.py'
+      - 'projects/robot-detector/fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json'
       - 'projects/robot-detector/research/abides_public_grid_160case_precommit_20261121.json'
       - 'projects/robot-detector/tests_background/test_abides_matched_smalln_audit.py'
       - 'projects/robot-detector/research/abides_matched_uncertainty_audit_protocol_20261121.json'
@@ -263,6 +269,8 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_abides_clustered_grid_holdout.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_matched_smalln_audit.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_grid_replication_160.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_160_original_audit.py' -v
+          python tools/abides_160_original_audit.py
           python tools/abides_matched_smalln_audit.py --output data/results/abides-matched-uncertainty.json
           python tools/public_cluster_conditional_toy_null.py --output data/results/public-cluster-conditional-toy-null.json
           python tools/public_timing_phase_tied_fills.py --output data/results/public-phase-tied-fill-diagnostic.json
