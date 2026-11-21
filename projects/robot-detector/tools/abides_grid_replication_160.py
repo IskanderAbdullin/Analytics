@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import json
+import logging
 from pathlib import Path
 
 from abides_export import UPSTREAM_COMMIT
@@ -195,6 +196,10 @@ def simulate_source_case(seed:int,cohort:str)->dict:
             start_time_offset="00:01:00",end_time_offset="00:01:00",
             freq="45s",direction="BID",quantity=1200,trade=True,
             order_style="market"),count=1)
+    # Public CI logs must not expose per-fill simulator agent names or internal IDs.
+    # Filtering ABIDES INFO logs does NOT modify synthetic source generation,
+    # public-only scores, frozen seeds, oracle separation, or final aggregates.
+    logging.disable(logging.INFO)
     simulation=run_simulation(builder.build(),profile=ResultProfile.QUANT)
     market=simulation.markets["ABM"]
     if not market.trades or market.l2_series is None:
