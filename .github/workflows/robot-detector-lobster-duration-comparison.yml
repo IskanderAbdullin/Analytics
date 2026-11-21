@@ -2,10 +2,9 @@ name: Robot Detector retrospective AMZN post-event clock-vs-event duration resea
 # Source and metrics fixed before this replay; original 2012 sample already
 # seen, no blind testing or market actor validation.
 # One cheap public demo replay; after success use workflow_dispatch only.
+# Source-verifying original scientific run #44926012965 succeeded.
+# Re-fetch previously inspected public demo only when manually requested.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-lobster-duration-comparison.yml'
   workflow_dispatch:
 
 permissions:
