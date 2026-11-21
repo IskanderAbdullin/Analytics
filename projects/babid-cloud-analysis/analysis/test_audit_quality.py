@@ -93,6 +93,15 @@ class QualityGateTests(unittest.TestCase):
         self.assertEqual(result["status"], "review_required")
         self.assertIn("external_position_transitions_reported", result["review_issues"])
 
+    def test_ambiguous_market_sessions_block_full_audit(self):
+        manifest = self.template()
+        manifest["reports"]["market"] = {
+            "rejected_recordings": 2, "quality_warning_files": 0,
+        }
+        result = evaluate(manifest)
+        self.assertEqual(result["status"], "incomplete")
+        self.assertIn("ambiguous_market_study_recordings", result["blocking_issues"])
+
 
 if __name__ == "__main__":
     unittest.main()

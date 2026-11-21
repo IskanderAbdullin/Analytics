@@ -4,11 +4,13 @@ import argparse
 import csv
 import gzip
 import json
+import math
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from report_safety import validate_report_output
+from tape_integrity import good_book
 
 MSK = timezone(timedelta(hours=3))
 DEFAULT_LEVELS = (1, 3, 5, 10, 20, 50, 100, 120, 200, 500, 1000)
@@ -40,6 +42,7 @@ def scan(path, thresholds, tick_override=None):
     hourly = defaultdict(lambda: [0, 0, 0, 0.0, 0.0, 0.0])
     ticker, tick, pending_down, gap_ms = path.parent.name, tick_override, None, 0
     issues = set()
+    valid_books = 0
     try:
         with op(path, "rt", encoding="utf-8", errors="replace") as stream:
             for line in stream:
@@ -53,8 +56,14 @@ def scan(path, thresholds, tick_override=None):
                         obj = json.loads(parts[1])
                         ticker = obj.get("Ticker", ticker)
                         if tick_override is None:
-                            tick = float(obj.get("PriceStep") or 0) or None
+                            tick = None
+                            candidate = float(obj.get("PriceStep") or 0)
+                            if not math.isfinite(candidate) or candidate <= 0:
+                                issues.add("nonfinite or missing price step")
+                            else:
+                                tick = candidate
                     except (ValueError, IndexError, TypeError):
+                        tick = None
                         issues.add("invalid instrument header")
                     continue
                 if kind not in ("B", "D", "U") or len(parts) < 2:
@@ -71,14 +80,19 @@ def scan(path, thresholds, tick_override=None):
                         gap_ms += max(0, ms - pending_down)
                     pending_down = None
                     continue
-                if not tick or tick <= 0:
-                    issues.add("missing tick size: specify --tick")
+                if pending_down is not None:
+                    issues.add("book during known feed outage")
+                    continue
+                if not tick or not math.isfinite(tick) or tick <= 0:
+                    issues.add("missing or invalid tick size: specify --tick")
                     continue
                 try:
-                    bids, asks = levels(parts[3]), levels(parts[4])
-                    if not bids or not asks or bids[0][0] >= asks[0][0]:
+                    if len(parts) < 5 or not good_book(parts[3], parts[4]):
+                        issues.add("malformed or crossed order book")
                         continue
+                    bids, asks = levels(parts[3]), levels(parts[4])
                     spread = (asks[0][0] - bids[0][0]) / tick
+                    valid_books += 1
                     local = datetime.fromtimestamp(ms / 1000, MSK)
                     date, hour = local.strftime("%Y-%m-%d"), local.strftime("%H")
                     for threshold in thresholds:
@@ -104,6 +118,7 @@ def scan(path, thresholds, tick_override=None):
                          buy_edge_ticks=bedge / b if b else 0,
                          sell_edge_ticks=sedge / s if s else 0))
     quality = dict(ticker=ticker, file=path.name, books=count["B"],
+                   valid_books=valid_books, invalid_books=count["B"] - valid_books,
                    trades=count["T"], gap_trades=count["G"],
                    disconnects=count["D"], reconnects=count["U"],
                    known_outage_seconds=gap_ms / 1000,
@@ -123,11 +138,24 @@ def run(root, output, thresholds, tick):
     if not (root / "recordings").is_dir():
         raise ValueError("root must contain recordings")
     rows, quality = [], []
+    sessions = defaultdict(list)
     for file in sorted((root / "recordings").glob("*/*.tsv*")):
-        if not file.is_file() or file.suffix not in (".tsv", ".gz"):
+        if not file.is_file() or file.suffix.lower() not in (".tsv", ".gz"):
             continue
         if not file.resolve().is_relative_to(root):
             continue
+        logical_name = file.name[:-3] if file.suffix.lower() == ".gz" else file.name
+        if not logical_name.lower().endswith(".tsv"):
+            continue
+        sessions[(file.parent.name, logical_name)].append(file)
+    rejected = []
+    for (instrument, logical_name), variants in sorted(sessions.items()):
+        if len(variants) != 1:
+            rejected.extend({"instrument": instrument, "file": file.name,
+                             "reason": "duplicate representations of " + logical_name}
+                            for file in variants)
+            continue
+        file = variants[0]
         report, q = scan(file, thresholds, tick)
         rows.extend(report)
         quality.append(q)
@@ -136,10 +164,17 @@ def run(root, output, thresholds, tick):
                 ["ticker", "date_msk", "hour_msk", "min_level_lots", "books",
                  "buy_share", "sell_share", "spread_ticks", "buy_edge_ticks", "sell_edge_ticks"])
     write_table(output / "market_quality.csv", quality,
-                ["ticker", "file", "books", "trades", "gap_trades",
-                 "disconnects", "reconnects", "known_outage_seconds", "issues"])
-    summary = dict(files=len(quality), books=sum(q["books"] for q in quality),
-                   scope="instantaneous quote feasibility only; not a backtest")
+                ["ticker", "file", "books", "valid_books", "invalid_books",
+                 "trades", "gap_trades", "disconnects", "reconnects",
+                 "known_outage_seconds", "issues"])
+    summary = dict(
+        files=len(quality),
+        books=sum(q["books"] for q in quality),
+        eligible_books=sum(q["valid_books"] for q in quality),
+        rejected_recordings=len(rejected),
+        rejected=rejected[:100],
+        quality_warning_files=sum(bool(q["issues"]) for q in quality),
+        scope="instantaneous quote feasibility only; not a backtest")
     (output / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
 
@@ -153,7 +188,8 @@ def main():
     args = ap.parse_args()
     try:
         thresholds = tuple(sorted({int(s.strip()) for s in args.levels.split(",")}))
-        if not thresholds or thresholds[0] <= 0 or (args.tick is not None and args.tick <= 0):
+        if not thresholds or thresholds[0] <= 0 or (
+                args.tick is not None and (not math.isfinite(args.tick) or args.tick <= 0)):
             raise ValueError("invalid threshold or tick")
         result = run(args.root, args.output or args.root / "reports" / "market-study",
                      thresholds, args.tick)

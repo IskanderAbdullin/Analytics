@@ -48,6 +48,11 @@ def evaluate(manifest: dict) -> dict:
     geometry = reports.get("geometry_validation") or {}
     warn_if(geometry.get("invalid_source_rows", 0) > 0, "geometry_input_rows_invalid")
     warn_if(geometry.get("possible_overlapping_groups", 0) > 0, "market_hour_overlap_suspected")
+    market = reports.get("market") or {}
+    critical_if(market.get("rejected_recordings", 0) > 0,
+                "ambiguous_market_study_recordings")
+    warn_if(market.get("quality_warning_files", 0) > 0,
+            "market_study_contains_unverified_books")
     weighted = reports.get("time_weighted") or {}
     critical_if(weighted.get("rejected_recordings", 0) > 0, "market_recorder_rejected_files")
 
