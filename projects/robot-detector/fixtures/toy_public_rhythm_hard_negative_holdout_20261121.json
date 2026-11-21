@@ -1,0 +1,49 @@
+{
+  "schema_version": "toy-fixed-clock-public-rhythm-original-holdout-v1",
+  "source_free_research_ci_run_id": 44927619509,
+  "protocol_frozen_before_results": "research/fixed_clock_toy_rhythm_precommit_20261121.json",
+  "toy_source_only_not_genuine_abides_or_exchange": true,
+  "development_seeds": [
+    2601,
+    2602,
+    2603,
+    2604
+  ],
+  "holdout_seeds": [
+    2701,
+    2702,
+    2703,
+    2704
+  ],
+  "fixed_period_seconds": 10,
+  "tolerance_microseconds": 250000,
+  "predeclared_score_threshold_fraction": 0.22,
+  "three_scenarios_per_seed": true,
+  "holdout_case_count": 12,
+  "cohort_results": {
+    "independent_noise_null": {
+      "sources": 4,
+      "flagged": 0,
+      "actual_target_present": false,
+      "false_positive": 0
+    },
+    "periodic_noise_hard_negative": {
+      "sources": 4,
+      "flagged": 4,
+      "actual_target_present": false,
+      "false_positive": 4
+    },
+    "periodic_target_positive": {
+      "sources": 4,
+      "flagged": 4,
+      "actual_target_present": true,
+      "true_positive": 4
+    }
+  },
+  "periodic_hard_negative_and_target_have_identical_public_stream_per_seed": true,
+  "private_truth_never_used_in_public_scoring": true,
+  "posthoc_phase_or_threshold_selection": false,
+  "physically_identifiable_real_market_robot": false,
+  "real_market_FDR_or_classifier_accuracy_calibrated": false,
+  "no_source_archive_or_private_agent_id_exported": true
+}

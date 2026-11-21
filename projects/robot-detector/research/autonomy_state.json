@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "6d51cbc304fc84b02ca2acda00578f5e828407a4",
+  "last_verified_base_commit": "323f6866648725409c516c2e088cfcf261da75c6",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-SYNTHETIC-TEMPORAL-06",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44927619509",
+      "result": "Frozen 4-seed toy holdout: random-noise null 0/4 alarms, periodic non-target background 4/4 FALSE alarms, injected periodic target 4/4 hits; hard negative and positive public streams identical per seed. Real-market accuracy unknown.",
+      "status": "VERIFIED_NEGATIVE_CONSTRUCTED_TOY_NOT_GENUINE_ABIDES"
+    },
     {
       "stage_id": "RD-REPRO-05",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44927111552",
@@ -59,28 +65,30 @@
     }
   ],
   "current_stage": {
-    "id": "RD-SYNTHETIC-TEMPORAL-06",
+    "id": "RD-ABIDES-INDEPENDENT-07",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Precommitted public-only fixed-clock synthetic rhythm vs periodic-noise hard negative",
-    "why_next": "Existing real market timing results on LTC/BCH are heterogeneous; need a source-free blind-seed toy experiment where identical periodic *background* activity can mimic an injected algorithm. Preserve hard false positives.",
+    "title": "Audit real ABIDES source and test whether public fixed-grid rhythm transfers beyond toy to heterogeneous background nulls",
+    "why_next": "The exact public equality of toy periodic background and target shows an unfixable source-label ambiguity; need more realistic synthetic order-book background with hidden truth, while preserving spent seed ledger and publish both false positives and negative results.",
     "inputs": [
-      "tools/public_l2_ownership_nonidentifiability.py",
-      "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md",
-      "research/seed_registry.json"
+      "tools/abides_l2_background_nulls.py",
+      "tools/abides_l2_twap_phase_contrast.py",
+      "tools/toy_public_execution_rhythm.py",
+      "research/seed_registry.json",
+      "docs/TOY_PUBLIC_EXECUTION_RHYTHM_HARD_NEGATIVE_20261121.md"
     ],
     "deliverables": [
-      "Strict seed and threshold protocol frozen before generation of holdout scenarios",
-      "Public-only projected executed print phase-grid feature with no oracle agent labels",
-      "Independent synthetic null, periodic-noise hard negative, and target-positive cohorts, evaluated on unseen local ledger seeds",
-      "Full negative results, fixed threshold and clear toy-only accuracy statement"
+      "Review existing genuine ABIDES public projection and hard-negative background controls",
+      "Precommit feasible new validation design or document source/data/compute blocker and choose independent alternate",
+      "No leakage of synthetic agent IDs to public features; no real-market FDR claim",
+      "Cheap offline tests and bounded public CI only where genuinely useful"
     ],
     "acceptance": [
-      "No target/source ID leaks into features",
-      "Three scenarios per seed; hard false-positive remains visible",
-      "All frozen holdout scenarios accounted for, no posthoc threshold selection",
-      "Cheap CI, commit/push, checkpoint and next research task"
+      "Public/source/identity contracts aligned before any new ABIDES seed run",
+      "No spent seed falsely declared fresh blind validation",
+      "Any source-rich negative result preserved",
+      "Commit/push and next explicit checkpoint"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/82"
+    "issue_url": ""
   },
   "backlog": [
     {
@@ -88,12 +96,6 @@
       "status": "QUEUED",
       "priority": 3,
       "title": "Optional research-only real-time read-only connector and OsEngine integration after offline validity gates"
-    },
-    {
-      "id": "RD-ABIDES-INDEPENDENT-07",
-      "status": "QUEUED",
-      "priority": 1,
-      "title": "Compare fixed-clock toy feature with genuine ABIDES independent holdout and realistic cadence-only background negatives, preserving synthetic source privacy"
     },
     {
       "id": "RD-SCIENCE-AUDIT-08",
@@ -126,5 +128,5 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "RD-REPRO-05 one-command research offline reproduction verified (14 suites/113 tests) in CI #44927111552. Next source-free preregistered synthetic hard-negative timing study #82 selected; master goal remains active."
+  "last_session_result": "RD-SYNTHETIC-TEMPORAL-06 predeclared 2701–2704 toy holdout, 4/4 periodic-background false alarms and 4/4 positive hits on identical public tapes, passed CI #44927619509. Next: audit genuine ABIDES public-only baselines before any new seed run. Main scientific project still active."
 }
