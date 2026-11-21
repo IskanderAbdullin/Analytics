@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Simulated public L2 order-book feasibility (2026-11-21)
+
+The new strictly **read-only**, optional `tools/l2_probe.py` checks whether the genuine, pinned ABIDES-NG matching engine can export timestamped public depth-five order-book updates without participant IDs. In [successful L2 CI #44894589485](https://github.com/IskanderAbdullin/Analytics/actions/runs/44894589485), a five-minute simulation exported **1,152** L2 snapshots (**661** two-sided, **457** one-sided, **34** empty), **709** executed trades, and **434** extra book snapshots sharing timestamps. **Do not deduplicate snapshots solely by exchange timestamp.**
+
+The official T-Invest historical archive documents trade and candle files, **not a downloadable historical depth-of-book archive**; separate GetOrderBook / MarketDataStream methods provide current/ongoing quotes, not retroactive L2 proof. [Method, data contracts and source evidence](docs/L2_FEASIBILITY.md). This is synthetic L2 *data feasibility*, not a validated market bot detector.
+
 ## Public-only directional regime shifts — experimental Stage 2
 
 Added additive, read-only `direction-shift` to inspect abrupt changes in publicly reported BUY share after a contiguous, qualified six-bin *past-only* reference window. A missing clock bin, too little known-side volume or many UNKNOWN-side prints reset the baseline. No private maker/taker labels or broker order APIs are referenced.
