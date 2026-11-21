@@ -66,7 +66,8 @@ def summarize_lagged_book(
     public_executions: Iterable[PublicExecution],
     *, bin_seconds: int = 30,
     maximum_quote_age_seconds: int | None = None,
-    maximum_depth: int = 5
+    maximum_depth: int = 5,
+    complete_through_ns: int | None = None
 ) -> dict:
     # Defaults must remain valid when the caller chooses shorter clock bins.
     if maximum_quote_age_seconds is None:
@@ -76,6 +77,10 @@ def summarize_lagged_book(
         maximum_quote_age_seconds > bin_seconds or
         maximum_depth < 1 or maximum_depth > 20):
         raise ValueError("Invalid bounded previous-completed-bin settings")
+    if complete_through_ns is not None and (
+        type(complete_through_ns) is not int or complete_through_ns < 0
+    ):
+        raise ValueError("Completion watermark must be a nonnegative nanosecond integer")
     if snapshots is None or len(snapshots.times_ns) > MAX_SNAPSHOTS:
         raise ValueError("Missing or excessive L2 snapshots")
     source = audit_l2_public(snapshots, max_depth=maximum_depth)
@@ -108,6 +113,13 @@ def summarize_lagged_book(
     abstain = Counter()
     observations: list[LaggedBinRecord] = []
     for ordinal, trade_bin in sorted(fills_by_bin.items()):
+        # A caller-supplied exclusive completeness watermark must cover the
+        # END of the current trade bin. A mere last-seen event timestamp
+        # cannot attest that the terminal partial bin is complete.
+        if (complete_through_ns is not None and
+            (ordinal + 1) * duration > complete_through_ns):
+            abstain["current_bin_not_closed_by_watermark"] += 1
+            continue
         prev_idx = last_prior_by_bin.get(ordinal - 1)
         if prev_idx is None:
             abstain["missing_immediately_previous_book_bin"] += 1
@@ -171,7 +183,8 @@ def summarize_lagged_book(
             "missing_immediately_previous_book_bin",
             "prior_quote_too_old",
             "one_sided_or_empty_prior_book",
-            "locked_or_crossed_prior_book"
+            "locked_or_crossed_prior_book",
+            "current_bin_not_closed_by_watermark"
         )},
         "observations": [
             {
@@ -192,6 +205,10 @@ def summarize_lagged_book(
         "rotated_next_bin_share_placebo_spearman": placebo,
         "at_least_five_eligible_bins": k >= 5,
         "previous_completed_bin_only": True,
+        "archive_completion_watermark_supplied": complete_through_ns is not None,
+        "complete_through_ns": complete_through_ns,
+        "completion_watermark_independently_verified": False,
+        "terminal_bin_may_be_partial_without_watermark": complete_through_ns is None,
         "private_agent_identifiers_used": False,
         "individual_robot_detected": False,
         "real_market_significance_calibrated": False,
@@ -199,6 +216,10 @@ def summarize_lagged_book(
         "limitations": [
             "Lagged bin feature is available only after the preceding bin closes; "
             "current buy share is an ex-post outcome, never a future prediction.",
+            "By default an archive terminal trade bin is NOT independently proven "
+            "complete. Set a trustworthy exclusive completion watermark and "
+            "the tool abstains for any trade-bin ending after that watermark. "
+            "The source itself cannot verify the caller attestation.",
             "Markets with many participants can show the same correlation.",
             "Rotated-bin placebo is NOT a market-preserving conditional null.",
             "ABIDES source book sequence is not proof of real broker L2 ordering.",
