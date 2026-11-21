@@ -48,6 +48,9 @@ def evaluate(manifest: dict) -> dict:
     geometry = reports.get("geometry_validation") or {}
     warn_if(geometry.get("invalid_source_rows", 0) > 0, "geometry_input_rows_invalid")
     warn_if(geometry.get("possible_overlapping_groups", 0) > 0, "market_hour_overlap_suspected")
+    opp = reports.get("opportunity_validation") or {}
+    warn_if(opp.get("warnings_total", 0) > 0,
+            "opportunity_validation_input_corrupt_or_duplicated")
     market = reports.get("market") or {}
     critical_if(market.get("rejected_recordings", 0) > 0,
                 "ambiguous_market_study_recordings")
