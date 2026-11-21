@@ -5,12 +5,14 @@ on:
     paths:
       - 'projects/robot-detector/tools/l2_probe.py'
       - 'projects/robot-detector/tools/l2_trade_context.py'
+      - 'projects/robot-detector/tools/lagged_l2_bin.py'
       - 'projects/robot-detector/tests_l2/**'
       - '.github/workflows/robot-detector-l2-feasibility.yml'
   pull_request:
     paths:
       - 'projects/robot-detector/tools/l2_probe.py'
       - 'projects/robot-detector/tools/l2_trade_context.py'
+      - 'projects/robot-detector/tools/lagged_l2_bin.py'
       - 'projects/robot-detector/tests_l2/**'
       - '.github/workflows/robot-detector-l2-feasibility.yml'
   workflow_dispatch:
@@ -88,6 +90,25 @@ jobs:
               assert not a['physical_owner_identity_known'],case
               assert not a['statistical_significance_established'],case
               assert a['eligible_two_sided_fills']<=a['public_fill_count'],case
+              lag=case['lagged_previous_completed_book']
+              assert lag['source_l2_snapshot_count']==a['l2_snapshot_count'],case
+              assert lag['public_execution_prints']==a['public_fill_count'],case
+              assert lag['previous_completed_bin_only'] is True,lag
+              assert lag['private_agent_identifiers_used'] is False,lag
+              assert lag['individual_robot_detected'] is False,lag
+              assert lag['real_market_significance_calibrated'] is False,lag
+              assert lag['real_l2_feed_coverage_proven'] is False,lag
+              assert lag['populated_execution_clock_bins']==(
+                  lag['eligible_lagged_bins']+sum(lag['abstained_clock_bins'].values())),lag
+              assert lag['eligible_lagged_bins']==len(lag['observations']),lag
+              for observation in lag['observations']:
+                  assert observation['previous_last_l2_time_ns'] < observation['current_bin_ordinal']*30*1000000000,observation
+                  assert 0 <= observation['current_reported_buy_share'] <= 1,observation
+                  assert -1 <= observation['previous_book_imbalance'] <= 1,observation
+              for field in ('descriptive_lagged_imbalance_to_next_buy_share_spearman',
+                            'rotated_next_bin_share_placebo_spearman'):
+                  v=lag[field]
+                  assert v is None or (-1<=v<=1),lag
               print('PUBLIC_L2_TRADE_CONTEXT_CHECK',json.dumps({
                   'mode':case['mode'],'quotes':case['public_book']['snapshot_events'],
                   'fills':a['public_fill_count'],
@@ -95,6 +116,9 @@ jobs:
                   'eligible':a['eligible_two_sided_fills'],
                   'compatible_natural':a['categories']['at_or_through_prior_opposite_best'],
                   'compatible_placebo':b['categories']['at_or_through_prior_opposite_best'],
+                  'lagged_bins':lag['eligible_lagged_bins'],
+                  'lagged_spearman':lag['descriptive_lagged_imbalance_to_next_buy_share_spearman'],
+                  'lagged_placebo':lag['rotated_next_bin_share_placebo_spearman'],
               }))
           PY
       - name: Upload public-only quote/trade context aggregate

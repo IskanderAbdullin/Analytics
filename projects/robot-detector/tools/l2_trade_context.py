@@ -162,6 +162,7 @@ def audit_public_join(snapshots: Any,
 
 def simulate_public_context(seed: int = 1501, modes: tuple[str, ...] = MODES) -> dict:
     """Run actual ABIDES matching, stripping private attribution immediately."""
+    from lagged_l2_bin import summarize_lagged_book
     from abides_markets.config_system import SimulationBuilder
     from abides_markets.config_system.agent_configs import (
         NoiseAgentConfig, POVExecutionAgentConfig, VWAPExecutionAgentConfig)
@@ -209,6 +210,9 @@ def simulate_public_context(seed: int = 1501, modes: tuple[str, ...] = MODES) ->
         natural = audit_public_join(market.l2_series, public)
         placebo = audit_public_join(
             market.l2_series, rotated_public_prints(public))
+        # Unlike the within-timestamp as-of join, this evaluates the last
+        # public L2 state of the strictly PREVIOUS COMPLETED clock bin.
+        lagged = summarize_lagged_book(market.l2_series, public)
         if natural["public_fill_count"] != placebo["public_fill_count"] or (
             natural["public_total_lots"] != placebo["public_total_lots"]
         ):
@@ -220,7 +224,8 @@ def simulate_public_context(seed: int = 1501, modes: tuple[str, ...] = MODES) ->
                     natural["same_timestamp_l2_updates_retained"]
             },
             "natural": natural,
-            "rotated_public_print_placebo": placebo
+            "rotated_public_print_placebo": placebo,
+            "lagged_previous_completed_book": lagged
         })
     return {
         "schema_version": "abides-public-l2-context-development-v1",
@@ -243,7 +248,9 @@ def simulate_public_context(seed: int = 1501, modes: tuple[str, ...] = MODES) ->
             "Unknown same-time quote/execution ordering always abstains.",
             "Natural/rotated differences do not prove causation, "
             "significance or individual execution strategy.",
-            "No validated parent-order IDs, real market FDR or trading signal."
+            "No validated parent-order IDs, real market FDR or trading signal.",
+            "Previous completed 30-second book-bin imbalance is analyzed "
+            "only against later whole-bin public prints, not individual IDs."
         ],
     }
 
