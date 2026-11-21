@@ -34,3 +34,9 @@ The five tests verify deterministic fixture generation, 24 repeated append compa
 ## Release and scientific limits
 
 The invariants are **functional correctness properties**. Passing 64 synthetic trials cannot validate how frequently complete, gap-free, correctly timestamped public data are delivered by a live venue. It cannot estimate real-market signal accuracy, p-values, quote causality, physical parent-order identity or strategy profitability. Those require a separate independent real source provenance and scientific evaluation protocol. Scientific/trading release gate CLOSED.
+
+## Executed results (2026-11-21)
+
+[Successful lightweight GitHub CI #44911963501](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911963501) passed **5/5 unit tests** plus a separate **64-fixture** deterministic public source stress run. Every fixture met the closed-prefix invariant, independent book/trades gap monotonicity, earlier watermark nonrevision and eligible/abstained trade-bin conservation. The reference fixture began with **8** closed eligible bins; one declared book gap reduced eligibility to **7**, one independent trade-feed gap to **7**, both distinct gaps to **6**, and an earlier trusted-by-caller watermark also to **6**. None of this proves independent real-feed completeness.
+
+[Successful .NET CI #44911963474](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911963474) and [successful research seed-provenance CI #44911963433](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911963433) confirmed adjacent project checks were unaffected. These test fixtures are not ABIDES matching engine market simulations and have no statistical calibration.
