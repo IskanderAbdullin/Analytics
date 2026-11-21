@@ -1,0 +1,138 @@
+{
+  "schema_version": "market-robot-detector-seed-ledger-v1",
+  "scope": "locally_known_studies_only_not_global_novelty_proof",
+  "description": "Previously evaluated development, validation and constructed toy seeds. All are spent for fresh blinded evaluation; reproducibility replays allowed only with explicit non-independent labels.",
+  "studies": [
+    {
+      "id": "initial_execution_development",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        41,
+        42,
+        43,
+        44
+      ]
+    },
+    {
+      "id": "public_volume_lag_development",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        61,
+        62,
+        63
+      ]
+    },
+    {
+      "id": "direction_shift_development",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        71,
+        72,
+        73
+      ]
+    },
+    {
+      "id": "initial_execution_blind_spent",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        901,
+        902,
+        903,
+        904
+      ]
+    },
+    {
+      "id": "direction_shift_replication",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        1101,
+        1102,
+        1103,
+        1104
+      ],
+      "source_file": "tools/directional_shift_frozen_replication.py",
+      "source_constant": "FROZEN_REPLICATION_SEEDS"
+    },
+    {
+      "id": "strategy_execution_baseline",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        1301,
+        1302,
+        1303,
+        1304
+      ],
+      "source_file": "tools/abides_execution_baseline_holdout.py",
+      "source_constant": "FROZEN_SEEDS"
+    },
+    {
+      "id": "l2_capture_feasibility",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        1401
+      ]
+    },
+    {
+      "id": "l2_public_trade_temporal_context",
+      "kind": "genuine_abides",
+      "phase": "development",
+      "seeds": [
+        1501
+      ]
+    },
+    {
+      "id": "toy_common_market_factor",
+      "kind": "constructed_toy",
+      "phase": "illustrative",
+      "seeds": [
+        1701
+      ]
+    },
+    {
+      "id": "genuine_public_l2_background_nulls",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        1801,
+        1802
+      ],
+      "source_file": "tools/abides_l2_background_nulls.py",
+      "source_constant": "SEEDS"
+    },
+    {
+      "id": "l2_clock_binwidth_sensitivity",
+      "kind": "genuine_abides",
+      "phase": "evaluated",
+      "seeds": [
+        1901,
+        1902
+      ],
+      "source_file": "tools/abides_l2_binwidth_sensitivity.py",
+      "source_constant": "SEEDS"
+    }
+  ],
+  "replays": [
+    {
+      "study_id": "lagged_l2_reanalysis_of_same_tape",
+      "canonical_study_id": "l2_public_trade_temporal_context",
+      "seeds": [
+        1501
+      ],
+      "classification": "non_independent_development_replay"
+    }
+  ],
+  "prohibited_claims": [
+    "Seed absent from this ledger is NOT confirmed unused globally.",
+    "Previously spent seeds cannot be described as fresh blinded holdout.",
+    "Replay of the same simulated public tape is not independent validation.",
+    "Constructed toy nulls are not genuine exchange simulations.",
+    "No model fitting on an evaluated holdout without creating a new evaluation cohort."
+  ]
+}
