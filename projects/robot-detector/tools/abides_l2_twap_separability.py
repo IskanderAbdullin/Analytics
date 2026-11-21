@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """No-threshold post-hoc phase-choice separation warning on simulated L2 rho."""
 from __future__ import annotations
+import argparse
+from hashlib import sha256
+import json
+from pathlib import Path
 from typing import Any
-from abides_l2_twap_phase_contrast import SEEDS,SCENARIOS,PHASES_SECONDS,aggregate
+from abides_l2_twap_phase_contrast import (
+    SEEDS,SCENARIOS,PHASES_SECONDS,aggregate,frozen_plan
+)
+from abides_l2_phase_review import parse_input
 
 
 def assess_descriptive_separation(cases: list[dict[str,Any]]) -> dict[str,Any]:
@@ -87,3 +94,56 @@ def assess_descriptive_separation(cases: list[dict[str,Any]]) -> dict[str,Any]:
             "No real MOEX/SPB/NEO market specificity or physical owner count is established.",
         ],
     }
+
+
+def reanalyse_frozen_json(data: dict[str,Any]) -> dict[str,Any]:
+    """Recheck either original full aggregate or committed scalar-only fixture."""
+    if type(data) is not dict:
+        raise ValueError("Missing source report")
+    schema=data.get("schema_version")
+    if schema=="abides-l2-controlled-twap-phase-contrast-v1":
+        if data.get("frozen_plan")!=frozen_plan():
+            raise ValueError("Original source protocol is not frozen")
+        for field in ("private_truth_used_for_feature","private_truth_exported",
+                      "real_market_significance_established",
+                      "physical_bot_count_known","trade_execution_enabled"):
+            if data.get(field) is not False:
+                raise ValueError("Forbidden or missing original provenance claim")
+        reconstructed=aggregate(data.get("cases"))
+        if data.get("cohorts")!=reconstructed["cohorts"]:
+            raise ValueError("Original cohort summaries disagree with source cases")
+    elif schema=="abides-l2-twap-phase-observed-aggregate-fixture-v1":
+        if (data.get("original_matching_runs")!=4 or
+                data.get("correlated_analytic_views")!=12 or
+                data.get("individual_owner_known") is not False or
+                data.get("real_market_accuracy_known") is not False or
+                data.get("raw_event_archive_included") is not False or
+                data.get("source_content_authenticated_by_external_provider") is not False):
+            raise ValueError("Misleading scalar fixture source metadata")
+    else:
+        raise ValueError("Unsupported source-controlled ABIDES schema")
+    return assess_descriptive_separation(data.get("cases"))
+
+
+def main() -> None:
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input",required=True,type=Path)
+    parser.add_argument("--output",required=True,type=Path)
+    args=parser.parse_args()
+    raw=args.input.read_bytes()
+    out=reanalyse_frozen_json(parse_input(raw))
+    out["input_file_sha256"]=sha256(raw).hexdigest()
+    out["source_authenticity_independently_verified"]=False
+    args.output.parent.mkdir(parents=True,exist_ok=True)
+    with args.output.open("x",encoding="utf-8") as file:
+        json.dump(out,file,indent=2,sort_keys=True,allow_nan=False)
+        file.write("\n")
+    print("ABIDES_L2_PHASE_CHOICE_TRAP",json.dumps({
+        "runs":out["original_simulation_runs"],
+        "strict_all_phase_separation":out["strict_separation_across_every_precommitted_phase"],
+        "calibrated":False,
+    },sort_keys=True))
+
+
+if __name__=="__main__":
+    main()

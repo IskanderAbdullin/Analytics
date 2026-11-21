@@ -1,9 +1,13 @@
 import json
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
-from abides_l2_twap_separability import assess_descriptive_separation
+from abides_l2_twap_separability import (
+    assess_descriptive_separation,reanalyse_frozen_json,main
+)
 from abides_l2_twap_phase_contrast import SEEDS,SCENARIOS,PHASES_SECONDS
 
 def observed():
@@ -57,6 +61,36 @@ class PhaseChoiceTrapTests(unittest.TestCase):
                           for x in out["in_sample_phase_range_checks"]],
                          [False,False,False])
         self.assertFalse(out["apparent_separation_changes_with_phase_choice"])
+
+    def test_offline_cli_accepts_only_frozen_source_and_never_overwrites(self):
+        fixture=(Path(__file__).resolve().parents[1]/"fixtures"
+                 /"abides_l2_twap_phase_observed_20261121.json")
+        doc=json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertFalse(reanalyse_frozen_json(doc)["scientific_stage2_release_allowed"])
+        with tempfile.TemporaryDirectory() as directory:
+            out=Path(directory)/"review.json"
+            with patch("sys.argv",["separability","--input",str(fixture),
+                                   "--output",str(out)]):
+                with patch("abides_l2_twap_phase_contrast.run_case",
+                           side_effect=AssertionError("Should never simulate")):
+                    main()
+            result=json.loads(out.read_text(encoding="utf-8"))
+            self.assertFalse(result["strict_separation_across_every_precommitted_phase"])
+            self.assertFalse(result["source_authenticity_independently_verified"])
+            first=out.read_bytes()
+            with patch("sys.argv",["separability","--input",str(fixture),
+                                   "--output",str(out)]):
+                with self.assertRaises(FileExistsError):
+                    main()
+            self.assertEqual(out.read_bytes(),first)
+        for broken in (
+            dict(doc,schema_version="unknown"),
+            dict(doc,original_matching_runs=12),
+            dict(doc,source_content_authenticated_by_external_provider=True),
+            dict(doc,individual_owner_known=True),
+        ):
+            with self.assertRaises(ValueError):
+                reanalyse_frozen_json(broken)
 
     def test_bad_source_matrix_and_forged_attribution_fail_closed(self):
         with self.assertRaises(ValueError):
