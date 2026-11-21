@@ -34,6 +34,7 @@ SUITES=(
     "test_l2_duration_weighting.py",
     "test_public_l2_ownership_nonidentifiability.py",
     "test_public_l2_feed_coverage_gate.py",
+    "test_toy_public_execution_rhythm.py",
     "test_binance_public_trade_archive.py",
     "test_public_trade_direction_null.py",
     "test_real_public_trade_pair_review.py",

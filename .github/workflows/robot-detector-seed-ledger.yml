@@ -33,6 +33,9 @@ on:
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
       - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/research/fixed_clock_toy_rhythm_precommit_20261121.json'
+      - 'projects/robot-detector/tools/toy_public_execution_rhythm.py'
+      - 'projects/robot-detector/tests_background/test_toy_public_execution_rhythm.py'
       - 'projects/robot-detector/tools/offline_research_reproducer.py'
       - 'projects/robot-detector/tests_background/test_offline_research_reproducer.py'
       - 'projects/robot-detector/tools/public_l2_feed_coverage_gate.py'
@@ -101,6 +104,9 @@ on:
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
       - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/research/fixed_clock_toy_rhythm_precommit_20261121.json'
+      - 'projects/robot-detector/tools/toy_public_execution_rhythm.py'
+      - 'projects/robot-detector/tests_background/test_toy_public_execution_rhythm.py'
       - 'projects/robot-detector/tools/offline_research_reproducer.py'
       - 'projects/robot-detector/tests_background/test_offline_research_reproducer.py'
       - 'projects/robot-detector/tools/public_l2_feed_coverage_gate.py'
@@ -171,6 +177,8 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_public_l2_ownership_nonidentifiability.py' -v
           python -m unittest discover -s tests_background -p 'test_public_l2_feed_coverage_gate.py' -v
           python -m unittest discover -s tests_background -p 'test_offline_research_reproducer.py' -v
+          python -m unittest discover -s tests_background -p 'test_toy_public_execution_rhythm.py' -v
+          python tools/toy_public_execution_rhythm.py --output data/results/heldout-public-rhythm-hard-negative.json
           python tools/offline_research_reproducer.py --output data/results/reproduction-offline-source-free.json
           python tools/public_l2_feed_coverage_gate.py
           python tools/public_l2_ownership_nonidentifiability.py
