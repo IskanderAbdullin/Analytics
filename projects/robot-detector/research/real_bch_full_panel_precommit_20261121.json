@@ -1,0 +1,67 @@
+{
+  "schema_version": "robot-detector-bch-full-spot-panel-precommit-v1",
+  "freeze_utc_date": "2026-11-21",
+  "new_precommitted_archives": [
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-18",
+      "status": "never_inspected_in_this_project"
+    },
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-19",
+      "status": "never_inspected_in_this_project"
+    }
+  ],
+  "previous_bch_archives_seen_for_method_development": [
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-17",
+      "count": 42678,
+      "preregistered_primary_ge5_pass": false
+    },
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-20",
+      "count": 73279,
+      "preregistered_primary_unconditioned_pass": false
+    }
+  ],
+  "frozen_primary_signal": "count single-sided public-print 30-second full-UTC-clock bins with at least 5 observed prints at phase origin 0 seconds; positive iff observed > maximum of eight fixed same-size equal-timestamp-side-vector cluster-shuffle nulls within source UTC minute",
+  "frozen_secondary_origins_seconds": [
+    10,
+    20
+  ],
+  "frozen_primary_origin_seconds": 0,
+  "frozen_bin_width_seconds": 30,
+  "frozen_minimum_fills_per_bin": 5,
+  "frozen_occupancy_groups": [
+    "1",
+    "2",
+    "3-4",
+    "5-9",
+    "10+"
+  ],
+  "frozen_null_rng_seeds": [
+    32001,
+    32003,
+    32009,
+    32027,
+    32029,
+    32051,
+    32057,
+    32063
+  ],
+  "frozen_provider": "Binance Vision official SPOT daily raw trades ZIP plus published SHA256",
+  "license": "CC BY-NC-SA 4.0; Binance Vision Dataset Terms 2026-08-26",
+  "only_noncommercial_public_source_research": true,
+  "new_sources_earlier_than_last_seen_2026_11_20": true,
+  "not_forward_time_or_labelled_bot_holdout": true,
+  "record_both_archive_outcomes_including_negative": true,
+  "never_select_best_phase_after_results": true,
+  "never_select_sources_after_results": true,
+  "do_not_claim_independent_exchange_completeness_or_actor_identity": true,
+  "never_upload_raw_trades_or_personal_ids": true,
+  "do_not_claim_p_values_FDR_or_live_trading_licence": true,
+  "if_data_unavailable_abort_without_substitution": true
+}
