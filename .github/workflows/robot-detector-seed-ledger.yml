@@ -38,6 +38,9 @@ on:
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
       - 'projects/robot-detector/research/fixed_clock_toy_rhythm_precommit_20261121.json'
       - 'projects/robot-detector/research/genuine_abides_fixed_clock_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/tests_background/test_public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/fixtures/abides_multiscale_public_l2_observed_20261121.json'
       - 'projects/robot-detector/tools/abides_multiscale_public_l2.py'
       - 'projects/robot-detector/tests_background/test_abides_multiscale_public_l2.py'
       - 'projects/robot-detector/tools/abides_fixed_clock_transfer.py'
@@ -118,6 +121,9 @@ on:
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
       - 'projects/robot-detector/research/fixed_clock_toy_rhythm_precommit_20261121.json'
       - 'projects/robot-detector/research/genuine_abides_fixed_clock_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/tests_background/test_public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/fixtures/abides_multiscale_public_l2_observed_20261121.json'
       - 'projects/robot-detector/tools/abides_multiscale_public_l2.py'
       - 'projects/robot-detector/tests_background/test_abides_multiscale_public_l2.py'
       - 'projects/robot-detector/tools/abides_fixed_clock_transfer.py'
@@ -198,6 +204,8 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_toy_public_execution_rhythm.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_fixed_clock_transfer.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_multiscale_public_l2.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_clock_aliasing_negative.py' -v
+          python tools/public_clock_aliasing_negative.py
           python tools/toy_public_execution_rhythm.py --output data/results/heldout-public-rhythm-hard-negative.json
           python tools/offline_research_reproducer.py --output data/results/reproduction-offline-source-free.json
           python tools/public_l2_feed_coverage_gate.py
