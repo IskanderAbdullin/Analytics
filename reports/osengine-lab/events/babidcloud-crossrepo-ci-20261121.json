@@ -1,0 +1,59 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "chatgpt/babidcloud-ci-20261121",
+    "component_id": "babidcloud-ci-bridge"
+  },
+  "event": {
+    "id": "10bc2be0-e8b1-44bd-80db-d9cf867713c6",
+    "occurred_at": "2026-11-21T14:40:00Z",
+    "type": "development",
+    "title": "Prepare opt-in private Babid audit tests on public Analytics GitHub Actions",
+    "summary": "Workflow checks a least-privilege read token before privately checking out Babid C Cloud to run synthetic Python tests on Linux and Windows. When token is absent tests are explicitly NOT TESTED; no private code is committed to Analytics.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": ".github/workflows/babidcloud-private-audit.yml",
+      "action": "added",
+      "summary": "Safe conditional cross-repository private checkout and synthetic test matrix; no live broker or artifacts."
+    },
+    {
+      "path": "docs/babidcloud-private-audit-ci.md",
+      "action": "added",
+      "summary": "Documents public/private isolation, token setup, limitations and explicit skip behavior."
+    }
+  ],
+  "checks": [
+    {
+      "id": "analytics-gh-actions",
+      "title": "Cross-repository GitHub Actions run",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Workflow staging; result must be read after push. Actual private test run requires BABIDCLOUD_READ_TOKEN."
+    }
+  ],
+  "issues": [
+    {
+      "id": "token-requirement",
+      "title": "Analytics Actions cannot read private Babid without a read-only token",
+      "state": "open",
+      "severity": "medium",
+      "description": "An explicit user-created fine-grained token is needed; never request its value in chat."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "inspect-ci-status",
+      "title": "Inspect triggered workflow and verify whether private tests ran or were skipped",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No private code, trading logs or credentials are published to Analytics.",
+    "No live trading; no default-branch changes."
+  ]
+}

@@ -1,0 +1,91 @@
+name: Babid Cloud private audit tests
+
+on:
+  push:
+    branches:
+      - "chatgpt/babidcloud-ci-*"
+    paths:
+      - ".github/workflows/babidcloud-private-audit.yml"
+      - "docs/babidcloud-private-audit-ci.md"
+  workflow_dispatch:
+
+# This workflow is in PUBLIC Analytics. Never commit or upload private Babid
+# source, live logs, broker credentials or execution reports to this repo.
+permissions:
+  contents: read
+
+concurrency:
+  group: babidcloud-audit-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  access-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      token_present: ${{ steps.check.outputs.token_present }}
+    steps:
+      - id: check
+        name: Check availability of least-privilege read token
+        shell: bash
+        env:
+          READ_TOKEN: ${{ secrets.BABIDCLOUD_READ_TOKEN }}
+        run: |
+          if [[ -n "$READ_TOKEN" ]]; then
+            echo "token_present=true" >> "$GITHUB_OUTPUT"
+            echo "Private repository checkout is configured; synthetic tests will run." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "token_present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::BABIDCLOUD_READ_TOKEN is not configured. Private tests NOT run; a green readiness job is not test success."
+            echo "**NOT TESTED** — \`BABIDCLOUD_READ_TOKEN\` is missing. No private source was fetched." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  offline-unit-tests:
+    needs: access-check
+    if: needs.access-check.outputs.token_present == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.11"
+          - os: windows-latest
+            python: "3.13"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout private Babid C source without persisting credentials
+        uses: actions/checkout@v4
+        with:
+          repository: IskanderAbdullin/Babid-C-gpt-
+          ref: chatgpt/babidcloud-audit-20261121
+          token: ${{ secrets.BABIDCLOUD_READ_TOKEN }}
+          persist-credentials: false
+          path: private-babid
+          fetch-depth: 1
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Report exact private source revision
+        shell: bash
+        run: |
+          git -C private-babid rev-parse HEAD >> "$GITHUB_STEP_SUMMARY"
+      - name: Offline compile and synthetic unit tests
+        working-directory: private-babid/BabidCCloud/analysis
+        shell: bash
+        env:
+          TINVEST_TOKEN: ""
+          FINAM_API_SECRET: ""
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -m compileall -q .
+          python -m unittest discover -p 'test_*.py' -v
+      - name: Summarize scope
+        if: always()
+        shell: bash
+        run: |
+          echo "Only Python synthetic analysis tests were selected." >> "$GITHUB_STEP_SUMMARY"
+          echo "No live state, trade logs, broker sessions or full data replay were accessed." >> "$GITHUB_STEP_SUMMARY"
