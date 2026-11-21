@@ -114,6 +114,45 @@ class RealTradeArchiveTests(unittest.TestCase):
                 blob,check=archive(rows)
                 analyze_verified_zip(blob,check,symbol=SYMBOL,day=DAY)
 
+    def test_frozen_three_origin_public_trade_phase_and_conservation(self):
+        raw,check=archive()
+        result=analyze_verified_zip(raw,check,symbol=SYMBOL,day=DAY,
+                                    clock_origin_study=True)
+        study=result["clock_origin_descriptive_v1"]
+        self.assertEqual(study["predeclared_origin_seconds"],[0,10,20])
+        self.assertEqual(study["source_event_count"],3)
+        self.assertTrue(study["all_source_prints_accounted_for_each_phase"])
+        self.assertFalse(study["threshold_or_best_phase_selected"])
+        self.assertFalse(study["real_world_bot_calibration_claimed"])
+        self.assertEqual(len(study["variants"]),3)
+        by_phase={x["origin_seconds"]:x for x in study["variants"]}
+        self.assertEqual([by_phase[p]["fully_contained_utc_day_bins"] for p in (0,10,20)],
+                         [2880,2879,2879])
+        self.assertEqual([by_phase[p]["public_prints_in_full_bins"] for p in (0,10,20)],
+                         [3,1,1])
+        self.assertEqual([by_phase[p]["boundary_trades_excluded"] for p in (0,10,20)],
+                         [0,2,2])
+        self.assertEqual(by_phase[0]["equal_buy_sell_print_count_bins"],1)
+        self.assertEqual(by_phase[0]["strictly_buy_one_sided_bins_or_sell_one_sided_bins"],1)
+        self.assertTrue(all(not x["has_public_orderbook_l2"] for x in study["variants"]))
+
+    def test_utc_last_partial_bin_is_discarded_for_shifted_origins(self):
+        last=f"55,101.00,1.0,101.0,{START_US+86_400_000_000-1},False,True"
+        raw,check=archive(ROWS+[last])
+        result=analyze_verified_zip(raw,check,symbol=SYMBOL,day=DAY,
+                                    clock_origin_study=True)
+        phases=result["clock_origin_descriptive_v1"]["variants"]
+        self.assertEqual([v["public_prints_in_full_bins"] for v in phases],[4,1,1])
+        self.assertEqual([v["boundary_trades_excluded"] for v in phases],[0,3,3])
+        self.assertEqual([v["eligible_nonempty_bins"] for v in phases],[3,1,1])
+
+    def test_rejects_nonboolean_phase_switch(self):
+        raw,check=archive()
+        for bad in (0,1,"yes",None):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                analyze_verified_zip(raw,check,symbol=SYMBOL,day=DAY,
+                                     clock_origin_study=bad)
+
     def test_invalid_dates_and_paths_are_not_network_targets(self):
         for symbol,day in (
             ("../../etc",DAY),("ltcusdt",DAY),("LTCUSDT","2026-11-31"),
