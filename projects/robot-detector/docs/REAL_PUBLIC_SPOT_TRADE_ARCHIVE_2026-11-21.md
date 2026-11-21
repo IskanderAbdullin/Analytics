@@ -92,3 +92,47 @@ for out-of-sample timing robustness. The original 2026-11-18
 LTCUSDT data are now **seen** and must not be promoted to a fresh
 blinded detector holdout. Without a complete verifiable L2 stream,
 book-imbalance/quote-oscillation tests remain **BLOCKED_BY_L2_DATA**.
+
+## Predeclared independent UTC-day public print timing sample (2026-11-19)
+
+After the first 2026-11-18 observation became visible, a different UTC
+source day **2026-11-19** was frozen and acquired through
+[successful GitHub Actions #44917086043](https://github.com/IskanderAbdullin/Analytics/actions/runs/44917086043).
+This is a distinct, previously uninspected *chronological real market
+day* of public prints, **not** a blind test of a previously frozen
+robot-detector classifier.
+
+- **161,957** exchange public execution rows, official ZIP SHA-256:
+  `9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a`.
+- First/last spot trade IDs **608302704 / 608464660**,
+  zero missing IDs within the observed UTC day; official provider
+  ZIP checksum matched.
+- **71,851** aggressive BUY / **90,106** aggressive SELL prints;
+  all 1,440 UTC minutes contain observed executions.
+- The first ID of 2026-11-19 (**608302704**) directly follows
+  the last ID of 2026-11-18 (**608302703**): strong observed
+  adjacent-day continuity of this one provider archive, but
+  **not** independent proof that every real exchange event exists.
+- Three **predeclared 30-second** analytical phases use the *same*
+  161,957-source-trade tape. They are correlated views, not 3 days.
+  Only bins completely contained within the UTC date count;
+  10s/20s shifted phase partially intersecting boundary bins are excluded.
+
+| Frozen origin | Full UTC-day bins | Nonempty bins | Excluded edge prints | BUY-dominant / SELL-dominant / tied bins | One-sided bins |
+|---|---:|---:|---:|---:|---:|
+| 0s | 2880 | 2879 | 0 | 1363 / 1447 / 69 | 135 |
+| 10s | 2879 | 2878 | 20 | 1312 / 1484 / 82 | 113 |
+| 20s | 2879 | 2878 | 37 | 1337 / 1478 / 63 | 135 |
+
+These **real exchange executed-trade** summaries show that the
+researcher's arbitrary clock origin changes the assignment of
+public buy/sell-dominant bins; no L2 book or individual identity
+is observable. Comparing counts of dominant/one-sided bins with
+different eligible interval memberships is descriptive, not a
+calibrated FDR estimate.
+
+A second compact no-raw-events fixture
+`fixtures/binance_spot_ltcusdt_real_observed_20261119.json`
+pins all source checksum and timing phase counts. Both provider
+network-fetch workflows became **manual-only after successful
+one-time executions**.
