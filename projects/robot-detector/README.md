@@ -9,7 +9,7 @@ Added `tools/abides_l2_background_nulls.py` with **six frozen genuine ABIDES-NG 
 
 The output compares the last valid L2 state of a *fully completed previous* 30-second bin against the next completed bin's aggregate public BUY fraction. Exact-time fill/quote joins remain intentionally unclassified. The study reports only public counts, source fingerprints and *descriptive* correlation, without physical owner labels, real-market statistical significance or live trading. Seeds, parameters and study cohorts were frozen before running any results; no tuning on these seeds.
 
-[Methodology and experimental limitations](docs/ABIDES_BACKGROUND_L2_NULLS.md).
+[Methodology, executed six-case ABIDES results and scientific limits](docs/ABIDES_BACKGROUND_L2_NULLS.md). In [successful CI #44902051089](https://github.com/IskanderAbdullin/Analytics/actions/runs/44902051089), 60 Poisson background agents produced **median rho −0.509** (39 lagged pairs over two seeds), 60 fixed-cadence background agents **−0.361** (41 pairs), and 50 noise + 10 momentum agents **−0.201** (41 pairs). The change with market background illustrates confounding, **not** independent physical robot identification or calibrated real-market specificity.
 
 ## Adversarial common-market public-book null controls
 

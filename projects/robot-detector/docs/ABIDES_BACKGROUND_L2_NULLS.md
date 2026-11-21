@@ -46,6 +46,22 @@ The dedicated [`robot-detector-abides-background-nulls.yml`](../../.github/workf
 - Assert public fills and L2 exist, no named execution agents were inserted, no identity or statistical significance fields are claimed, and all accounting conserves counts.
 - A seven-day **summary-only** artifact with no private maker/taker IDs, no raw trade tape or user market data.
 
+## Executed genuine ABIDES outcome — 2026-11-21
+
+The preregistered six-case cohort completed successfully on the pinned genuine ABIDES matching engine: [GitHub Actions run #44902051089](https://github.com/IskanderAbdullin/Analytics/actions/runs/44902051089). The workflow passed **5/5** frozen-plan public-only unit tests before running matching simulations. The matching-engine case aggregation and public invariants passed. Separately, [.NET CI #44902050995](https://github.com/IskanderAbdullin/Analytics/actions/runs/44902050995) succeeded without modifying the original C# detector.
+
+| Genuine simulator background (2 independent seeds 1801/1802 per cohort) | Public fills | Public L2 snapshots | Qualifying strictly lagged 30-second book/flow pairs | Median descriptive lagged Spearman rho |
+|---|---:|---:|---:|---:|
+| 60 Poisson background agents | **3,210** | **5,345** | **39** | **−0.5094** |
+| 60 independently waking fixed-cadence background agents | **3,150** | **5,113** | **41** | **−0.3607** |
+| 50 Poisson background + 10 momentum agents | **2,932** | **4,964** | **41** | **−0.2008** |
+
+Every two-seed cohort had **two** simulations with evaluable correlations. All results are **negative** in the simulated regime, but vary materially with background design even though **no named TWAP/VWAP/POV execution agent was injected**. The mixed cohort *does* contain algorithmic trend-followers by design; therefore it cannot be called a market without algorithms.
+
+**Interpretation:** The previous completed L2 book imbalance to next completed trade-direction correlation is sensitive to background agent composition and wake-up policy. This variation is an explicit caveat for any attempted VWAP/POV classification based only on a public rho value. It does **not** estimate detection false-positive frequency: the experiment does not output actor classifications, sample synthetic parent-order labels or a threshold, and has only two seeds per background. Its negative rho coefficients are neither proof against future real algorithms nor evidence of no algorithmic behavior. The six seeds and modes are now **spent** for fresh out-of-sample claims.
+
+The seven-day `abides-genuine-l2-background-nulls` GitHub artifact contains case-level **public-only aggregate summaries and SHA-256 fingerprints**. No per-execution private maker/taker labels, user broker credentials or raw order-book events are uploaded. Any future new public L2 signal must be designed using *different* development seeds and then tested on a wholly untouched, preregistered evaluation cohort.
+
 ## Scientific decision rule
 
 Even a large positive rho in *any* background cohort is sufficient to **refute the claim that high public rho uniquely identifies a single VWAP/POV execution program**. Conversely, a low rho in all six simulations **cannot** prove real-world specificity: the sample is extremely small, these are not realistic distributions of every market microstructure regime, and the three cohorts vary several factors simultaneously. A missing/undefined coefficient is not evidence of no bots.
