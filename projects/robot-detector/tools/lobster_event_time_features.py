@@ -19,11 +19,13 @@ from pathlib import Path
 from zipfile import ZipFile
 
 if __package__:
+    from .l2_duration_weighting import DurationWeightedBBO
     from .lobster_public_sample_format_audit import (
         SOURCE_URL, MAX_ZIP_BYTES, MAX_ROWS, _members, _validate_book,
         _validate_message, audit_sample_zip, download_exact_demo, is_zipfile
     )
 else:
+    from l2_duration_weighting import DurationWeightedBBO
     from lobster_public_sample_format_audit import (
         SOURCE_URL, MAX_ZIP_BYTES, MAX_ROWS, _members, _validate_book,
         _validate_message, audit_sample_zip, download_exact_demo, is_zipfile
@@ -61,7 +63,8 @@ OUTPUT_ALLOWED_TOP_FIELDS = frozenset((
     "event_timestamp_or_price_series_exported","individual_agent_labels_available",
     "real_market_robot_accuracy_or_FDR_calibrated","commercial_trade_or_signal_authorized",
     "not_complete_market_depth","post_event_snapshot_semantics",
-    "same_timestamp_order_of_events_preserved","limitations"
+    "same_timestamp_order_of_events_preserved",
+    "post_event_clock_weighted_bbo","limitations"
 ))
 
 
@@ -92,6 +95,7 @@ def event_time_features(raw: bytes, *, require_original_sha: bool = False) -> di
     half_hours = [0] * HALF_HOUR_BUCKETS
     prior_time = None
     prior_book = None
+    weighted_clock = DurationWeightedBBO()
     n = distinct_times = max_tied = same_time = gap_pos = gap_zero = 0
     cluster_size = 0
     max_gap = Decimal(0)
@@ -119,6 +123,9 @@ def event_time_features(raw: bytes, *, require_original_sha: bool = False) -> di
                     msg, prior_time
                 )
                 ask, bid, empty, invalid, top_depth = _validate_book(book)
+                weighted_clock.observe_post_event(
+                    stamp, ask, bid, int(book[1]), int(book[3])
+                )
                 counts[event_type] += 1
                 if event_type == 4:
                     if resting_side == -1:
@@ -244,9 +251,12 @@ def event_time_features(raw: bytes, *, require_original_sha: bool = False) -> di
         "not_complete_market_depth": True,
         "post_event_snapshot_semantics": True,
         "same_timestamp_order_of_events_preserved": True,
+        "post_event_clock_weighted_bbo": weighted_clock.summary(),
         "limitations": [
             "Original sample is historical AMZN 2012 NASDAQ; not present-day or a labelled bot dataset.",
-            "Output statistics are event-weighted, not calendar-time weighted.",
+            "Primary source metrics are event-weighted; a separate nested right-continuous duration-weighted BBO estimate is supplied.",
+            "Clock-weighted quotes use last post-event BBO until next event, excluding pre-first and post-last intervals.",
+            "Large interevent gaps are carried forward by convention and flagged as potential stale-quote uncertainty.",
             "Previous post-event quote is a pre-state proxy, not a proven causal counterfactual.",
             "Event type 4 indicates passive order side; aggressive trade side is opposite.",
             "Hidden type-5 execution direction is not counted as observed aggressive side.",
