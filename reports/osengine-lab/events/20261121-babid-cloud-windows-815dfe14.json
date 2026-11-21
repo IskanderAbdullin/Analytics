@@ -1,0 +1,112 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-cloud-offline-analysis-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "815dfe14-12ee-4937-94de-36b33912987e",
+    "occurred_at": "2026-11-21T14:48:25.662Z",
+    "type": "bugfix",
+    "title": "Fix Windows path normalization and provenance inventory in offline audit CI",
+    "summary": "Actual Analytics CI found four Windows-only failures caused by Win32 short-path canonicalization and separator mismatch. Normalize inventory root/manifest paths, compare resolved destinations, and update checkout/setup-python actions. Re-run the real two-OS matrix.",
+    "basis": "observed_by_agent",
+    "source_commit": "fe645f6bcdd895218e2903fc1d124bf134854435"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Resolve source root before safety scan and serialize manifest paths with POSIX slash."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/audit_provenance.py",
+      "action": "modified",
+      "summary": "Normalize manifest and newly discovered file paths to same portable slash representation."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_report_safety.py",
+      "action": "modified",
+      "summary": "Compare canonical Windows paths, avoiding short-name/full-name representation mismatch."
+    },
+    {
+      "path": ".github/workflows/babid-cloud-analysis.yml",
+      "action": "modified",
+      "summary": "Use Node 24 actions/checkout@v5 and actions/setup-python@v6."
+    }
+  ],
+  "checks": [
+    {
+      "id": "analytics-linux-first",
+      "title": "First Analytics synthetic run Ubuntu Python 3.11",
+      "kind": "ci",
+      "status": "passed",
+      "command": "GitHub Actions run 44915728229 job synthetic ubuntu-latest Python 3.11",
+      "exit_code": 0,
+      "tested_commit": "fe645f6bcdd895218e2903fc1d124bf134854435",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44915728229"
+        }
+      ],
+      "counts": {
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "31 synthetic tests passed; no live data."
+    },
+    {
+      "id": "analytics-windows-first",
+      "title": "First Analytics synthetic run Windows Python 3.13",
+      "kind": "ci",
+      "status": "failed",
+      "command": "GitHub Actions run 44915728229 job synthetic windows-latest Python 3.13",
+      "exit_code": 1,
+      "tested_commit": "fe645f6bcdd895218e2903fc1d124bf134854435",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44915728229"
+        }
+      ],
+      "counts": {
+        "passed": 27,
+        "failed": 4,
+        "skipped": 0
+      },
+      "summary": "Four Windows-only failures triggered this fix; re-test pending."
+    },
+    {
+      "id": "windows-fix-rerun",
+      "title": "Re-run both OSes after portability fixes",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Commit and push needed to trigger revised CI."
+    }
+  ],
+  "issues": [
+    {
+      "id": "windows-path-20261121",
+      "title": "Windows path separator and short path normalization",
+      "state": "in_progress",
+      "severity": "medium",
+      "root_cause": "Manifest paths use Windows backslashes while re-scanned paths differ; unresolved 8.3 vs full TEMP paths; inventory root not canonical.",
+      "description": "Patch prepared; confirm after Actions rerun."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "windows-ci-recheck",
+      "title": "Inspect Windows and Linux CI results on patched commit",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No live logs or private source checkout; all code modifications in Analytics only."
+  ]
+}

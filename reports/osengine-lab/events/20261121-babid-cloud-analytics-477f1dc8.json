@@ -1,0 +1,69 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-cloud-offline-analysis-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "477f1dc8-0e69-4fe4-8341-40b4d328861f",
+    "occurred_at": "2026-11-21T14:47:04.028Z",
+    "type": "development",
+    "title": "Create standalone offline Babid Cloud analysis project in Analytics",
+    "summary": "Ported generic forensic Python analysis modules and synthetic tests into Analytics only, added public-safe CI with no private checkout/tokens and documented privacy/scope constraints. Existing trading repositories remain unchanged.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/",
+      "action": "added",
+      "summary": "Eight generic read-only analysis modules and eight synthetic test suites; no source trading engine or proprietary data."
+    },
+    {
+      "path": ".github/workflows/babid-cloud-analysis.yml",
+      "action": "added",
+      "summary": "Only Analytics checkout, Linux/Windows synthetic unittest matrix, no secrets."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "added",
+      "summary": "Scope, usage and privacy guarantees."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/.gitignore",
+      "action": "added",
+      "summary": "Excludes live state, logs, recordings, CSV and configuration secrets."
+    }
+  ],
+  "checks": [
+    {
+      "id": "new-project-ci",
+      "title": "Run independent Analytics GitHub Actions synthetic matrix",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Workflow added; verify results after branch push, never mark as passed before actual run."
+    }
+  ],
+  "issues": [
+    {
+      "id": "real-history-not-in-github",
+      "title": "Full private trading archive remains outside Analytics",
+      "state": "open",
+      "severity": "medium",
+      "description": "Only synthetic tests may run on public CI; actual trade analysis must run on local read-only copy."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "verify-actions",
+      "title": "Verify real workflow results and fix failing tests",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No real trading data committed.",
+    "Source-trading repositories were not modified."
+  ]
+}
