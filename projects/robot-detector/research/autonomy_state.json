@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "da5f6fd9d5d0bdd957ab1d26c590b8aa969538e8",
+  "last_verified_base_commit": "e1c70fa23f3efe79958fe025faacf610769d284e",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-MATCHED-UNCERTAINTY-14",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44943333914",
+      "result": "Retrospective exact 4-seed synthetic source matched confidence audit: nominal Clopper-Pearson 95% 0/4 upper=0.60236464, 4/4 lower=0.39763536 assuming hypothetical IID simulator trials, 1 discordant positive TWAP seed 3204 (print-only), same Poisson source false alarm both; 25 suites/190 source-free tests. No new source runs or market FDR.",
+      "status": "VERIFIED_RETROSPECTIVE_SYNTHETIC_SMALL_N_UNCERTAINTY_NOT_MARKET_PRECISION"
+    },
     {
       "stage_id": "RD-CLUSTER-MARKET-13",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44938991772",
@@ -113,29 +119,30 @@
     }
   ],
   "current_stage": {
-    "id": "RD-MATCHED-UNCERTAINTY-14",
+    "id": "RD-ABIDES-POWER-15",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Exact finite synthetic 4-seed uncertainty and paired print/cluster source comparison",
-    "why_next": "A grouping diagnostic that solved a constructed pseudo-replication case failed to improve specificity on genuine ABIDES and missed a controlled TWAP positive. Four per-cohort independent seeds cannot establish confident error rates; matched source and correct uncertainty audit needed before further classifiers.",
+    "title": "Preregister and execute wider 40 local seeds × four genuine ABIDES cohorts with unchanged public-only per-print and timestamp-cluster scores",
+    "why_next": "The genuine 3201-3204 matched source showed grouped one missed TWAP, same Poisson false alarm; with only 4 trials per cohort CP uncertainty is too broad. An additional larger local independent simulator source matrix can test synthetic robustness without pretending to know market FDR.",
     "inputs": [
-      "docs/ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md",
-      "fixtures/abides_clustered_grid_original_20261121.json",
+      "tools/abides_clustered_grid_holdout.py",
       "research/abides_clustered_grid_source_precommit_20261121.json",
+      "docs/ABIDES_MATCHED_UNCERTAINTY_20261121.md",
+      "research/seed_registry.json",
       "docs/MASTER_RESEARCH_PLAN.md"
     ],
     "deliverables": [
-      "Fixed small-sample exact binomial intervals by synthetic cohort only; no pooling incompatible backgrounds as exchange-real days",
-      "Paired same-seed decision discordance and source-independent unit count",
-      "Offline source aggregate conservation and adversarial tests",
-      "Precise limitations and next high-value scientific source decision"
+      "Separate immutable fresh 40-seed x 4-cohort protocol with matching-engine revision, methods, thresholds and coverage frozen",
+      "One bounded public source workflow and 160 original source-only results, all negative outcomes retained",
+      "Synthetic confidence intervals per cohort, paired decision accounting and abstentions without posthoc tuning",
+      "Next stage scientific plan and checkpoint with full source provenance"
     ],
     "acceptance": [
-      "No real-market FDR or parent-order ID assertion",
-      "Keep all 16 original source outcomes untouched and baseline comparison paired",
-      "No ratio phase/seeds retuning",
-      "Unit/CI evidence, fast-forward push and checkpoint after completion"
+      "New local source seeds not present in canonical registry and frozen before run",
+      "No retroactive edits to 3201-3204 protocol, no power claims about real markets",
+      "All 160 cases produce source-anonymous aggregate or fail loudly, no selecting favorable seeds",
+      "Offline and genuine original CI, commit/push without force, master #72 stays open"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/95"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/96"
   },
   "backlog": [
     {
@@ -174,7 +181,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Read latest branch HEAD, AGENTS, MASTER_RESEARCH_PLAN, checkpoint, seed ledger and issue #95. Source original #44938991772 verified, full source aggregate artifact 14720831681, SHA e75c089f023a12bddd19c2f4cf33a64470a29aeb79125024877fb4a9997885e2. Compute strict small-N exact interval and paired audit from fixture, tests, CI. Do not retune or claim real-market FDR. Commit/push with evidence and choose next stage.",
-  "last_session_result": "Genuine ABIDES 16 original source run #44938991772 on locally new 3201-3204 is successful, verified from original source artifact and logs; naive 4/4 TWAP, 1/4 Poisson false, grouped 3/4 TWAP with 1 miss, same 1/4 Poisson false. 16142 public prints, 14801 unique timestamps, 61 oracle controlled fills. No grouped specificity benefit. Original source workflow now manual-only; next #95 uncertainty audit.",
+  "resume_instruction": "Check remote HEAD then AGENTS.md, MASTER_RESEARCH_PLAN, checkpoint and issue #96. First commit separate frozen new source protocol with 40 locally unused seeds × 4 cohorts, unchanged 20s/45s fixed ratio .60, lagged L2 coverage and original ABIDES version. Implement original 160-case runner and negative tests, no raw source; bounded GH Action only public repo, manual-only after success. Update source evidence/checkpoint and continue.",
+  "last_session_result": "Original 16 ABIDES #44938991772 reconciled; retrospective 4-per-cohort matched uncertainty audit source-free CI #44943333914 passed 25 suites/190 tests. 0/4 errors nominal 95% upper=.6024; 4/4 successes lower=.3976 conditional on IID synthetic seed trials, no real market calibration. Next #96 preregister 40 locally new seeds ×4 genuine ABIDES cohorts and perform bounded original source.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }

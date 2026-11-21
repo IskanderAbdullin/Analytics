@@ -9,6 +9,16 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Аудит малой мощности и парного сравнения двух классификаторов](
+  docs/ABIDES_MATCHED_UNCERTAINTY_20261121.md):
+  при четырёх синтетических seeds на одну
+  когорту даже **0/4** ошибок допускает
+  номинальную верхнюю 95% CP границу **0,6024**,
+  а **4/4** удачных случаев — нижнюю **0,3976**
+  (лишь под IID simulator assumptions). Один
+  grouped TWAP miss; улучшения нет.
+  Продолжение: [#96](https://github.com/IskanderAbdullin/Analytics/issues/96).
+
 - [Новый genuine ABIDES 16-run эксперимент: по prints и по exact timestamp](docs/ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md):
   **16 142** исполнений, **14 801** уникальных timestamps,
   61 posthoc TWAP fills. Naive print 4/4 TWAP, grouped

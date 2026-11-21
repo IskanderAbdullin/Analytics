@@ -375,6 +375,45 @@ paired decision discordances, интервалы
 Не переобучать порог на уже просмотренных
 3201–3204 и не объявлять реальные owner IDs.
 
+### P0 / RD-MATCHED-UNCERTAINTY-14 — ограниченная мощность проверена
+
+[Source-free CI #44943333914](https://github.com/IskanderAbdullin/Analytics/actions/runs/44943333914):
+**25 наборов / 190 пройденных тестов**,
+исходные 16 synthetic matching-engine cases
+сверены с агрегатными source totals.
+Для `0/4` nominal exact Clopper–Pearson
+95% верхняя граница **0,60236464**,
+для `4/4` нижняя **0,39763536**.
+Это широкие интервалы при *гипотетических IID
+source-seed trials*, **не** реальные
+market-owner confidence limits.
+Парное сравнение показывает ровно
+**один discordant TWAP** (naive обнаружил,
+grouped пропустил, seed 3204),
+и одинаковый Poisson ложный сигнал
+3203. [Полный ретроспективный отчёт](
+ABIDES_MATCHED_UNCERTAINTY_20261121.md).
+Не выполнено ни одного нового source run.
+
+### P0 / RD-ABIDES-POWER-15 — следующий этап: расширенная мощность
+
+[Issue #96](https://github.com/IskanderAbdullin/Analytics/issues/96):
+заморозить новый, более широкий
+40-seed × 4-cohort genuine ABIDES
+синтетический протокол (160 исходных
+matching-engine cases) **перед** запуском,
+не изменять старый source-frozen код,
+порог 0,60, anchor, допуск ±250мс,
+L2/coverage abstention и 4 семьи сценариев.
+Только публичные features, oracle IDs
+строго после inference, все исходы
+и negative controls сохраняются.
+Размер source artifacts небольшой;
+после единственного успешного Action
+перевести workflow в manual-only.
+Даже 160 synthetic прогонов не
+калибруют real-market FDR.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -395,6 +434,8 @@ paired decision discordances, интервалы
 | 2026-11-21 | 13-placement exact toy conditional null #44938416432: naive print-weighted ratio raised alarm in 2/13 placements of one 100-fill cluster, while timestamp-grouped score was constant and 0/13 alarm. Strong toy exchangeability assumption DOES NOT calibrate market FDR. Next #94 genuine ABIDES cluster-aware control | VERIFIED exact toy-only negative; new real matching-source study NOT_STARTED |
 
 | 2026-11-21 | Genuine ABIDES original CI #44938991772 verified all 16 locally new 3201–3204 seeds; grouped timestamp score yields 3/4 TWAP vs print-based 4/4, Poisson false 1/4 in BOTH, 0/8 fixed/momentum false both. Preserve negative source outcome; paired small-N power audit next #95 | VERIFIED genuine source negative transfer; no real-market FDR |
+
+| 2026-11-21 | Source-free small-N CI #44943333914: exact nominal 95% CP bounds 0/4 upper 0.6024, 4/4 lower 0.3976 conditional on hypothetical IID synthetic seeds; matched same source tapes show one extra grouped TWAP miss and unchanged Poisson FP. No real-market FDR. New 40-seed ×4 source replication frozen before running next | VERIFIED offline statistical audit only; #96 source NOT_RUN |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
