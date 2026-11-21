@@ -4,10 +4,9 @@ name: Robot Detector one-time official LOBSTER AMZN ten-level sample format QA
 # c864b763e3535810e3720c729710fc9ec84e9f0e on 2026-11-21.
 # Public DEMO only, bounded single source, not labelled robot detection.
 # After one successful run change to workflow_dispatch only.
+# Original vendor demonstration format QA #44922750898 PASSED.
+# Subsequent network retrieval requires intentional manual dispatch.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-lobster-amzn-sample-format-qa.yml'
   workflow_dispatch:
 
 permissions:
