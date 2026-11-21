@@ -12,14 +12,21 @@ historical AMZN limit-order book state pairs for
 executions**, **27,557 best-quote changes**, and
 **8,483 adjacent events with equal exchange timestamps**.
 
-**This is a structural and format QA only, not robot detection.**
-Although the vendor [publicly offers demonstration samples](
-https://php.lobsterdata.com/info/DataSamples.php), there
-is **no standalone public academic data subscription license**
-and no confirmed permission for ML training, signal
-development, commercial/trading use or redistributing
-source market-event rows. The original **4.8MB compressed**
-demo ZIP is NOT in GitHub or artifacts, only small metadata.
+**The completed stage is structural and format QA only, not
+a robot-detector performance test.** The vendor
+[explicitly publishes demonstration samples](
+https://php.lobsterdata.com/info/DataSamples.php) and research
+examples. Its separate [contractual academic subscription terms](
+https://php.lobsterdata.com/termsAndConditions.php) do not, by
+themselves, prohibit **noncommercial scientific experiments
+with publicly downloadable sample files**. Further exploratory
+research with these demos and publication of OUR code,
+aggregate statistics and figures is therefore **not blocked
+solely for lack of a paid subscription**. We do not claim
+that raw source redistribution, commercial use or additional
+subscription datasets are openly licensed. The original
+**4.8MB compressed** demo ZIP was NOT committed to GitHub
+or uploaded as a workflow artifact, only compact metadata.
 We calculated a local original ZIP SHA-256 but the
 vendor does **not** provide a published/signed checksum
 for independent authentication. The 2012 data are

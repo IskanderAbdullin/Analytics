@@ -23,15 +23,33 @@ and stored only a tiny aggregate JSON (artifact ID
 Vendor-sample source:
 https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip
 
-**Important rights limitation:** LOBSTER's [terms page](https://php.lobsterdata.com/termsAndConditions.php)
-explicitly says academic subscription terms are issued only with
-a contract, **not publicly as a standalone PDF**. Public
-permission to download a *demo* is NOT permission for training,
-algorithmic model development, trading or commercial derived
-products. We have **not trained or validated any robot detector
-on this vendor sample**. We publish no raw source messages,
-order reference IDs, book states, replay or derived model
-features, and do not claim commercial permission.
+**Clarification, 2026-11-21:** LOBSTER itself
+[offers sample datasets for public download](
+https://php.lobsterdata.com/info/DataSamples.php), provides
+Matlab/R research examples, and
+[states that its academic work is research-oriented](
+https://php.lobsterdata.com/info/help_faq_general.php).
+Its separate [academic subscription agreement](
+https://php.lobsterdata.com/termsAndConditions.php) covers
+subscription access; that statement is **not an express
+prohibition on noncommercial scientific experiments using
+the publicly downloadable demo**. We previously treated
+these two distinct matters as one and were over-restrictive.
+
+**Practical project policy:** Continue noncommercial scientific
+experiments with the public demo, release independently written
+algorithms, methodology, figures and sufficiently aggregated
+results with LOBSTER/NASDAQ source attribution. Do not commit
+or redistribute the vendor's original event/book CSV or ZIP;
+do not infer that it is licensed for commercial exploitation
+or that additional subscription data are freely accessible.
+The publisher's publicly displayed material does not clearly
+specify universal downstream redistribution terms.
+Actual licensed-training/redistribution obligations, if
+material to a future release, should be resolved separately.
+We have **not yet trained or validated a real robot detector
+using this sample**; that remains a scientific status, not
+a claimed legal prohibition on exploratory research.
 
 The downloaded sample ZIP's **locally observed** byte SHA256:
 `5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f`
@@ -94,14 +112,16 @@ was made **manual-only after the first successful execution**.
 
 ## Release scope
 
-**ALLOWED in this stage:** learn the real event/book column
-schema, test message-to-book alignment, count original
-event classes and book structural anomalies for a public
-offered vendor demonstration sample.
+**Completed in this stage:** event/book structural format
+validation and original aggregate checks.
 
-**NOT licensed/validated:** ML training or inference,
-calibration, market bot identification or physical owner
-counts, subsequent use of full LOBSTER subscription data,
-real-time proprietary trading or model-based trading signals.
-A separate explicit source-use entitlement and real
-independent labeled test set are required for those goals.
+**Next research stage:** reproducible, noncommercial
+exploratory detection-method experiments on the freely
+offered demo. The academic subscription agreement does not
+by itself make that exploration impermissible. Distinguish
+*technical/statistical validation* (still absent because
+there is no labelled ground truth) from *data access rights*.
+No commercial trading, vendor raw-file republication
+or claim of unrestricted third-party reuse. Require
+additional source terms if the project later seeks
+subscription-only datasets or a commercial product.

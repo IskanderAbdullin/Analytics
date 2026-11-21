@@ -506,3 +506,27 @@ A metadata-only fixture with original source QA counts and
 rights exclusions is pinned to offline CI.
 See [LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md](
 LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md).
+
+## 2026-11-21 — correction: public LOBSTER demos vs paid academic subscriptions
+
+After checking the [official publicly downloadable samples](
+https://php.lobsterdata.com/info/DataSamples.php),
+[FAQ](https://php.lobsterdata.com/info/help_faq_general.php)
+and [subscription contract page](
+https://php.lobsterdata.com/termsAndConditions.php),
+we corrected the former blanket
+`BLOCKED_PENDING_VENDOR_LICENSE` language above. That
+older language **overstated** the restriction: the
+subscription-contract terms are not, by themselves, a
+prohibition on *noncommercial exploratory research*
+using publicly offered demo samples.
+
+**Proceed** with scientific feature/method experiments on
+the public demos and publish original code/aggregate
+findings with attribution. **Do not** automatically
+republish the vendor raw CSV/ZIP, presume commercial
+or subscription-only rights, or claim labelled real-actor
+FDR without a ground-truth dataset. The research-status
+gate (scientific validity) remains distinct from
+source-redistribution rights. This clarification
+supersedes the categorical licensing statements above.
