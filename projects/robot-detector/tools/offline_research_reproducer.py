@@ -29,6 +29,7 @@ TEST_ROOT=ROOT/"tests_background"
 SCHEMA="robot-detector-offline-scientific-evidence-repro-v1"
 SUITES=(
     "test_autonomy_checkpoint.py",
+    "test_master_research_plan.py",
     "test_lobster_public_sample_format_audit.py",
     "test_lobster_event_time_features.py",
     "test_l2_duration_weighting.py",
@@ -58,6 +59,7 @@ FIXTURES=(
 )
 DOCS=(
     "docs/AUTONOMOUS_RESEARCH_TZ.md",
+    "docs/MASTER_RESEARCH_PLAN.md",
     "docs/LOBSTER_EVENT_TIME_FEATURES_20261121.md",
     "docs/LOBSTER_CLOCK_VS_EVENT_WEIGHTING_20261121.md",
     "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md",

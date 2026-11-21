@@ -6,6 +6,9 @@ on:
       - 'projects/robot-detector/research/seed_registry.json'
       - 'projects/robot-detector/AGENTS.md'
       - 'projects/robot-detector/docs/AUTONOMOUS_RESEARCH_TZ.md'
+      - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
+      - 'projects/robot-detector/tests_background/test_master_research_plan.py'
+      - 'projects/robot-detector/research/abides_multiscale_public_l2_protocol_20261121.json'
       - 'projects/robot-detector/research/autonomy_state.json'
       - 'projects/robot-detector/tools/autonomy_checkpoint.py'
       - 'projects/robot-detector/tests_background/test_autonomy_checkpoint.py'
@@ -81,6 +84,9 @@ on:
       - 'projects/robot-detector/research/seed_registry.json'
       - 'projects/robot-detector/AGENTS.md'
       - 'projects/robot-detector/docs/AUTONOMOUS_RESEARCH_TZ.md'
+      - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
+      - 'projects/robot-detector/tests_background/test_master_research_plan.py'
+      - 'projects/robot-detector/research/abides_multiscale_public_l2_protocol_20261121.json'
       - 'projects/robot-detector/research/autonomy_state.json'
       - 'projects/robot-detector/tools/autonomy_checkpoint.py'
       - 'projects/robot-detector/tests_background/test_autonomy_checkpoint.py'
@@ -192,6 +198,7 @@ jobs:
           python tools/public_l2_feed_coverage_gate.py
           python tools/public_l2_ownership_nonidentifiability.py
           python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
+          python -m unittest discover -s tests_background -p 'test_master_research_plan.py' -v
           python tools/autonomy_checkpoint.py
           python tools/real_public_trade_pair_review.py --output data/results/two-days-source-provenance.json
           python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
