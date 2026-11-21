@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "7c045f33671b64d8d41cc23c7516ae801c0b30dd",
+  "last_verified_base_commit": "907918fb6c78238c716e798f73c5561d7a52692c",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-ROBUSTNESS-04",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926821602",
+      "result": "Source-event observability gate strictly separates synthetic oracle-attested 1.0 coverage, known missing-event 0.8 abstention, and real-like untrusted sequence UNKNOWN. Missing books, time gaps and order-ID confusion explicitly blocked.",
+      "status": "VERIFIED_SYNTHETIC_COVERAGE_NOT_REAL_EXCHANGE_COMPLETENESS"
+    },
     {
       "stage_id": "RD-SYNTHETIC-BLIND-03",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926352634",
@@ -47,37 +53,34 @@
     }
   ],
   "current_stage": {
-    "id": "RD-ROBUSTNESS-04",
+    "id": "RD-REPRO-05",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Coverage and abstention gate under missing/misaligned/stale public L2 events",
-    "why_next": "No physical owner labels and public archive checksum are not evidence that all exchange events or matching L2 updates were observed. Need enforce abstention under missing sequence/book coverage before any performance claim.",
+    "title": "One-command offline reproducibility and machine-readable scientific evidence manifest",
+    "why_next": "The research methods and original source provenance are spread across 5 completed stages. A single source-free replay is needed so future agents never confuse repeatability of unit tests with independent access/ground truth.",
     "inputs": [
-      "tools/lobster_event_time_features.py",
-      "tools/l2_duration_weighting.py",
-      "docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md"
+      "docs/AUTONOMOUS_RESEARCH_TZ.md",
+      "research/autonomy_state.json",
+      "tools/autonomy_checkpoint.py",
+      "tests_background/test_lobster_event_time_features.py",
+      "tests_background/test_l2_duration_weighting.py",
+      "tests_background/test_public_l2_ownership_nonidentifiability.py",
+      "tests_background/test_public_l2_feed_coverage_gate.py"
     ],
     "deliverables": [
-      "Offline public event/L2 observability gate with explicit UNKNOWN state absent provider sequence completeness proof",
-      "Source-free missing, duplicate, reversed, stale and misaligned event/book scenarios",
-      "No inference of real-market FDR from a pass on synthetic contiguous sequence",
-      "Scientific documentation and reproducible tests"
+      "Single command to run core deterministic negative/offline suites, fail closed on missing tests",
+      "Compact JSON evidence manifest with tests/suites and source-scoped original run URLs",
+      "Clear distinction between source-free reproduction and paid/demo source network replays",
+      "Adversarial tests for omitted suite and changed checkpoint"
     ],
     "acceptance": [
-      "Missing gap/duplicate/stale book causes abstention, not score inference",
-      "Unknown provider source completeness remains UNKNOWN not falsely certified",
-      "Coverage denominators only reported if trusted expected counts exist",
-      "No raw vendor data nor owners/real trading in output",
-      "CI, commit/push and next checkpoint"
+      "All required unit suites run and CI passes",
+      "No source network fetch or raw archive needed",
+      "Machine-readable output includes unresolved real-actor FDR and data completeness limitations",
+      "Commit/push and following science stage selected"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/79"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/80"
   },
   "backlog": [
-    {
-      "id": "RD-REPRO-05",
-      "status": "QUEUED",
-      "priority": 2,
-      "title": "One-command reproducer, consolidated JSON scientific paper/limitations and end-to-end CI evidence"
-    },
     {
       "id": "RD-READONLY-06",
       "status": "QUEUED",
@@ -109,5 +112,5 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "Read project AGENTS.md, docs/AUTONOMOUS_RESEARCH_TZ.md, this state file, issue #72, branch HEAD and recent CI. Verify actual GitHub state. Implement current_stage and its tests; commit/push, update checkpoint/evidence and choose/start the next useful unblocked stage in the same active execution.",
-  "last_session_result": "RD-SYNTHETIC-BLIND-03 verified: identical source-visible full 10-level L2 can have 1 vs 3 hidden owner truth in two synthetic worlds; CI #44926352634 successful. Next RD-ROBUSTNESS-04 abstention under data-feed gaps chosen; master goal remains unfinished."
+  "last_session_result": "RD-ROBUSTNESS-04 source-free L2 coverage/abstention gate passed adversarial tests in CI #44926821602, with unknown real source completeness preserved. RD-REPRO-05 #80 selected and continuing immediately; master goal remains open."
 }

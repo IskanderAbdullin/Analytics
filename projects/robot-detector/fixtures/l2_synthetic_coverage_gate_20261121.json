@@ -1,0 +1,18 @@
+{
+  "schema_version": "l2-source-coverage-abstention-synthetic-pinned-v1",
+  "verified_research_ci_run": 44926821602,
+  "source_model": "tools/public_l2_feed_coverage_gate.py",
+  "synthetic_total_events_with_oracle_boundaries": 5,
+  "synthetic_complete_source_event_sequence": "200..204",
+  "complete_case_status": "SYNTHETIC_COVERAGE_ELIGIBLE_ONLY",
+  "complete_case_coverage_fraction": 1,
+  "one_missing_case_expected_event_count": 5,
+  "one_missing_case_observed_events": 4,
+  "one_missing_case_coverage_fraction": 0.8,
+  "one_missing_case_abstain": true,
+  "unattested_contiguous_market_like_case_status": "UNKNOWN_SOURCE_COMPLETENESS",
+  "quote_stale_threshold_seconds": 30,
+  "real_source_completeness_certified": false,
+  "real_market_bot_actor_labels_available": false,
+  "any_raw_market_event_or_order_ids_in_report": false
+}
