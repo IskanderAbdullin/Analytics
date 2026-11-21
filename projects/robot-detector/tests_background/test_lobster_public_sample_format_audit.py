@@ -157,6 +157,37 @@ class LobsterPublicSampleQATests(unittest.TestCase):
             with self.subTest(col=col,value=value),self.assertRaises(ValueError):
                 _validate_book(bad)
 
+    def test_original_vendor_amzn_2012_demo_format_only_result_is_pinned(self):
+        import json
+        p=Path(__file__).resolve().parents[1]/"fixtures"/"lobster_amzn_20120621_10level_format_observed_20261121.json"
+        result=json.loads(p.read_text(encoding="utf-8"))
+        self.assertEqual(result["original_provider_demo_qa_run_id"],44922750898)
+        self.assertEqual(result["precommitted_original_source_commit"],
+                         "c864b763e3535810e3720c729710fc9ec84e9f0e")
+        self.assertEqual(result["original_download_zip_bytes"],4814504)
+        self.assertEqual(result["original_download_zip_sha256_observed_locally_only"],
+                         "5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f")
+        self.assertIs(result["vendor_published_checksum_available"],False)
+        self.assertEqual(result["paired_market_event_and_book_state_rows"],269748)
+        self.assertEqual(result["reconstructed_orderbook_levels_per_side"],10)
+        self.assertEqual(
+            sum(result["original_message_type_counts"].values()),269748)
+        self.assertEqual(result["original_message_type_counts"]["4"],8974)
+        self.assertEqual(
+            result["visible_executions_passive_sell_implies_aggressive_buy"]+
+            result["visible_executions_passive_buy_implies_aggressive_sell"],8974)
+        self.assertEqual(result["hidden_executions"],2445)
+        self.assertEqual(result["adjacent_exact_timestamp_event_pairs"],8483)
+        self.assertEqual(result["quote_snapshots_best_bid_ask_changed_since_previous"],27557)
+        self.assertEqual(result["quote_snapshots_locked_or_crossed_best_bid_ask"],0)
+        self.assertEqual(result["book_state_rows_missing_any_best_quote"],0)
+        self.assertEqual(result["total_dummy_book_side_level_slots"],0)
+        self.assertIs(result["ML_training_or_advanced_detector_rights_confirmed"],False)
+        self.assertIs(result["commercial_use_or_trading_rights_confirmed"],False)
+        self.assertIs(result["not_full_market_depth"],True)
+        self.assertIs(result["no_real_bot_account_or_parent_order_truth"],True)
+        self.assertIs(result["original_raw_market_event_rows_retained_or_published"],False)
+
     def test_archive_bounded_and_download_disabled_in_unit_suite(self):
         data=archive()
         with patch("lobster_public_sample_format_audit.MAX_UNCOMPRESSED_BYTES",40):
