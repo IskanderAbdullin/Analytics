@@ -32,3 +32,20 @@ On execution, 2101/2102 are spent for future independent holdout claims. They ar
 Six no-simulator tests in `tests_background/test_abides_l2_binphase_sensitivity.py` verify phase values, exact shift invariance, signed source arithmetic validation, four-vs-twelve independence, frozen case matrix and rejection of false source/identity claims. The isolated [`robot-detector-abides-binphase.yml`](../../.github/workflows/robot-detector-abides-binphase.yml) workflow runs these pure tests **before** the genuine pinned matching engine and publishes only an aggregate-only seven-day result artifact.
 
 No actual accounts, broker tokens, user trade history, local PC GUI or real orders are touched. **Scientific Stage-2 identity and live-trading gates remain CLOSED.**
+
+## Executed four-simulation result (2026-11-21)
+
+[Successful genuine ABIDES matching CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330) ran the **six frozen-plan Python tests** and **four actual pinned matching-engine scenarios**, reprocessing each anonymous public L2/executed-print tape at the three predeclared 30-second origins without any market reruns across origins.
+
+| Public synthetic background | Origin offset 0s: rho / eligible bin pairs | 10s | 20s |
+|---|---:|---:|---:|
+| Poisson noise, two-seed median | **−0.0137 / 39** | **−0.1608 / 42** | **−0.1809 / 41** |
+| Fixed-cadence noise, two-seed median | **−0.2178 / 42** | **−0.1946 / 41** | **−0.4925 / 42** |
+
+Changing only the analytical **clock-origin** of the same simulated public tape altered the two-seed median coefficients materially, especially fixed-cadence at 20 seconds. Unlike the earlier width experiment, **none of these six median values changes sign**. The result is a negative robustness warning **about researcher-controlled time alignment**, not a measure of real market false-positive rates or statistically significant agent identification. Cohort medians do not establish a sign change in any individual simulation, and the twelve views are correlated.
+
+The exact public digest, executed lot/fill totals and L2 source snapshot counts were conserved across all phases within each of the **four** genuine simulations. The evaluated 2101/2102 seeds are now **spent** for any further independent holdout claim.
+
+[Research seed-ledger CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) passed after replacing its former "unlisted candidate" illustration: once 2101/2102 became spent, testing them as unknown candidates was correctly rejected. The non-spent demonstration numbers 2201/2202 are **not** certified globally unused; they only lack a local ledger collision.
+
+Seven-day aggregate-only result `abides-public-l2-binphase` contains per-run descriptive values without private maker/taker truth or raw public events.

@@ -7,7 +7,7 @@
 
 The new **pre-registered** `tools/abides_l2_binphase_sensitivity.py` evaluates the same anonymous ABIDES depth-five book/trade tape at three **30-second clock origins (0, 10 and 20 seconds)**. Exactly **four new genuine market simulations** (seeds 2101/2102 × Poisson/fixed-cadence backgrounds) produce twelve **correlated** views. Relative public event times, quantities and reported sides are conserved; no phase is selected as a best model and no private execution actor is identified. The two new seeds are registered as spent in the research provenance ledger.
 
-[Precommitted source, tests and scientific limits](docs/ABIDES_L2_BINPHASE_SENSITIVITY.md).
+[Precommitted source, genuine ABIDES results and scientific limits](docs/ABIDES_L2_BINPHASE_SENSITIVITY.md). [Successful CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330) found Poisson-background two-seed median rho **−0.014/−0.161/−0.181** and fixed-cadence **−0.218/−0.195/−0.493** for offsets **0/10/20s**. This is clock-origin sensitivity, **not** owner recognition or a real-market trading signal.
 
 ## Reproducible public-feed invariant stress tests
 

@@ -60,3 +60,7 @@ No broker accounts, trading signals, private maker/taker attribution or actual t
 ## Newly pre-registered phase-sensitivity cohort
 
 The genuine ABIDES 30-second **clock-origin phase** protocol precommits the fresh development seeds `2101,2102` to `tools/abides_l2_binphase_sensitivity.py`. These values are **immediately registered as spent for any subsequent blind-test claims** once this study executes, and the source-constant audit now checks five literal seed lists. The experiment uses four actual genuine simulated market tapes, with three correlated public-time-origin re-binnings each; twelve analytical views are **not** twelve independent markets. [Method](ABIDES_L2_BINPHASE_SENSITIVITY.md).
+
+## Ledger validation after phase study
+
+[Successful source-ledger CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) confirms **12 canonical studies, 31 known spent seed values and five frozen Python constant checks** after including the 2101/2102 genuine clock-origin cohort. A formerly "unknown" candidate example using 2101/2102 now correctly collides with the registry; the test and workflow use 2201/2202 solely to illustrate absence from the local list, not proof that they were never used globally.
