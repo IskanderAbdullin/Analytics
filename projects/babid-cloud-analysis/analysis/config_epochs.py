@@ -119,7 +119,7 @@ def reconstruct(folder: Path) -> tuple[list[dict], list[dict]]:
     for item in events:
         kind, changes = item["kind"], item["values"]
         if kind == "engine_stopped":
-            if epochs:
+            if epochs and not epochs[-1]["end_msk"]:
                 epochs[-1]["end_msk"] = item["at"]
             state = {}  # Nothing may be attributed after an observed stop.
             issues.append(dict(log_dir=log_dir, at_msk=item["at"], kind="observed_stop",
@@ -148,7 +148,7 @@ def reconstruct(folder: Path) -> tuple[list[dict], list[dict]]:
                       known_fields=",".join(sorted(state)), settings_digest=digest,
                       source_file=item["file"], source_line=item["line"])
         record.update(state)
-        if epochs:
+        if epochs and not epochs[-1]["end_msk"]:
             epochs[-1]["end_msk"] = item["at"]
         epochs.append(record)
     return epochs, issues
