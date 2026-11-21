@@ -52,7 +52,7 @@ jobs:
           spent=assess_proposed_seeds(ledger,[1801,1901])
           assert len(spent['known_spent_overlap'])==2,spent
           assert spent['eligible_for_claim_of_fresh_blind_test'] is False,spent
-          candidate=assess_proposed_seeds(ledger,[2101,2102])
+          candidate=assess_proposed_seeds(ledger,[2201,2202])
           assert candidate['not_previously_listed_in_project_ledger'] is True,candidate
           assert candidate['globally_unused_or_unseen_elsewhere_verified'] is False,candidate
           print('SEED_LEDGER_GUARD_VALIDATED',

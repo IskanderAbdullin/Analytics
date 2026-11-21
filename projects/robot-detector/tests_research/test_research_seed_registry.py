@@ -45,7 +45,7 @@ class ResearchSeedLedgerTests(unittest.TestCase):
                 self.assertFalse(r["globally_unused_or_unseen_elsewhere_verified"])
 
     def test_unknown_seed_is_not_proven_globally_new(self):
-        r = assess_proposed_seeds(self.registry, [2101, 2102])
+        r = assess_proposed_seeds(self.registry, [2201, 2202])
         self.assertTrue(r["not_previously_listed_in_project_ledger"])
         self.assertFalse(r["known_spent_overlap"])
         self.assertFalse(r["eligible_for_claim_of_fresh_blind_test"])
