@@ -33,6 +33,8 @@ on:
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
       - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_l2_ownership_nonidentifiability.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_ownership_nonidentifiability.py'
       - 'projects/robot-detector/tools/l2_duration_weighting.py'
       - 'projects/robot-detector/tests_background/test_l2_duration_weighting.py'
       - 'projects/robot-detector/tools/lobster_event_time_features.py'
@@ -94,6 +96,8 @@ on:
       - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
       - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
       - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_l2_ownership_nonidentifiability.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_ownership_nonidentifiability.py'
       - 'projects/robot-detector/tools/l2_duration_weighting.py'
       - 'projects/robot-detector/tests_background/test_l2_duration_weighting.py'
       - 'projects/robot-detector/tools/lobster_event_time_features.py'
@@ -154,6 +158,8 @@ jobs:
           python -m unittest discover -s tests_background -p 'test_lobster_public_sample_format_audit.py' -v
           python -m unittest discover -s tests_background -p 'test_lobster_event_time_features.py' -v
           python -m unittest discover -s tests_background -p 'test_l2_duration_weighting.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_l2_ownership_nonidentifiability.py' -v
+          python tools/public_l2_ownership_nonidentifiability.py
           python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
           python tools/autonomy_checkpoint.py
           python tools/real_public_trade_pair_review.py --output data/results/two-days-source-provenance.json
