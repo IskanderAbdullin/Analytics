@@ -1,0 +1,90 @@
+name: Robot Detector source-verified equal-timestamp cluster control research
+
+# Original research only, no owner inference and no calibration.
+# After the first provider-verified run convert to workflow_dispatch-only.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-spot-cluster-null-controls.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conservative-same-time-cluster-nulls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deterministic pure negative controls
+        run: |
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+      - name: Use same two already inspected original public source days
+        run: |
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-18 --clock-origin-study \
+            --cluster-preserving-null-study \
+            --output /tmp/real-2018-cluster-controls.json
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-19 --clock-origin-study \
+            --cluster-preserving-null-study \
+            --output /tmp/real-2019-cluster-controls.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          days=(
+             ('2026-11-18',116446,'2fbf1fe2f85c813b3d5e4922d674799adced6f306effe0e5cf9add62a57e6522','/tmp/real-2018-cluster-controls.json'),
+             ('2026-11-19',161957,'9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a','/tmp/real-2019-cluster-controls.json'),
+          )
+          for date, count, checksum, file in days:
+             r=json.loads(Path(file).read_text())
+             c=r['public_within_minute_cluster_direction_null_v1']
+             p=r['clock_origin_descriptive_v1']
+             assert r['symbol']=='LTCUSDT' and r['utc_date']==date
+             assert r['source_zip_sha256']==checksum
+             assert r['public_trade_count']==count
+             assert r['provider_published_checksum_matched']
+             assert not r['l2_orderbook_present']
+             assert c['same_timestamp_side_vector_clusters_preserved']
+             assert c['source_event_count']==count
+             assert c['clock_phases_seconds']==[0,10,20]
+             assert c['independent_market_days_in_this_report']==1
+             assert not c['market_false_discovery_rate_calibrated']
+             assert not c['physical_robot_identification_validated']
+             assert not c['optimal_phase_selected']
+             assert not c['commercial_or_live_trading_allowed']
+             assert not r['commercial_use_allowed_without_license']
+             for a,b in zip(c['variants'],p['variants']):
+                 assert a['observed_one_sided_bins']==b['strictly_buy_one_sided_bins_or_sell_one_sided_bins']
+                 assert a['observed_prints_in_full_bins']==b['public_prints_in_full_bins']
+                 assert a['excluded_utc_edge_prints']==b['boundary_trades_excluded']
+                 assert a['num_predeclared_weak_null_replicates']==8
+             print('REAL_SAME_TIMESTAMP_CLUSTER_NULL',json.dumps({
+                 'date':date,'provider_sha256':checksum,'count':count,
+                 'results':[{
+                   'phase_seconds':x['origin_seconds'],
+                   'observed_one_sided':x['observed_one_sided_bins'],
+                   'control_min':x['null_one_sided_bin_count_min'],
+                   'control_median':x['null_one_sided_bin_count_median'],
+                   'control_max':x['null_one_sided_bin_count_max']
+                 } for x in c['variants']],
+                 'physical_owner_count_known':False
+             },sort_keys=True))
+          PY
+      - name: Save only source metadata and descriptive aggregate JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-real-spot-strong-cluster-nulls
+          path: |
+            /tmp/real-2018-cluster-controls.json
+            /tmp/real-2019-cluster-controls.json
+          retention-days: 7
+          if-no-files-found: error
