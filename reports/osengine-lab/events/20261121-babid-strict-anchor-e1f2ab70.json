@@ -1,0 +1,79 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-position-evidence-distinct-notices-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "e1f2ab70-85a4-4653-8530-09f2e2171ed8",
+    "occurred_at": "2026-11-21T16:47:11.914Z",
+    "type": "research",
+    "title": "Require strictly earlier anchor for first reported position transition",
+    "summary": "Prevent same-millisecond baseline from falsely anchoring a reported initial transition and abstain from prior-value comparisons without temporal ordering.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/position_evidence.py",
+      "action": "modified",
+      "summary": "Evidence-based strict-anchor correction and durable checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_position_evidence.py",
+      "action": "modified",
+      "summary": "Evidence-based strict-anchor correction and durable checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Evidence-based strict-anchor correction and durable checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Evidence-based strict-anchor correction and durable checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Evidence-based strict-anchor correction and durable checkpoint"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Evidence-based strict-anchor correction and durable checkpoint"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-ci",
+      "title": "GitHub Actions cross-platform synthetic tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "To run after push"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-001",
+      "title": "Real frozen BabitCloud data unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "No evidence linking this parser edge case to actual NVDA divergence."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Inspect frozen local files by separately authorized read-only channel",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No private data or broker access.",
+    "No root cause established."
+  ]
+}

@@ -16,7 +16,8 @@
     "E-005",
     "E-006",
     "E-007",
-    "E-008"
+    "E-008",
+    "E-009"
   ],
   "hypotheses": [
     {
@@ -85,6 +86,13 @@
       "description": "В отчёте boundary fills и одновременные position samples теперь имеют неопределённую причинную интерпретацию; две синтетические регрессии добавлены",
       "evidence_refs": [
         "E-008"
+      ]
+    },
+    {
+      "id": "M-007",
+      "description": "Начальный reported position transition считается anchored только при строго более раннем наблюдении; same-timestamp prior comparison не заявляется как подтверждённое несоответствие",
+      "evidence_refs": [
+        "E-009"
       ]
     }
   ],

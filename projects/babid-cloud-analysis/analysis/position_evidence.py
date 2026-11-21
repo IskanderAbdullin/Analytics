@@ -189,10 +189,23 @@ def reconcile(root: Path, state: str, logs: str):
     transition_reports = [p for p in positions
                           if p["kind"] in ("changed", "restart_comparison")
                           and p["reported_transition_lots"] != 0]
+    # The first transition is anchored only by a strictly EARLIER observed
+    # position, not by a deterministic file/line order at the same millisecond.
+    first_transition_index = next(
+        (i for i, p in enumerate(positions)
+         if p["kind"] in ("changed", "restart_comparison")), None)
+    first_transition_unanchored = (
+        first_transition_index is not None and
+        not any(t < times[first_transition_index]
+                for t in times[:first_transition_index]))
     prior_position_disagreements = 0
-    for previous, current in zip(positions, positions[1:], strict=False):
-        if (current["kind"] != "baseline" and
-                current["previous_external_lots"] != previous["external_lots"]):
+    ambiguous_prior_comparisons = 0
+    for i, (previous, current) in enumerate(zip(positions, positions[1:], strict=False)):
+        if current["kind"] == "baseline":
+            continue
+        if times[i] == times[i + 1]:
+            ambiguous_prior_comparisons += 1
+        elif current["previous_external_lots"] != previous["external_lots"]:
             prior_position_disagreements += 1
     summary = dict(state=state, logs=logs, observations=len(positions),
                    comparison_intervals=len(intervals),
@@ -200,9 +213,9 @@ def reconcile(root: Path, state: str, logs: str):
                    same_timestamp_unordered_intervals=sum(
                        x["same_timestamp_order_ambiguous"] for x in intervals),
                    reported_external_transitions=len(transition_reports),
-                   first_observation_transition_unanchored=bool(
-                       positions and positions[0]["kind"] != "baseline"),
+                   first_observation_transition_unanchored=first_transition_unanchored,
                    reported_prior_position_disagreements=prior_position_disagreements,
+                   reported_prior_position_comparisons_ambiguous=ambiguous_prior_comparisons,
                    journal_fill_mismatches=sum(
                        x["journal_fill_delta_consistent"] is False for x in intervals),
                    inconsistent_observation_arithmetic=sum(not x["reported_consistent"] for x in positions),
@@ -212,6 +225,7 @@ def reconcile(root: Path, state: str, logs: str):
                        "A first 'changed from ... to ...' log is a reported transition even without a prior broker snapshot.",
                        "external_changes counts paired observed endpoints; reported_external_transitions counts log notices.",
                        "A mismatch between a logged prior value and an earlier sample may reflect skipped checks or stale responses.",
+                       "Only strictly earlier observations can anchor reported prior positions; same-time comparisons abstain.",
                        "Broker position samples are sparse and may be stale or delayed.",
                        "Fills use exchange timestamps, logs use robot observation timestamps.",
                        "Fills exactly at the first/last check are time-boundary ambiguous.",

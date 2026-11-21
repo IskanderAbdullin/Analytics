@@ -103,6 +103,9 @@ class PositionEvidenceTests(unittest.TestCase):
         self.assertEqual(positions[1]["kind"], "changed")
         self.assertEqual(summary["reported_external_transitions"], 2)
         self.assertEqual(str(positions[1]["reported_transition_lots"]), "-2")
+        self.assertTrue(summary["first_observation_transition_unanchored"])
+        self.assertEqual(summary["reported_prior_position_comparisons_ambiguous"], 1)
+        self.assertEqual(summary["reported_prior_position_disagreements"], 0)
         self.assertEqual(len(intervals), 2)
 
     def test_same_millisecond_distinct_reported_transitions_survive(self):
@@ -154,6 +157,25 @@ class PositionEvidenceTests(unittest.TestCase):
         self.assertEqual(summary["same_timestamp_unordered_intervals"], 1)
         self.assertEqual(summary["journal_fill_mismatches"], 0)
         self.assertEqual(summary["external_changes"], 1)
+
+    def test_strictly_earlier_baseline_anchors_first_reported_transition(self):
+        self.fixture()
+        path = self.logs / "babid01.log"
+        old = path.read_text(encoding="utf-8")
+        earlier = (
+            "2026-11-21 14:54:59.000 INF Position check: "
+            "Broker position: +31 lots; robot journal: +33 lots; "
+            "outside the robot: -2 lots\n"
+        )
+        tied = earlier.replace("14:54:59.000", "14:55:00.000")
+        path.write_text(earlier + tied + old, encoding="utf-8")
+        _, intervals, summary = reconcile(self.root, "state-nvda", "logs-nvda")
+        self.assertFalse(summary["first_observation_transition_unanchored"])
+        self.assertEqual(summary["reported_prior_position_comparisons_ambiguous"], 1)
+        self.assertEqual(summary["reported_prior_position_disagreements"], 0)
+        self.assertEqual(summary["same_timestamp_unordered_intervals"], 1)
+        self.assertEqual(len(intervals), 3)
+
 
 if __name__ == "__main__":
     unittest.main()
