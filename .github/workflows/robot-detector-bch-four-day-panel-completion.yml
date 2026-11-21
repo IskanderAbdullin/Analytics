@@ -3,10 +3,9 @@ name: Robot Detector frozen BCH Nov18 19 four-day public print panel
 # Before ANY new BCH Nov18/19 provider download, protocol pinned at
 # commits a71958e59f and e2a7114799. BCH20 is an ALREADY INSPECTED
 # replay to complete occupancy comparability, not fresh evaluation.
+# Original provider-verified workflow #44921851326 completed successfully.
+# All later source archive replays require explicit manual dispatch.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-bch-four-day-panel-completion.yml'
   workflow_dispatch:
 
 permissions:
