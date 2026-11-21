@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-cloud-offline-analysis-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "e4c2ae91-4f7b-4bd2-83a6-a03265c71c58",
+    "occurred_at": "2026-11-21T14:51:16.515Z",
+    "type": "testing",
+    "title": "End-to-end synthetic Babid Cloud offline archive regression and scope rules",
+    "summary": "Add a full in-memory synthetic trading archive test covering configs, fills, journal, risk, log, market recording, historical validation, and immutable read-only output; reinforce Analytics-only agent scope.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_integration_pipeline.py",
+      "action": "added",
+      "summary": "Full offline audit coordinator integration with synthetic non-sensitive source files."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/AGENTS.md",
+      "action": "added",
+      "summary": "Bind future agents to Analytics-only writes, synthetic CI and no-live-trading rules."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Document end-to-end synthetic integration verification."
+    }
+  ],
+  "checks": [
+    {
+      "id": "integration-ci",
+      "title": "Run end-to-end synthetic audit on Linux and Windows",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending push and CI run."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "inspect-integration-results",
+      "title": "Review Actions logs for full integration suite and correct defects",
+      "priority": "high",
+      "state": "todo"
+    }
+  ],
+  "limitations": [
+    "Only synthetic records are created during tests.",
+    "No Windows computer-use or trade execution."
+  ]
+}
