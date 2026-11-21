@@ -19,7 +19,6 @@ MAX_PRINTS = 3_000_000
 
 
 def _stats(slots: list[list[int]], sides: list[bool]) -> list[dict]:
-    counts = [[{} for _ in PHASES_SECONDS]]
     # Keep only the three dictionaries; every slot corresponds to one
     # *completely contained* 30s UTC-day interval.
     bins = [{ } for _ in PHASES_SECONDS]

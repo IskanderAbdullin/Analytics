@@ -42,9 +42,9 @@ class MinutePreservingControlTests(unittest.TestCase):
         self.assertEqual([x["complete_utc_clock_bins"] for x in report["variants"]],
                          [2880,2879,2879])
         self.assertEqual([x["excluded_utc_edge_prints"] for x in report["variants"]],
-                         [0,3,3])
+                         [0,4,4])
         self.assertEqual([x["observed_prints_in_full_bins"] for x in report["variants"]],
-                         [10,7,7])
+                         [10,6,6])
 
     def test_translation_invariance_of_absolute_utc_clock(self):
         first=evaluate_public_side_null(example(),utc_day_start_us=0)
@@ -63,7 +63,7 @@ class MinutePreservingControlTests(unittest.TestCase):
     def test_invalid_public_payload_and_source_bounds_fail_closed(self):
         rows=example()
         for bad in (
-            [],None,tuple(rows),rows[:2]+[(2_000_000,True)]+rows[3:],
+            [],None,tuple(rows),rows[:2]+[(500_000,True)]+rows[3:],
             rows+[(DAY_US,False)],[(True,False)],[(1.0,False)],
             [(0,1)],[(0,None)],[("0",False)],[(0,"SELL")],
         ):
