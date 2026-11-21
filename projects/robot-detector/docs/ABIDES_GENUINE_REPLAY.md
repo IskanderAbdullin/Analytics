@@ -84,6 +84,23 @@ Both VWAP and POV controlled execution fills **actually occurred**, verified thr
 
 A second report version, `abides-blind-score-v2`, adds `postHocControlledDiagnostics`: distinct quantities, unique timestamps, collisions, median positive/nonpositive interprint intervals, all calculated using hidden controlled-truth labels strictly **after** both detectors finish. Do not feed these post-hoc statistics into the detector or reuse the same seeds as a fresh holdout after tuning new algorithms.
 
+## New independent executed-fill baseline (pre-registered 2026-11-21)
+
+The initial ABIDES TWAP/fixed-q 4-seed cohort (901–904), and individual VWAP/POV examples (43,44), have already been inspected and therefore **cannot** be treated as unused evaluation data. Public volume-response development seeds (61–63), directional-share development seeds (71–73) and independent share-shift replication (1101–1104) are likewise spent. The [direction-share replication](DIRECTIONAL_REGIME_SHIFT.md) found null 1 / VWAP 0 / POV 1 public shift windows at fixed settings, so **that feature does not provide reliable program recognition**.
+
+For the **original unchanged existing C# fixed-/variable-quantity screens**, the next execution-level test pre-registers **entirely new** ABIDES seeds `1301,1302,1303,1304`, four simulator modes `null,twap,vwap,pov`, and both existing detector default configurations. See `tools/abides_execution_baseline_holdout.py`.
+
+The protocol runs **16 genuine matching-engine simulations** with complete maker/taker per-fill attribution. Each detector sees **only public CSV prints**. The existing `benchmark-abides-blind` C# scorer reads private labels **only after the candidate detection outputs are produced**, verifies a SHA-256-linked one-to-one event mapping, and writes aggregate-only synthetic event counts TP/FP/missed by model and mode. Every private manifest and detailed public tape is stored only in an ephemeral CI directory, not in artifacts or the repository. Report metrics:
+
+- `pooled_event_recall = controlled synthetic prints detected / all controlled synthetic prints` for positive modes, **null** for zero-controlled null scenarios.
+- `pooled_event_precision = controlled prints detected / all publicly attributed prints` if any attribution, else **null**.
+- `false_positive_prints`: publicly attributed print IDs belonging to **uncontrolled synthetic agent participation**; this is not a calibrated real-market FDR.
+- `cases_with_any_attribution`: descriptive number of four simulator runs in which the screen emitted at least one public print attribution.
+
+**No detector coefficients, periods, sizes or cutoffs are changed** and no frozen-run labels are used in training. A locked seed/mode/config contract and a Python accounting-unit test are committed **before** the results. If a positive strategy fails to execute actual exchange fills, the experiment fails instead of misleadingly counting it as zero recall. The separate aggregate-only workflow artifact has 14-day retention.
+
+This test cannot establish physical traders, actual MOEX/SPB precision, a market opportunity or independent physical bots. The 1301–1304 cohort becomes **spent immediately after evaluation**; no further model tuning against it is permitted. Any future new strategy requires a new unrelated hidden evaluation set.
+
 ## Scientific limits and release gates
 
 ABIDES-NG is a synthetic exchange simulator, not a calibrated representation of MOEX/SPB, nor an independent prediction trial on untouched real instruments/dates. One seeded scenario with an ABIDES execution agent does not prove precision, recall or model advantage on a real market. Exchange per-fill truth identifies synthetic agent participants, **not** independent physical real-world owners. The private truth is an evaluator input; tampering SHA mismatches or event records fails closed, but the scorer cannot cryptographically prove that an external manifest really originated from ABIDES unless the environment/source is independently audited.
