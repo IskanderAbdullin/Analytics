@@ -35,6 +35,29 @@ COHORT_FIELDS = frozenset((
     "posthoc_twap_fills", "naive_positive_seeds", "grouped_positive_seeds",
     "naive_abstain_seeds", "grouped_abstain_seeds",
 ))
+# Retrospective original outcomes, pinned as an independent integrity guard
+# against edits to the compact artifact. NOT a new calibration/protocol.
+FROZEN_DECISIONS = {
+    "poisson_noise_null": (
+        {3316,3319,3326,3331,3333,3338,3339},
+        {3316,3319,3326,3333,3338,3339},set(),set()),
+    "fixed_20s_noise_hard_negative": (
+        set(),set(),{3320},{3320}),
+    "momentum_noise_hard_negative": (
+        {3305,3319,3324,3328,3333,3338,3339},
+        {3305,3319,3324,3328,3333,3338,3339},set(),set()),
+    "twap_45s_positive": (
+        set(SEEDS)-{3321},
+        set(SEEDS)-{3302,3304,3307,3308,3311,3318,3321,3335},
+        {3321},{3321}),
+}
+FROZEN_PUBLIC_COUNTS = {
+    "poisson_noise_null":(41398,40063,0),
+    "fixed_20s_noise_hard_negative":(39531,32367,0),
+    "momentum_noise_hard_negative":(36049,34751,0),
+    "twap_45s_positive":(39256,37727,617),
+}
+
 ALLOWED_CASE_FIELDS = frozenset((
     "actual_market_owner_identity_or_FDR_known", "eligible_previous_completed_30s_L2_bins",
     "largest_timestamp_cluster_prints", "per_print_abstain_reason",
@@ -144,6 +167,10 @@ def audit_fixture(data: dict) -> dict:
         ga = _mask(c["grouped_abstain_seeds"], cohort + ".grouped_abstain")
         if pp & pa or gp & ga:
             raise ValueError("A seed cannot simultaneously alarm and abstain")
+        if ((pp,gp,pa,ga)!=FROZEN_DECISIONS[cohort]
+            or (c["public_prints"],c["unique_execution_timestamps"],
+                c["posthoc_twap_fills"]) != FROZEN_PUBLIC_COUNTS[cohort]):
+            raise ValueError("Retrospective original 160-source case outcomes or counts changed")
         pm = set(SEEDS) - pp - pa if is_target else set()
         gm = set(SEEDS) - gp - ga if is_target else set()
         if is_target and gm != _mask(c["grouped_missed_twap_seeds"], "grouped_missed"):
