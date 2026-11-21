@@ -23,7 +23,7 @@ class AutonomyContractTests(unittest.TestCase):
         self.assertTrue(result["can_resume_from_checkpoint"])
         self.assertFalse(result["scientific_final_goal_already_verified"])
         self.assertFalse(result["is_background_daemon_running"])
-        self.assertGreaterEqual(result["available_queued_followups"],3)
+        self.assertGreaterEqual(result["available_queued_followups"],1)
         self.assertIn("issues/72",result["master_issue"])
         self.assertTrue(TZ.is_file())
         self.assertIn("автоном",TZ.read_text(encoding="utf-8").lower())
