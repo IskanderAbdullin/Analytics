@@ -157,6 +157,26 @@ class RealL2EventTimeSyntheticTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 event_time_features(archive())
 
+    def test_pinned_real_event_time_findings_reconcile_and_are_nonidentifying(self):
+        import json
+        fixture=Path(__file__).resolve().parents[1]/"fixtures"/"lobster_amzn_event_time_observed_20261121.json"
+        report=json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertEqual(report["original_successful_run"],44925498585)
+        self.assertEqual(report["original_aggregate_only_artifact"],14714963264)
+        self.assertEqual(report["paired_event_and_post_event_l2_snapshot_rows"],269748)
+        self.assertEqual(sum(report["original_13_consecutive_halfhour_event_counts"]),269748)
+        self.assertEqual(len(report["original_13_consecutive_halfhour_event_counts"]),13)
+        self.assertEqual(report["observed_top_bid_ask_price_change_count"],27557)
+        self.assertEqual(report["observed_visible_execution_quote_price_change_count"],4239)
+        self.assertEqual(report["observed_same_timestamp_quote_price_changes"],2445)
+        self.assertAlmostEqual(report["observed_mean_event_weighted_spread_x10000"],1308.61693136)
+        self.assertAlmostEqual(report["observed_mean_event_weighted_top_imbalance"],0.10299666)
+        for key in ("not_independent_market_holdout","not_time_weighted_statistics",
+                    "no_actor_identity_or_real_robot_FDR",
+                    "no_event_rows_timestamps_price_series_or_order_ids_published"):
+            self.assertIs(report[key],True)
+        self.assertIs(report["vendor_published_checksum_available"],False)
+
     def test_no_network_or_trade_method_in_replay(self):
         with patch("lobster_event_time_features.download_exact_demo") as net:
             summary=event_time_features(archive())

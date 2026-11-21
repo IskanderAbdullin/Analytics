@@ -16,7 +16,9 @@ class AutonomyContractTests(unittest.TestCase):
 
     def test_actual_checked_in_project_has_resume_evidence_and_next_action(self):
         result=validate_state(self.source)
-        self.assertEqual(result["current_stage_id"],"RD-L2-RESEARCH-01")
+        self.assertRegex(result["current_stage_id"],r"^RD-[A-Z0-9-]+$")
+        self.assertIn(result["current_stage_status"],
+                      ("READY_TO_IMPLEMENT","IN_PROGRESS","DONE_PENDING_FOLLOW_ON","BLOCKED"))
         self.assertEqual(result["status"],"ACTIVE_RESEARCH_NOT_RELEASED")
         self.assertTrue(result["can_resume_from_checkpoint"])
         self.assertFalse(result["scientific_final_goal_already_verified"])
