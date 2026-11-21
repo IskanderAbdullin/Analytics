@@ -242,3 +242,10 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 - Added eight no-ABIDES tests in `tests_l2/test_public_numeric.py`, covered by the existing L2 CI; no additional expensive ABIDES workflow is needed. Documentation: [L2_PUBLIC_NUMERIC_INTEGRITY.md](L2_PUBLIC_NUMERIC_INTEGRITY.md). This fixes one class of source-data distortion, not feed completeness, exchange causal ordering, physical bot identity or real-market FDR.
 
 - **Executed strict public numeric integrity CI:** [successful pinned ABIDES run #44911366203](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911366203), **41 Python tests** including 8 new strict scalar tests; prior genuine simulator public L2/print outputs remain consistent. No truncation of float/string/decimal/boolean values into tick price, lots or timestamp in the public analysis paths. Source authenticity/coverage remain unverified.
+
+## 2026-11-21 — strict unique-price L2 structure
+
+- Strengthened `l2_probe.audit_l2_public`: duplicate or reversed prices inside one aggregated L2 side now fail closed (bid prices strictly decreasing; ask prices strictly increasing), preventing double-counting at the same level in the previous-bin public imbalance. Repeated timestamps across separate snapshots are **still preserved**.
+- Added six deterministic no-ABIDES tests in `tests_l2/test_l2_level_uniqueness.py`, including source-level rejection in both public join and lagged-L2 analytics. Document: [L2_UNIQUE_PRICE_LEVELS.md](L2_UNIQUE_PRICE_LEVELS.md). Must not apply this aggregated-L2 rule directly to per-order L3 feeds. Real feed provenance and bot-identity claims remain unverified.
+
+- **Verified strict unique-price L2 source check:** [successful pinned ABIDES CI #44911604350](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911604350) passed **47 Python tests**, including six new duplicate-level checks, while genuine 1,152-snapshot / 709-fill feasibility output remained unchanged. Research/market release gate stays CLOSED.
