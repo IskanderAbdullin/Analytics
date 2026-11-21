@@ -2,10 +2,9 @@ name: Robot Detector one-time official public exchange trade research
 
 # One frozen research sample only. After the first successful execution,
 # remove push trigger; never spend runner on repeated identical downloads.
+# Completed frozen 2026-11-18 source run #44916791033. No automatic
+# downloads on later pushes: manual-only, source terms may change.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-binance-research.yml'
   workflow_dispatch:
 
 permissions:
