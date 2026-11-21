@@ -13,7 +13,7 @@ dotnet run --project src/RobotDetector.Cli -- benchmark-clock-null `
   --output data/results/clock-null.json
 ```
 
-[Protocol, limitations and acceptance](docs/CLOCKED_NULL_STRESS.md). The prior four-scenario blinded benchmark remains available and unchanged. **Stage-2 scientific release gate remains CLOSED.**
+[Protocol, limitations and acceptance](docs/CLOCKED_NULL_STRESS.md). In the [verified 120-check CI smoke](https://github.com/IskanderAbdullin/Analytics/actions/runs/44888523166), each detector falsely attributed 81/180 independent prints from its matching adverse 3-seed clocked-null profile; this does **not** establish a real-world market false-positive rate. The prior four-scenario blinded benchmark remains available and unchanged. **Stage-2 scientific release gate remains CLOSED.**
 
 ## Научная проверка с приватной синтетической разметкой — 19.11.2026
 

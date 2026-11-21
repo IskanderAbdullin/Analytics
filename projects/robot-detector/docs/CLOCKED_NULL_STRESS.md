@@ -34,7 +34,16 @@ For any model, exactly conserve counts: the sum of `FalsePositivePrints` across 
 
 Four additional deterministic no-NuGet self-tests check: independent private producers and opaque IDs; zero controlled truth, false-positive conservation and undefined recall; summary arithmetic, reproducibility and fail-closed input bounds. The Windows convenience `RobotDetector.DotnetTests` wrapper executes the entire console self-test battery through `dotnet test`; this optional local wrapper is not required by upstream's no-NuGet CI.
 
-**Executed fixed-q stress smoke (3 seeds × 60 background prints; 2026-11-21):** the fixed-quantity detector attributed 81/180 independent public prints as candidate evidence across 3/3 adverse null cases; the variable-quantity detector attributed 0/180 because clip sizes were constant. This is a counterexample to naive physical-robot identification, **not** an empirical market-wide false-positive rate. [Source CI run](https://github.com/IskanderAbdullin/Analytics/actions/runs/44888157567). Variable-size adversarial results require a separate run; do not infer its performance from the fixed-q control.
+**Executed stress smoke (2026-11-21):** 3 deterministic seeds per background profile, 60 independent public prints in each case, zero controlled parent executions. [Successful .NET CI run, 120/120 internal checks](https://github.com/IskanderAbdullin/Analytics/actions/runs/44888523166).
+
+| Adversarial background | Detector | Cases with false attributions | Falsely attributed prints / total in cases |
+|---|---|---:|---:|
+| Shared clock, fixed 100-lot prints | Fixed-quantity | 3/3 | **81/180** |
+| Shared clock, fixed 100-lot prints | Variable-quantity | 0/3 | 0/180 |
+| Shared clock, cycling 25/50/75/100 lots | Fixed-quantity | 0/3 | 0/180 |
+| Shared clock, cycling 25/50/75/100 lots | Variable-quantity | 3/3 | **81/180** |
+
+The same three public cases are evaluated by both models in each profile; detector scores should not be summed as independent market observations. These 81 false attributions are a controlled *counterexample* to identifying a physical robot from a periodic anonymous tape, not a calibrated MOEX/SPB real-world false-positive rate, and do not establish a causal exchange mechanism. Neither null profile produces any controlled synthetic execution program.
 
 Current research status: `Stage 2 scientific release gate CLOSED`. This experiment is neither ABIDES-NG with hidden agent truth and queue matching nor empirically calibrated clustered-null validation. Before any real-market claims: hold out entire dates/instruments, run multiple competing conditional null families through the full candidate-selection pipeline, check source clock precision/market session coverage, and evaluate forecast ability against prespecified placebo.
 
