@@ -1,0 +1,102 @@
+{
+  "schema_version": "abides-public-clustered-grid-16source-precommit-v1",
+  "date_frozen_utc": "2026-11-21",
+  "source_type": "genuine ABIDES-NG matching engine synthetic ONLY",
+  "new_source_status": "NOT_RUN",
+  "motivating_exact_toy_source_ci": 44938416432,
+  "previous_inspected_source_runs": [
+    44936592641,
+    44937478576
+  ],
+  "upstream_engine_source_commit": "ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "new_local_seed_candidates": [
+    3201,
+    3202,
+    3203,
+    3204
+  ],
+  "globally_blind_seed_novelty_not_certified": true,
+  "source_clock_interval_exchange_local": [
+    "09:30:00",
+    "09:38:00"
+  ],
+  "market_symbol": "ABM",
+  "book_depth_levels": 5,
+  "cohorts": [
+    "poisson_noise_null",
+    "fixed_20s_noise_hard_negative",
+    "momentum_noise_hard_negative",
+    "twap_45s_positive"
+  ],
+  "configurations": {
+    "poisson_noise_null": {
+      "noise_agents": 60,
+      "poisson_arrival": true,
+      "noise_wakeup_seconds": 20,
+      "momentum_agents": 0,
+      "twap_agents": 0
+    },
+    "fixed_20s_noise_hard_negative": {
+      "noise_agents": 60,
+      "poisson_arrival": false,
+      "noise_wakeup_seconds": 20,
+      "momentum_agents": 0,
+      "twap_agents": 0
+    },
+    "momentum_noise_hard_negative": {
+      "noise_agents": 50,
+      "poisson_arrival": true,
+      "noise_wakeup_seconds": 20,
+      "momentum_agents": 10,
+      "momentum_wakeup_seconds": 25,
+      "momentum_poisson": true,
+      "short_window": 5,
+      "long_window": 15,
+      "twap_agents": 0
+    },
+    "twap_45s_positive": {
+      "noise_agents": 60,
+      "poisson_arrival": true,
+      "noise_wakeup_seconds": 20,
+      "momentum_agents": 0,
+      "twap_agents": 1,
+      "twap_period_seconds": 45,
+      "twap_quantity_lots": 1200,
+      "twap_direction": "BID",
+      "twap_order_style": "market",
+      "twap_offset_session_seconds": 60
+    }
+  },
+  "planned_independent_matching_engine_runs": 16,
+  "frozen_clock_feature": {
+    "clock_anchor_seconds_after_exchange_midnight": 34260,
+    "periods_seconds": [
+      20,
+      45
+    ],
+    "tolerance_ns": 250000000,
+    "legacy_print_grid_ratio_threshold": 0.6,
+    "new_timestamp_cluster_grid_ratio_threshold": 0.6,
+    "no_optimizer_fit_threshold_or_phase_on_new_source": true,
+    "min_public_prints_for_either_rule": 200,
+    "min_grid20_print_hits_for_legacy_decision": 8,
+    "min_grid20_distinct_timestamp_hits_for_cluster_decision": 8,
+    "min_eligible_prior_completed_30second_l2_bins": 5,
+    "same_timestamp_exact_ns_only": true,
+    "source_trade_side_price_volume_used_only_for_public_metadata_not_cluster_ID": true,
+    "timestamp_cluster_not_equivalent_to_parent_or_owner": true,
+    "abstentions_explicit_not_negative_class": true
+  },
+  "expected_analyses": [
+    "All naive print ratio & timestamp-cluster ratio per source seed/cohort",
+    "Independent per-cohort false alarms, missed TWAP, abstention reasons",
+    "Source public trade-print count vs unique timestamp count and max cluster multiplicity",
+    "Same timestamp may represent independent orders; don't claim deduped owners",
+    "FDR and physical owner labels unavailable in real market"
+  ],
+  "posthoc_private_TWAP_agent_labels_only_after_both_public_scores": true,
+  "no_raw_execution_tape_l2_snapshots_or_private_oracle_agent_ID_export": true,
+  "all_negative_results_and_seed_cohorts_retained": true,
+  "original_source_one_bounded_public_GitHub_Action_then_manual_only": true,
+  "not_real_market_owner_precision_pvalue_or_FDR_calibration": true
+}
