@@ -130,10 +130,13 @@ def analyze_coverage(
     fully_attested=(expected is not None and not reasons)
     # Only a synthetic oracle expected range can produce an 'eligible'
     # result. Full exchange completeness is NEVER inferred here.
+    only_unobservable_sequence=(
+        expected is None and reasons=={"MISSING_EVENT_SEQUENCE"}
+    )
     state=(
         "SYNTHETIC_COVERAGE_ELIGIBLE_ONLY" if fully_attested else
-        "ABSTAIN_SOURCE_OR_BOOK_INTEGRITY" if reasons else
-        "UNKNOWN_SOURCE_COMPLETENESS"
+        "UNKNOWN_SOURCE_COMPLETENESS" if only_unobservable_sequence or not reasons else
+        "ABSTAIN_SOURCE_OR_BOOK_INTEGRITY"
     )
     coverage=(len(seen_sequences)/(expected[1]-expected[0]+1)
               if expected is not None else None)
