@@ -1,0 +1,25 @@
+{
+  "schema_version": "abides-160-zero-execution-source-inclusion-addendum-v1",
+  "stage": "RD-ABIDES-POWER-15",
+  "registered_utc_date": "2026-11-21",
+  "classification": "PRE_SOURCE_CORRECTION_TO_AVOID_CENSORING",
+  "frozen_parent_protocol": "research/abides_public_grid_160case_precommit_20261121.json",
+  "frozen_parent_blob_sha": "124f1700d403d731190cb628355ac8fb3fc6e87a",
+  "original_matching_engine_runs_observed_at_addendum": 0,
+  "seeds_unchanged": "3301..3340",
+  "source_cohorts_unchanged": 4,
+  "public_grid_phase_thresholds_unchanged": true,
+  "hypothesis": "An injected TWAP agent can produce zero controlled executions; excluding that source seed after inspecting posthoc oracle creates outcome-dependent selection.",
+  "operational_decision": "Retain all 40 injected positive simulations, even if controlled fills=0; distinguish injected-agent presence from any observable execution and report a separate zero-execution stratum. Do not convert no-fills into an observed execution true positive.",
+  "outcomes_required": [
+    "original source 160 cases or explicit source failure, never seed replacement",
+    "posthoc injected TWAP source count",
+    "posthoc TWAP controlled executed source count",
+    "positive cases with zero controlled fills",
+    "paired decisions in zero-fill positive source cases",
+    "all negative cohorts preserved"
+  ],
+  "original_frozen_thresholds_not_refitted": true,
+  "oracle_never_exposed_to_public_features": true,
+  "synthetic_only_not_real_market_FDR": true
+}
