@@ -66,7 +66,24 @@ def inventory(root: Path) -> list[dict]:
 def run(root: Path, output: Path, with_market: bool = True, *,
         epoch_state: str | None = None, epoch_logs: str | None = None,
         markout_state: str | None = None, markout_instrument: str | None = None,
-        markout_day: str | None = None) -> dict:
+        markout_day: str | None = None,
+        focus_start: str | None = None, focus_end: str | None = None,
+        incident_state: str | None = None, incident_logs: str | None = None,
+        incident_start: str | None = None, incident_end: str | None = None) -> dict:
+    if bool(focus_start) != bool(focus_end):
+        raise ValueError("both focus_start and focus_end are required for a narrowed history")
+    if any((incident_state, incident_logs, incident_start, incident_end)) and not all(
+            (incident_state, incident_logs, incident_start, incident_end)):
+        raise ValueError("incident study requires explicit state/logs/start/end")
+    if focus_start is not None:
+        if datetime.fromisoformat(focus_start).tzinfo or datetime.fromisoformat(focus_end).tzinfo:
+            raise ValueError("focus timestamps must be naive Moscow time")
+        if datetime.fromisoformat(focus_start) > datetime.fromisoformat(focus_end):
+            raise ValueError("focus_start must not be later than focus_end")
+    if incident_state and incident_logs and incident_start and incident_end:
+        first, last = datetime.fromisoformat(incident_start), datetime.fromisoformat(incident_end)
+        if first.tzinfo or last.tzinfo or first > last:
+            raise ValueError("incident timestamps must be naive Moscow time and ordered")
     if bool(epoch_state) != bool(epoch_logs):
         raise ValueError("epoch_state and epoch_logs must be supplied together")
     if any((markout_state, markout_instrument, markout_day)) and not all(
@@ -77,16 +94,19 @@ def run(root: Path, output: Path, with_market: bool = True, *,
     # the report explicitly says it is not an atomic snapshot.
     files = inventory(root)
     output.mkdir(parents=True, exist_ok=False)
+    selected_start = focus_start or "0001-01-01T00:00:00"
+    selected_end = focus_end or "9999-12-31T23:59:59"
     manifest = dict(created_utc=datetime.now(UTC).isoformat(),
                     root=str(root), files=files, reports={},
+                    history_scope={"mode": "all" if not focus_start else "window",
+                                   "focus_start_msk": selected_start, "focus_end_msk": selected_end},
                     limitations=["Input folders are not an atomic filesystem snapshot",
                                  "No independent broker-side executed-trade reconciliation",
                                  "Historical config epochs may be unavailable",
                                  "No auto-application of optimized settings"])
     try:
         manifest["reports"]["history"] = audit_history.run(
-            root, output / "history", "2026-11-21T14:40:00",
-            "2026-11-21T15:10:00")
+            root, output / "history", selected_start, selected_end)
     except (OSError, ValueError) as error:
         manifest["reports"]["history_error"] = str(error)[:300]
     try:
@@ -127,14 +147,13 @@ def run(root: Path, output: Path, with_market: bool = True, *,
                 output / "opportunity_validation")
         except (OSError, ValueError) as error:
             manifest["reports"]["opportunity_validation_error"] = str(error)[:300]
-    if (root / "state-nvda-iis-live" / "fills.csv").is_file():
+    if incident_state and incident_logs and incident_start and incident_end:
         try:
-            manifest["reports"]["nvda"] = position_forensics.run(
-                root, "state-nvda-iis-live", "logs-nvda-iis-live",
-                "2026-11-21 14:40:00", "2026-11-21 15:10:00",
-                output / "nvda")
+            manifest["reports"]["incident"] = position_forensics.run(
+                root, incident_state, incident_logs, incident_start,
+                incident_end, output / "incident")
         except (OSError, ValueError) as error:
-            manifest["reports"]["nvda_error"] = str(error)[:300]
+            manifest["reports"]["incident_error"] = str(error)[:300]
     if epoch_state and epoch_logs:
         try:
             manifest["reports"]["position_evidence"] = position_evidence.run(
@@ -172,6 +191,12 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
     p.add_argument("--output", type=Path)
+    p.add_argument("--focus-start", help="optional start of history timeline (MSK ISO); default ALL history")
+    p.add_argument("--focus-end", help="optional end of history timeline (MSK ISO); default ALL history")
+    p.add_argument("--incident-state", help="explicit state folder for narrow incident review")
+    p.add_argument("--incident-logs", help="explicit log folder for narrow incident review")
+    p.add_argument("--incident-start", help="incident start MSK, YYYY-MM-DD HH:MM:SS")
+    p.add_argument("--incident-end", help="incident end MSK, YYYY-MM-DD HH:MM:SS")
     p.add_argument("--skip-market", action="store_true",
                    help="skip potentially lengthy scans of market recordings")
     p.add_argument("--epoch-state", help="explicit state folder for per-setting booked fills")
@@ -188,7 +213,10 @@ def main() -> int:
                      epoch_state=args.epoch_state, epoch_logs=args.epoch_logs,
                      markout_state=args.markout_state,
                      markout_instrument=args.markout_instrument,
-                     markout_day=args.markout_day)
+                     markout_day=args.markout_day,
+                     focus_start=args.focus_start, focus_end=args.focus_end,
+                     incident_state=args.incident_state, incident_logs=args.incident_logs,
+                     incident_start=args.incident_start, incident_end=args.incident_end)
     except (OSError, ValueError) as error:
         print("Offline audit refused:", error, file=sys.stderr)
         return 1
