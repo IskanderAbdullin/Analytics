@@ -1,5 +1,29 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
+## Real-public-trade negative controls: clock and partial-fill preservation
+
+**Executed twice on the same two inspected real LTCUSDT UTC days.**
+Research-only per-print within-minute side shuffling initially left
+observed one-sided 30s intervals far above its weak background.
+A second, more conservative control shuffled whole equal-size,
+equal-timestamp execution side-vector clusters instead. With the
+original 30-second origin, the **eight-control medians** rose from
+**74 to 136.5** (2026-11-18) and from **58.5 to 105**
+(2026-11-19), while real counts were **173 and 135**.
+This demonstrates the importance of preserving split-fill
+clustering before interpreting time-series concentration.
+Eight permutations of two previously inspected days are **not**
+calibrated significance, FDR, causal inference or physical
+owner detection. [Frozen source provenance, all six clock offsets
+and limitations](docs/REAL_PUBLIC_SPOT_TRADE_ARCHIVE_2026-11-21.md).
+
+[Weak control original CI #44918585645](https://github.com/IskanderAbdullin/Analytics/actions/runs/44918585645)
+and [stronger cluster-preserving original CI #44919058627](https://github.com/IskanderAbdullin/Analytics/actions/runs/44919058627)
+both succeeded. The original source ZIP checksums match both
+original providers' audited archives. All expensive repeated
+source-fetch workflow schedules are now **manual-only**; only
+small deterministic source/tests auto-run on push.
+
 ## New REAL public trade evidence — November 2026, research only
 
 **New live-provider archive downloads succeeded** through public GitHub

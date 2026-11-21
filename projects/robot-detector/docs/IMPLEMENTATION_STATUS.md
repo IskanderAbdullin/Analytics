@@ -383,3 +383,40 @@ proprietary trading, data redistribution and commercial use.
 MOEX non-display feeds for algorithmic trading require a separate
 contract; no such automated MOEX use is claimed. No raw public trade
 ZIP, private IDs, credentials or large artifacts were committed.
+
+## Retrospective real spot partial-fill-aware negative controls (2026-11-21)
+
+- Successfully implemented `tools/public_trade_direction_null.py`
+  with fixed 30s origins **0/10/20s** and exactly 8 deterministic
+  within-minute source-side permutations. Public timestamps,
+  per-minute BUY/SELL counts and fixed UTC-day edge policies are
+  conserved exactly; zero raw labels/timestamps exported.
+- Original provider-verifying [CI #44918585645](https://github.com/IskanderAbdullin/Analytics/actions/runs/44918585645)
+  re-read the **116,446 + 161,957** real LTCUSDT print tapes.
+  At 0s, observed real one-sided intervals were 173 / 135;
+  weak-null median controls 74 / 58.5.
+- A second [original CI #44919058627](https://github.com/IskanderAbdullin/Analytics/actions/runs/44919058627)
+  successfully recomputed a stronger, post-hoc **equal-timestamp
+  cluster-preserving** null over those already inspected tapes.
+  Each exact-timestamp side vector moves only among equal-size
+  clusters in the same minute: all original timestamp positions,
+  within-cluster multiplicities and source minute side counts
+  are conserved. At 0s, median one-sided control counts rose
+  from 74 to **136.5** on Nov 18 and 58.5 to **105** on Nov 19.
+- The larger null medians demonstrate how much the weak per-print
+  randomization breaks real partial-fill structure. The remaining
+  differences (173 vs 136.5 and 135 vs 105) **cannot be assigned
+  to physical trading bots**, and eight descriptive shuffles
+  cannot justify significance, out-of-sample precision/FDR or a
+  trading strategy. Observed results for all three phases and two
+  dates are pinned in compact source-controlled JSON fixtures.
+- Both new genuine-provider Actions used the original known
+  source archive SHA-256 values; no private identities, raw ZIPs
+  or broker trading services entered the repository. After
+  completion, source network workflows changed to **manual
+  dispatch only**. Lightweight CI validates the source/test
+  and both no-owner-claim fixtures offline.
+- User authorized future optional processing via PC Agent on
+  their Windows machine. No local clone or raw data download was
+  necessary: archives are only a few MB and cloud CI passed.
+  Never claim local mirror exists until actually created.
