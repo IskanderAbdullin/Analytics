@@ -24,33 +24,46 @@ FIELDS = ("ticker", "min_level_lots", "days", "train_days", "held_out_day",
           "qualifications")
 
 
-def load_daily(source: Path) -> tuple[dict, list[str]]:
+def load_daily(source: Path) -> tuple[dict, list[str], int, int]:
     data = defaultdict(lambda: [0, Decimal(0), Decimal(0)])
     warnings = []
+    warnings_total = 0
+    duplicate_hours = 0
+    seen_hours = set()
     with source.open("r", encoding="utf-8-sig", newline="") as input_stream:
         reader = csv.DictReader(input_stream)
-        required = {"ticker", "date_msk", "min_level_lots", "books", "buy_share", "sell_share"}
+        required = {"ticker", "date_msk", "hour_msk", "min_level_lots",
+                    "books", "buy_share", "sell_share"}
         if not reader.fieldnames or not required.issubset(reader.fieldnames):
             raise ValueError("market opportunities CSV schema mismatch")
         for line, row in enumerate(reader, 2):
             try:
                 name, day = row["ticker"], row["date_msk"]
                 date.fromisoformat(day)
+                hour = int(row["hour_msk"])
                 threshold = int(row["min_level_lots"])
                 books = int(row["books"])
                 buy = Decimal(row["buy_share"])
                 sell = Decimal(row["sell_share"])
-                if (not name or len(day) != 10 or threshold < 1 or books <= 0 or
+                if (not name or len(day) != 10 or not 0 <= hour <= 23
+                        or threshold < 1 or books <= 0 or
                         not (buy.is_finite() and sell.is_finite()) or
                         not (0 <= buy <= 1 and 0 <= sell <= 1)):
                     raise ValueError("invalid opportunity values")
+                hour_key = (name, threshold, day, hour)
+                if hour_key in seen_hours:
+                    duplicate_hours += 1
+                    raise ValueError("repeated hour for one instrument, day and threshold")
+                seen_hours.add(hour_key)
                 key = (name, threshold, day)
                 data[key][0] += books
                 data[key][1] += buy * books
                 data[key][2] += sell * books
             except (KeyError, ValueError, TypeError, InvalidOperation) as error:
-                warnings.append(f"line {line}: {str(error)[:80]}")
-    return data, warnings
+                warnings_total += 1
+                if len(warnings) < 100:
+                    warnings.append(f"line {line}: {str(error)[:80]}")
+    return data, warnings, warnings_total, duplicate_hours
 
 
 def summarize(data: dict, *, min_days: int, min_books: int) -> list[dict]:
@@ -93,20 +106,25 @@ def run(root: Path, source: Path, output: Path, min_days: int = 3, min_books: in
         raise ValueError("input must be a market-study CSV within reports/")
     if min_days < 2 or min_books < 1:
         raise ValueError("min_days >= 2 and min_books >= 1 are required")
-    data, warnings = load_daily(source)
+    data, warnings, warnings_total, duplicate_hours = load_daily(source)
     rows = summarize(data, min_days=min_days, min_books=min_books)
-    if source_quality_unverified:
+    if source_quality_unverified or warnings_total:
         for row in rows:
             row["ready_for_comparison"] = False
-            row["qualifications"] = ";".join(
-                part for part in (row["qualifications"], "source_market_quality_unverified") if part)
+            reasons = [row["qualifications"]]
+            if source_quality_unverified:
+                reasons.append("source_market_quality_unverified")
+            if warnings_total:
+                reasons.append("invalid_or_duplicate_opportunity_rows")
+            row["qualifications"] = ";".join(part for part in reasons if part)
     output.mkdir(parents=True, exist_ok=False)
     with (output / "out_of_sample_feasibility.csv").open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=FIELDS)
         writer.writeheader()
         writer.writerows(rows)
     summary = {"groups": len(rows), "comparable_groups": sum(x["ready_for_comparison"] for x in rows),
-               "warnings": warnings[:100], "warnings_total": len(warnings),
+               "warnings": warnings, "warnings_total": warnings_total,
+               "duplicate_hour_rows": duplicate_hours,
                "source_market_quality_unverified": source_quality_unverified,
                "held_out_last_day": True, "min_days": min_days, "min_books": min_books,
                "limits": ["No live configuration recommendations: quote eligibility is not fill probability or P&L.",

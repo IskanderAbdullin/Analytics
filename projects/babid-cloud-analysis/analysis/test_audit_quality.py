@@ -102,6 +102,14 @@ class QualityGateTests(unittest.TestCase):
         self.assertEqual(result["status"], "incomplete")
         self.assertIn("ambiguous_market_study_recordings", result["blocking_issues"])
 
+    def test_corrupt_opportunity_rows_require_review(self):
+        manifest = self.template()
+        manifest["reports"]["opportunity_validation"] = {"warnings_total": 2}
+        result = evaluate(manifest)
+        self.assertEqual(result["status"], "review_required")
+        self.assertIn("opportunity_validation_input_corrupt_or_duplicated",
+                      result["review_issues"])
+
 
 if __name__ == "__main__":
     unittest.main()

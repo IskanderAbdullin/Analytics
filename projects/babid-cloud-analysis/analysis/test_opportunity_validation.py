@@ -68,6 +68,38 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(row["ready_for_comparison"], "False")
         self.assertIn("source_market_quality_unverified", row["qualifications"])
 
+    def test_invalid_csv_rows_block_success_even_with_many_valid_days(self):
+        self.data()
+        with self.source.open("a") as file:
+            file.write("NVDA,2026-11-22,13,120,100,NaN,0.1,1,1,1\n")
+        result = run(self.root, self.source, self.output)
+        self.assertEqual(result["warnings_total"], 1)
+        self.assertEqual(result["comparable_groups"], 0)
+        with (self.output / "out_of_sample_feasibility.csv").open(newline="") as f:
+            row = next(csv.DictReader(f))
+        self.assertIn("invalid_or_duplicate_opportunity_rows", row["qualifications"])
+
+    def test_duplicate_hour_not_allowed_to_inflate_training(self):
+        self.data()
+        with self.source.open("a") as file:
+            file.write("NVDA,2026-11-19,12,120,100,0.9,0.9,3,1,1\n")
+        result = run(self.root, self.source, self.output)
+        self.assertEqual(result["duplicate_hour_rows"], 1)
+        self.assertEqual(result["comparable_groups"], 0)
+        with (self.output / "out_of_sample_feasibility.csv").open(newline="") as f:
+            row = next(csv.DictReader(f))
+        self.assertEqual(row["train_books"], "200")
+        self.assertIn("invalid_or_duplicate_opportunity_rows", row["qualifications"])
+
+    def test_error_examples_are_bounded_without_losing_error_total(self):
+        self.data()
+        with self.source.open("a") as file:
+            file.write("NVDA,2026-11-99,13,120,100,NaN,0.1,1,1,1\n" * 120)
+        result = run(self.root, self.source, self.output)
+        self.assertEqual(result["warnings_total"], 120)
+        self.assertEqual(len(result["warnings"]), 100)
+        self.assertEqual(result["comparable_groups"], 0)
+
 
 if __name__ == '__main__':
     unittest.main()
