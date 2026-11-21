@@ -1,0 +1,59 @@
+{
+  "schema_version": "genuine-abides-public-fixed-grid-transfer-precommit-v1",
+  "frozen_before_first_new_seed_simulation": true,
+  "utc_freeze_date": "2026-11-21",
+  "abides_upstream_git_commit": "ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "new_locally_uninspected_seeds": [
+    2801,
+    2802
+  ],
+  "global_unseen_seed_certification": false,
+  "simulator_instrument": "ABM",
+  "simulation_start_exchange_time": "09:30:00",
+  "simulation_end_exchange_time": "09:38:00",
+  "genuine_abides_l2_book_capture_depth": 5,
+  "cohorts": [
+    {
+      "key": "poisson_noise_null",
+      "background_agents": 60,
+      "noise_wakeup_seconds": 20,
+      "poisson": true,
+      "injected_twap_agents": 0
+    },
+    {
+      "key": "fixed_cadence_noise_hard_negative",
+      "background_agents": 60,
+      "noise_wakeup_seconds": 20,
+      "poisson": false,
+      "injected_twap_agents": 0
+    },
+    {
+      "key": "twap_injected_positive",
+      "background_agents": 60,
+      "noise_wakeup_seconds": 20,
+      "poisson": true,
+      "injected_twap_agents": 1,
+      "twap_direction": "BID",
+      "twap_order_style": "market",
+      "twap_quantity_lots": 1200,
+      "twap_frequency_seconds": 45,
+      "twap_start_and_end_offsets_seconds": 60
+    }
+  ],
+  "source_matching_engine_runs": 6,
+  "fixed_public_feature": "fraction of ABIDES public executed prints (no private attribution) whose exchange nanosecond timestamp mod 10sec is within +/-250ms of exact original wall clock 10-second grid",
+  "frozen_period_seconds": 10,
+  "frozen_grid_tolerance_ns": 250000000,
+  "frozen_fraction_threshold": 0.22,
+  "fixed_phase_origin_ns": 0,
+  "no_best_phase_model_threshold_or_seed_selection": true,
+  "private_simulated_owner_ids_only_accessible_posthoc_after_public_feature_computed": true,
+  "missing_or_zero_controlled_twap_executions_abort_and_report_failure": true,
+  "no_real_market_ownership_or_accuracy_claim": true,
+  "real_market_FDR_calibrated": false,
+  "raw_public_event_book_tapes_or_oracle_agent_ids_exported": false,
+  "licensed_for_commercial_trade_or_order_placement": false,
+  "original_toy_negative_result_already_inspected": "periodic noise hard-negative produced 4/4 public rhythm alarms while no injected target",
+  "exact_negative_and_positive_cases_must_be_reported": true,
+  "source_limit": "one noncommercial original public GitHub CI source run then manual-only, small aggregate-only artifact"
+}
