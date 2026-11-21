@@ -43,7 +43,8 @@ def _stats(slots: list[list[int]], sides: list[bool]) -> list[dict]:
 
 
 def evaluate_public_side_null(
-    observations: list[tuple[int, bool]], *, utc_day_start_us: int
+    observations: list[tuple[int, bool]], *, utc_day_start_us: int,
+    preserve_same_timestamp_clusters: bool = False
 ) -> dict:
     """Evaluate exactly eight fixed shuffles on identical anonymous timestamps.
 
@@ -55,6 +56,8 @@ def evaluate_public_side_null(
     """
     if type(utc_day_start_us) is not int or utc_day_start_us < 0:
         raise ValueError("Expected integer UTC-day microsecond origin")
+    if type(preserve_same_timestamp_clusters) is not bool:
+        raise ValueError("Null unit selection must be a strict boolean")
     if type(observations) is not list or not 0 < len(observations) <= MAX_PRINTS:
         raise ValueError("Expected bounded public trade observations")
     slots = []
@@ -97,10 +100,28 @@ def evaluate_public_side_null(
     for seed in NULL_SEEDS:
         shuffled = sides.copy()
         rng = Random(seed)
-        for lo, hi in minute_groups:
-            group = shuffled[lo:hi]
-            rng.shuffle(group)
-            shuffled[lo:hi] = group
+        if preserve_same_timestamp_clusters:
+            # Shuffle entire SAME-SIZE timestamp blocks, never individual
+            # fills. This preserves event timestamps, exact multiplicity,
+            # equal-time side vectors and full per-minute BUY/SELL totals.
+            for lo, hi in minute_groups:
+                by_length = {}
+                begin = lo
+                for index in range(lo + 1, hi + 1):
+                    if (index == hi or
+                            observations[index][0] != observations[begin][0]):
+                        by_length.setdefault(index-begin, []).append((begin,index))
+                        begin = index
+                for ranges in by_length.values():
+                    patterns = [shuffled[left:right] for left,right in ranges]
+                    rng.shuffle(patterns)
+                    for (left,right), pattern in zip(ranges,patterns):
+                        shuffled[left:right] = pattern
+        else:
+            for lo, hi in minute_groups:
+                group = shuffled[lo:hi]
+                rng.shuffle(group)
+                shuffled[lo:hi] = group
         shuffled_stats = _stats(slots, shuffled)
         for i, row in enumerate(shuffled_stats):
             if (row["included_public_prints"] != observed[i]["included_public_prints"]
@@ -138,25 +159,40 @@ def evaluate_public_side_null(
         })
 
     return {
-        "schema_version": "public-real-spot-within-minute-side-shuffle-v1",
+        "schema_version": (
+            "public-real-spot-within-minute-cluster-shuffle-v1"
+            if preserve_same_timestamp_clusters else
+            "public-real-spot-within-minute-side-shuffle-v1"
+        ),
         "source_event_count": len(observations),
         "independent_market_days_in_this_report": 1,
         "same_public_tape_reused_in_phase_and_null_analyses": True,
         "clock_phases_seconds": list(PHASES_SECONDS),
-        "null_type": "within_utc_minute_side_shuffle_exact_timestamp_positions",
+        "null_type": (
+            "same_size_same_timestamp_side_vector_cluster_shuffle_within_utc_minute"
+            if preserve_same_timestamp_clusters else
+            "within_utc_minute_side_shuffle_exact_timestamp_positions"
+        ),
         "preserved": [
             "all_public_trade_timestamps_us",
             "original_timestamp_order_including_ties",
             "exact_buy_sell_counts_per_source_utc_minute",
             "original_source_event_count",
-        ],
-        "not_preserved": [
-            "same_timestamp_execution_side_clusters",
+        ] + (["same_timestamp_cluster_size_and_joint_side_vector"]
+              if preserve_same_timestamp_clusters else []),
+        "not_preserved": (
+            [] if preserve_same_timestamp_clusters else
+            ["same_timestamp_execution_side_clusters"]
+        ) + [
+            "cross_timestamp_execution_order_dependence",
             "cross_minute_trade_side_dependence",
             "order_book_and_market_queue_effects",
             "true_parent_order_or_participant_labels",
         ],
         "variants": variants,
+        "same_timestamp_side_vector_clusters_preserved": (
+            preserve_same_timestamp_clusters
+        ),
         "source_real_market_completeness_independently_verified": False,
         "physical_robot_identification_validated": False,
         "market_false_discovery_rate_calibrated": False,
@@ -165,7 +201,10 @@ def evaluate_public_side_null(
         "raw_print_timestamps_or_labels_exported": False,
         "limitations": [
             "Eight fixed shuffles per UTC day are descriptive controls, not an inferential null distribution.",
-            "Shuffling per execution may destroy same-time partial-fill side dependencies.",
+            ("Whole timestamp clusters are shuffled only across equal-size groups; "
+             "unmodelled order queues and within-minute timing relations remain."
+             if preserve_same_timestamp_clusters else
+             "Shuffling per execution may destroy same-time partial-fill side dependencies."),
             "Data are already inspected development samples, never a fresh robot-detector holdout.",
             "Within-minute side balance does not model Hawkes clustering or exchange order queues.",
             "No L2 snapshots or individual physical-owner attribution are present.",
