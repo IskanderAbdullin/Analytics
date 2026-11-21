@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "56211df8cb1d3eef5e871b917671401cf48f5586",
+  "last_verified_base_commit": "8c6013abb50753f29bfa03e9a84d454dfdce88d4",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -122,6 +122,12 @@
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44922750898",
       "result": "Original publicly downloadable LOBSTER AMZN 2012-06-21 10-level sample format audit, 269748 aligned message/book rows; research performance not yet tested",
       "status": "VERIFIED_FORMAT_ONLY"
+    },
+    {
+      "stage_id": "RD-SOURCE-PRECISION-16A",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44945044597",
+      "result": "Preregistered source-free 4 toy tapes x 4 precision x3 previous-only L2 plus 4 unknown precision controls: 52 dependent views, 0 new source runs. 8 adversarial tests green. Split-fill no-target print false positive/group no, sparse 45s cadence missed by both; 36 quality abstentions. Hypothetical precision 1ms ceiling not independently validated on real feeds.",
+      "status": "VERIFIED_SOURCE_FREE_TECHNICAL_NEGATIVE_ONLY"
     }
   ],
   "current_stage": {
@@ -187,7 +193,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Read remote GitHub HEAD, AGENTS.md, MASTER_RESEARCH_PLAN.md, checkpoint, original source audit, source seed masks and issue #97. Do not rerun 160 source; source runs #44944144915 and #44944168231 exact repeat SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62, 160 independent cases total. First domain gap/source-free negative controls, then freeze a new period-agnostic public null before any new simulator/source runs. No real actor/FDR claims, fast-forward commit/push.",
-  "last_session_result": "RD-ABIDES-POWER-15 original run #44944144915 and deterministic replay #44944168231 succeeded. Same raw JSON SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62; not double the sample. 156234 prints, 144908 unique timestamps, 253386 L2, 617 oracle TWAP fills. False alarms 7/40 Poisson and 7/40 momentum naive, grouped 6/40 and 7/40; grouped missed 7 injected TWAP. Source masks/CP audit persisted. Next #97 period-agnostic public conditional null.",
+  "resume_instruction": "NEXT_ACTION: 1) Verify current remote HEAD, AGENTS.md, MASTER_RESEARCH_PLAN.md, AUTONOMOUS_RESEARCH_TZ.md, seed_registry.json, checkpoint, master #72 and current #97. 2) Respect already frozen research/public_interarrival_period_scan_precommit_20261121.json (#97) and research/public_time_precision_coverage_precommit_20261121.json (#98); do NOT retrofit threshold 0.60 after seeing original 3301–3340. 3) Integrate source-free #98 demonstrated precision/coverage ABSTAIN and split-fill negative cases into period-agnostic cluster-aware/lagged-L2 conditional null for #97, implement and test ALL precommitted phase/period negative controls before fresh source runs. 4) Compare with source-only verified 160 masks/CP audit, keep all false alarms/misses and source hashes. 5) Run cheap public CI, fast-forward commit/push, update issue #97, exact NEXT_ACTION, retain master #72 OPEN. Never present same-seed 160 replay as independent new data, no real market owner/FDR claim, no PC/control or trading.",
+  "last_session_result": "Original ABIDES 160 source #44944144915 (160 unique seed-cohort synthetic cases) and deterministic same-seed replay #44944168231 SUCCESS; full source-only SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62. Source negative outcome: 7/40 Poisson and momentum false positives (print), grouped 6/40 and 7/40; grouped missed seven injected TWAP cases, 1 TWAP L2 abstain. 40 per cohort nominal CP 95% bounds source-free verified. Additional PRE-REGISTERED source-free precision/L2 #98: 52 dependent technical views, 8 adversarial tests green on #44945044597, no additional engine/market data; no-target 100 split fills cause naive TARGET/grouped no target; sparse 45s cadence missed by both; 16 numerically eligible and 36 quality-abstained views. Current primary stage #97 period-agnostic conditional null remains NOT VALIDATED on independent external labels.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
