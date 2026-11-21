@@ -81,6 +81,20 @@ A null source **also** triggered. This is a genuine confounder for any claim tha
 
 A new sealed wrapper, `tools/directional_shift_frozen_replication.py`, fixes the **previously unused** seeds `1101,1102,1103,1104`, the three modes `null,vwap,pov`, and **all existing feature settings** (30 s bin, 6 earlier bins, 0.25 minimum absolute reported BUY share change, 0.9 known-side fraction, 2-bin cooldown, minimum current known lots 100, reference known lots 500). Its protocol, Python invariance tests and CI command are committed **before** collecting the outcomes. This tests *replication*, not learning or threshold optimization, and provides a separate aggregate-only expiring artifact. Do not use these results to tune a follow-up model; a later model needs another genuinely untouched holdout.
 
+### Independent replication outcome — negative result
+
+The locked protocol completed **successfully** in [GitHub ABIDES-NG CI #44893601107](https://github.com/IskanderAbdullin/Analytics/actions/runs/44893601107), producing the separate expiring `abides-public-direction-shift-frozen` artifact. All 12 genuine matching-engine runs used the **exact same parameters** as the exploratory study; the 4×3 seed/mode matrix was fixed before evaluation.
+
+| Pre-registered cohort (four simulations) | Public exchange prints | Evaluated clock bins | Unvalidated public shift windows | Simulations containing at least one |
+|---|---:|---:|---:|---:|
+| **No controlled execution agent** | 13,798 | 216 | **1** | 1/4 |
+| **VWAP controlled execution** | 14,007 | 216 | **0** | 0/4 |
+| **POV controlled execution** | 13,753 | 216 | **1** | 1/4 |
+
+**Conclusion:** The hopeful exploratory ranking (**null 1, VWAP 4, POV 2**, each on three development runs) **did not replicate**. In this independent synthetic seed cohort VWAP produced **no shift candidates**, while a background-only null produced one. POV and the null each generated one. The feature is **not a reliable discriminator** of VWAP/POV controlled execution under these simulated conditions. Do not re-tune its threshold against these now-spent 1101–1104 outcomes, do not ship real-time alerts, and do not interpret shift windows as parent orders or individual bots.
+
+This is an explicit negative result rather than an inferential test: the number of simulations is small, reported-side definitions are simulator-specific, null/positive cohorts are not perfectly matched causal counterfactuals, and a count of market-wide shift windows is not a per-order true/false classification. Zero VWAP candidate windows says this feature did not detect a public share shift in these runs; it is **not** a measured 0% fill-level VWAP recall.
+
 ## Boundaries and next gates
 
 - First run this monitor on held-out **synthetic development** nulls and disclose the null shift windows. Never tune to spent seeds 901–904.

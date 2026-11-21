@@ -14,7 +14,7 @@ dotnet run --project src/RobotDetector.Cli -- direction-shift `
   --output data/results/directional-shifts.json
 ```
 
-[Full methodology and scientific limits](docs/DIRECTIONAL_REGIME_SHIFT.md). The result counts **unvalidated market-wide change windows**, not individual robots. No calibrated false alarm probability, trading signal or real-market identity is established. A new genuine ABIDES-NG development null survey contrasts null/VWAP/POV without exposing private agent truth.
+[Full methodology, ABIDES experiments and scientific limits](docs/DIRECTIONAL_REGIME_SHIFT.md). The result counts **unvalidated market-wide change windows**, not individual robots. In [real ABIDES-NG CI #44893601107](https://github.com/IskanderAbdullin/Analytics/actions/runs/44893601107), a pre-registered four-seed independent replication yielded candidate windows **null 1, VWAP 0, POV 1** (216 evaluated bins per cohort). The earlier exploratory results did **not** replicate; this public share-shift feature is **not** an independently verified VWAP/POV detector. No calibrated real-market false alarm probability, trading signal or physical identity is established.
 
 ## Public-only lagged volume response — experimental Stage 2
 
