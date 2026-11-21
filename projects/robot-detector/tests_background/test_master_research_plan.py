@@ -86,7 +86,7 @@ class LivingResearchPlanContract(unittest.TestCase):
             with self.subTest(clause=clause):
                 self.assertIn(clause.lower(),self.plan.lower())
         self.assertRegex(self.plan,r"\[ \] .+")
-        self.assertIn("не потраченные в локальном реестре",self.plan)
+        self.assertIn("зарезервированные в локальном seed registry",self.plan.lower())
         self.assertIn("исходные прогоны для него ещё не подтверждены",self.plan)
 
     def test_evidence_not_reported_as_true_physical_owner_detection(self):
