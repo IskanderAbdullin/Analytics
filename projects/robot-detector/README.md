@@ -9,6 +9,17 @@
 
 ## Цепочка научных этапов: работа продолжена после checkpoints
 
+- [Точный conditional toy-null размера timestamp-кластера](
+  docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md):
+  при **13** неизменных публичных timestamps и
+  мультимножестве размеров кластеров
+  **12×1 + 1×100** наивное print ratio даёт
+  **2/13 ложных тревог** в строго synthetic toy
+  перестановках; grouped timestamps дают **0/13**.
+  Это **не** реальная рыночная FDR.
+  Следующий этап: genuine ABIDES [#94](
+  https://github.com/IskanderAbdullin/Analytics/issues/94).
+
 - [Фиксированные фазы и псевдорепликация частичных исполнений](
   docs/PUBLIC_PHASE_TIED_FILLS_NEGATIVE_20261121.md):
   **13** уникальных timestamps; после 100 prints

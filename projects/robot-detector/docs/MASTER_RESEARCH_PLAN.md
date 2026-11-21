@@ -308,6 +308,39 @@ partial fills и сессионную активность,
 независимые репликации или synthetic
 oracle за real-market FDR.
 
+### P0 / RD-CONDITIONAL-NULL-12 — проверен точный synthetic cluster null
+
+[Source-free CI #44938416432](https://github.com/IskanderAbdullin/Analytics/actions/runs/44938416432)
+проверил **все 13 возможных** положений 100-fill
+кластера при фиксированных 13 уникальных
+timestamps и неизменных 112 public prints.
+**2/13** naive print-weighted placements дают
+ложный alarm (один кластер в grid45-only,
+один в grid20∩45), **0/13** grouped timestamp
+placements дают alarm. Это
+[точный toy-контрпример](PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md),
+а **не FDR, significance и не владелец
+реальной заявки**. Offline подтверждение:
+**23 набора / 174 source-free tests**.
+
+### P0 / RD-CLUSTER-MARKET-13 — СЛЕДУЮЩИЙ исследовательский этап
+
+[Issue #94](https://github.com/IskanderAbdullin/Analytics/issues/94):
+перенести честное сравнение naive per-print
+vs grouping identical timestamps на genuine
+ABIDES-NG matching engine с Poisson,
+fixed cadence, momentum и injected TWAP,
+исследовать зависимость false positives,
+coverage и агрегатов от кластеризации.
+**До новых genuine source runs** отдельно
+зафиксировать ещё не израсходованные
+locally seeds, исходное окно,
+threshold и все когорты.
+Не использовать ранее просмотренные
+3001–3104 как blind confirmatory данные,
+не считать одинаковый timestamp
+доказанным единым parent order.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -324,5 +357,7 @@ oracle за real-market FDR.
 | 2026-11-21 | Split-half original 16 case source #44937478576: 3/4 TWAP alarm, 1/4 positive abstain, 0 false alarms in each of three negative cohorts but 1/4 abstain per cohort. Original full-session ratio on same new seeds had 4/4 positives and 0/12 background false positives; split-half no specificity improvement, only coverage loss | Negative scientific result VERIFIED; investigate phase/timestamp-cluster pseudo-replication in #92 |
 
 | 2026-11-21 | Source-free phase/tied-fill counterexample #44937958809: 13 unique timestamps, but 100 fills at a 45s-only timestamp inflate print-weighted ratio 0.1667 → 8.4167 without any target; grouping timestamps reverses false signal; ±300ms shift leads to denominator 0/ABSTAIN | VERIFIED negative measurement artifact; cluster-aware conditional null #93 next |
+
+| 2026-11-21 | 13-placement exact toy conditional null #44938416432: naive print-weighted ratio raised alarm in 2/13 placements of one 100-fill cluster, while timestamp-grouped score was constant and 0/13 alarm. Strong toy exchangeability assumption DOES NOT calibrate market FDR. Next #94 genuine ABIDES cluster-aware control | VERIFIED exact toy-only negative; new real matching-source study NOT_STARTED |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.

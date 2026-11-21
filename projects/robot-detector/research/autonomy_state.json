@@ -7,8 +7,14 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "0bc564a93ed22ed6ec6b65f5d7b2466a96a352c0",
+  "last_verified_base_commit": "dcb06d222462e58c5371682b10383574fe2447ed",
   "last_known_verified_results": [
+    {
+      "stage_id": "RD-CONDITIONAL-NULL-12",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44938416432",
+      "result": "Exact 13-position synthetic timestamp-cluster size permutation, source free: naive print-weighted 2/13 FALSE alarms from a 100-fill cluster placed at 45-only or 20+45 timestamps, grouped unique timestamp 0/13 alarms; 23 suites/174 tests. Strong toy exchangeability assumption, not market FDR/pvalue.",
+      "status": "VERIFIED_EXACT_CONDITIONAL_TOY_ONLY_NOT_REAL_MARKET_SIGNIFICANCE"
+    },
     {
       "stage_id": "RD-PHASE-ROBUSTNESS-11",
       "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44937958809",
@@ -101,30 +107,31 @@
     }
   ],
   "current_stage": {
-    "id": "RD-CONDITIONAL-NULL-12",
+    "id": "RD-CLUSTER-MARKET-13",
     "status": "READY_TO_IMPLEMENT",
-    "title": "Timestamp-cluster-conditioned public clock null preserving split-fill dependence",
-    "why_next": "The source-free 13-timestamp background can create false ratio 8.4167 from 100 dependent prints at one 45s timestamp. Need a conditional matched null that treats grouped timestamps and occupancy as nuisance before next classification claims.",
+    "title": "Genuine ABIDES matching source naive print-weighting versus same-timestamp cluster-aware clock ratio",
+    "why_next": "Source-free exact toy conditional null shows a single large split-fill cluster can create 2/13 naive false-alarm placements although timestamp support is invariant. Need empirical independent ABIDES background/target comparisons and abstain/coverage testing without assuming same timestamp means same parent order.",
     "inputs": [
-      "tools/public_timing_phase_tied_fills.py",
-      "projects/robot-detector/docs/PUBLIC_PHASE_TIED_FILLS_NEGATIVE_20261121.md",
-      "projects/robot-detector/fixtures/public_phase_tied_fills_observed_20261121.json",
-      "docs/MASTER_RESEARCH_PLAN.md",
-      "research/seed_registry.json"
+      "tools/public_cluster_conditional_toy_null.py",
+      "tools/abides_background_ratio_holdout.py",
+      "tools/abides_multiscale_public_l2.py",
+      "research/seed_registry.json",
+      "docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md"
     ],
     "deliverables": [
-      "Frozen cluster-size-preserving clock-rhythm control and source-free adversarial tests",
-      "Separate original public print counts vs timestamp-cluster grouped signal; no parent owner inference",
-      "Strong negative/null against periodic background and split fills with explicit abstention",
-      "Reproducible compact scientific report, CI evidence, checkpoint and next stage selection"
+      "Freeze new separate source simulator seeds and four cohort configurations before running",
+      "Public-only per-print vs per-unique-time grid metrics with no owner agent IDs",
+      "Negative tests for timestamp clusters, split fills, phase and source confidence",
+      "Original ABIDES only if cheap/justified, all cohort negatives and abstentions preserved",
+      "Update scientific plan, checkpoint, no raw source upload, continue next stage"
     ],
     "acceptance": [
-      "No posthoc best-phase or threshold tuning on inspected source datasets",
-      "All synthetic source clusters and owner field exclusions validated",
-      "Null preservation/violation contract explicitly documented",
-      "Offline tests and fast-forward push; master issue #72 remains open"
+      "All 4 background/target cohort outcomes accounted for across locally new seeds",
+      "No posthoc threshold tuning or real-market FDR/owner claims",
+      "Source-free offline tests pass; bounded original engine CI if scientifically useful",
+      "Confirmed SHA and fast-forward push, master scientific issue #72 open"
     ],
-    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/93"
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/94"
   },
   "backlog": [
     {
@@ -163,7 +170,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "Read actual GitHub HEAD, AGENTS, MASTER_RESEARCH_PLAN, current checkpoint, seed registry, issue #72/#93, CI #44937958809. Implement cluster-size-preserving source-free matched timing nulls; source-free artifacts and provenance. No posthoc phase tuning or assumption that timestamp cluster=owner. Commit/push, select/start next research stage in same active session.",
-  "last_session_result": "RD-PHASE-ROBUSTNESS-11 passed original source-free CI #44937958809: 22 suites/168 tests, 13 synthetic unique times and 100 tied 45s-only fills drive print ratio .1667→8.4167 (false alarm), unique timestamp aggregation restores .1667, ±300ms gives denominator zero/abstain. No real source or owners. Next #93 conditional cluster-preserving null.",
+  "resume_instruction": "Read remote HEAD, AGENTS, MASTER_RESEARCH_PLAN, AUTONOMOUS_RESEARCH_TZ, current state, seed ledger, #72 and #94. Freeze new locally unused ABIDES seeds/cohorts in separate protocol before source. Compare public-only naive prints vs exact timestamp clusters under fixed 20s/45s ratio; preserve abstain and negative, no owner ID. Run tests and commit/push with next checkpoint.",
+  "last_session_result": "RD-CONDITIONAL-NULL-12 verified in source-free CI #44938416432: exact 13 positions for one 100-fill cluster, same public timestamps and cluster-size multiset; naive 2/13 false alarms, grouped timestamp 0/13, 23 suites/174 tests. Only toy conditional count, not real market FDR. Next genuine ABIDES cluster-aware source stage #94 selected.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
