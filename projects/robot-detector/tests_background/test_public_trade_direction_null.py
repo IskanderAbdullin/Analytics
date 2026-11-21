@@ -80,6 +80,39 @@ class MinutePreservingControlTests(unittest.TestCase):
                 self.assertLessEqual(phase["weak_null_min"],phase["weak_null_median"])
                 self.assertLessEqual(phase["weak_null_median"],phase["weak_null_max"])
 
+    def test_exact_timestamp_clusters_are_preserved_as_joint_vectors(self):
+        # Equal-size groups at distinct timestamps within the *same*
+        # minute. The stronger null may swap whole 3-print vectors, never
+        # mix BUY and SELL inside one of the two source timestamps.
+        rows=[(5_000_000,False)]*3 + [(35_000_000,True)]*3
+        strict=evaluate_public_side_null(
+            rows,utc_day_start_us=0,preserve_same_timestamp_clusters=True)
+        weak=evaluate_public_side_null(rows,utc_day_start_us=0)
+        self.assertTrue(strict["same_timestamp_side_vector_clusters_preserved"])
+        self.assertFalse(weak["same_timestamp_side_vector_clusters_preserved"])
+        self.assertEqual(strict["variants"][0]["observed_one_sided_bins"],2)
+        self.assertEqual(strict["variants"][0]["null_one_sided_bin_count_min"],2)
+        self.assertEqual(strict["variants"][0]["null_one_sided_bin_count_max"],2)
+        self.assertLess(weak["variants"][0]["null_one_sided_bin_count_min"],2)
+        self.assertEqual(strict["source_event_count"],6)
+        self.assertFalse(strict["market_false_discovery_rate_calibrated"])
+        self.assertFalse(strict["physical_robot_identification_validated"])
+
+    def test_cluster_preserving_controls_still_conserve_three_origin_source_events(self):
+        rows=example()+[(DAY_US-1,False)]
+        strict=evaluate_public_side_null(
+            rows,utc_day_start_us=0,preserve_same_timestamp_clusters=True)
+        self.assertEqual([r["excluded_utc_edge_prints"] for r in strict["variants"]],
+                         [0,4,4])
+        self.assertEqual([r["observed_prints_in_full_bins"] for r in strict["variants"]],
+                         [10,6,6])
+        self.assertEqual(strict["variants"][0]["num_predeclared_weak_null_replicates"],8)
+        self.assertTrue(strict["same_timestamp_side_vector_clusters_preserved"])
+        for wrong in (0,1,"yes",None):
+            with self.assertRaises(ValueError):
+                evaluate_public_side_null(rows,utc_day_start_us=0,
+                    preserve_same_timestamp_clusters=wrong)
+
     def test_invalid_public_payload_and_source_bounds_fail_closed(self):
         rows=example()
         for bad in (

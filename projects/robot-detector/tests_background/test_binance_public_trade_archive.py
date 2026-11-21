@@ -167,6 +167,24 @@ class RealTradeArchiveTests(unittest.TestCase):
         self.assertFalse(null["commercial_or_live_trading_allowed"])
         self.assertFalse(null["raw_print_timestamps_or_labels_exported"])
 
+    def test_stronger_source_null_preserves_observed_exact_30s_counts(self):
+        raw,checksum=archive()
+        report=analyze_verified_zip(
+            raw,checksum,symbol=SYMBOL,day=DAY,
+            clock_origin_study=True,cluster_preserving_null_study=True)
+        strong=report["public_within_minute_cluster_direction_null_v1"]
+        original=report["clock_origin_descriptive_v1"]
+        self.assertTrue(strong["same_timestamp_side_vector_clusters_preserved"])
+        self.assertEqual(strong["source_event_count"],3)
+        for a,b in zip(strong["variants"],original["variants"]):
+            self.assertEqual(a["observed_one_sided_bins"],
+                             b["strictly_buy_one_sided_bins_or_sell_one_sided_bins"])
+            self.assertEqual(a["excluded_utc_edge_prints"],
+                             b["boundary_trades_excluded"])
+        self.assertFalse(strong["real_world_owner_count_known"]
+                         if "real_world_owner_count_known" in strong else
+                         strong["physical_robot_identification_validated"])
+
     def test_rejects_nonboolean_null_flag(self):
         raw,check=archive()
         for value in (1,0,"yes",None):
