@@ -1,0 +1,60 @@
+"""Conservative quality gate for an offline Babid Cloud forensic report.
+
+A locally consistent archive is NOT a broker reconciliation or a license to
+automatically tune trading parameters. Never convert synthetic tests or a
+green process exit into a claim about real-world profitability.
+"""
+from __future__ import annotations
+
+
+def evaluate(manifest: dict) -> dict:
+    reports = manifest.get("reports") or {}
+    critical, warnings = [], []
+
+    def critical_if(test, code):
+        if test:
+            critical.append(code)
+
+    def warn_if(test, code):
+        if test:
+            warnings.append(code)
+
+    critical_if(manifest.get("unstable_input_files", 0) > 0, "source_modified_during_hash")
+    critical_if(bool(manifest.get("changed_inputs_across_scan")), "source_modified_during_audit")
+    failed = sorted(name for name in reports if name.endswith("_error"))
+    critical_if(bool(failed), "analysis_subtasks_failed")
+    for name in ("history", "reconciliation", "configs", "config_epochs"):
+        critical_if(name not in reports, "missing_required_" + name)
+
+    reconciliation = reports.get("reconciliation") or {}
+    critical_if(reconciliation.get("incomplete_or_unverified", 0) > 0,
+                "incomplete_or_unstable_fill_history")
+    warn_if(reconciliation.get("needs_review", 0) > 0,
+            "journal_and_fill_disagreement")
+    warn_if(reconciliation.get("states", 0) == 0, "no_reconciled_states")
+    history = reports.get("history") or {}
+    warn_if(history.get("problems", 0) > 0, "missing_or_unreadable_history")
+    warn_if((reports.get("config_epochs") or {}).get("observed_epochs", 0) == 0,
+            "no_historical_config_events")
+    tape = reports.get("tape_integrity") or {}
+    warn_if(tape.get("malformed_books", 0) > 0, "invalid_order_books")
+    warn_if(tape.get("unreadable_rows", 0) > 0, "unreadable_market_tape")
+    warn_if(tape.get("negative_exchange_age", 0) > 0, "exchange_clock_skew")
+    weighted = reports.get("time_weighted") or {}
+    critical_if(weighted.get("rejected_recordings", 0) > 0, "market_recorder_rejected_files")
+
+    status = "incomplete" if critical else "review_required" if warnings else "locally_consistent"
+    return {
+        "status": status,
+        "blocking_issues": critical,
+        "review_issues": warnings,
+        "failed_subtasks": failed,
+        "independent_broker_reconciliation": False,
+        "verified_historical_strategy_epochs": False,
+        "safe_for_automatic_live_tuning": False,
+        "disclosure": [
+            "locally_consistent means only that observed local inputs did not trigger quality gates.",
+            "Broker fills, funding, commissions and full historical settings remain unverified.",
+            "Do not change live risk limits, trading parameters or real positions from this report.",
+        ],
+    }

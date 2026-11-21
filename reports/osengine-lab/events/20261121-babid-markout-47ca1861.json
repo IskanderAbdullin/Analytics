@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "47ca1861-684d-4811-a364-0cdf3bbb445a",
+    "occurred_at": "2026-11-21T15:03:46.137Z",
+    "type": "research",
+    "title": "Compute no-lookahead 5s/30s per-fill markouts on copied market data",
+    "summary": "Offline per-day and per-instrument fill alignment with fresh order books strictly older than each sampling time, explicit gap invalidation, duplicate detection and real-vs-synthetic separation.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/execution_markout.py",
+      "action": "added",
+      "summary": "Event-stream aligned 5s and 30s markouts on broker fills without look-ahead."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_execution_markout.py",
+      "action": "added",
+      "summary": "Synthetic market gap, stale future book, equal-time and no-overwrite tests."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Usage and limitations: markout is not P&L or execution model."
+    }
+  ],
+  "checks": [
+    {
+      "id": "markout-ci",
+      "title": "Linux/Windows synthetic markout tests",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending GitHub Actions."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "integrate-markout",
+      "title": "After validated tests, add optional mapping-aware coordinator support",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No real fills or private accounts used in tests.",
+    "No live trading, calibration or code changes outside Analytics."
+  ]
+}

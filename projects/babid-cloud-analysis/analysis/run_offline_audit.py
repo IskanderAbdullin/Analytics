@@ -21,6 +21,12 @@ import reconcile_fills
 import opportunity_validation
 import audit_provenance
 import config_audit
+import tape_integrity
+import time_weighted_books
+import config_epochs
+import audit_quality
+import fills_by_epoch
+import execution_markout
 
 
 def checksum(path: Path) -> str:
@@ -56,7 +62,15 @@ def inventory(root: Path) -> list[dict]:
     return records
 
 
-def run(root: Path, output: Path, with_market: bool = True) -> dict:
+def run(root: Path, output: Path, with_market: bool = True, *,
+        epoch_state: str | None = None, epoch_logs: str | None = None,
+        markout_state: str | None = None, markout_instrument: str | None = None,
+        markout_day: str | None = None) -> dict:
+    if bool(epoch_state) != bool(epoch_logs):
+        raise ValueError("epoch_state and epoch_logs must be supplied together")
+    if any((markout_state, markout_instrument, markout_day)) and not all(
+            (markout_state, markout_instrument, markout_day)):
+        raise ValueError("markout_state, markout_instrument and markout_day must all be supplied")
     root, output = validate_report_output(root, output)
     # First take file-level checksums; no source changes. If inputs are changing,
     # the report explicitly says it is not an atomic snapshot.
@@ -84,7 +98,22 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
             root, output / "config-audit")
     except (OSError, ValueError) as error:
         manifest["reports"]["configs_error"] = str(error)[:300]
+    try:
+        manifest["reports"]["config_epochs"] = config_epochs.run(
+            root, output / "config-epochs")
+    except (OSError, ValueError) as error:
+        manifest["reports"]["config_epochs_error"] = str(error)[:300]
     if with_market and (root / "recordings").is_dir():
+        try:
+            manifest["reports"]["time_weighted"] = time_weighted_books.run(
+                root, output / "time-weighted", 2000)
+        except (OSError, ValueError) as error:
+            manifest["reports"]["time_weighted_error"] = str(error)[:300]
+        try:
+            manifest["reports"]["tape_integrity"] = tape_integrity.run(
+                root, output / "tape-integrity")
+        except (OSError, ValueError) as error:
+            manifest["reports"]["tape_integrity_error"] = str(error)[:300]
         try:
             manifest["reports"]["market"] = market_study.run(
                 root, output / "market", market_study.DEFAULT_LEVELS, None)
@@ -105,15 +134,31 @@ def run(root: Path, output: Path, with_market: bool = True) -> dict:
                 output / "nvda")
         except (OSError, ValueError) as error:
             manifest["reports"]["nvda_error"] = str(error)[:300]
+    if epoch_state and epoch_logs:
+        try:
+            manifest["reports"]["epoch_attribution"] = fills_by_epoch.run(
+                root, output / "epoch-attribution", epoch_state, epoch_logs)
+        except (OSError, ValueError) as error:
+            manifest["reports"]["epoch_attribution_error"] = str(error)[:300]
+    if markout_state and markout_instrument and markout_day:
+        try:
+            manifest["reports"]["markout"] = execution_markout.run(
+                root, output / "markout", markout_state, markout_instrument, markout_day)
+        except (OSError, ValueError) as error:
+            manifest["reports"]["markout_error"] = str(error)[:300]
     manifest["unstable_input_files"] = sum(
         1 for f in files if not f.get("stable_during_hash", False))
     manifest["changed_inputs_across_scan"] = audit_provenance.changes_since_inventory(root, files)
     manifest["input_files_appear_stable"] = (
         manifest["unstable_input_files"] == 0 and not manifest["changed_inputs_across_scan"])
+    manifest["quality_gate"] = audit_quality.evaluate(manifest)
+    (output / "quality_gate.json").write_text(
+        json.dumps(manifest["quality_gate"], ensure_ascii=False, indent=2), encoding="utf-8")
     (output / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     return dict(output=str(output), files=len(files),
                 unstable_input_files=manifest["unstable_input_files"],
+                audit_status=manifest["quality_gate"]["status"],
                 reports=list(manifest["reports"]))
 
 
@@ -123,17 +168,26 @@ def main() -> int:
     p.add_argument("--output", type=Path)
     p.add_argument("--skip-market", action="store_true",
                    help="skip potentially lengthy scans of market recordings")
+    p.add_argument("--epoch-state", help="explicit state folder for per-setting booked fills")
+    p.add_argument("--epoch-logs", help="explicit logs folder for per-setting booked fills")
+    p.add_argument("--markout-state", help="explicit state folder for markouts")
+    p.add_argument("--markout-instrument", help="explicit tape ticker for markouts")
+    p.add_argument("--markout-day", help="MSK day YYYY-MM-DD for markouts")
     args = p.parse_args()
     root = args.root.resolve()
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     output = args.output or (root / "reports" / ("complete-audit-" + stamp))
     try:
-        result = run(root, output, not args.skip_market)
+        result = run(root, output, not args.skip_market,
+                     epoch_state=args.epoch_state, epoch_logs=args.epoch_logs,
+                     markout_state=args.markout_state,
+                     markout_instrument=args.markout_instrument,
+                     markout_day=args.markout_day)
     except (OSError, ValueError) as error:
         print("Offline audit refused:", error, file=sys.stderr)
         return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return 0
+    return 2 if result["audit_status"] == "incomplete" else 0
 
 
 if __name__ == "__main__":

@@ -1,0 +1,61 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "a42e8d55-402c-4f7d-8be6-9d1b8daf8d47",
+    "occurred_at": "2026-11-21T15:07:57.674Z",
+    "type": "research",
+    "title": "Recover logged strategy/risk/schedule change epochs without inventing historic configuration",
+    "summary": "Parses Babid Cloud Engine.Describe/Config applied/Risk/Schedule marker strings into provenance-tagged effective parameter intervals, flags reload failures, and explicitly marks partial/unknown fields.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/config_epochs.py",
+      "action": "added",
+      "summary": "Recover only log-supported parameter epochs with traceable event times and confidence levels."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_config_epochs.py",
+      "action": "added",
+      "summary": "Synthetic tests of startup, live config change, schedule scaling, reload failures and unknown history."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/run_offline_audit.py",
+      "action": "modified",
+      "summary": "Include config epoch extraction in complete offline audit."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/README.md",
+      "action": "modified",
+      "summary": "Document provenance and limitations on history of settings."
+    }
+  ],
+  "checks": [
+    {
+      "id": "config-epochs-ci",
+      "title": "Check source-derived setting timeline parser on Linux and Windows",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending Actions run after push."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "epoch-attribution",
+      "title": "Join explicitly verified log epochs to fill statistics, preserving unknown intervals",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No full config changes can be reconstructed from final JSON alone.",
+    "Log directory may contain multiple robot sessions; attributable result needs independent identity verification."
+  ]
+}

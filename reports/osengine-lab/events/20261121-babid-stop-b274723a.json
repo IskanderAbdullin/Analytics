@@ -1,0 +1,51 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-market-forensics-20261121",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "b274723a-caa9-42f2-9d4b-c660ba4058d8",
+    "occurred_at": "2026-11-21T15:08:49.894Z",
+    "type": "bugfix",
+    "title": "Bound historic config epochs by confirmed robot stop markers",
+    "summary": "Do not propagate a configuration's apparent validity beyond logged 'P&L at stop' and across the gap before a later Engine started event.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/config_epochs.py",
+      "action": "modified",
+      "summary": "Observe stop marker, end last epoch and reset inferred effective state."
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_config_epochs.py",
+      "action": "modified",
+      "summary": "Regression for two sessions separated by an unknown interval."
+    }
+  ],
+  "checks": [
+    {
+      "id": "stop-ci",
+      "title": "Test session boundary with synthetic log on Linux and Windows",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Run after push."
+    }
+  ],
+  "issues": [],
+  "next_actions": [
+    {
+      "id": "epoch-joins",
+      "title": "Use closed and unknown time spans for conservative per-setting realized P&L attribution",
+      "state": "todo",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "A missing stop marker does not prove that the robot stayed running.",
+    "No live operations performed."
+  ]
+}
