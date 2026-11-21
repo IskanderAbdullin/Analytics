@@ -28,6 +28,21 @@ COHORTS=("poisson_noise_null","fixed_20s_noise_hard_negative",
          "momentum_noise_hard_negative","twap_45s_positive")
 PERIODS=(10,20,45,90)
 LAGGED_BIN_WIDTHS=(30,60)
+CASE_ALLOWED_FIELDS=frozenset((
+    "seed","cohort","public_prints","public_tape_sha256",
+    "grid_hit_counts","grid_fractions",
+    "descriptive_grid_lifts_not_probability_or_significance",
+    "original_legacy_10s_rule_alarm","original_legacy_10s_rule_fraction",
+    "public_only_feature_input_type_verified",
+    "actual_private_agent_ids_accessed","real_market_owner_accuracy_calibrated",
+    "public_l2_snapshots","public_l2_same_timestamp_repeats",
+    "l2_binned_lagged","source_complete_exchange_sequence_proven",
+    "private_id_leakage_from_L2_features",
+    "raw_quote_rows_or_l2_observations_exported",
+    "injected_target_present_only_after_public_inference",
+    "controlled_twap_fills_posthoc","true_owner_IDs_exposed",
+    "real_market_bot_FDR_known"
+))
 ANCHOR_NS=34_260_000_000_000
 TOLERANCE_NS=250_000_000
 BOOK_DEPTH=5
@@ -250,7 +265,7 @@ def simulate_case(seed:int,cohort:str)->dict:
                          for t in market.trades)
     if (present and controlled_fills<=0) or (not present and controlled_fills):
         raise RuntimeError("Actual posthoc target execution verification failed")
-    return {
+    result={
         "seed":seed,"cohort":cohort,
         **measured,
         "injected_target_present_only_after_public_inference":present,
@@ -258,6 +273,9 @@ def simulate_case(seed:int,cohort:str)->dict:
         "true_owner_IDs_exposed":False,
         "real_market_bot_FDR_known":False,
     }
+    if set(result)!=CASE_ALLOWED_FIELDS:
+        raise AssertionError("Accidentally exported or omitted private/source research fields")
+    return result
 
 
 def validate_results(rows:list[dict])->dict:
@@ -271,8 +289,20 @@ def validate_results(rows:list[dict])->dict:
         raise ValueError("Missing, duplicate or substituted source case")
     safe=[]
     for x in rows:
-        if type(x) is not dict or not 0<x.get("public_prints",0)<=MAX_FILLS:
+        if type(x) is not dict or set(x)!=CASE_ALLOWED_FIELDS:
+            raise ValueError("Source private field or missing required aggregate")
+        if type(x["public_prints"]) is not int or not 0<x["public_prints"]<=MAX_FILLS:
             raise ValueError("Original public executed tape missing")
+        if (type(x["public_l2_snapshots"]) is not int
+                or not 0<x["public_l2_snapshots"]<=MAX_SNAPSHOTS
+                or x["source_complete_exchange_sequence_proven"] is not False):
+            raise ValueError("Unknown source completeness or missing L2")
+        if (type(x["public_tape_sha256"]) is not str or
+                len(x["public_tape_sha256"])!=64 or
+                any(ch not in "0123456789abcdef" for ch in x["public_tape_sha256"])):
+            raise ValueError("Source-public print fingerprint unavailable")
+        if type(x["controlled_twap_fills_posthoc"]) is not int or x["controlled_twap_fills_posthoc"]<0:
+            raise ValueError("Invalid private oracle count")
         for attr in ("public_only_feature_input_type_verified",):
             if x[attr] is not True:
                 raise ValueError("Public projection validation failed")
