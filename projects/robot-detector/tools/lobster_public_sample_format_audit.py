@@ -18,7 +18,7 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 from urllib.request import Request,urlopen
-from zipfile import ZipFile,BadZipFile
+from zipfile import ZipFile,BadZipFile,is_zipfile
 
 SOURCE_URL = "https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip"
 LANDING_URL = "https://php.lobsterdata.com/info/DataSamples.php"
@@ -180,6 +180,8 @@ def _validate_book(record: list[str]) -> tuple[int | None,int | None,int,bool,in
 def audit_sample_zip(raw: bytes) -> dict:
     if type(raw) is not bytes or not 0<len(raw)<=MAX_ZIP_BYTES:
         raise ValueError("Invalid/oversized vendor sample ZIP")
+    if not is_zipfile(io.BytesIO(raw)):
+        raise ValueError("Source is not a valid ZIP archive")
     digest=sha256(raw).hexdigest()
     with ZipFile(io.BytesIO(raw)) as z:
         members=_members(z)
