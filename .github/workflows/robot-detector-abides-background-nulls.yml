@@ -1,0 +1,74 @@
+name: Robot Detector genuine ABIDES public L2 background null families
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_background_nulls.py'
+      - '.github/workflows/robot-detector-abides-background-nulls.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_background_nulls.py'
+      - '.github/workflows/robot-detector-abides-background-nulls.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-background-null:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify pre-registered plan and public-only accounting before simulation
+        run: |
+          python -m unittest discover -s tests_background -p 'test_*.py' -v
+      - name: Install pinned genuine ABIDES matching engine
+        run: |
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Execute frozen public background matching-engine cohorts
+        run: |
+          python tools/abides_l2_background_nulls.py \
+            --output /tmp/abides-public-background-nulls.json
+          python - <<'PY'
+          import json
+          p='/tmp/abides-public-background-nulls.json'
+          r=json.load(open(p,encoding='utf-8'))
+          assert r['frozen_plan']['seeds']==[1801,1802],r
+          assert r['frozen_plan']['cohorts']==[
+              'poisson_noise','fixed_cadence_noise','noise_plus_momentum'],r
+          assert len(r['cases'])==6 and len(r['cohorts'])==3,r
+          assert r['private_truth_read_or_published'] is False,r
+          assert r['physical_owner_count_known'] is False,r
+          assert r['real_market_statistical_significance_calibrated'] is False,r
+          assert r['trading_enabled'] is False,r
+          for row in r['cases']:
+              assert row['public_executed_prints']>0 and row['public_l2_snapshots']>0,row
+              assert row['eligible_previous_book_bins']<=row['populated_trade_bins'],row
+              assert not row['named_execution_agent_injected'],row
+              assert not row['private_agent_identifiers_accessed'],row
+              assert not row['real_market_accuracy_calibrated'],row
+              assert row['lagged_spearman'] is None or -1<=row['lagged_spearman']<=1,row
+          for cohort in r['cohorts']:
+              assert cohort['simulations']==2,cohort
+              assert cohort['real_market_false_alarm_rate'] is None,cohort
+              assert cohort['one_parent_order_identified'] is False,cohort
+              print('ABIDES_GENUINE_PUBLIC_BACKGROUND',json.dumps(cohort,sort_keys=True))
+          PY
+      - name: Upload anonymized aggregate-only experimental evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-genuine-l2-background-nulls
+          path: /tmp/abides-public-background-nulls.json
+          retention-days: 7
+          if-no-files-found: error
