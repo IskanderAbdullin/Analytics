@@ -3,6 +3,12 @@
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
 
+## Public executed-print / prior L2 context — experimental, no attribution
+
+A new strictly **read-only** public-only audit (`tools/l2_trade_context.py`) pairs anonymous ABIDES executed prints with the **last strictly older** simulated L2 book snapshot. Executions sharing a timestamp with any quote mutation are explicitly **unclassified**, never ordered arbitrarily; one-sided, stale, crossed and missing quotes cause abstention. It conserves all prints and lots and reports at/through-previous-opposite-best only as a **descriptive quote compatibility**, not a detected VWAP/POV bot or execution-cost estimate. The runner also compares an agent-free background to POV/VWAP and a transparent **rotated public-print placebo**; the latter is **not** a valid market-conditional statistical null.
+
+[Full data and causality contract](docs/L2_TRADE_CONTEXT.md). No broker account/API, live alerts, private agent IDs or changed OS Engine code.
+
 ## Simulated public L2 order-book feasibility (2026-11-21)
 
 The new strictly **read-only**, optional `tools/l2_probe.py` checks whether the genuine, pinned ABIDES-NG matching engine can export timestamped public depth-five order-book updates without participant IDs. In [successful L2 CI #44894589485](https://github.com/IskanderAbdullin/Analytics/actions/runs/44894589485), a five-minute simulation exported **1,152** L2 snapshots (**661** two-sided, **457** one-sided, **34** empty), **709** executed trades, and **434** extra book snapshots sharing timestamps. **Do not deduplicate snapshots solely by exchange timestamp.**
