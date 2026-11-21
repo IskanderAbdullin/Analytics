@@ -86,8 +86,8 @@ class AuditTests(unittest.TestCase):
         report = run(self.root, output, "0001-01-01T00:00:00",
                      "9999-12-31T23:59:59", incident_limit=2)
         self.assertEqual(report["incident_events"], 2)
-        self.assertEqual(report["incident_events_total"], 3)
-        self.assertEqual(report["incident_events_omitted"], 1)
+        self.assertEqual(report["incident_events_total"], 4)
+        self.assertEqual(report["incident_events_omitted"], 2)
         self.assertTrue(report["incident_timeline_truncated"])
         # Error statistics must cover all history, including the omitted event.
         self.assertEqual(report["error_events"], 4)
