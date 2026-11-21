@@ -9,7 +9,7 @@ The script fetches ONLY public date-scoped immutable static archives.
 from __future__ import annotations
 import argparse
 import csv
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timezone
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import io
@@ -32,7 +32,7 @@ FLAG = {"true": True, "false": False}
 def frozen_source(symbol: str, day: str) -> tuple[str, date, str, str]:
     if type(symbol) is not str or not re.fullmatch(r"[A-Z0-9]{5,16}", symbol):
         raise ValueError("Invalid fixed spot instrument")
-    if type(day) is not str or not re.fullmatch(r"20\\d{2}-\\d{2}-\\d{2}", day):
+    if type(day) is not str or not re.fullmatch(r"20\d{2}-\d{2}-\d{2}", day):
         raise ValueError("Invalid UTC session date")
     trading_day = date.fromisoformat(day)
     if trading_day >= datetime.now(timezone.utc).date():
@@ -47,7 +47,7 @@ def verify_checksum(raw_zip: bytes, checksum_text: str, expected_name: str) -> s
         raise ValueError("Empty, oversized or malformed ZIP download")
     if type(checksum_text) is not str:
         raise ValueError("Missing provider checksum")
-    match = re.fullmatch(r"([0-9a-fA-F]{64})\\s+\\*?([^\\s/]+)\\s*", checksum_text)
+    match = re.fullmatch(r"([0-9a-fA-F]{64})\s+\*?([^\s/]+)\s*", checksum_text)
     if match is None or match.group(2) != expected_name:
         raise ValueError("No exact source file checksum attestation")
     actual = sha256(raw_zip).hexdigest()
@@ -57,7 +57,7 @@ def verify_checksum(raw_zip: bytes, checksum_text: str, expected_name: str) -> s
 
 
 def _decimal(value: str, label: str, *, positive: bool = False) -> Decimal:
-    if not re.fullmatch(r"(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?", value):
+    if not re.fullmatch(r"(?:0|[1-9][0-9]*)(?:\.[0-9]+)?", value):
         raise ValueError(f"Noncanonical {label}")
     try:
         number = Decimal(value)
@@ -87,7 +87,6 @@ def analyze_verified_zip(
                 or files[0].is_dir() or files[0].file_size > MAX_CSV_BYTES
                 or files[0].file_size == 0 or files[0].flag_bits & 0x1):
             raise ValueError("Unexpected ZIP member, size or encryption")
-        times = []
         count = buyer_taker_count = seller_taker_count = 0
         buy_qty = sell_qty = Decimal(0)
         previous_id = previous_time = None
