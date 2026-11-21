@@ -92,6 +92,22 @@ class PhaseChoiceTrapTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 reanalyse_frozen_json(broken)
 
+    def test_public_activity_differences_warn_about_endogenous_market_response(self):
+        report=assess_descriptive_separation(observed())
+        rows=report["public_market_activity_difference_by_seed"]
+        self.assertEqual(len(rows),2)
+        by_seed={r["seed"]:r for r in rows}
+        self.assertEqual(by_seed[2401]["public_print_count_difference"],14)
+        self.assertEqual(by_seed[2402]["public_print_count_difference"],110)
+        self.assertEqual(by_seed[2401]["public_lots_difference"],804)
+        self.assertEqual(by_seed[2402]["public_lots_difference"],8654)
+        self.assertEqual(by_seed[2401]["public_l2_snapshot_difference"],9)
+        self.assertEqual(by_seed[2402]["public_l2_snapshot_difference"],183)
+        for row in rows:
+            self.assertEqual(row["observed_controlled_prints_in_injected_run"],22)
+            self.assertFalse(row["individual_background_response_identified"])
+            self.assertFalse(row["pairwise_counterfactual_event_matching_justified"])
+
     def test_original_full_aggregate_json_compatibility_and_cohort_tampering(self):
         genuine_shape=aggregate(observed())
         result=reanalyse_frozen_json(genuine_shape)

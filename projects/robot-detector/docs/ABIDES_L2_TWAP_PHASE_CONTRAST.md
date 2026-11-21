@@ -190,3 +190,25 @@ cohort medians, refuses to overwrite output, and hashes its entire
 input file for traceability. It **cannot independently authenticate
 the simulated exchange feed** from a JSON file. No private truth,
 new matching run, threshold optimization or trading API is involved.
+
+## Observable market activity also changes endogenously
+
+An additional source-only audit computes *whole-market* public activity
+differences when the known TWAP is present, without trying to match
+individual background prints across counterfactual simulated markets:
+
+| Registered seed | Extra total public prints | Extra public lots | Extra L2 snapshots | Post-hoc controlled TWAP prints in injected run |
+|---|---:|---:|---:|---:|
+| 2401 | +14 | +804 | +9 | 22 |
+| 2402 | +110 | +8,654 | +183 | 22 |
+
+The total public print change (**+14** or **+110**) is **not** the
+number of directly injected fills (**22 in each injected simulated
+market**), nor does their arithmetic difference identify which
+background owners changed behavior. With market impact, matching queues
+and endogenous reactions, naive subtraction of entire-market prints,
+lots or book updates cannot be treated as a controlled-agent execution
+count or causal effect. The separate *private synthetic oracle* verifies
+the number of controlled fills **after** public feature construction;
+it is not used to fit rho. This strengthens the original caution
+about using aggregate public features for individual owner attribution.

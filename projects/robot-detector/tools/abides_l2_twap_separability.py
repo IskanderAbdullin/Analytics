@@ -70,6 +70,20 @@ def assess_descriptive_separation(cases: list[dict[str,Any]]) -> dict[str,Any]:
                 "same_seed_but_separate_simulated_market_runs":True,
                 "causal_agent_effect_established":False,
             })
+    source_contrasts=[]
+    for seed in SEEDS:
+        base=lookup[(seed,SCENARIOS[0],PHASES_SECONDS[0])]
+        twap=lookup[(seed,SCENARIOS[1],PHASES_SECONDS[0])]
+        source_contrasts.append({
+            "seed":seed,
+            "public_print_count_difference":twap["public_prints"]-base["public_prints"],
+            "public_lots_difference":twap["public_lots"]-base["public_lots"],
+            "public_l2_snapshot_difference":twap["l2_snapshots"]-base["l2_snapshots"],
+            "observed_controlled_prints_in_injected_run":
+                twap["posthoc_controlled_prints"],
+            "individual_background_response_identified":False,
+            "pairwise_counterfactual_event_matching_justified":False,
+        })
     return {
         "schema_version":"abides-l2-twap-phase-choice-trap-v1",
         "original_simulation_runs":4,"correlated_public_views":12,
@@ -78,6 +92,7 @@ def assess_descriptive_separation(cases: list[dict[str,Any]]) -> dict[str,Any]:
         "whole_view_rho_range_gap":combined_gap,
         "apparent_separation_changes_with_phase_choice":phase_dependence,
         "seed_aligned_between_scenario_contrasts":paired,
+        "public_market_activity_difference_by_seed":source_contrasts,
         "single_best_phase_selected":False,
         "threshold_fitted_to_development_study":False,
         "independent_source_completeness_verified":False,
@@ -90,6 +105,7 @@ def assess_descriptive_separation(cases: list[dict[str,Any]]) -> dict[str,Any]:
             "A positive range gap is not a calibrated predictive classifier.",
             "Phase views of one tape are correlated and may have different eligible bins.",
             "Injected TWAP changes the whole endogenous simulated market, not only its own prints.",
+            "Difference in total public prints/lots/book updates is not the number of injected fills.",
             "Reusing a seed across background/TWAP scenarios does not establish independent draws.",
             "No real MOEX/SPB/NEO market specificity or physical owner count is established.",
         ],
