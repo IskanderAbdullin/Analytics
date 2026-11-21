@@ -35,6 +35,25 @@ python tools/l2_probe.py --seed 1401 --output /tmp/abides-l2-feasibility.json
 
 The tool refuses to overwrite prior evidence.
 
+## Verified simulated L2 result (2026-11-21)
+
+The dedicated [successful pinned ABIDES L2 CI #44894589485](https://github.com/IskanderAbdullin/Analytics/actions/runs/44894589485) ran all three data-contract tests and a genuine 5-minute exchange simulation (seed 1401, 40 background noise agents, depth limit five). Results:
+
+| Observable in ABIDES simulated L2 | Value |
+|---|---:|
+| Public order-book update snapshots | **1,152** |
+| Unique exchange timestamps | **718** |
+| Additional snapshots sharing timestamps | **434** |
+| Two-sided snapshots | **661** |
+| One-sided snapshots | **457** |
+| Fully empty snapshots | **34** |
+| Maximum captured depth on each side | **5 levels** |
+| Actual simulated exchange trade prints | **709** |
+
+All 661 two-sided snapshots had a strictly positive best-bid/best-ask spread. Input snapshot ordering was monotone, but **434 additional snapshots shared a timestamp with another book mutation**; timestamp-based deduplication would destroy exchange-state transitions and potential quote/trade causality. Quote snapshots must be preserved in simulator order (and in any real provider feed using an independently verified sequence field), not naively merged by timestamp.
+
+This **confirms genuine ABIDES source availability and extraction feasibility**, not that T-Invest provides historical L2 files or guarantees a complete real-time L2 stream. The aggregate-only CI artifact `abides-public-l2-feasibility` expires after 14 days. No user account or actual broker market data was queried.
+
 ## Scientific interpretation
 
 A simulated order book allows model studies of spread, imbalance, market-wide liquidity shocks and **public** quote/trade interactions, but public L2 levels still do **not** carry order owner IDs. Even a perfectly timestamped L2 tape cannot uniquely reconstruct hidden parent orders if many participants place observationally equivalent orders. A high correlation between prints and depth changes may arise from market makers and volatility; it is not proof of one robot.
