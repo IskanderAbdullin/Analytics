@@ -29,7 +29,7 @@ class ResearchSeedLedgerTests(unittest.TestCase):
         r = audit_sources(self.registry, ROOT)
         self.assertGreaterEqual(r["canonical_studies"], 11)
         self.assertGreaterEqual(r["canonical_spent_seeds"], 25)
-        self.assertEqual(len(r["source_constant_checks"]), 4)
+        self.assertEqual(len(r["source_constant_checks"]), 6)
         self.assertEqual(r["non_independent_replay_groups"], 1)
         self.assertFalse(r["globally_unused_seeds_verified"])
         self.assertFalse(r["blind_evaluation_reuse_allowed"])
@@ -37,7 +37,7 @@ class ResearchSeedLedgerTests(unittest.TestCase):
 
     def test_all_prior_development_and_toy_seeds_are_blocked_for_blind_claim(self):
         for seed in (41, 61, 71, 901, 1101, 1301, 1401, 1501,
-                     1701, 1801, 1901):
+                     1701, 1801, 1901, 2101, 2401):
             with self.subTest(seed=seed):
                 r = assess_proposed_seeds(self.registry, [seed])
                 self.assertTrue(r["known_spent_overlap"])
@@ -45,7 +45,7 @@ class ResearchSeedLedgerTests(unittest.TestCase):
                 self.assertFalse(r["globally_unused_or_unseen_elsewhere_verified"])
 
     def test_unknown_seed_is_not_proven_globally_new(self):
-        r = assess_proposed_seeds(self.registry, [2101, 2102])
+        r = assess_proposed_seeds(self.registry, [2201, 2202])
         self.assertTrue(r["not_previously_listed_in_project_ledger"])
         self.assertFalse(r["known_spent_overlap"])
         self.assertFalse(r["eligible_for_claim_of_fresh_blind_test"])

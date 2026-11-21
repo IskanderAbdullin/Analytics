@@ -1,7 +1,64 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
+## New REAL public trade evidence — November 2026, research only
+
+**New live-provider archive downloads succeeded** through public GitHub
+Actions, not the Windows PC. Exactly **278,403 real exchange executed
+spot prints** were verified with the original provider ZIP SHA-256 files:
+LTCUSDT **116,446 on 2026-11-18 UTC** and **161,957 on 2026-11-19 UTC**.
+The observed trade IDs are strictly sequential even across the
+consecutive-day boundary; that is not independent proof of market
+archive completeness. [Scientific provenance and original actions runs](docs/REAL_PUBLIC_SPOT_TRADE_ARCHIVE_2026-11-21.md).
+
+The second predeclared UTC session was used for *descriptive*
+30-second clock-origin binning at **0/10/20 seconds**. Changing
+only the analytical bin offset changes counts of buy/sell-dominant
+and one-sided intervals; none of this identifies physical robots.
+All three phase views are correlated. **Historical full L2 is not
+included** and quote-based detection remains BLOCKED_BY_L2_DATA.
+
+The source dataset is restricted to **non-commercial CC BY-NC-SA 4.0
+research** under Binance Vision terms, not authorized for trading
+execution or commercial deployment. Raw trades are **never** committed
+or uploaded as workflow artifacts. The original source workflows
+were made manual-only immediately after successful first runs.
+
+
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
+
+## New controlled TWAP versus background genuine ABIDES L2 experiment
+
+The preregistered development-only `tools/abides_l2_twap_phase_contrast.py`
+adds exactly **one known TWAP execution strategy** to a Poisson background
+and compares its public depth-five L2/print timing against a background-only
+configuration at fixed 0/10/20s origins. Two source-registered development
+seeds (2401/2402), two scenarios and three **correlated** views per
+simulated market imply **4 genuine market runs, not 12 independent markets**.
+The instrument is synthetic ABM, not MOEX or SPB; real market owner count
+and accuracy remain unknown. Both the contrast and the new
+`abides_l2_phase_fragility.py` use only public analytics; simulated
+controlled agent IDs are inspected *after* features, only to check
+execution actually occurred.
+
+[Exact frozen experimental protocol, failure gates and provenance](docs/ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+The `public_tape_fingerprint.py` now verifies **ordered full L2 snapshots
+plus executed prints** under known clock shifts. Earlier ABIDES phase
+archives fingerprinted only prints, so historical book content equality
+cannot be independently reconstructed from those aggregate-only results.
+
+The executed controlled TWAP-versus-background study provides a
+**phase-choice overfitting counterexample**: the two synthetic cohorts
+are perfectly separated by observed rho ranges at **10s and 20s**,
+but **not at 0s** and not across all origins. No threshold is fitted,
+no real-market recognition accuracy follows.
+[Observed data and scientific limitations](docs/ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+
+## Genuine ABIDES public L2 30-second clock-origin sensitivity
+
+The new **pre-registered** `tools/abides_l2_binphase_sensitivity.py` evaluates the same anonymous ABIDES depth-five book/trade tape at three **30-second clock origins (0, 10 and 20 seconds)**. Exactly **four new genuine market simulations** (seeds 2101/2102 × Poisson/fixed-cadence backgrounds) produce twelve **correlated** views. Relative public event times, quantities and reported sides are conserved; no phase is selected as a best model and no private execution actor is identified. The two new seeds are registered as spent in the research provenance ledger.
+
+[Precommitted source, genuine ABIDES results and scientific limits](docs/ABIDES_L2_BINPHASE_SENSITIVITY.md). [Successful CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330) found Poisson-background two-seed median rho **−0.014/−0.161/−0.181** and fixed-cadence **−0.218/−0.195/−0.493** for offsets **0/10/20s**. This is clock-origin sensitivity, **not** owner recognition or a real-market trading signal.
 
 ## Reproducible public-feed invariant stress tests
 
@@ -31,7 +88,7 @@ Added a conservative optional **two-stream metadata gate**: the previous complet
 
 The new **read-only** `research/seed_registry.json` records already inspected ABIDES and deliberately constructed toy seeds, including explicit **non-independent replays**. `tools/research_seed_registry.py` checks the historical seed list against four frozen experiment scripts using Python AST, **without importing or running those experiments**, rejects source-plan drift and flags any proposed seed that has already been spent. A previously *unlisted* seed is **not automatically proven globally new or a valid blind holdout**. A lightweight Python-only CI audit runs when relevant source constants or ledger entries change.
 
-[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **29 known spent seeds across 11 canonical studies**, **4 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
+[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **31 known spent seeds across 12 canonical studies**, **5 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
 
 ## Genuine ABIDES public-L2 time-bin robustness experiment
 

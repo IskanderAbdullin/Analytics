@@ -21,6 +21,7 @@ Multiple Market Robot Detector stages have executed genuine ABIDES matching-engi
 | Constructed **non-ABIDES** common factor example | 1701 |
 | Genuine L2 background-only nulls | 1801–1802 |
 | Public L2 bin-width sensitivity | 1901–1902 |
+| Genuine L2 clock-origin phase sensitivity | 2101–2102 |
 
 A later lagged-bin reanalysis of **the same seed 1501** is recorded separately as a `non_independent_development_replay`. It does not magically create a second independent study. The constructed toy seed 1701 is separately identified as **not a genuine matching-engine run**.
 
@@ -29,7 +30,7 @@ A later lagged-bin reanalysis of **the same seed 1501** is recorded separately a
 `tools/research_seed_registry.py` uses the Python standard library only. It validates:
 - Schema, unique canonical study IDs and unique seed lists, without overlaps between independent canonical studies;
 - Explicit non-independent replay referencing the exact canonical study seed set;
-- Exactly matched seed constants via Python **AST literal inspection**, without importing or running the ABIDES experiment scripts, for four frozen source plans: `directional_shift_frozen_replication.py`, `abides_execution_baseline_holdout.py`, `abides_l2_background_nulls.py`, and `abides_l2_binwidth_sensitivity.py`;
+- Exactly matched seed constants via Python **AST literal inspection**, without importing or running the ABIDES experiment scripts, for five frozen source plans: `directional_shift_frozen_replication.py`, `abides_execution_baseline_holdout.py`, `abides_l2_background_nulls.py`, and `abides_l2_binwidth_sensitivity.py`;
 - A changed frozen constant or missing/duplicated seed is an **error**, not silent success;
 - Future `--candidate-seeds` proposals are checked against known spent values, and any collision returns a nonzero exit code.
 
@@ -55,3 +56,52 @@ The lightweight [`robot-detector-seed-ledger.yml`](../../.github/workflows/robot
 The ledger is a guard against **known** reuse; it cannot detect all evaluation runs in unrelated branches, notebooks or external projects. Never claim it proves a new seed was globally unseen. Historical source evidence is frozen: to add a truly new experiment, first register its design in a new code review before executing it, and after observing results mark that cohort as spent. Do not rewrite historical labels to manufacture validation.
 
 No broker accounts, trading signals, private maker/taker attribution or actual trading occurs here. **Scientific identity and real-market significance gates remain CLOSED.**
+
+## Newly pre-registered phase-sensitivity cohort
+
+The genuine ABIDES 30-second **clock-origin phase** protocol precommits the fresh development seeds `2101,2102` to `tools/abides_l2_binphase_sensitivity.py`. These values are **immediately registered as spent for any subsequent blind-test claims** once this study executes, and the source-constant audit now checks five literal seed lists. The experiment uses four actual genuine simulated market tapes, with three correlated public-time-origin re-binnings each; twelve analytical views are **not** twelve independent markets. [Method](ABIDES_L2_BINPHASE_SENSITIVITY.md).
+
+## Ledger validation after phase study
+
+[Successful source-ledger CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) confirms **12 canonical studies, 31 known spent seed values and five frozen Python constant checks** after including the 2101/2102 genuine clock-origin cohort. A formerly "unknown" candidate example using 2101/2102 now correctly collides with the registry; the test and workflow use 2201/2202 solely to illustrate absence from the local list, not proof that they were never used globally.
+
+## Prospective controlled-TWAP L2 phase experiment (2026-11-21)
+
+A new project-local development-only cohort **2401/2402** is registered
+to the literal `SEEDS` constant in
+`tools/abides_l2_twap_phase_contrast.py`, extending the canonical ledger
+to **13 studies, 33 registered/spent values and 6 frozen-source constant
+checks**. These seeds had no collision with the prior project-local
+ledger before registration but this is **not** globally verified novelty
+or certified independent blind evaluation. This is a predeclared,
+not tuned, exploratory contrast and any obtained outcomes immediately
+spend these seeds for all later blind claims.
+
+Four genuine ABIDES runs (background-only versus injected market-order
+TWAP across the same two development seeds) are summarized at three
+correlated fixed 30-second origins. The private simulated TWAP agent ID
+is used **only after all public features are computed** to count
+executed controlled fills; it never enters the detector. The public
+full-depth book/print source fingerprint is checked for equal content
+across each set of phase views. No real-market identity or false
+discovery probability is inferred.
+
+[Prospective protocol](ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+
+## Source-controlled TWAP-versus-background execution verification
+
+[Original frozen matching-engine CI #44915375635](https://github.com/IskanderAbdullin/Analytics/actions/runs/44915375635)
+successfully exercised 2401 and 2402 across background-only and
+one injected TWAP configurations, with three dependent clock-origin
+views of each original tape. Both seeds are **now spent for any
+future independent holdout claim**. The new full-depth public L2/trade
+fingerprint is coherent across phase views within the four simulations,
+but cannot attest real exchange tape provenance. The total canonical
+ledger is **13 study entries / 33 locally registered seed values /
+6 literal-frozen source constant checks**.
+
+A later retrospective phase-choice separability audit consumes the
+**same** simulation results and does not constitute any new independent
+market replication or unspent seed observation. Keeping the source
+analysis and source simulation in distinct records avoids hidden
+double-counting.

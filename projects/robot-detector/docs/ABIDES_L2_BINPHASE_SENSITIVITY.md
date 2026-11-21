@@ -1,0 +1,203 @@
+# Genuine ABIDES public L2 clock-origin sensitivity — frozen before outcomes
+
+**Date:** 2026-11-21. This is a strictly **read-only** source-timing robustness study, not a new detector, physical agent label, real-market FDR or trading algorithm.
+
+## Scientific reason
+
+The preceding genuine ABIDES [bin-width robustness experiment](ABIDES_L2_BINWIDTH_SENSITIVITY.md) found that the **two-seed Poisson-background median Spearman correlation changed sign** when the public book/next-trade interval width changed from 30 seconds to 60 seconds on the **same synthetic market tapes**. Bin width is not the only arbitrary time discretization choice: a researcher can also shift the **origin (clock phase)** of a fixed-width interval while holding the underlying public trades and order-book snapshots unchanged.
+
+This experiment fixes three offsets **0s, 10s and 20s** for **one constant width of 30s** *before* seeing any new results. It reports all three values without selecting a "best" phase.
+
+## Preregistered pinned genuine matching-engine plan
+
+Source: `tools/abides_l2_binphase_sensitivity.py`. Source-controlled immutable constants:
+
+- Previously unused development-only genuine ABIDES seeds **2101 and 2102**, registered as **spent for future blind evaluation** on the same source commit that launches this study. Previous seeds 41–44, 61–63, 71–73, 901–904, 1101–1104, 1301–1304, 1401, 1501, 1801–1802 and 1901–1902 cannot be reused as fresh evaluations.
+- Two background modes: 60 Poisson-noise agents (mean 20s wake-up) and 60 fixed-cadence noise agents (20s), no separately injected TWAP/VWAP/POV execution agent. This is **not** a market devoid of algorithmic policies.
+- **Exactly four genuine exchange simulations** (two seeds × two backgrounds), each producing one original anonymous public execution tape and one depth-five L2 stream.
+- Pinned upstream matching engine revision `ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242`; session 09:30–09:42, ABM instrument, depth 5.
+- For each original public tape, re-bin the book and prints with identical 30-second intervals at **exactly three fixed phase offsets** 0/10/20 seconds. Mathematically the source timestamps are shifted together by a constant *before* the existing strict integer L2 processing, so relative event times, equal-timestamp ties, prices, quantities and reported sides remain unchanged. This is a coordinate transformation, not a new market draw or event sequence.
+- Previous fully completed book bin's displayed depth imbalance versus *next completed trade bin's* reported BUY fraction; same missing/stale/crossed book abstention and tie-aware Spearman. No threshold/phase selection, future lookahead, real-time prediction, maker/taker ID reading or individual parent-order identification.
+
+The script checks exact original public SHA-256, print count, total public lot count and L2 snapshot count across the **three correlated views of each of the four actual tapes**. It reports a per-simulation rho range across phases and cohort-median descriptive coefficients across the two genuine seeds per phase. Undefined coefficients are explicitly null, not zero. Source archive completeness remains **not independently attested**.
+
+## Scientific non-independence / release decision
+
+The twelve analytical records are **NOT twelve independent market experiments** and do not support confidence intervals or real market p-values. Changing source time origin, like changing bin width, is a researcher degree of freedom that can produce large apparent variation without any distinct execution program. A large phase-dependent correlation would undermine use of a single chosen public rho as evidence of a physical bot. Conversely, a small variation on four synthetic market runs is insufficient to validate the real world.
+
+On execution, 2101/2102 are spent for future independent holdout claims. They are tracked in `research/seed_registry.json` with literal source-constant auditing, not used for model training or trading.
+
+## Reproduction and tests
+
+Six no-simulator tests in `tests_background/test_abides_l2_binphase_sensitivity.py` verify phase values, exact shift invariance, signed source arithmetic validation, four-vs-twelve independence, frozen case matrix and rejection of false source/identity claims. The isolated [`robot-detector-abides-binphase.yml`](../../.github/workflows/robot-detector-abides-binphase.yml) workflow runs these pure tests **before** the genuine pinned matching engine and publishes only an aggregate-only seven-day result artifact.
+
+No actual accounts, broker tokens, user trade history, local PC GUI or real orders are touched. **Scientific Stage-2 identity and live-trading gates remain CLOSED.**
+
+## Executed four-simulation result (2026-11-21)
+
+[Successful genuine ABIDES matching CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330) ran the **six frozen-plan Python tests** and **four actual pinned matching-engine scenarios**, reprocessing each anonymous public L2/executed-print tape at the three predeclared 30-second origins without any market reruns across origins.
+
+| Public synthetic background | Origin offset 0s: rho / eligible bin pairs | 10s | 20s |
+|---|---:|---:|---:|
+| Poisson noise, two-seed median | **−0.0137 / 39** | **−0.1608 / 42** | **−0.1809 / 41** |
+| Fixed-cadence noise, two-seed median | **−0.2178 / 42** | **−0.1946 / 41** | **−0.4925 / 42** |
+
+Changing only the analytical **clock-origin** of the same simulated public tape altered the two-seed median coefficients materially, especially fixed-cadence at 20 seconds. Unlike the earlier width experiment, **none of these six median values changes sign**. The result is a negative robustness warning **about researcher-controlled time alignment**, not a measure of real market false-positive rates or statistically significant agent identification. Cohort medians do not establish a sign change in any individual simulation, and the twelve views are correlated.
+
+The exact public digest, executed lot/fill totals and L2 source snapshot counts were conserved across all phases within each of the **four** genuine simulations. The evaluated 2101/2102 seeds are now **spent** for any further independent holdout claim.
+
+[Research seed-ledger CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) passed after replacing its former "unlisted candidate" illustration: once 2101/2102 became spent, testing them as unknown candidates was correctly rejected. The non-spent demonstration numbers 2201/2202 are **not** certified globally unused; they only lack a local ledger collision.
+
+Seven-day aggregate-only result `abides-public-l2-binphase` contains per-run descriptive values without private maker/taker truth or raw public events.
+
+## Follow-up: within-original-tape paired diagnostics (2026-11-21)
+
+After the original four simulations, the read-only aggregate now explicitly
+compares **each original seed/background simulation with itself** at 0s→10s
+and 0s→20s. These are signed **descriptive** rho differences, not four
+independent experiments at each origin. Per-simulation output also records
+whether the **defined** rho signs straddle zero (distinct from the sign of a
+two-seed cohort median) and the range of eligible clock-bin counts.
+
+The derived `paired_cohort_contrasts` computes medians **only from seeds
+with both comparison coefficients defined**. It refuses to infer a paired
+effect by subtracting unpaired phase-specific medians: one phase may have
+valid rho on a different subset of the two original seeds. A null paired
+contrast means not enough defined paired coefficients, not zero difference.
+The same simulated source tape is used, but the *eligible bin memberships
+may change*, so these contrasts are not event-wise matched observations.
+No phase is selected, no additional matching-engine run is required to
+re-analyze already saved full case outputs, and seeds 2101/2102 remain spent.
+
+This is a scientific **robustness/fragility diagnostic only**: with merely
+two seeds per background, no confidence interval, real-market error rate,
+private actor attribution or live release gate is justified. The additional
+tests use constructed software fixtures, not new independent market data.
+
+## Offline retrospective review: no new ABIDES runs
+
+Use a downloaded **original full result JSON** from the earlier pinned study:
+
+```bash
+cd projects/robot-detector
+python tools/abides_l2_phase_review.py --input /path/to/old_full_result.json --output /path/to/new_paired_review.json
+python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
+```
+
+The offline converter checks the exact frozen plan, case matrix, previous
+two-seed cohort medians and historical per-simulation fields, and rejects
+duplicate keys, nonstandard non-finite JSON and forged provenance flags.
+The output is never allowed to overwrite an existing file. Original source
+data/authenticity **cannot be independently established from metadata alone**.
+It does not run ABIDES, use any private identity or select a trading signal.
+
+## Verified original artifact: paired scalar analysis (2026-11-21)
+
+The seven-day **aggregate-only** artifact `abides-public-l2-binphase` from
+[successful pinned matching CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330)
+was retrieved and its **12 original case coefficients** independently
+recomputed as within-seed signed differences. Its complete original JSON
+has SHA-256 `8db020efd034eb3870aa772785320ada62ac25a7392ffd158284b55af1eb1009`.
+An immutable, compact, raw-event-free scalar fixture now lives in
+`fixtures/abides_l2_phase_observed_scalars_20261121.json`. The fixture
+contains precisely the reported rho and eligible/populated bin counts;
+it is **not** an independent authentication of the source simulator.
+
+| Original simulation (seed, noise background) | rho 0s | rho 10s | rho 20s | Δrho 10s−0s | Δrho 20s−0s |
+|---|---:|---:|---:|---:|---:|
+| 2101, Poisson | +0.0509 | −0.0872 | −0.0947 | −0.1381 | −0.1456 |
+| 2102, Poisson | −0.0782 | −0.2343 | −0.2671 | −0.1561 | −0.1889 |
+| 2101, fixed cadence | −0.3414 | −0.0228 | −0.6807 | +0.3185 | −0.3393 |
+| 2102, fixed cadence | −0.0943 | −0.3665 | −0.3043 | −0.2722 | −0.2101 |
+
+Median within-original-simulation paired changes:
+**Poisson −0.1471 (10s), −0.1672 (20s)**;
+**fixed cadence +0.0232 (10s), −0.2747 (20s)**.
+The modest fixed-cadence median at 10s conceals two opposing signed
+changes (+0.3185 and −0.2722); the median of their absolute magnitudes
+is **0.2954**. This is why simply inspecting a cohort median can hide
+phase sensitivity.
+
+**Correction of the earlier cohort-only reading:** although all six
+two-seed **cohort median** correlations remain negative, **one of four
+individual original simulations** (seed 2101 Poisson) *does* reverse
+the sign of rho at changed phase origins. These four simulations,
+rather than twelve analytical views, are the independent unit.
+The effective eligible bin counts vary across origin offsets, so
+deltas measure **whole-tape analysis sensitivity**, not a controlled
+difference on identical aligned bin observations.
+
+No rerun was launched to obtain these figures; all data came from
+the already executed study. There is no new seed or p-value, no
+identified robot, no real-market specificity and no permission to trade.
+
+## GitHub Actions cost gate after original research
+
+The genuine four-market `robot-detector-abides-binphase.yml` experiment is
+now **manual-only** (`workflow_dispatch`). Repeated automatically triggered
+runs on a previously inspected pair of seeds are **not independent evidence**
+and waste matching-engine CI minutes. The prior successful artifact and
+scalar fixture preserve the historical output.
+
+The lightweight research provenance workflow instead validates the two
+standard-library-only Python phase/review test suites, including
+the original aggregate-only numeric fixture, without starting ABIDES.
+A future manual matching-engine rerun may check reproducibility, but
+cannot be advertised as a fresh holdout.
+
+## Full public L2 source integrity (post-experiment correction)
+
+The historical phase study's `public_sha256` fingerprint was derived from
+**executed trade prints only**. Equal snapshot counts and print digests
+do **not** establish equality of the entire book. Thus its prior output
+cannot retrospectively prove every L2 price, lot count, event timestamp
+or equal-time update order was unchanged. The original raw L2 event
+stream was not preserved in its seven-day aggregate-only result.
+
+A new standard-library-only `public_tape_fingerprint.py` hashes every
+bounded public L2 snapshot and trade print in event order with separate
+domain prefixes and combined SHA-256. When given an exactly known 0/10/20s
+coordinate shift, it restores the time origin before hashing. The
+future `public_tape_sha256` field is **optional for legacy reports** and
+required consistently across all twelve views if present; differing
+values within one original simulation now fail closed. The aggregate
+explicitly declares `full_public_tape_digest_available_all_phases`.
+
+Five new tests cover exact rephasing, changed L2 sizes and quote order,
+trade mutation, identical legacy trade-only hashes despite changed
+books, malformed source integers and unsupported sides. These are
+software integrity tests, not newly observed market evidence.
+No cryptographic signature from an independent market-data provider
+or source-completeness proof exists; Stage-2 physical identity remains
+unvalidated. New pins cannot be retroactively added to old archives.
+
+## Deterministic phase fragility and **release abstention** gate
+
+The new source-only `abides_l2_phase_fragility.py` reports three
+predefined descriptive states: `SIGN_REVERSAL_OBSERVED`,
+`SIGN_STABILITY_UNDETERMINED` (missing/zero coefficients), and
+`NO_REVERSAL_IN_TINY_SYNTHETIC_SAMPLE`. These states do **not**
+represent calibrated confidence or probability. Per-original-simulation
+zero crossings and eligible-bin count drift are separate outputs. The
+audit also flags paired phase changes with **opposing signs across two
+seed runs** even when their median nearly cancels.
+
+For the original ABIDES artifact's twelve observed scalar rows the
+source-only audit finds **one of four original simulations** with a
+strict sign reversal, **four of four original simulations** with
+changing eligible-bin counts, and **one of four paired background/phase
+contrasts** with opposing signed seed differences. This is descriptive
+instability, not proof of a true agent or market-wide false alarm rate.
+
+The four original matching runs are not four independently proven
+statistical samples: the same seeds were reused under two alternative
+background configurations. All four phase outcome rows per
+seed/background derive from the **same** run (three phases). The
+output enforces `scientific_stage2_release_allowed=false` and
+`live_trading_allowed=false` regardless of whether synthetic rho
+signs look stable; no physical owner is identified.
+
+The offline review CLI appends this audit to earlier aggregate JSON
+without requiring ABIDES. Historical reports without an L2 content
+digest remain explicitly unverified. Cheap CI runs all pure-Python tests;
+the original expensive matching workflow remains manual-only.

@@ -256,3 +256,130 @@ See [OFFLINE_RESEARCH_DASHBOARD.md](OFFLINE_RESEARCH_DASHBOARD.md), [BOUNDED_EVE
 - Five Python offline tests plus independent lightweight `.github/workflows/robot-detector-feed-metamorphic.yml` run 64 deterministic source-only fixtures without a genuine ABIDES matching-engine simulation. No hidden maker/taker IDs, real broker market data or trading. [L2_PUBLIC_METAMORPHIC.md](L2_PUBLIC_METAMORPHIC.md). Test seed labels are not scientific held-out real simulations.
 
 - **Executed read-only public-feed metamorphic stress:** [GitHub CI #44911963501](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911963501) **5/5 tests plus 64 generated synthetic software fixtures**, all append-only closed-prefix, independent declared L2/trades gaps, watermark tightening and eligible/abstained bin conservation checks passed. Reference 8 eligible bins declined to 7 with one source gap, 6 with both, and 6 with tighter watermark. [.NET CI #44911963474](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911963474) and [seed provenance CI #44911963433](https://github.com/IskanderAbdullin/Analytics/actions/runs/44911963433) also succeeded. Synthetic fixtures do NOT represent empirical exchange participants or real-market FDR.
+
+## 2026-11-21 — preregistered genuine ABIDES 30-second clock-origin robustness
+
+- Added `tools/abides_l2_binphase_sensitivity.py` with previously unused **2101/2102** genuine ABIDES development seeds, two frozen Poisson/fixed-cadence noise backgrounds, one 30-second bin width, and fixed **0/10/20-second phase offsets**. Exactly four actual matching-engine tapes are reanalysed into twelve correlated public clock-origin views; unchanged original public SHA, prices, lots, side and relative event timing are checked. No phase tuning, hidden maker/taker IDs, trade signals, exchange market FDR or physical owner claims.
+- Six source-only tests and an isolated pinned genuine ABIDES workflow; seed registry extended to **12 canonical studies / 31 known spent seeds / five frozen source constants**, with CI trigger for future source drift and documentation [ABIDES_L2_BINPHASE_SENSITIVITY.md](ABIDES_L2_BINPHASE_SENSITIVITY.md). All later independent scientific evaluations must use new genuinely untouched held-out data. Stage-2 release gate CLOSED.
+
+- **Executed genuine 30-second clock-origin sensitivity:** [successful ABIDES CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330), **6 frozen-plan Python tests**, 4 actual matching-engine simulations, 12 correlated public analytic views. Two-seed median Poisson rho **−0.0137 / −0.1608 / −0.1809** with **39 / 42 / 41** eligible lagged-bin pairs across offsets 0/10/20 seconds; fixed-cadence rho **−0.2178 / −0.1946 / −0.4925** with **42 / 41 / 42** pairs. No median sign flip in this phase survey, but magnitude changes substantially on identical tapes. All original public SHA, book events, prints and lots conserved; source completeness unverified, no threshold/model/phase selected. Seeds 2101/2102 spent.
+- [Successful research provenance CI #44912522820](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912522820) confirmed the updated 12-study/31-seed ledger and five frozen source constants; earlier example 2101/2102 became spent and therefore had to be replaced with nonregistered 2201/2202, which are **not globally verified fresh**.
+
+## Post-phase robustness and prospective controlled-TWAP contrast (2026-11-21)
+
+- The prior 2101/2102 four-tape retrospective review now includes strict
+  nonfinite/type checks, a per-seed signed correlation phase contrast,
+  changed eligible-bin count, and a **threshold-free abstention gate**.
+  One of four original synthetic runs actually **reverses rho sign**
+  although all six two-seed phase medians remain negative. All four
+  simulations change eligible-bin counts across origins. Four matching
+  runs may also share seed-level randomness across backgrounds; do
+  not call them statistically independent market samples.
+- Previous `public_sha256` provenance hashes only *executed print
+  records*, so old aggregate-only artifacts **do not prove equality
+  of entire L2 book contents**. New strict domain-separated
+  `public_tape_fingerprint.py` adds exact hashes of quote timestamps,
+  ordered same-time snapshots, unique price/size levels, public prints
+  and side labels; a source-normalized phase shift must preserve
+  the combined SHA. No exchange-provider authenticity claim.
+- Pure review `abides_l2_phase_review.py` and
+  `abides_l2_phase_fragility.py` produce descriptive JSON and keep
+  `scientific_stage2_release_allowed=false`, irrespective of
+  observed rho. No raw private agent IDs or account data exported.
+- Newly reserved development seeds `2401/2402` (13 canonical ledger
+  records / 33 locally known seed values / 6 constant checks) specify
+  one *controlled TWAP* against background-only ABIDES conditions, two
+  runs each, with three analytical origins each. Tests reject missing
+  case matrices, content drift, misreported controlled fills and
+  posthoc truth leak claims. Study protocol:
+  [ABIDES_L2_TWAP_PHASE_CONTRAST.md](ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+  Until genuine matching-engine CI is checked, no empirical result
+  for the injected-TWAP study is asserted.
+- Live trading, physical bot identification, independent source
+  completeness and real-market phase false-alarm estimates remain
+  **CLOSED / UNKNOWN**, not silently inferred.
+
+## Executed controlled public L2 TWAP contrast and phase-choice diagnostic (2026-11-21)
+
+- [ABIDES CI #44915375635](https://github.com/IskanderAbdullin/Analytics/actions/runs/44915375635)
+  succeeded on the **source-preregistered** 2401/2402 development seed
+  cohort: 4 actual matching-engine market simulations and 12 dependent
+  public phase-origin views; true controlled TWAP execution participation
+  was verified *after* public feature computation (22 printed fills on
+  each injected-TWAP original market).
+- The two-seed median descriptive rho for **background only** at
+  0/10/20s was **−0.2262/−0.0613/−0.4756**; with **injected TWAP**
+  **−0.0711/+0.000058/+0.1004**. Exactly **2 of 4** original runs change
+  rho sign across fixed phases, and eligible book/trade bin counts
+  change across phases for all 4 originals. The raw event tape was
+  NOT committed; complete aggregate-only original SHA-256 is
+  `2391c9f223b6841f8346502282b7e099856e6feee7726cd4769967dcbcd97fa8`.
+- Deterministic, source-only `abides_l2_twap_separability.py` reveals
+  the **post-hoc phase-choice trap**: apparent strict ordering
+  (injected rho range entirely above background range) is **false
+  at 0s**, **true at 10/20s**, but **false across all origins**.
+  It explicitly does not select a threshold, use statistical
+  classification accuracy, or open the scientific or trading gates.
+  A matching new CLI can reprocess saved full JSON or the 12-row
+  committed scalar fixture without ABIDES.
+- The old L2 experiment used a print-only SHA; this new study checks
+  **combined exact ordered public L2 plus public trade SHA** across
+  every phase before retaining case summaries. That prevents silent
+  L2-content drift within a simulated source but cannot authenticate
+  independent real provider archives.
+- Expensive source-controlled ABIDES workflow changed to **manual
+  dispatch only after the successful original run**; the cheap
+  research-ledger workflow tests the source, retrospective case
+  fixture, non-identifiability and all provenance gates. Seeds
+  2401/2402 are now **spent**, and no real market owner-count claim
+  or out-of-sample significance is supported.
+
+## Aggregate-only privacy hardening
+
+The public-phase aggregate serializers for the original background study
+and new controlled-TWAP experiment now reject **every unrecognized row
+field**, in addition to enforcing numeric exactness, frozen row matrices
+and source hash consistency. Synthetic tests inject
+`passive_agent_id`, `controlled_agent_ids`, `hidden_order_id`,
+`private_event_manifest` and raw book fields and verify they cannot
+be persisted in aggregate-only CI artifacts. This closes a leakage
+path where future developer code could have appended extra private
+keys to otherwise valid public summaries. All source-private analysis
+remains detached from the published public case schema.
+
+## 2026-11-21 — new real execution archives, two independent UTC sessions
+
+[Official Binance Vision raw spot trade download #44916791033](https://github.com/IskanderAbdullin/Analytics/actions/runs/44916791033)
+successfully verified **116,446 real LTCUSDT public prints** for
+**2026-11-18 UTC**, SHA-256
+`2fbf1fe2f85c813b3d5e4922d674799adced6f306effe0e5cf9add62a57e6522`.
+The second precommitted [run #44917086043](https://github.com/IskanderAbdullin/Analytics/actions/runs/44917086043)
+verified **161,957 public prints** for **2026-11-19 UTC**,
+SHA-256
+`9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a`.
+The first day is inspected development evidence, second day is a
+previously unseen *source/timing descriptive* day, not a blind
+evaluation of an unchanged bot classifier.
+
+Observed trade IDs contiguous inside and between dates:
+**608186258–608464660**, **278,403** exchange public executions.
+No missing IDs inside the downloaded intervals, no external guarantee
+that this is every matching-engine execution. Total observed aggressive
+buy/sell counts: **131,444 / 146,959**.
+
+The second day was rebinned at **0/10/20s** for one fixed 30s
+window, strict UTC-edge exclusion and preservation of all source
+trade counts. Buy/sell-dominant bin memberships and one-sided
+count change with the origin. **These are three analytic views of
+one real source day, not independent market samples.** No real L2
+book was sourced. A strict separate offline fixture pair validator
+and synthetic negative tests were added; the original new-data
+workflow is now manual-only, with the cheap research-ledger CI
+guarding all source metadata and within-day conservation.
+
+Source-license gate: Binance Vision dataset **CC BY-NC-SA 4.0**
+non-commercial research only, with separate restrictions on live
+proprietary trading, data redistribution and commercial use.
+MOEX non-display feeds for algorithmic trading require a separate
+contract; no such automated MOEX use is claimed. No raw public trade
+ZIP, private IDs, credentials or large artifacts were committed.

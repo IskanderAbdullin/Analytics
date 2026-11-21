@@ -10,6 +10,26 @@ on:
       - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tools/public_tape_fingerprint.py'
+      - 'projects/robot-detector/tests_background/test_public_tape_fingerprint.py'
+      - 'projects/robot-detector/tools/abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tools/abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/fixtures/abides_l2_twap_phase_observed_20261121.json'
+      - 'projects/robot-detector/tools/abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tools/binance_public_trade_archive.py'
+      - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
+      - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
+      - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261119.json'
+      - 'projects/robot-detector/tools/abides_l2_phase_review.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
+      - 'projects/robot-detector/fixtures/abides_l2_phase_observed_scalars_20261121.json'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   pull_request:
     paths:
@@ -20,6 +40,26 @@ on:
       - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tools/public_tape_fingerprint.py'
+      - 'projects/robot-detector/tests_background/test_public_tape_fingerprint.py'
+      - 'projects/robot-detector/tools/abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tools/abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/fixtures/abides_l2_twap_phase_observed_20261121.json'
+      - 'projects/robot-detector/tools/abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tools/binance_public_trade_archive.py'
+      - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
+      - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
+      - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261119.json'
+      - 'projects/robot-detector/tools/abides_l2_phase_review.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
+      - 'projects/robot-detector/fixtures/abides_l2_phase_observed_scalars_20261121.json'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   workflow_dispatch:
 
@@ -41,6 +81,15 @@ jobs:
       - name: Validate known spent seeds and no source constant drift
         run: |
           python -m unittest discover -s tests_research -p 'test_*.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_public_trade_pair_review.py' -v
+          python tools/real_public_trade_pair_review.py --output data/results/two-days-source-provenance.json
+          python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_phase_fragility.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_twap_phase_contrast.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_twap_separability.py' -v
           python tools/research_seed_registry.py
           python - <<'PY'
           from tools.research_seed_registry import read_ledger, audit_sources, assess_proposed_seeds
@@ -50,7 +99,7 @@ jobs:
           spent=assess_proposed_seeds(ledger,[1801,1901])
           assert len(spent['known_spent_overlap'])==2,spent
           assert spent['eligible_for_claim_of_fresh_blind_test'] is False,spent
-          candidate=assess_proposed_seeds(ledger,[2101,2102])
+          candidate=assess_proposed_seeds(ledger,[2201,2202])
           assert candidate['not_previously_listed_in_project_ledger'] is True,candidate
           assert candidate['globally_unused_or_unseen_elsewhere_verified'] is False,candidate
           print('SEED_LEDGER_GUARD_VALIDATED',

@@ -1,0 +1,77 @@
+import json
+import sys
+import unittest
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
+from public_trade_direction_null import (
+    evaluate_public_side_null, PHASES_SECONDS, NULL_SEEDS, DAY_US
+)
+
+def example():
+    # One-sided first 30s, sell-only second 30s, same 60s minute.
+    # Crossing an origin at 10s or 20s changes eligible event membership.
+    return [(1_000_000,False),(2_000_000,False),(3_000_000,False),
+            (33_000_000,True),(34_000_000,True),(35_000_000,True),
+            (65_000_000,False),(65_000_000,False),(70_000_000,True)]
+
+class MinutePreservingControlTests(unittest.TestCase):
+    def test_preregistered_controls_reproducible_and_no_owner_claim(self):
+        a=evaluate_public_side_null(example(),utc_day_start_us=0)
+        b=evaluate_public_side_null(example(),utc_day_start_us=0)
+        self.assertEqual(a,b)
+        self.assertEqual(a["source_event_count"],9)
+        self.assertEqual(a["clock_phases_seconds"],[0,10,20])
+        self.assertEqual(len(a["variants"]),3)
+        self.assertFalse(a["physical_robot_identification_validated"])
+        self.assertFalse(a["market_false_discovery_rate_calibrated"])
+        self.assertFalse(a["commercial_or_live_trading_allowed"])
+        self.assertFalse(a["raw_print_timestamps_or_labels_exported"])
+        for variant in a["variants"]:
+            self.assertEqual(variant["predeclared_null_seeds"],list(NULL_SEEDS))
+            self.assertEqual(variant["num_predeclared_weak_null_replicates"],8)
+            self.assertLessEqual(variant["null_one_sided_bin_count_min"],
+                                 variant["null_one_sided_bin_count_median"])
+            self.assertLessEqual(variant["null_one_sided_bin_count_median"],
+                                 variant["null_one_sided_bin_count_max"])
+            self.assertFalse(variant["statistical_p_value_or_FDR_calibrated"])
+        self.assertEqual(a["variants"][0]["observed_one_sided_bins"],2)
+
+    def test_clock_phase_membership_and_source_boundary_exclusion(self):
+        rows=example()+[(DAY_US-1,False)]
+        report=evaluate_public_side_null(rows,utc_day_start_us=0)
+        self.assertEqual([x["complete_utc_clock_bins"] for x in report["variants"]],
+                         [2880,2879,2879])
+        self.assertEqual([x["excluded_utc_edge_prints"] for x in report["variants"]],
+                         [0,4,4])
+        self.assertEqual([x["observed_prints_in_full_bins"] for x in report["variants"]],
+                         [10,6,6])
+
+    def test_translation_invariance_of_absolute_utc_clock(self):
+        first=evaluate_public_side_null(example(),utc_day_start_us=0)
+        shifted=[(t+1800000000000,s) for t,s in example()]
+        second=evaluate_public_side_null(shifted,utc_day_start_us=1800000000000)
+        self.assertEqual(first,second)
+
+    def test_known_participant_count_not_derived_from_any_control(self):
+        all_buy=[(i*1000000,False) for i in range(120)]
+        r=evaluate_public_side_null(all_buy,utc_day_start_us=0)
+        self.assertEqual(r["variants"][0]["observed_one_sided_bins"],4)
+        self.assertEqual(r["variants"][0]["null_one_sided_bin_count_min"],4)
+        self.assertEqual(r["variants"][0]["null_one_sided_bin_count_max"],4)
+        self.assertFalse(r["physical_robot_identification_validated"])
+
+    def test_invalid_public_payload_and_source_bounds_fail_closed(self):
+        rows=example()
+        for bad in (
+            [],None,tuple(rows),rows[:2]+[(500_000,True)]+rows[3:],
+            rows+[(DAY_US,False)],[(True,False)],[(1.0,False)],
+            [(0,1)],[(0,None)],[("0",False)],[(0,"SELL")],
+        ):
+            with self.subTest(bad=str(bad)[:40]),self.assertRaises(ValueError):
+                evaluate_public_side_null(bad,utc_day_start_us=0)
+        for start in (True,1.0,-1):
+            with self.assertRaises(ValueError):
+                evaluate_public_side_null(rows,utc_day_start_us=start)
+
+if __name__=="__main__":
+    unittest.main(verbosity=2)
