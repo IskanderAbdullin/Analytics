@@ -1,5 +1,39 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
+## Historical NASDAQ real 10-level L2 format validation — demo only
+
+[Original official LOBSTER public AMZN 10-level sample
+format test](https://github.com/IskanderAbdullin/Analytics/actions/runs/44922750898)
+successfully audited **269,748** event-aligned NASDAQ
+historical AMZN limit-order book state pairs for
+**2012-06-21**, with 6-field event messages and
+40-field post-event L2 quotes. Sample includes
+**8,974 visible resting-order executions**, **2,445 hidden
+executions**, **27,557 best-quote changes**, and
+**8,483 adjacent events with equal exchange timestamps**.
+
+**This is a structural and format QA only, not robot detection.**
+Although the vendor [publicly offers demonstration samples](
+https://php.lobsterdata.com/info/DataSamples.php), there
+is **no standalone public academic data subscription license**
+and no confirmed permission for ML training, signal
+development, commercial/trading use or redistributing
+source market-event rows. The original **4.8MB compressed**
+demo ZIP is NOT in GitHub or artifacts, only small metadata.
+We calculated a local original ZIP SHA-256 but the
+vendor does **not** provide a published/signed checksum
+for independent authentication. The 2012 data are
+historic reconstruction with only **10 occupied price
+levels per side**, not full-depth current L2.
+
+The [source contracts and full original event-type counts
+are documented](docs/LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md).
+The paired event/book structural validator
+`tools/lobster_public_sample_format_audit.py`
+runs on Python stdlib, with synthetic no-network negative
+tests. The once-successful public CI source fetch is
+**manual-only** thereafter, while cheap parser tests run on push.
+
 ## Extended source-verified real spot print panel: 776,007 public executions
 
 The project has verified **8 independent exchange daily SPOT public trade

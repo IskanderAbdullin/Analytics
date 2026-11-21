@@ -465,3 +465,44 @@ ZIP, private IDs, credentials or large artifacts were committed.
   shuffles or choosing a better posthoc phase cannot solve
   the missing L2/actual source-owner ground-truth problem.
   See [complete four-day BCH source/negative results](BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md).
+
+## 2026-11-21 — genuine old NASDAQ 10-level L2 demo schema integrity, not model training
+
+Vendor public demonstration sample **LOBSTER AMZN 2012-06-21,
+10 occupied price levels**, acquired exactly once through the
+public research GitHub Actions
+[#44922750898](https://github.com/IskanderAbdullin/Analytics/actions/runs/44922750898)
+**success**. Exact source chosen **before** download
+at precommit `c864b763e3535810e3720c729710fc9ec84e9f0e`.
+Paired event CSV N×6 / reconstructed post-event L2 book CSV
+N×40 contained exactly **269,748 aligned rows**. Types 1..7
+counts 131954/2917/123458/8974/2445/0/0.
+Actual visible executions: passive sell→aggressive BUY
+**4808**, passive buy→aggressive SELL **4166**.
+Hidden executions **2445**, adjacent same-time message
+pairs **8483**, best quote changes **27557**, locked/crossed
+best book states **0**.
+
+No raw original archive or message/book rows exported,
+no order references, login, user PC or broker state.
+ZIP 4,814,504 bytes, locally observed SHA256
+`5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f`;
+**no official published provider checksum**, so not
+source-authenticated. Historical 2012 date, 10 levels,
+NOT full modern L2 or participant ground truth.
+
+Vendor [subscription terms page](https://php.lobsterdata.com/termsAndConditions.php)
+explicitly states academic contract terms are issued only
+with a subscription agreement, no standalone public
+terms PDF. This demo is **only permitted here as
+a bounded download for format/QA demonstration**.
+**BLOCKED_PENDING_VENDOR_LICENSE** for ML training,
+robot feature inference, commercial/real-time trading,
+raw redistribution and any deeper use of vendor data.
+
+CLI and synthetic adverse tests implemented;
+original network CI converted to **manual-only**.
+A metadata-only fixture with original source QA counts and
+rights exclusions is pinned to offline CI.
+See [LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md](
+LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md).
