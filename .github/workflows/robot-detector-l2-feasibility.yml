@@ -1,0 +1,69 @@
+name: Robot Detector ABIDES L2 public book feasibility
+
+on:
+  push:
+    paths:
+      - 'projects/robot-detector/tools/l2_probe.py'
+      - 'projects/robot-detector/tests_l2/**'
+      - '.github/workflows/robot-detector-l2-feasibility.yml'
+  pull_request:
+    paths:
+      - 'projects/robot-detector/tools/l2_probe.py'
+      - 'projects/robot-detector/tests_l2/**'
+      - '.github/workflows/robot-detector-l2-feasibility.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-public-l2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: No-dependency public book schema and safety tests
+        run: python -m unittest discover -s tests_l2 -p 'test_*.py' -v
+      - name: Install exact genuine ABIDES-NG matching engine version
+        run: |
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Simulate and audit L2 snapshots without identities
+        run: |
+          python tools/l2_probe.py --seed 1401 --output /tmp/abides-l2-feasibility.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides-l2-feasibility.json',encoding='utf-8'))
+          b=r['public_book']
+          assert r['simulator']=='abides-ng',r
+          assert r['simulator_revision']=='ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242',r
+          assert r['real_exchange_l2_archive_availability_verified'] is False,r
+          assert r['physical_owner_identity_known'] is False,r
+          assert r['statistical_accuracy_calibrated'] is False,r
+          assert r['live_trading_enabled'] is False,r
+          assert b['l2_snapshot_events']>0 and b['two_sided_snapshots']>0,b
+          assert b['unique_exchange_timestamps']<=b['l2_snapshot_events'],b
+          assert b['all_input_snapshots_preserved'] is True,b
+          assert b['order_level_owner_ids_exposed'] is False,b
+          assert b['source_capture_depth']==5,b
+          assert b['max_observed_bid_depth']<=5 and b['max_observed_ask_depth']<=5,b
+          print('SIMULATED_L2_VALIDATED',json.dumps({
+              'snapshots':b['l2_snapshot_events'],
+              'two_sided':b['two_sided_snapshots'],
+              'same_time':b['same_timestamp_repeated_snapshots'],
+              'trade_prints':r['public_trade_print_count']}))
+          PY
+      - name: Upload aggregate public simulated book audit only
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-l2-feasibility
+          path: /tmp/abides-l2-feasibility.json
+          if-no-files-found: error
+          retention-days: 14
