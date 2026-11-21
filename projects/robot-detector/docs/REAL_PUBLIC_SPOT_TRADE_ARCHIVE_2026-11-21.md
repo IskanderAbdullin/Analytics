@@ -241,3 +241,55 @@ preserves equal-timestamp execution clusters**, plus independent
 true external market validation. Source data remains under
 non-commercial CC BY-NC-SA terms and must not enter live trading.
 The original expensive workflow is now **manual-only**.
+
+## Stronger null: preserving same-timestamp execution-side clusters
+
+Following the **weak** per-print within-minute shuffle, a separate
+retrospective test freezes the *entire joint side vector* of every
+equal-exchange-timestamp cluster (including duplicated-time
+partial fills). It shuffles only **equal-size timestamp blocks**
+within the same original UTC minute. This exactly preserves:
+source trade count, all timestamp locations and multiplicities,
+within-group side vectors, total BUY/SELL counts per minute,
+and all UTC-edge/bin eligibility. These synthetic controls still
+break higher-order market-maker queue dynamics and inter-cluster
+dependence. They are **not a validated statistical null**.
+
+The original [GitHub Actions genuine source run
+#44919058627](https://github.com/IskanderAbdullin/Analytics/actions/runs/44919058627)
+rechecked the SHA-256 of the **same two inspected** original
+provider ZIPs and evaluated eight frozen deterministic
+equal-timestamp-cluster swaps. Only compact source/provenance
+JSON saved in GitHub artifact ID `14713261444`, with a
+separate pinned scalar fixture
+`fixtures/binance_spot_cluster_preserving_nulls_20261121.json`.
+
+| UTC day | 30s origin | Actual one-sided 30s bins | Weak per-print null median | Strong whole-cluster null min / median / max |
+|---|---:|---:|---:|---|
+| 2026-11-18 | 0s | 173 | 74 | 120 / **136.5** / 148 |
+| 2026-11-18 | 10s | 161 | 56.5 | 118 / **128** / 141 |
+| 2026-11-18 | 20s | 177 | 59 | 117 / **132** / 146 |
+| 2026-11-19 | 0s | 135 | 58.5 | 96 / **105** / 111 |
+| 2026-11-19 | 10s | 113 | 51 | 82 / **92.5** / 100 |
+| 2026-11-19 | 20s | 135 | 47 | 90 / **97** / 110 |
+
+The stronger control explains **much more** of the apparent
+single-sided clock-bin concentration. For example at 0s,
+the control median for day 18 rises from 74 to 136.5 and
+for day 19 rises from 58.5 to 105 when within-timestamp
+partial-fill structure is retained. In all six descriptive
+comparisons, real one-sided bin counts still exceed the
+observed maximum of these eight stronger shuffles, but
+**that is not a significance test**: eight shuffles,
+two already inspected dates, market-flow dependencies,
+selection effects and limited null assumptions make
+inferential p-values/FDR invalid.
+
+It would be wrong to equate the remaining difference
+with execution of an algorithm. The observations are
+market-level public print clusters, not known source-owned
+orders. Building and checking a stronger null in response
+to already seen results is **post-hoc research development**,
+not blind replication or calibrated robot detection.
+The expensive re-download workflow was converted to
+**manual-only** after its successful original run.

@@ -2,10 +2,9 @@ name: Robot Detector source-verified equal-timestamp cluster control research
 
 # Original research only, no owner inference and no calibration.
 # After the first provider-verified run convert to workflow_dispatch-only.
+# Original true source-verification research passed in run #44919058627.
+# Re-run of inspected tapes requires explicit manual dispatch only.
 on:
-  push:
-    paths:
-      - '.github/workflows/robot-detector-spot-cluster-null-controls.yml'
   workflow_dispatch:
 
 permissions:
