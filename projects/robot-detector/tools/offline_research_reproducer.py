@@ -45,6 +45,7 @@ SUITES=(
     "test_abides_clustered_grid_holdout.py",
     "test_abides_matched_smalln_audit.py",
     "test_abides_grid_replication_160.py",
+    "test_public_interarrival_period_scan_negative.py",
     "test_public_clock_aliasing_negative.py",
     "test_binance_public_trade_archive.py",
     "test_public_trade_direction_null.py",
