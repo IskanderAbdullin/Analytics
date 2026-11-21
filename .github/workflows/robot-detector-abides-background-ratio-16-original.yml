@@ -1,0 +1,115 @@
+name: Robot Detector original preregistered ABIDES 16-case background ratio
+# One bounded source run after protocol frozen (research/abides_background_
+# conditioned_ratio_precommit_20261121.json) and seeds reserved 3001-3004.
+# ORIGINAL source is genuine ABIDES-NG, only source-free public aggregates
+# uploaded. After one successful run change trigger to workflow_dispatch only.
+on:
+  push:
+    paths:
+      - '.github/workflows/robot-detector-abides-background-ratio-16-original.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-abides-frozen-ratio-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze/seed provenance and adversarial no-network tests
+        run: |
+          set -euo pipefail
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_background_ratio_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_multiscale_public_l2.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_clock_aliasing_negative.py' -v
+          python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.abides_background_ratio_holdout import (
+              SEEDS,COHORTS,THRESHOLD,MIN_PRINTS,MIN_20S_GRID_HITS,
+              MIN_LAGGED_L2_BINS,frozen_plan,check_seed_registry
+          )
+          plan=frozen_plan()
+          check_seed_registry()
+          assert list(SEEDS)==[3001,3002,3003,3004]
+          assert list(COHORTS)==[
+              'poisson_noise_null','fixed_20s_noise_hard_negative',
+              'momentum_noise_hard_negative','twap_45s_positive'
+          ]
+          assert (THRESHOLD,MIN_PRINTS,MIN_20S_GRID_HITS,
+                  MIN_LAGGED_L2_BINS)==(.60,200,8,5)
+          assert plan['hypothesis_origin'].startswith('POSTHOC_')
+          assert plan['new_evaluation_source_status']=='NOT_RUN'
+          assert plan['original_independent_source_runs_planned']==16
+          assert plan['no_real_owner_accuracy_or_market_FDR_claim']
+          PY
+      - name: Install upstream pinned genuine ABIDES-NG engine
+        run: |
+          set -euo pipefail
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Execute ALL 16 independent genuine ABIDES source cases
+        run: |
+          set -euo pipefail
+          python tools/abides_background_ratio_holdout.py \
+            --output /tmp/abides-background-ratio-16-original-source-only.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/abides-background-ratio-16-original-source-only.json').read_text())
+          assert data['schema_version']=='genuine-abides-public-ratio-16source-holdout-v1'
+          assert data['original_matching_engine_runs']==16
+          assert data['locally_reserved_but_not_globally_certified_seeds']==[3001,3002,3003,3004]
+          assert len(data['all_cohort_source_cases'])==16
+          assert data['ratio_threshold_selected_after_prior_development_data_not_this_holdout']
+          assert data['source_original_matching_engine_ABIDES_synthetic_only']
+          assert data['negative_results_retained_without_posthoc_tuning']
+          assert not data['any_real_market_owner_FDR_or_precision_claim']
+          assert not data['raw_trade_l2_or_private_agent_IDs_exported']
+          assert set(data['cohort_results'])=={
+            'poisson_noise_null','fixed_20s_noise_hard_negative',
+            'momentum_noise_hard_negative','twap_45s_positive'}
+          for row in data['all_cohort_source_cases']:
+              assert row['public_prints']>0 and row['public_l2_snapshots']>0
+              assert row['decision'] in (
+                  'TARGET_PATTERN','NO_TARGET_PATTERN','ABSTAIN')
+              assert not row['quote_stream_completeness_known']
+              assert not row['public_features_accessed_oracle_agent_IDs']
+              assert not row['real_market_actor_accuracy_or_FDR_calibrated']
+              if row['cohort']=='twap_45s_positive':
+                  assert row['posthoc_target_present']
+                  assert row['posthoc_controlled_execution_count']>0
+              else:
+                  assert not row['posthoc_target_present']
+                  assert row['posthoc_controlled_execution_count']==0
+              print('ABIDES_PREREGISTERED_PUBLIC_RATIO_CASE',json.dumps({
+                  'seed':row['seed'],'cohort':row['cohort'],
+                  'prints':row['public_prints'],'L2':row['public_l2_snapshots'],
+                  '20s_hits':row['public_20s_hits'],
+                  '45s_hits':row['public_45s_hits'],
+                  'ratio':row['observed_ratio_45s_over_20s'],
+                  'eligible_prev_l2_bins':row['eligible_completed_prior_l2_bins_30s'],
+                  'decision':row['decision'],
+                  'abstain_reason':row['abstain_reason'],
+                  'posthoc_target_fills':row['posthoc_controlled_execution_count'],
+                  'real_market_FDR_known':False
+              },sort_keys=True))
+          PY
+      - name: Store only small source-anonymous aggregate with 7-day expiry
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-genuine-abides-16-ratio-source-only
+          path: /tmp/abides-background-ratio-16-original-source-only.json
+          retention-days: 7
+          if-no-files-found: error
