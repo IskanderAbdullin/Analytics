@@ -153,9 +153,16 @@ def run(root: Path, output: Path, with_market: bool = True, *,
             manifest["reports"]["geometry_validation_error"] = str(error)[:300]
     if with_market and (output / "market" / "opportunities.csv").is_file():
         try:
+            market_quality = manifest["reports"].get("market") or {}
+            source_unverified = bool(
+                market_quality.get("rejected_recordings", 0)
+                or market_quality.get("quality_warning_files", 0)
+                or (manifest["reports"].get("time_weighted") or {}).get(
+                    "rejected_recordings", 0))
             manifest["reports"]["opportunity_validation"] = opportunity_validation.run(
                 root, output / "market" / "opportunities.csv",
-                output / "opportunity_validation")
+                output / "opportunity_validation",
+                source_quality_unverified=source_unverified)
         except (OSError, ValueError) as error:
             manifest["reports"]["opportunity_validation_error"] = str(error)[:300]
     if incident_state and incident_logs and incident_start and incident_end:

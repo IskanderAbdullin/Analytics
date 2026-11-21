@@ -37,6 +37,60 @@ class MarketStudyTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 run(root, root / "reports" / "market", (5, 50), None)
 
+    def test_duplicate_tsv_variants_cannot_create_opportunity(self):
+        import csv
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            folder = root / "recordings" / "FAKE"
+            folder.mkdir(parents=True)
+            raw = folder / "FAKE_2026-11-21.tsv"
+            body = ('I\t{"Ticker":"FAKE","PriceStep":1}\n'
+                    'B\t1795167000000\t1795167000000\t100@5\t102@5\t\t\n')
+            raw.write_text(body, encoding="utf-8")
+            with gzip.open(folder / (raw.name + ".gz"), "wt") as zipped:
+                zipped.write(body)
+            result = run(root, root / "reports" / "market", (5,), None)
+            self.assertEqual(result["files"], 0)
+            self.assertEqual(result["rejected_recordings"], 2)
+            with (root / "reports" / "market" / "opportunities.csv").open(newline="") as stream:
+                self.assertEqual(len(list(csv.DictReader(stream))), 0)
+
+    def test_invalid_book_and_feed_outage_do_not_become_opportunities(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp) / "recordings" / "FAKE"
+            folder.mkdir(parents=True)
+            path = folder / "FAKE_2026-11-21.tsv"
+            path.write_text(
+                'I\t{"Ticker":"FAKE","PriceStep":1}\n'
+                'B\t1795167000000\t1795167000000\t100@5\t103@5\t\t\n'
+                'B\t1795167000100\t1795167000100\t100@5;101@5\t103@5\t\t\n'
+                'D\t1795167000500\tdown\n'
+                'B\t1795167000600\t1795167000600\t100@5\t103@5\t\t\n'
+                'U\t1795167002000\n'
+                'B\t1795167002100\t1795167002100\tnan@5\t103@5\t\t\n',
+                encoding="utf-8")
+            rows, quality = scan(path, (5,))
+            self.assertEqual(quality["books"], 4)
+            self.assertEqual(quality["valid_books"], 1)
+            self.assertEqual(quality["invalid_books"], 3)
+            self.assertIn("malformed or crossed order book", quality["issues"])
+            self.assertIn("book during known feed outage", quality["issues"])
+            self.assertEqual(rows[0]["books"], 1)
+
+    def test_nonfinite_price_step_blocks_all_book_opportunities(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp) / "recordings" / "FAKE"
+            folder.mkdir(parents=True)
+            path = folder / "FAKE_2026-11-21.tsv"
+            path.write_text(
+                'I\t{"Ticker":"FAKE","PriceStep":"NaN"}\n'
+                'B\t1795167000000\t1795167000000\t100@5\t103@5\t\t\n',
+                encoding="utf-8")
+            rows, quality = scan(path, (5,))
+            self.assertEqual(rows, [])
+            self.assertEqual(quality["valid_books"], 0)
+            self.assertIn("nonfinite or missing price step", quality["issues"])
+
 
 if __name__ == "__main__":
     unittest.main()

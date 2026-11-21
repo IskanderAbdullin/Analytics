@@ -58,6 +58,16 @@ class ValidationTests(unittest.TestCase):
         result = run(self.root, self.source, self.output)
         self.assertEqual(result['warnings_total'], 2)
 
+    def test_bad_source_quality_prevents_eligible_comparison(self):
+        self.data()
+        result = run(self.root, self.source, self.output, source_quality_unverified=True)
+        self.assertEqual(result["comparable_groups"], 0)
+        self.assertTrue(result["source_market_quality_unverified"])
+        with (self.output / "out_of_sample_feasibility.csv").open(newline="") as f:
+            row = next(csv.DictReader(f))
+        self.assertEqual(row["ready_for_comparison"], "False")
+        self.assertIn("source_market_quality_unverified", row["qualifications"])
+
 
 if __name__ == '__main__':
     unittest.main()

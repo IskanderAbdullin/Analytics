@@ -85,7 +85,8 @@ def summarize(data: dict, *, min_days: int, min_books: int) -> list[dict]:
     return rows
 
 
-def run(root: Path, source: Path, output: Path, min_days: int = 3, min_books: int = 100) -> dict:
+def run(root: Path, source: Path, output: Path, min_days: int = 3, min_books: int = 100,
+        source_quality_unverified: bool = False) -> dict:
     root, output = validate_report_output(root, output)
     source = source.resolve(strict=True)
     if not source.is_file() or not source.is_relative_to(root / "reports"):
@@ -94,6 +95,11 @@ def run(root: Path, source: Path, output: Path, min_days: int = 3, min_books: in
         raise ValueError("min_days >= 2 and min_books >= 1 are required")
     data, warnings = load_daily(source)
     rows = summarize(data, min_days=min_days, min_books=min_books)
+    if source_quality_unverified:
+        for row in rows:
+            row["ready_for_comparison"] = False
+            row["qualifications"] = ";".join(
+                part for part in (row["qualifications"], "source_market_quality_unverified") if part)
     output.mkdir(parents=True, exist_ok=False)
     with (output / "out_of_sample_feasibility.csv").open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=FIELDS)
@@ -101,6 +107,7 @@ def run(root: Path, source: Path, output: Path, min_days: int = 3, min_books: in
         writer.writerows(rows)
     summary = {"groups": len(rows), "comparable_groups": sum(x["ready_for_comparison"] for x in rows),
                "warnings": warnings[:100], "warnings_total": len(warnings),
+               "source_market_quality_unverified": source_quality_unverified,
                "held_out_last_day": True, "min_days": min_days, "min_books": min_books,
                "limits": ["No live configuration recommendations: quote eligibility is not fill probability or P&L.",
                           "Book snapshots are serially correlated, not independent samples.",
