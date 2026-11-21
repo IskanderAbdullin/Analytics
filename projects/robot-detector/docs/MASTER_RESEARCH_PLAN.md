@@ -457,6 +457,17 @@ seeds и thresholds фиксировать **ДО**
 ретроспективно оптимизировать.
 Master #72 открытый.
 
+**Результат source-free domain-gap подзадачи [#98](https://github.com/IskanderAbdullin/Analytics/issues/98), без новых seeds:**
+отдельно ДО эксперимента заморожена [precision/coverage матрица](../research/public_time_precision_coverage_precommit_20261121.json) из четырёх сконструированных публичных toy-tapes × четырёх разрешений exchange timestamps (1ns/1ms/10ms/100ms) × трёх уровней coverage (4/5/10 prior L2 bins), плюс четыре unknown-precision контроля; итого **52 зависимых наблюдения, 0 новых source samples**.
+[Оригинальный дешёвый CI #44945044597](https://github.com/IskanderAbdullin/Analytics/actions/runs/44945044597) **SUCCESS**, 8 дополнительных adversarial tests.
+При 100 split prints без target исходное per-print дало TARGET,
+grouped — NO TARGET; при девяти sparse 45s событиях оба дали **ложноотрицательное отсутствие сигнала**, несмотря на искусственный cadence.
+Из 52 dependent variants: 16 eligible, 16 low-prior-L2 ABSTAIN,
+16 coarse-precision ABSTAIN, 4 unknown-precision ABSTAIN.
+[Полный source-free отрицательный отчёт](PUBLIC_TIME_PRECISION_COVERAGE_NEGATIVE_20261121.md).
+Не принимать выбранный игрушечный 1ms quality gate за проверенную реальную биржевую спецификацию.
+Следующий основной шаг — **#97 period-agnostic conditional-null** с новыми prereg-controlled негативными источниками, не перенастраивая 0,60.
+
 ## 10. Журнал решений и изменения плана
 
 | Дата | Изменение и причина | Статус |
@@ -485,6 +496,8 @@ Master #72 открытый.
 | 2026-11-21 | PRE-SOURCE уточнение RD-ABIDES-POWER-15: исходный frozen 40×4 протокол оставлен неизменным; [отдельное addendum](../research/abides_160_zero_execution_oracle_handling_addendum_20261121.json) предотвращает отбрасывание source-сценариев, где injected TWAP агент не получил ни одного фактического исполнения; сохраняются все 160 seed×cohort, отдельно считаются zero-execution positives. Не считать их подтверждёнными публично наблюдаемыми execution patterns, не менять seed/порог/фазу и не включать oracle в public scoring. | PRE-SOURCE methodological guard; original 160 engine runs not yet verified |
 
 | 2026-11-21 | Frozen 40-seed × 4-cohort original genuine ABIDES #44944144915 and exact replay #44944168231 (same source SHA, not 320 independent): per-print FP Poisson 7/40, momentum 7/40; grouped FP Poisson 6/40, momentum 7/40; injected TWAP per-print 39/40, grouped 32/40 (7 additional misses), fixed20/TWAP 1 abstain each. Pivot to period-agnostic conditional null #97 | VERIFIED source negative result, no real market FDR |
+
+| 2026-11-21 | Separate preregistered **source-free** #98 precision+lagged-L2 control: 4 constructed public tapes × 4 nested timestamp resolutions × 3 synthetic coverage gates + 4 unknown-precision controls = 52 **dependent views** (0 new engine/market sources). CI #44945044597 GREEN, 8 adversarial tests; split-print null gave naive TARGET/grouped NO, but sparse synthetic 45s cadence was missed by BOTH. 16/52 views were numerically eligible, 36/52 required quality ABSTAIN. No owner/FDR claims; maintain primary #97 period-agnostic null. | VERIFIED source-free falsification and coverage guard, no new holdout |
 
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
