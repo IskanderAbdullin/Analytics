@@ -10,3 +10,5 @@
 - **Контроли и ограничения:** [нулевая гармоника](docs/PERIOD_ZERO_HARMONIC_V2_NEGATIVE_20261122.md), [публичная owner неидентифицируемость](docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md), [условная 500ms неразличимость](docs/INTENSITY_CONDITIONAL_EQUIVALENCE_CLASS_NEGATIVE_20261122.md). Исторические неудачи не скрывать.
 
 **Не подтверждено:** real-market FDR, число физических роботов, обменность кандидатных timing nulls, статистическая значимость M0/M1/M2, фактическое качество конкретного коммерческого источника L2. Нельзя распространять raw vendor archives/секреты.
+
+**Further verified repair:** [provenance CI #45024279130](https://github.com/IskanderAbdullin/Analytics/actions/runs/45024279130) on SHA `24f2e8ff` SUCCESS after restoring living-plan/decision-log markers in concise AGENTS. [M2 preregistration](docs/CONDITIONAL_M2_PREDICTABLE_HISTORY_PREREG_20261122.md) remains DESIGN-ONLY: no tests or source results.

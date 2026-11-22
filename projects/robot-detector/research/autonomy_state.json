@@ -149,7 +149,8 @@
       "Strict public feature/oracle separation and no posthoc threshold/source selection",
       "New separate source-holdout protocol only after sufficient adversarial tests",
       "Checkpoint, tests, CI, push and next scientific stage",
-      "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains"
+      "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains",
+      "Prospective M2 predictable-history exponential intensity candidate preregistration (2026-11-22; design-only)"
     ],
     "acceptance": [
       "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
@@ -196,8 +197,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: check exact provenance CI after restoring the AGENTS living-plan contract, then register and implement prospective M2 predictable history intensity on training-only independent runs with source-free Poisson/fixed-period/momentum negatives; first audit M1's asserted-stable-book precondition, not real L2 continuity. No fresh seeds before run-disjoint protocol and no owner/FDR inference.",
-  "last_session_result": "2026-11-22 12:42 UTC project-standard migration in 83d9be1c; M1 prereg f3d78068; source-free M1 code/tests 0f3728e1; 51/51 exact-source Python tests verified at CI #45024195498. Master plan regression provenance FAILED on AGENTS missing archival autonomous/decision keywords; remediation in next commit, exact provenance CI pending. No source/holdout, owner labels or market FDR.",
+  "resume_instruction": "NEXT_ACTION: implement exact source-free train-only M2 predictable-history log-likelihood scoring per docs/CONDITIONAL_M2_PREDICTABLE_HISTORY_PREREG_20261122.md; verify strict <t, split-fill invariance, no evaluation leakage and negative Poisson/fixed20/momentum controls. Compare with M0/M1 only after original-run allocation frozen. No new ABIDES seeds before preregistered run-disjoint source protocol. Check remote SHA/CI and conflicts first.",
+  "last_session_result": "2026-11-22 migration 83d9be1c (original AGENTS archived), M1 prereg f3d78068, M1 implementation 0f3728e1 with 51/51 exact Python tests CI #45024195498. Provenance regression from short AGENTS detected and fixed at 24f2e8ff; provenance CI #45024279130 SUCCESS. Newly frozen M2 design only; no M2 tests or source data, no new seeds, no owner/FDR claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
@@ -247,5 +248,34 @@
     "canonical_state": "research/autonomy_state.json",
     "history_preserved": "existing master scientific chronology, issue #72/#97, git commits and archived AGENTS",
     "notes": "No duplicate Info project, no raw vendor data, no private Actions/Computer Use."
+  },
+  "last_confirmed_provenance_ci": {
+    "sha": "24f2e8ff408ab9f457266b36024b92bcedfd6d43",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024279130",
+    "status": "success"
+  },
+  "last_session_clock": {
+    "start_time_utc": "2026-11-22T12:42:11Z",
+    "original_deadline_utc": "2026-11-22T13:32:11Z",
+    "next_hourly_overlap_guard": "Stop before scheduled 13:12 UTC hourly research run",
+    "recorded_stage_checks": [
+      {
+        "stage": "Recovery/migration and original AGENTS preservation",
+        "clock_check_utc": "2026-11-22T12:45:20Z",
+        "elapsed_minutes": 3.15
+      },
+      {
+        "stage": "M1 prereg+source-free implementation and initial tests",
+        "clock_check_utc": "2026-11-22T12:48:39Z",
+        "elapsed_minutes": 6.47
+      },
+      {
+        "stage": "M1 exact CI / provenance regression fix",
+        "clock_check_utc": "2026-11-22T12:49:38Z",
+        "elapsed_minutes": 7.45
+      }
+    ],
+    "current_stage": "M2 prereg",
+    "note": "Clock checks are measured environment UTC samples, not evidence of continuous activity between tools; do not confuse this chat with the hourly agent."
   }
 }
