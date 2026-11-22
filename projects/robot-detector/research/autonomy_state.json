@@ -195,7 +195,21 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify latest HEAD CI and exact test discovery for tests_background/test_public_abc_constructed_controls.py (3 new tests), collect full 64-replicate A/B/C descriptive outputs for Poisson-like, momentum-like and unrelated periodic hard negatives, record every failure; no parameter retuning or p-values. Then audit local intensity confounding and precision abstentions. No new ABIDES seeds; #72 stays open.",
-  "last_session_result": "2026-11-22: Added source-free 64-replicate A/B/C constructed hard-negative comparison covering quantized exponential gaps, momentum-like bursts and unrelated periodic stream; added three adversarial tests. All empirical test results and CI for this new SHA pending. Previous HEAD 75dde9d7 had three successful GitHub CI workflows. No new ABIDES, real-market FDR, owner attribution or live trading.",
-  "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
+  "resume_instruction": "NEXT_ACTION: Inspect exact new-HEAD provenance CI: confirm explicit Python tests test_public_conditional_timing_null, test_public_burst_null_falsification, test_public_intensity_conditioned_null, test_public_period_scan, test_public_period_l2_gate, test_public_abc_constructed_controls and test_public_abc_report. Inspect retained 3-day small JSON 64-replicate artifact; repair any test or importer failures without retuning frozen 500ms condition. Then design independent prospective local-dependence and precision/L2 abstention adversarial tests. Do not infer market p-values/FDR/owners; master #72 open.",
+  "last_session_result": "2026-11-22 active inline run: remote HEAD 87b03636 CI 5/5 green, but new A/B/C Python tests were NOT in provenance workflow and were not verified by those runs. Source-equivalent local reproduction, not repo checkout: 3 constructed + 3 new reporter unit tests PASS; Poisson obs 186 A mean 184.0625 C mean 185.453125; momentum obs 168 A mean 2.4375 C mean 24.765625 B 168 fixed; periodic short-gap obs 0. Added exact CI discovery plus aggregate-only full 64-replicate report; committed CI pending. No ABIDES, no real-market claims.",
+  "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
+  "active_run_time_log": {
+    "start_time_utc": "2026-11-22T06:51:04Z",
+    "deadline_utc": "2026-11-22T07:41:04Z",
+    "measured_checkpoints": [
+      {
+        "stage": "source-equivalent A/B/C local reproduction and report unit tests",
+        "stage_end_time_utc": "2026-11-22T06:54:11Z",
+        "elapsed_minutes": 3.1167,
+        "tests": "6 source-equivalent local tests passed; exact remote CI pending"
+      }
+    ],
+    "final_elapsed_minutes": null,
+    "note": "This checkpoint records observed UTC times; no claim of uninterrupted 50-minute execution."
+  }
 }

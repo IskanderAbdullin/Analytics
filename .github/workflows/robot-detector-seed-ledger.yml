@@ -43,6 +43,17 @@ on:
       - 'projects/robot-detector/AGENTS.md'
       - 'projects/robot-detector/docs/AUTONOMOUS_RESEARCH_TZ.md'
       - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
+      - 'projects/robot-detector/tools/public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
+      - 'projects/robot-detector/tests_background/test_public_conditional_timing_null.py'
+      - 'projects/robot-detector/tools/public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tools/public_burst_null_falsification.py'
+      - 'projects/robot-detector/tools/public_conditional_timing_null.py'
+      - 'projects/robot-detector/tests_background/test_public_period_scan.py'
+      - 'projects/robot-detector/tests_background/test_public_period_l2_gate.py'
       - 'projects/robot-detector/tests_background/test_master_research_plan.py'
       - 'projects/robot-detector/research/abides_multiscale_public_l2_protocol_20261121.json'
       - 'projects/robot-detector/research/autonomy_state.json'
@@ -162,6 +173,17 @@ on:
       - 'projects/robot-detector/AGENTS.md'
       - 'projects/robot-detector/docs/AUTONOMOUS_RESEARCH_TZ.md'
       - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
+      - 'projects/robot-detector/tools/public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
+      - 'projects/robot-detector/tests_background/test_public_conditional_timing_null.py'
+      - 'projects/robot-detector/tools/public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tools/public_burst_null_falsification.py'
+      - 'projects/robot-detector/tools/public_conditional_timing_null.py'
+      - 'projects/robot-detector/tests_background/test_public_period_scan.py'
+      - 'projects/robot-detector/tests_background/test_public_period_l2_gate.py'
       - 'projects/robot-detector/tests_background/test_master_research_plan.py'
       - 'projects/robot-detector/research/abides_multiscale_public_l2_protocol_20261121.json'
       - 'projects/robot-detector/research/autonomy_state.json'
@@ -322,3 +344,20 @@ jobs:
                 {'canonical_spent_seeds':audit['canonical_spent_seeds'],
                  'frozen_source_checks':len(audit['source_constant_checks'])})
           PY
+          # Cheap source-free current-stage tests (not ABIDES simulations).
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_conditional_timing_null.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_burst_null_falsification.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_conditioned_null.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_scan.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_l2_gate.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_abc_constructed_controls.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_abc_report.py' -v
+          PYTHONPATH=tools python tools/public_abc_report.py --output data/results/abc-constructed-source-free.json
+      - name: Upload bounded constructed A/B/C aggregate only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-abc-constructed-${{ github.run_id }}
+          path: projects/robot-detector/data/results/abc-constructed-source-free.json
+          retention-days: 3
+          if-no-files-found: error

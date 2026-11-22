@@ -499,6 +499,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-21 | Separate preregistered **source-free** #98 precision+lagged-L2 control: 4 constructed public tapes × 4 nested timestamp resolutions × 3 synthetic coverage gates + 4 unknown-precision controls = 52 **dependent views** (0 new engine/market sources). CI #44945044597 GREEN, 8 adversarial tests; split-print null gave naive TARGET/grouped NO, but sparse synthetic 45s cadence was missed by BOTH. 16/52 views were numerically eligible, 36/52 required quality ABSTAIN. No owner/FDR claims; maintain primary #97 period-agnostic null. | VERIFIED source-free falsification and coverage guard, no new holdout |
 
+| 2026-11-22 | Constructed 64×3 A/B/C hard-negative panel exposes C's failure to preserve 168 momentum burst gaps (17–34 resampled), while B preserves them mechanically. Existing green CI did NOT discover these new tests; explicit source-free test discovery and report CLI added to provenance workflow. | NEGATIVE SOURCE-FREE DEVELOPMENT; new CI PENDING, no market p-value/FDR |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -568,3 +570,34 @@ Implemented `tools/public_intensity_conditioned_null.py` from the frozen [INTENS
 ### 2026-11-22 — constructed hard-negative A/B/C comparison committed (pending CI)
 
 Added `tests_background/test_public_abc_constructed_controls.py` on branch commit `7af347b168898ca705d5c8ce088aa1b4bb4d864f`. The frozen, source-free development panel includes quantized exponential-gap Poisson-like events, eight-event momentum-like millisecond bursts in 24 fixed five-second cells, and unrelated 20-second periodic events. Each is evaluated with **all** 64 deterministic replicate indices (seed 404) against A: uniform 5s cluster-preserving resampling, B: rigid within-cell offset-preserving translation, and C: intensity-conditioned 500ms cluster-preserving resampling. Descriptive metric: adjacent unique timestamp gaps <=10ms, with min/max/mean and all replicate values; no selective best candidate or market p-values. Three new adversarial tests check scenario coverage, reproducibility, cluster multiplicities, and explicit non-target burst classification. The Poisson-like generator is constructed and quantized, **not** a fitted real-market Poisson process; momentum-like bursts are constructed and not an estimated Hawkes process. The 20s control has no injected target. No real owner truth or market FDR, no new ABIDES simulations, no fresh source seeds. CI/exact committed test execution remains to be verified before interpreting empirical counts. NEXT_ACTION: verify exact new HEAD CI/test discovery, capture all A/B/C numeric outcomes, diagnose failures without silently retuning preregistered parameters; then test local-intensity confounding and source-precision abstentions.
+
+
+### 2026-11-22 — A/B/C descriptive hard-negative panel and missing-CI-coverage correction
+
+The exact HEAD \`87b0363690f7517b2e7be77b3486dc91c66be01d\` had five
+successful GitHub workflows, **but their existing Python provenance job did
+not discover the newly committed A/B/C tests**. A green unrelated workflow
+is therefore not evidence those tests ran. Source-equivalent local Python
+reproduction (no Git checkout) ran the three constructed-control tests
+and three new aggregate-report tests (6/6 PASS); see
+[ABC_CONSTRUCTED_CONTROLS_RESULTS_20261122.md](ABC_CONSTRUCTED_CONTROLS_RESULTS_20261122.md)
+for the full scenario comparison and limitations. The constructed momentum
+hard negative has 168 adjacent <=10ms gaps, while candidate C's 64
+500ms-stratified resamples have 17–34 and A's have 0–7; B preserves
+168 by construction. On a quantized Poisson-like control, observed 186
+vs A mean 184.0625, C mean 185.453125; unrelated periodic 20s yields zero
+short-gap counts for all candidates. These are **negative methodological
+diagnostics, not p-values, calibration, independent simulation cases, owner
+truth or real FDR**.
+
+One atomic engineering change adds explicit cheap Python current-stage
+test discovery, complete aggregate JSON report generation and three new
+report-integrity tests to the existing provenance workflow. The workflow
+is NOT an original ABIDES source run and the existing expensive source
+frozen protocols remain unchanged. CI for the new commit is **PENDING**
+until an exact HEAD run is inspected.
+
+NEXT_ACTION: confirm the exact committed GitHub CI test output and bounded
+artifact, investigate any failures without rewriting the registered 500ms
+condition, then test predeclared intensity/autocorrelation confounding and
+prior-only L2 precision abstention.
