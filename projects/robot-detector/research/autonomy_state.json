@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement source-free strictly typed ABIDES Unix epoch nanoseconds to explicit ns_since_simulated_utc_midnight with exact 1ns preservation and microsecond-loss negatives per docs/ABIDES_EPOCH_NS_PRECISION_PREREG_20261122.md, cheap Python CI. No original source seeds or historical vendor ZIP.",
-  "last_session_result": "New UTC session 2026-11-22T19:17:10.421Z: remote prior HEAD 016718e3 and green provenance CI checked. Pinned source ABIDES-NG TradeAttribution/L2 times Unix epoch ns; existing CSV exporter loses submicrosecond while original 160-source internal workflow retained full ns. New source-free qualification prereg before code.",
+  "resume_instruction": "NEXT_ACTION: inspect exact cheap public Python CI for 12 new ABIDES Unix-ns typed clock tests; correct any failed source-free fixture without weakening time/quality/identity rules. Then review pinned ABIDES sparse L2 and public execution event type semantics and separately preregister bounded source-free ABIDES public projection.",
+  "last_session_result": "2026-11-22 19:17 UTC ongoing: after source-specific prereg at 49ee0784, implemented source-free exact UTC-date epoch ns normalization, 1ns vs microsecond CSV loss checks and 12 hard-negative tests without changing existing ABIDES original exporter or M1-v3 LOBSTER model. Exact Python CI pending.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:19:59.971Z",
-    "elapsed_minutes": 2.825833333333333,
-    "stage": "Pinned ABIDES epoch-ns vs LOBSTER local-ns and old CSV microsecond loss PRETEST frozen",
+    "latest_clock_utc": "2026-11-22T19:20:57.566Z",
+    "elapsed_minutes": 3.78575,
+    "stage": "Pinned ABIDES explicit Unix-epoch exact-to-simulated-UTC ns typed conversion, 12 source-free negative/analytic tests CI pending",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0

@@ -52,6 +52,8 @@ on:
       - 'projects/robot-detector/tests/test_public_source_study_hard_stop.py'
       - 'projects/robot-detector/tools/public_ns_repro_demo.py'
       - 'projects/robot-detector/tests/test_public_ns_repro_demo.py'
+      - 'projects/robot-detector/tools/public_abides_epoch_ns_clock.py'
+      - 'projects/robot-detector/tests/test_public_abides_epoch_ns_clock.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
