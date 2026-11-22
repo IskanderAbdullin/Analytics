@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement source-free three-frozen-tape M0/M1v2/M2 heldout log likelihood panel according to docs/CONDITIONAL_CROSSMODEL_HELDOUT_LL_PREREG_20261122.md, run exact CI; report negative non-target model gains honestly, do not classify actors. Then audit original-market source validity before new seeds.",
+  "resume_instruction": "NEXT_ACTION: inspect exact GitHub Python CI for eight source-free frozen crossmodel LL panel tests. If green, preserve all three constructed non-target LL gains/losses, explain why predictive gain is not owner attribution, and audit realistic source quality before new independent ABIDES allocation.",
   "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:37:39.168Z",
-    "elapsed_minutes": 20.065066666666667,
+    "latest_clock_utc": "2026-11-22T15:38:25.481Z",
+    "elapsed_minutes": 20.83695,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Heldout M0/M1v2 exact source-free 141/141 CI verified; preregister crossmodel frozen non-target LL comparison before computation",
+    "stage": "Cross-model non-target full-window predictive LL panel coded; exact CI pending",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
