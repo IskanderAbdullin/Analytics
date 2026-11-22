@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "56ee8f06da735664e711aa543bfafd879093a4e9",
+  "last_verified_base_commit": "c296ed35332a3683f174149642442668a2ae960c",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify exact latest HEAD provenance CI explicitly ran test_public_period_l2_ambiguity.py (4 tests) and all prior L2 tests (8), plus full source-free panel. If failures, correct without weakening frozen thresholds. Follow with separate prospectively preregistered missing-feed / coarsened-precision conservatism and a non-degenerate dependence-preserving conditional model. No source replays or real-market attribution. Master issue #72 remains OPEN.",
-  "last_session_result": "2026-11-22 source-free method development: provenance run #44996020719 on 56ee8f06 PASS including 42 exact source-free current-stage tests; 500ms equivalence class paired tapes were negative 6 versus 0 observed <=10ms gaps but C produces identical sampled tapes, quantization erases gaps. New pretest registered #97 comment 7075629666, fixed L2 lookahead ambiguity and tied-snapshot input ordering fail-closed, four new adversarial cases plus old eight pass 12/12 locally source-equivalent. Exact committed CI on new SHA pending. No genuine new ABIDES, p-value, market FDR or owner identity.",
+  "resume_instruction": "NEXT_ACTION: Verify exact HEAD provenance CI discovers test_public_intensity_quality_guard.py four new cases with earlier 46 current-stage tests; if fail investigate without weakening preregistered strict previous-only L2 or 1ms diagnostic quality. Then preregister a distinct nontrivial dependence-preserving candidate with full source-free negative controls and no p-values before any new source experiment. No raw market data, no owner inference; issue #72 open.",
+  "last_session_result": "2026-11-22 active inline research: exact provenance CI #44996216864 PASS for preceding c296ed35 new 4 L2 ambiguity tests (plus 8 preexisting prior-L2), no new independent ABIDES or exchange source. Frozen pretest issue #97 comment 7075657012; built separate conservative 1ms precision and strictly prior L2 wrapper for uncalibrated 500ms candidate C, with four additional adversarial source-free tests 4/4 pass on local transcription, exact new-HEAD CI pending. Existing 500ms protocol/seed unchanged; real market FDR and owners unknown.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T06:51:04Z",
@@ -219,6 +219,12 @@
         "stage_end_time_utc": "2026-11-22T06:59:20Z",
         "elapsed_minutes": 8.2667,
         "tests": "4 new and 8 existing local source-equivalent L2 tests pass; exact remote CI pending"
+      },
+      {
+        "stage": "frozen source-free print precision and previous-only L2 abstention wrapper",
+        "stage_end_time_utc": "2026-11-22T07:01:05Z",
+        "elapsed_minutes": 10.0167,
+        "tests": "4 new local source-equivalent regression groups pass; previous L2 exact CI verified"
       }
     ],
     "final_elapsed_minutes": null,

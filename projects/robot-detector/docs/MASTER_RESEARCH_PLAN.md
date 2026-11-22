@@ -505,6 +505,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-22 | Preregistered L2 ambiguity/tied-snapshot counterexamples (#97 comment 7075629666), conservatively block fallback to older covered L2 after a newer overlapping-precision sample; resolve input-order-dependent same-time conflicting coverage with deterministic ABSTAIN. Frozen thresholds untouched. | Source-free regression; new CI pending |
 
+| 2026-11-22 | After registering #97 comment 7075657012, added optional conservative C quality wrapper: 1ms declared print precision plus strict previous-only public L2 needed before source-free sampling; all missing, coarse, ambiguous or private-field examples fail closed. No frozen candidate C parameters changed. | Engineering source-free diagnostic; exact new CI pending |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -653,4 +655,27 @@ completeness, owner count, market FDR or timing-null p-values.
 NEXT_ACTION: verify new four causal L2 regression tests in cheap CI,
 then register stronger input completeness/precision missingness
 abstention scenarios before any new synthetic or real source run.
+
+### 2026-11-22 — conservative precision/L2 source-free quality wrapper for C
+
+Following [pretest issue #97 comment](https://github.com/IskanderAbdullin/Analytics/issues/97#issuecomment-7075657012),
+added a distinct optional \`quality_gated_intensity_sample\` wrapper that
+returns no C samples without declared 1ms print precision, >=2 unique
+public timestamps and strictly previous locally eligible L2. The 1ms
+requirement is a conservative **toy diagnostic precondition**, not a
+verified exchange spec or calibration. Unknown/coarse precision or
+newer ambiguous coverage now ABSTAIN; private/oracle input fields fail
+closed. This leaves the original frozen A/B/C models, 500ms width,
+seed 404 and 64 replicate indices unchanged.
+[Methods/negative results](INTENSITY_QUALITY_ABSTENTION_20261122.md).
+Four source-equivalent locally recreated tests PASS (4/4);
+exact new-HEAD GitHub CI remains pending. The earlier causal-L2 patch
+has 4 new exact tests verified by
+[provenance CI #44996216864](https://github.com/IskanderAbdullin/Analytics/actions/runs/44996216864),
+plus its existing 8 prior-L2 checks: 12/12. These are technical
+quality checks, not proof of real exchange completeness or p-values.
+
+NEXT_ACTION: confirm four new wrapper tests by exact CI and prevent
+label-leak/coverage assumptions; then freeze a more informative
+dependence-preserving null comparison before adding more source data.
 
