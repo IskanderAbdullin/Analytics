@@ -6,6 +6,8 @@ on:
     paths:
       - 'projects/robot-detector/tools/public_intensity_rescaling.py'
       - 'projects/robot-detector/tests/test_public_intensity_rescaling.py'
+      - 'projects/robot-detector/tools/public_m0_train_only.py'
+      - 'projects/robot-detector/tests/test_public_m0_train_only.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
@@ -18,4 +20,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run exact checked-out Python source tests (no external data)
         working-directory: projects/robot-detector
-        run: python -m unittest discover -s tests -p 'test_public_intensity_rescaling.py' -v
+        run: python -m unittest discover -s tests -p 'test_public_*py' -v
