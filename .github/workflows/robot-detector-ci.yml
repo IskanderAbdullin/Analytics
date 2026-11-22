@@ -3,11 +3,19 @@ name: Robot Detector .NET CI
 on:
   push:
     paths:
-      - 'projects/robot-detector/**'
+      - 'projects/robot-detector/src/**'
+      - 'projects/robot-detector/tests/RobotDetector.SelfTests/**'
+      - 'projects/robot-detector/fixtures/**'
+      - 'projects/robot-detector/config/**'
+      - 'projects/robot-detector/RobotDetector.slnx'
       - '.github/workflows/robot-detector-ci.yml'
   pull_request:
     paths:
-      - 'projects/robot-detector/**'
+      - 'projects/robot-detector/src/**'
+      - 'projects/robot-detector/tests/RobotDetector.SelfTests/**'
+      - 'projects/robot-detector/fixtures/**'
+      - 'projects/robot-detector/config/**'
+      - 'projects/robot-detector/RobotDetector.slnx'
       - '.github/workflows/robot-detector-ci.yml'
   workflow_dispatch:
 
