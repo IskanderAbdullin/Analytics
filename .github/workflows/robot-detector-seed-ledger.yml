@@ -45,6 +45,7 @@ on:
       - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
       - 'projects/robot-detector/tools/public_abc_report.py'
       - 'projects/robot-detector/tests_background/test_public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_equivalence_class.py'
       - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
       - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
       - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
@@ -175,6 +176,7 @@ on:
       - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
       - 'projects/robot-detector/tools/public_abc_report.py'
       - 'projects/robot-detector/tests_background/test_public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_equivalence_class.py'
       - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
       - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
       - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
@@ -352,6 +354,7 @@ jobs:
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_l2_gate.py' -v
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_abc_constructed_controls.py' -v
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_abc_report.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_equivalence_class.py' -v
           PYTHONPATH=tools python tools/public_abc_report.py --output data/results/abc-constructed-source-free.json
       - name: Upload bounded constructed A/B/C aggregate only
         if: success()

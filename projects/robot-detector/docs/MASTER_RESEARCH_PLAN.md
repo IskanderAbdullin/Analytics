@@ -501,6 +501,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-22 | Constructed 64×3 A/B/C hard-negative panel exposes C's failure to preserve 168 momentum burst gaps (17–34 resampled), while B preserves them mechanically. Existing green CI did NOT discover these new tests; explicit source-free test discovery and report CLI added to provenance workflow. | NEGATIVE SOURCE-FREE DEVELOPMENT; new CI PENDING, no market p-value/FDR |
 
+| 2026-11-22 | Preregistered issue #97 paired 500ms occupancy-equivalence tapes; C's conditional resamples collapse different local gap structures (6 vs 0 observed) by construction, B is gap-preserving by construction; 10ms quantization erases dense short-gap evidence. Prior exact CI #44995874723 confirmed 38 source-free tests; new 4 exact tests CI pending. | Source-free identifiability limit, not statistical calibration |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -601,3 +603,28 @@ NEXT_ACTION: confirm the exact committed GitHub CI test output and bounded
 artifact, investigate any failures without rewriting the registered 500ms
 condition, then test predeclared intensity/autocorrelation confounding and
 prior-only L2 precision abstention.
+
+### 2026-11-22 — frozen paired 500ms-equivalence falsification (source-free)
+
+Before implementing a new negative test, [issue #97 prereg comment](https://github.com/IskanderAbdullin/Analytics/issues/97#issuecomment-7075610380)
+froze two 8-event public timestamp tapes with identical 500ms occupancy/rank
+multiplicities but different <=10ms gap structure: dense 6 and dispersed 0.
+Candidate C necessarily samples identical conditional timestamp tapes from both
+for the same seed and replicate, by its original code construction; A does too.
+B trivially retains the distinct gaps by rigid translation. Quantizing the
+dense tape to 10ms erases six short unique gaps, underscoring why source
+precision must be treated as a quality/abstention gate. See
+[INTENSITY_CONDITIONAL_EQUIVALENCE_CLASS_NEGATIVE_20261122.md](INTENSITY_CONDITIONAL_EQUIVALENCE_CLASS_NEGATIVE_20261122.md).
+Four preregistered adversarial cases passed on source-equivalent transcribed
+local code (4/4), **not yet exact GitHub committed tests**. The existing
+[provenance CI #44995874723](https://github.com/IskanderAbdullin/Analytics/actions/runs/44995874723)
+verified **38** explicit current-stage tests on the preceding SHA
+\`6505dbed\`, including the A/B/C full 64-replicate aggregate report and
+3-day artifact; this is technical source-free execution, not calibration.
+The new four tests are added to the same cheap provenance workflow;
+CI for this next SHA is PENDING.
+
+NEXT_ACTION: verify exact-HEAD new 4 tests and inspect CI; then design
+a dependence-preserving but non-degenerate prospective comparison
+without source/threshold retuning or real-market FDR claims.
+

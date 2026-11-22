@@ -23,9 +23,11 @@ simultaneous-print multiplicities. No best-model/phase/period selection.
 These numbers were reproduced **locally on a source-equivalent transcription** of
 the current GitHub modules and the three existing constructed-control tests
 (3/3 pass), plus new report unit tests (3/3 pass). The local run did not use
-a checked-out copy of the repository. **Exact committed-code GitHub CI
-execution is still required** before calling these numbers independently
-source-verified. The new report CLI emits all 64 replicate counts for every
+a checked-out copy of the repository. **Exact committed-code GitHub provenance CI #44995874723 SUCCESS**
+ran the entire current-stage source-free test suite (38 explicit tests),
+executed the report CLI and uploaded the small full 64-replicate artifact.
+This verifies the committed-code technical reproduction, **not** statistical
+exchangeability or generalisation to any exchange. The new report CLI emits all 64 replicate counts for every
 scenario/model; keep the small aggregate-only JSON, not synthetic raw timestamps.
 
 ## Negative interpretation, not significance

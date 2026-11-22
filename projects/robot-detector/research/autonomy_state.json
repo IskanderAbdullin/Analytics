@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "30e0075c33c8c1d7fe6fd131bbe811a7d4a2ef2e",
+  "last_verified_base_commit": "6505dbed362a38f69cbf5796ce727f5ba70554cc",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Inspect exact new-HEAD provenance CI: confirm explicit Python tests test_public_conditional_timing_null, test_public_burst_null_falsification, test_public_intensity_conditioned_null, test_public_period_scan, test_public_period_l2_gate, test_public_abc_constructed_controls and test_public_abc_report. Inspect retained 3-day small JSON 64-replicate artifact; repair any test or importer failures without retuning frozen 500ms condition. Then design independent prospective local-dependence and precision/L2 abstention adversarial tests. Do not infer market p-values/FDR/owners; master #72 open.",
-  "last_session_result": "2026-11-22 active inline run: remote HEAD 87b03636 CI 5/5 green, but new A/B/C Python tests were NOT in provenance workflow and were not verified by those runs. Source-equivalent local reproduction, not repo checkout: 3 constructed + 3 new reporter unit tests PASS; Poisson obs 186 A mean 184.0625 C mean 185.453125; momentum obs 168 A mean 2.4375 C mean 24.765625 B 168 fixed; periodic short-gap obs 0. Added exact CI discovery plus aggregate-only full 64-replicate report; committed CI pending. No ABIDES, no real-market claims.",
+  "resume_instruction": "NEXT_ACTION: Verify new HEAD provenance CI shows test_public_intensity_equivalence_class.py 4/4 alongside prior 38 and upload-only small aggregate artifact. Check no errors; do not falsely count PR and push copies as independent evidence. Then freeze stronger nontrivial local-dependence-preserving model or precision/previous-only-L2 abstention test BEFORE new experiments; use no viewed seeds as fresh holdout. Owner labels and real-market FDR unknown; master issue #72 open.",
+  "last_session_result": "2026-11-22: Source-free A/B/C 64×3 negative panel now VERIFIED by exact-HEAD provenance CI #44995874723 (38 newly discovered current-stage tests, bounded aggregate artifact, no source simulations). Prior .NET CI on same SHA green. Observed quantized Poisson 186 vs A 184.0625 / C 185.453125 means; momentum 168 vs A 2.4375 / C 24.765625 means, B 168 invariant; unrelated periodic short-gap 0 all models. New PRE-TEST prereg issue #97 comment 7075610380 and four equivalence-class/precision regression cases implemented; local source-equivalent 4/4 pass, committed test CI pending. No p-values, owners or market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T06:51:04Z",
@@ -207,6 +207,12 @@
         "stage_end_time_utc": "2026-11-22T06:54:11Z",
         "elapsed_minutes": 3.1167,
         "tests": "6 source-equivalent local tests passed; exact remote CI pending"
+      },
+      {
+        "stage": "preregistered and locally tested identical-occupancy/different-gap negative case",
+        "stage_end_time_utc": "2026-11-22T06:56:14Z",
+        "elapsed_minutes": 5.1667,
+        "tests": "4 additional source-equivalent local tests passed; exact CI pending"
       }
     ],
     "final_elapsed_minutes": null,
