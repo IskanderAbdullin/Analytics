@@ -779,3 +779,8 @@ negative outcomes were made. Corrected CLI path bootstrap using
 \`sys.path.insert(0,str(ROOT))\`, and executed direct CLI locally
 without PYTHONPATH to validate. Exact corrected GitHub CI PENDING.
 
+
+
+### 2026-11-22 — prospective conditional-intensity design (new protocol; no data evaluated)
+
+[Preregistration](CONDITIONAL_INTENSITY_PREREG_20261122.md) specifies a public unique-timestamp-cluster conditional-intensity rescaling diagnostic with strictly previous-only L2, exposure gaps, fail-closed abstentions and eight mandatory adversarial cases. M0 activity baseline, M1 causal L2, and M2 self-excitation are competing hypotheses, not validated detectors. Original 3301–3340 remain spent; no new holdout or p-values. Corrected HEAD 8fd4590a CI five workflows successful; this addition is design-only and requires implementation/tests. NEXT_ACTION: implement rescaling core and negative controls, then freeze truly independent source allocation before evaluation.

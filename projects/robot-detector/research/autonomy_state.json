@@ -195,63 +195,21 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Check corrected new HEAD provenance CI and confirm direct CLI generation of abcd-positive-harmonics-source-free.json plus three report tests and aggregate-only 3-day artifact. If still failing, examine job logs and fix without altering frozen method/results. Next science: prospective conditional-intensity/time-rescaling model with preregistered source-free falsifications and independent seeds. Do not overlap next hourly automation or claim market p-values. Master #72 open.",
-  "last_session_result": "2026-11-22: full A/B/C/D source-free v2 period report tests 3/3 succeeded on GitHub at b1dbd166, BUT provenance CI #44996834864 and #44996830341 FAILED on direct CLI import ModuleNotFoundError: No module named tools. Direct CLI bootstrap was corrected without changing data/protocol and validated locally without PYTHONPATH; corrected exact-HEAD CI pending. Previous v2 suite #44996649423 PASS. No source simulation nor real-market FDR/owners.",
+  "resume_instruction": "NEXT_ACTION: Implement deterministic fail-closed causal conditional-intensity rescaling core with eight source-free adversarial cases from docs/CONDITIONAL_INTENSITY_PREREG_20261122.md. Before any new source/holdout, freeze independent market-run allocation and full model-selection/threshold protocol. Verify latest CI. Keep master #72 open.",
+  "last_session_result": "2026-11-22: corrected HEAD 8fd4590a has five successful GitHub Actions runs (including provenance); new prospective conditional-intensity design registered, without experiments, new seeds, inferential claims or market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
-    "start_time_utc": "2026-11-22T06:51:04Z",
-    "deadline_utc": "2026-11-22T07:41:04Z",
+    "start_time_utc": "2026-11-22T08:16:57Z",
+    "deadline_utc": "2026-11-22T09:06:57Z",
     "measured_checkpoints": [
       {
-        "stage": "source-equivalent A/B/C local reproduction and report unit tests",
-        "stage_end_time_utc": "2026-11-22T06:54:11Z",
-        "elapsed_minutes": 3.1167,
-        "tests": "6 source-equivalent local tests passed; exact remote CI pending"
-      },
-      {
-        "stage": "preregistered and locally tested identical-occupancy/different-gap negative case",
-        "stage_end_time_utc": "2026-11-22T06:56:14Z",
-        "elapsed_minutes": 5.1667,
-        "tests": "4 additional source-equivalent local tests passed; exact CI pending"
-      },
-      {
-        "stage": "preregistered L2 ambiguity guards, tested old/new source-equivalent L2 suites",
-        "stage_end_time_utc": "2026-11-22T06:59:20Z",
-        "elapsed_minutes": 8.2667,
-        "tests": "4 new and 8 existing local source-equivalent L2 tests pass; exact remote CI pending"
-      },
-      {
-        "stage": "frozen source-free print precision and previous-only L2 abstention wrapper",
-        "stage_end_time_utc": "2026-11-22T07:01:05Z",
-        "elapsed_minutes": 10.0167,
-        "tests": "4 new local source-equivalent regression groups pass; previous L2 exact CI verified"
-      },
-      {
-        "stage": "precommitted D microburst-block relocation, falsified short-gap identification power",
-        "stage_end_time_utc": "2026-11-22T07:03:13Z",
-        "elapsed_minutes": 12.15,
-        "tests": "4 new local source-equivalent negative tests pass; short-gap count invariant 186/168/0 across 64 D replicas"
-      },
-      {
-        "stage": "preregistered v2 positive-harmonic scan correction, legacy v1 false 5–60s aliases",
-        "stage_end_time_utc": "2026-11-22T07:04:43Z",
-        "elapsed_minutes": 13.65,
-        "tests": "5 new source-equivalent local negatives pass; exact CI pending"
-      },
-      {
-        "stage": "precommitted 3×4×7×64 v2 A/B/C/D no-target all-period panel",
-        "stage_end_time_utc": "2026-11-22T07:06:32Z",
-        "elapsed_minutes": 15.4667,
-        "tests": "3 source-equivalent report tests pass; observed momentum23 5s hits and unrelated20s 5/5 5s/10s/20s"
-      },
-      {
-        "stage": "diagnosed failed direct CLI import after 3/3 GitHub unit tests; corrected only project-root sys.path",
-        "stage_end_time_utc": "2026-11-22T07:09:20Z",
-        "elapsed_minutes": 18.2667,
-        "tests": "all 3 GitHub report unit tests pass but workflow fails direct CLI import; corrected standalone CLI source-equivalent locally"
+        "stage": "Prospective conditional-intensity methodological preregistration (no experiments)",
+        "stage_end_time_utc": "2026-11-22T08:17:21Z",
+        "elapsed_minutes": 0.4,
+        "tests": "Not run; design-only; no new source or seed"
       }
     ],
     "final_elapsed_minutes": null,
-    "note": "This checkpoint records observed UTC times; no claim of uninterrupted 50-minute execution."
+    "note": "New run, measured UTC from environment; no claim of 50-minute execution."
   }
 }
