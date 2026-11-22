@@ -1015,3 +1015,8 @@ This active continuation started 18:20:59 UTC, not continuously from the prior p
 ### 2026-11-22 — ns-native M1-v3 training-only causal L2 source-free implementation (CI pending)
 
 Under prospectively frozen [M1-v3 design](CONDITIONAL_M1_V3_NS_LAGGED_L2_PREREG_20261122.md) at `42ff5f1b`, implemented separate `public_m1_v3_ns_l2.py` with exact integer-nanosecond, exchange-local clock, 1-second delayed post-event BBO, 10-second quote staleness, complete source-asserted exposure and training-only exposure-weighted spread regimes. Frozen toy training expects low=0.75/sec, high=0.50/sec over exact 4s/4s exposures. Evaluation accepts no print timestamps and cannot fit from evaluation events; old M1-v2 unchanged. Fifteen source-free adversarial tests check 1ns distinctness, split fills, private fields, source quality, invalid extreme timestamps/prices, future L2, missing strata, overlap and non-identifiability. Exact GitHub Python CI PENDING; no real market experiment, vendor download, new ABIDES seeds, owner or FDR assertions.
+
+
+### 2026-11-22 — M1-v3 first CI negative test PREMISE, source untouched
+
+First exact [Python CI #45054990701](https://github.com/IskanderAbdullin/Analytics/actions/runs/45054990701) on M1-v3 initial code **FAILED 1 of 194** tests. Source-free fixture erroneously expected ABSTAIN on only one post-event BBO at t=34220s in [34222,34226) window: the last age was **6s**, correctly below preregistered max 10s. This was **not** a production gate failure; changed only that negative fixture to t=34215s (age 11s) and added explicit positive test accepting a single prior quote still within source age. No frozen lag, age threshold, median, source data, seeds or oracle changed. Exact new CI pending; negative history retained.

@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact source-free Python CI for preregistered M1-v3 ns exposure and 15 hard negative tests; correct any invalid fixture or overflow WITHOUT changing 1s lag/10s age/median rules. Then separately preregister nanosecond-only heldout log-likelihood scoring and test ns-vs-ms conservation on frozen toy tapes.",
-  "last_session_result": "2026-11-22 18:20 UTC session: typed ns converter exact CI 179/179, then separately froze M1-v3 protocol 42ff5f1b before writing code; 15 source-free M1-v3 tests added, exact CI pending; no new data/seeds.",
+  "resume_instruction": "NEXT_ACTION: verify exact Python CI after source-free M1-v3 fixture correction, expect 195/195 tests; do not alter preregistered 1s lag/10s source book age. Then preregister ns heldout log-likelihood with explicit source-time unit and M1-v2 ms-aligned equivalence; source-free only.",
+  "last_session_result": "18:25 UTC exact Python CI #45054990701 FAILED 1/194 tests due to invalid fixture: quote at 34220s remains valid through 34226s (age 6 seconds < frozen 10sec), so a false ABSTAIN expectation failed. Kept the production 10s staleness unchanged, replaced fixture with 34215s (age 11s) and added positive valid single-book source-free test; new exact CI pending.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:25:18.088Z",
-    "elapsed_minutes": 4.3136833333333335,
-    "stage": "Distinct M1-v3 source-free ns lagged L2 model with 15 negative tests, exact CI pending",
+    "latest_clock_utc": "2026-11-22T18:25:55.098Z",
+    "elapsed_minutes": 4.930516666666667,
+    "stage": "M1-v3 source-free CI one incorrect stale quote fixture; corrected and counterexample positive one-book test added, original fixed age unchanged",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },

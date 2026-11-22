@@ -82,9 +82,18 @@ class NanosCausalBookIntensityTests(unittest.TestCase):
 
     def test_absent_initial_quote_or_stale_book_abstains(self):
         m=fit_ns_m1_v3_train_only(training())
-        for b in ((book("34221.5"),),(book("34200"),),(book("34220"),)):
+        for b in ((book("34221.5"),),(book("34200"),),(book("34215"),)):
             with self.subTest(b=b),self.assertRaises(Abstain):
                 predict_ns_m1_v3_exposure(m,replace(evaluation(),post_event_bbo=b))
+
+    def test_valid_single_prior_post_event_bbo_under_ten_seconds_is_eligible(self):
+        model=fit_ns_m1_v3_train_only(training())
+        one=replace(evaluation(),post_event_bbo=(book("34220"),))
+        pred=predict_ns_m1_v3_exposure(model,one)
+        self.assertEqual(len(pred),1)
+        self.assertEqual((pred[0].start_ns,pred[0].end_ns),
+                         (t("34222"),t("34226")))
+        self.assertEqual(pred[0].rate_per_second,.75)
 
     def test_future_tied_unsorted_post_event_bbo_abstains(self):
         m=fit_ns_m1_v3_train_only(training())
