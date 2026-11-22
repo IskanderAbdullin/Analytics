@@ -195,21 +195,27 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify exact-HEAD source-free rescaling tests in cheap GitHub CI; add model-input source allowlist, strict timestamp precision and previous-only L2 eligibility integration. Then freeze M0/M1/M2 fitting and independent source allocation BEFORE new ABIDES seeds. Do not call current rescaler a calibrated null. Master #72 stays open.",
-  "last_session_result": "2026-11-22: prospective causal intensity protocol committed; deterministic source-free piecewise constant rescaling prototype and 12 adversarial unit tests added. Earlier local source-equivalent 11 tests passed, but exact committed GitHub CI still needs verification. No new ABIDES, p-values, market FDR or owner claims.",
+  "resume_instruction": "NEXT_ACTION: Verify exact-HEAD tests/test_public_intensity_rescaling.py (21 source-free cases) using cheap GitHub CI or trusted runner; check new strict source gate for missed cases. Then preregister causal M0/M1/M2 fitting, independent market-run allocation and threshold/calibration BEFORE any new source seeds. No new ABIDES/real-market FDR/owner claims. Keep master #72 open.",
+  "last_session_result": "2026-11-22T09:12Z: Confirmed d30c8bb6 GitHub provenance/ABIDES integration/.NET CI success (does not prove Python unit tests ran). Added fail-closed public field allowlist, declared <=1ms timestamp-resolution gate and strictly previous complete L2 eligibility; nine source-free adversarial tests; code/test/plan commits 867dd6c8, efe69b75, fc82b016. Exact-HEAD unit execution/CI pending; no new source experiments.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
-    "start_time_utc": "2026-11-22T08:16:57Z",
-    "deadline_utc": "2026-11-22T09:06:57Z",
+    "start_time_utc": "2026-11-22T09:12:05Z",
+    "deadline_utc": "2026-11-22T10:02:05Z",
     "measured_checkpoints": [
       {
-        "stage": "Prospective conditional-intensity methodological preregistration (no experiments)",
-        "stage_end_time_utc": "2026-11-22T08:17:21Z",
-        "elapsed_minutes": 0.4,
-        "tests": "Not run; design-only; no new source or seed"
+        "stage": "Source provenance and exact prior SHA CI verification",
+        "stage_end_time_utc": "2026-11-22T09:12:23Z",
+        "elapsed_minutes": 0.3,
+        "tests": "Three prior HEAD workflows success; Python tests not established"
+      },
+      {
+        "stage": "Fail-closed public input/L2 eligibility and nine negative tests, plan checkpoint",
+        "stage_end_time_utc": "2026-11-22T09:12:51Z",
+        "elapsed_minutes": 0.7667,
+        "tests": "New tests authored, not executed; exact new CI pending"
       }
     ],
-    "final_elapsed_minutes": null,
-    "note": "New run, measured UTC from environment; no claim of 50-minute execution."
+    "final_elapsed_minutes": 0.7667,
+    "note": "Measured UTC in environment. Early stop due to bounded active execution, not 50 minutes."
   }
 }
