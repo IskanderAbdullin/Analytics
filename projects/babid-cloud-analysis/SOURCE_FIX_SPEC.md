@@ -210,3 +210,7 @@ Script sandbox функционирует **для уже подготовлен
 ## 18. P0-S12 — pinned-source Journal regression (E-049)
 
 Компилировать real Journal.cs+Domain.cs из pinned public Babid-C-gpt- SHA `5b553afdffe0679960d1b161a4885a645175e60b`, сверять Git blob SHA, не трогать LIVE. Использовать только фиктивные side/size/clock для Prune grace, detached order/lookup, Restore, FilledByState и unsettled flags. Compile-only stubs заменяют только unused persistence, но **не** сам Journal. Это не full Engine.Orders и не broker data; успех не докажет фактический archive в 2026-11-21.
+
+## 19. Безопасная отмена C# CI на закрытый source (E-050)
+
+Предыдущая задумка P0-S12 из E-049 не была исполнима в публичном GitHub Actions: pinned checkout из Babid-C-gpt- вернул `Repository not found` при обычном runner. Возможность connector читать исходник НЕ доказывает, что он публичный. Исходный код не включать в публичный Analytics или артефакты CI; удалён workflow и C# harness из публичного PR. Для future tests использовать только отдельный локальный private test project с разрешённым штатным `pc_run dotnet-test` на том же компьютере и без доступа к живому брокеру; приватные тестовые результаты не отправлять на GitHub.

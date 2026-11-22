@@ -1,0 +1,107 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "49db5e81-ff89-48de-bcf7-3e37ec0b3034",
+    "occurred_at": "2026-11-22T07:29:01.933Z",
+    "type": "research",
+    "title": "Public CI cannot checkout restricted Babid source; remove source-dependent harness",
+    "summary": "Pinned source checkout failed with GitHub 404, despite authenticated connector access. Removed the workflow and C# harness from public Analytics before continuing; retained only safe findings.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": ".github/workflows/babid-cloud-pinned-journal.yml",
+      "action": "deleted",
+      "summary": "Remove workflow attempting to checkout restricted source"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/csharp-journal-replay/JournalReplay.csproj",
+      "action": "deleted",
+      "summary": "Remove unexecutable public source-linked harness"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/csharp-journal-replay/Program.cs",
+      "action": "deleted",
+      "summary": "Remove unexecutable public source-linked harness"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/csharp-journal-replay/Stubs.cs",
+      "action": "deleted",
+      "summary": "Remove unexecutable public source-linked harness"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Correct E-049 claim and record E-050/M-030 barrier"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Correct E-049 claim and record E-050/M-030 barrier"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Correct E-049 claim and record E-050/M-030 barrier"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Correct E-049 claim and record E-050/M-030 barrier"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Correct E-049 claim and record E-050/M-030 barrier"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-private-source-ci-boundary-e050.json",
+      "action": "created",
+      "summary": "CI access evidence and safe rollback"
+    }
+  ],
+  "checks": [
+    {
+      "id": "real-source-ci",
+      "kind": "ci",
+      "title": "Attempted pinned C# source checkout",
+      "status": "failed",
+      "summary": "Run 44998247702: repository not found; no compilation"
+    },
+    {
+      "id": "public-privacy",
+      "kind": "review",
+      "title": "No private C# source was published",
+      "status": "passed",
+      "summary": "Only harness files/metadata, now removed; exact original files never committed"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-011",
+      "title": "Restricted original source cannot enter public CI",
+      "state": "open",
+      "severity": "high",
+      "description": "Use local private C# harness if authorized and supported by pc_run"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Frozen private execution chronology and independent broker report",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No real C# linked-source test was run",
+    "No source repository privacy state was independently checked",
+    "No trading data published"
+  ]
+}
