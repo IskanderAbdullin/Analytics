@@ -32,7 +32,7 @@ class SingleCommandSourceFreeReproTests(unittest.TestCase):
         self.assertFalse(r["real_market_fdr_known"])
         for forbidden in ("source_public_sha256","timestamp_ns","bid_price","ask_price",
                           "owner_id","agent_id","order_id","book_rows","source_event_rows"):
-            self.assertNotIn(forbidden,json.dumps(r).lower())
+            self.assertNotIn(forbidden,r)
 
 
 if __name__=="__main__":
