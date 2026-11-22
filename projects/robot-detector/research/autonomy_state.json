@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact public Python CI on new bounds and paired-seed source-only tests; repair failures without changing preregistered 1000-world guard, 4-test Bonferroni or worst-case abstention. Then audit source-world power/resource assumptions and independently freeze real source protocol; NO new ABIDES seeds without source-rights/coverage approval.",
+  "resume_instruction": "NEXT_ACTION: implement deterministic 6x3x4 marginal-binomial/Bonferroni joint-power feasibility grid frozen in docs/PAIRED_INDEPENDENT_POWER_GRID_PREREG_20261122.md. No new experimental source seeds; report zero/negative feasibility and within-world dependence limits honestly.",
   "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:20:48.793Z",
-    "elapsed_minutes": 3.2254833333333335,
+    "latest_clock_utc": "2026-11-22T15:22:16.574Z",
+    "elapsed_minutes": 4.6885,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Source-free exact numeric guards and paired seed-world inference authored; exact GitHub CI pending",
+    "stage": "Paired original-world inference exact 92/92 Python CI; preregister hypothetical joint-power source-free grid",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "32caf2c191571cbc07ffb0e359e72a32a547cf9d",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008917",
-    "result": "SUCCESS 75/75 exact source-free Python tests, incl 14 M2 and 10 original-run split integrity, full local seed ledger"
+    "sha": "9777e50f05743727db19035cdf673bf6dd2eb0c1",
+    "url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45037801535",
+    "result": "92/92 Python source-free tests incl bounds and paired seed-world controls"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
