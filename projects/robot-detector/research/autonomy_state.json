@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact Python source-free CI for separate ABIDES M0/M1v4 comparison, fix only source-free code/fixture issues without changing frozen negative LL or event/source family. Expected M1 minus M0 ~ -0.192678; no original simulation runs. Then audit source-readiness/power and write next scientifically useful independent study gate.",
+  "resume_instruction": "NEXT_ACTION: implement source-free ABIDES M1-v4 vs M0 explicit three non-target public tapes (one positive LL delta despite unrelated background; two negative), same public tape alternative hidden owner story invariance. No new source worlds, seeds or classifier claims; exact cheap GitHub Python CI.",
   "last_session_result": "Active 19:17 UTC: prior ABIDES full-window source-free 305/305 green, separate ABIDES M0/M1v4 descriptive prereg 1f6e3d73 frozen, new train-only source-free original-labelled public EXEC models with exact ratios, negative M1 vs M0 heldout, replay guards and 12 tests coded; CI pending, no original source/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:28:43.573Z",
-    "elapsed_minutes": 11.552533333333333,
-    "stage": "Separate ABIDES family M0 M1-v4 full-time source-free comparison 12 hard negative tests, exact GitHub CI pending",
+    "latest_clock_utc": "2026-11-22T19:29:55.611Z",
+    "elapsed_minutes": 12.753166666666667,
+    "stage": "ABIDES native M0/M1-v4 317/317 source-free CI, new non-target LL win/loss panel frozen before code",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "c243bcb8bc0bd1788ed8610b5e2f3d8eba1e75dd",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060740356",
-    "result": "305/305 source-free Python tests incl 12 full-window age/gap quote exposure guards"
+    "sha": "67f5888d55f4afd5f81fffb320041c4996de64db",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060985918",
+    "result": "317/317 source-free Python tests including 12 ABIDES M0/M1-v4 complete-window LL negatives"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
