@@ -21,3 +21,6 @@
 
 
 **Original-run allocation integrity (pre-source, no holdout created):** [prereg](docs/CONDITIONAL_SOURCE_RUN_ALLOCATION_INTEGRITY_PREREG_20261122.md) committed before implementation (`fe591340`); source-free checker/tests reject split leakage, replay phases, spent local seeds, missing hard-negative cohorts, oracle fields and malformed registry. Local minimal-ledger 10/10 PASS; exact GitHub full-ledger CI pending. No globally fresh seed claim.
+
+
+**Verified final source-free branch CI:** [#45025008917](https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008917) exact SHA `32caf2c1` **75/75 Python PASS**, including the two fail-closed M2 overflow tests and all ten allocation-integrity tests with full project ledger. [Provenance #45025008831](https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008831) SUCCESS. Other workflows may remain in progress; no source experiments, independent holdout, market p-values, true actors or real FDR established.

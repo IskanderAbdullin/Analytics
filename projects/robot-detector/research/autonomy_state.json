@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
+  "last_verified_base_commit": "32caf2c191571cbc07ffb0e359e72a32a547cf9d",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -200,8 +200,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact Python public-intensity CI on newest HEAD, confirming M2 two extreme-numeric negative tests and 10 original-run split-integrity negatives against full GitHub seed_registry.json. Resolve any failure. Then preregister statistically meaningful independent-run sample size/power and train/calibration/evaluation criteria incl source rights/revision before allocating any new seeds or evaluating market data. Do not confuse structural split gate or deterministic unit tests with scientific calibration.",
-  "last_session_result": "2026-11-22: migrated existing project (83d9be1c, no duplicate); M1 51/51 CI #45024195498, M2 63/63 CI #45024579897, provenance green #45024579964. M2 numerical fail-open repaired a90b8e2 (local 14/14, exact CI pending). Original-run split integrity prereg fe591340 BEFORE code; 10 source-free tests passed against minimal local ledger fixture (exact committed CI/full ledger pending). All 3301–3340 remain spent, no new sources or owner/FDR claims.",
+  "resume_instruction": "NEXT_ACTION: design/preregister scientifically powered independent original-source-run sample size and coverage/abstention acceptance criteria (4 frozen Poisson/fixed20/momentum/TWAP cohorts, seed-disjoint train/calibration/evaluation), verify source licenses and pinned revisions, plus calibration criteria BEFORE allocation of any new seeds or running original ABIDES. First check latest remote HEAD/CI and hourly agent overlap; do NOT interpret 75/75 deterministic unit tests as statistical validation. M1 remains stable-BBO asserted-coverage only, M2 prospective self-exciting hypothesis only, real-market owner/FDR unknown.",
+  "last_session_result": "2026-11-22 UTC single active chat session: updated existing Analytics/projects/robot-detector to UPDATE_EXISTING_CHAT standard without duplicate (83d9be1c), archived original AGENTS; M1 prereg f3d78068 and implementation 0f3728e1 (exact 51/51 Python PASS); restored provenance AGENTS contract 24f2e8ff (CI PASS); M2 prereg 167d9174 and implementation 8a28d374 (exact 63/63 Python PASS); overflow negative caught and corrected a90b8e2 (source-free CI PASS); prereg original-run split-integrity fe591340 before code 32caf2c1; latest exact public Python CI 75/75 PASS and provenance PASS. New source simulations/seeds=0; no market p-values, owner identity or real-market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
@@ -229,9 +229,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "8a28d374bb09497d63488ffe63d2ec1d696b9924",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024579897",
-    "result": "PASS 63/63 exact Python tests including 12 M2; new extreme-number regression pending on next SHA"
+    "sha": "32caf2c191571cbc07ffb0e359e72a32a547cf9d",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008917",
+    "result": "SUCCESS 75/75 exact source-free Python tests, incl 14 M2 and 10 original-run split integrity, full local seed ledger"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
@@ -253,8 +253,8 @@
     "notes": "No duplicate Info project, no raw vendor data, no private Actions/Computer Use."
   },
   "last_confirmed_provenance_ci": {
-    "sha": "8a28d374bb09497d63488ffe63d2ec1d696b9924",
-    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024579964",
+    "sha": "32caf2c191571cbc07ffb0e359e72a32a547cf9d",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008831",
     "status": "success"
   },
   "last_session_clock": {
@@ -276,9 +276,31 @@
         "stage": "M1 exact CI / provenance regression fix",
         "clock_check_utc": "2026-11-22T12:49:38Z",
         "elapsed_minutes": 7.45
+      },
+      {
+        "stage": "M2 prereg/code and source-free Python tests",
+        "clock_check_utc": "2026-11-22T12:54:59Z",
+        "elapsed_minutes": 12.8,
+        "tests": "63/63 Python exact CI #45024579897; no original source runs"
+      },
+      {
+        "stage": "M2 overflow safety and prospective run-split negative controls",
+        "clock_check_utc": "2026-11-22T12:58:59Z",
+        "elapsed_minutes": 16.8,
+        "tests": "75/75 exact Python CI #45025008917; provenance CI #45025008831; 0 new source runs"
       }
     ],
     "current_stage": "M2 prereg",
-    "note": "Clock checks are measured environment UTC samples, not evidence of continuous activity between tools; do not confuse this chat with the hourly agent."
+    "note": "Clock checks are measured environment UTC samples, not evidence of continuous activity between tools; do not confuse this chat with the hourly agent.",
+    "measured_final_checkpoint_time_utc": "2026-11-22T12:59:14Z",
+    "measured_elapsed_minutes": 17.05,
+    "stop_reason": "Reached safe completed source-free stage and checkpoint before next independently scheduled 13:12 UTC hourly agent (avoid overlap); no claim of 50 minutes.",
+    "completed_major_stages": [
+      "Existing-project standard migration without duplicate",
+      "Conservative M1 prereg and implementation with 51/51 exact Python tests",
+      "AGENTS regression repair and successful provenance CI",
+      "M2 prospective prereg/implementation, strict numeric failure repair with exact tests",
+      "Prospective source-run split integrity pre-registration/implementation and exact 75/75 Python CI"
+    ]
   }
 }
