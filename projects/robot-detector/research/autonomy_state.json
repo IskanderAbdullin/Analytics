@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement source-free fixed ns-native heldout LL of previously trained M1-v3 with strict typed NsPublicEventWindow, causal rate, full exposure; fixed numeric three-cluster score and analytic ms-vs-ns equivalence. Run exact CI and record negative outcomes. No real vendor source rerun or new seeds.",
-  "last_session_result": "2026-11-22 18:26 UTC: exact M1-v3 Python CI green 195/195 at SHA 80a4951b. Previous first CI 45054990701 failure was a wrong expected ABSTAIN for valid 6s-old quote, corrected fixture to 11s and added positive single-book test without changing code or thresholds. Separate ns heldout LL prereg committed BEFORE implementation.",
+  "resume_instruction": "NEXT_ACTION: inspect exact checked-out public Python CI for M1-v3 nanosecond heldout LL and 12 hard negative tests including analytic ms-aligned equivalence and 1ns distinctness. Repair any numeric/quality failures without changing frozen protocol; then audit source precision and sample normalization limitations.",
+  "last_session_result": "Separate ns full-window heldout LL prereg committed as 73f01137 before code. Added typed observed event input, full causal exposure time integral, finite logarithms, 1ns distinctness/split-fills and analytic equivalent millisecond scorer tests. 12 additional unit/negative tests, exact source-free CI pending. No new real source, ABIDES seeds or actor inference.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:26:53.472Z",
-    "elapsed_minutes": 5.903416666666667,
-    "stage": "M1-v3 exact source-free 195/195 CI confirmed; separate ns heldout log likelihood design frozen BEFORE implementation",
+    "latest_clock_utc": "2026-11-22T18:27:42.651Z",
+    "elapsed_minutes": 6.723066666666667,
+    "stage": "Source-free exact ns full-window heldout LL and ms-aligned equivalence 12 test methods coded, exact GitHub CI pending",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
