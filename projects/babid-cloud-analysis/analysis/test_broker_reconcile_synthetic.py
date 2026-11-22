@@ -1,5 +1,5 @@
 """All fixtures fictional. No connected broker, trade, or real identifier."""
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 import unittest
 
@@ -8,7 +8,7 @@ from broker_reconcile_synthetic import TradeFact, reconcile_facts
 
 def fact(**overrides):
     data = dict(account="fictional", instrument="FAKE", side="Sell", lots=2,
-                price=Decimal("99.50"), executed_utc=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                price=Decimal("99.50"), executed_utc=datetime(2026, 1, 1, tzinfo=UTC),
                 trade_id_namespace="orders", trade_id="synthetic-trade")
     data.update(overrides)
     return TradeFact(**data)
@@ -48,7 +48,7 @@ class BrokerReconcileTests(unittest.TestCase):
                 self.assertEqual(reconcile_facts([fact()], [fact(**patch)])[0].status, "unmatched")
 
     def test_time_tolerance_explicit(self):
-        later = fact(executed_utc=datetime(2026, 1, 1, tzinfo=timezone.utc)
+        later = fact(executed_utc=datetime(2026, 1, 1, tzinfo=UTC)
                      + timedelta(milliseconds=1500))
         self.assertEqual(reconcile_facts([fact()], [later])[0].status, "unmatched")
         self.assertEqual(reconcile_facts([fact()], [later], tolerance_ms=1500)[0].status, "confirmed_id")
