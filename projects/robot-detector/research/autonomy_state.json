@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact public Python source-free CI for public trade marks omitted from ABIDES timing-only feature source hash (366 tests expected). Clarify hash is projected-feature identity not full source authenticity. Then save exact UTC final checkpoint near 19:47:10Z and master issue #72 / stage #97 remarks. No source jobs/seeds.",
-  "last_session_result": "2026-11-22T19:17 UTC run: source-free 364/364 LL identification set then precommitted public marked-trade projection limitation 60c04657 and 2 tests: differing PUBLIC trade price/qty/side with identical public timing/lagged book produce identical M1v4 LL and internal feature fingerprint; private agent IDs rejected. Exact GitHub CI pending.",
+  "resume_instruction": "NEXT_ACTION: require independently attested original ABIDES trade-plus-L2 source capture and proper full PUBLIC marked tape provenance (not projected-feature hash), legal rights/clock exactness/full no-trade quote coverage, and feasible prospective independent train/calibration/evaluation original-world power before any new source execution. If building richer public marked point-process model, preregister and test as separate source-free version; do not retune old spent cohorts. No original source jobs or real-market FDR/owner claims.",
+  "last_session_result": "Active 2026-11-22T19:17Z: native ABIDES Unix-ns source clock, strict sparse L2 causal full-window, M0/M1v4, unrelated non-target positive LL, old genuine 160 compact no new source reanalysis, capture-profile preflight NO-GO, constructed 1ns vs microsecond LL bias and partial identification set, public price/qty/side mark omission from timing-only feature source SHA. Exact public source-free CI 366/366 PASS. No original data/seeds or physical owner/FDR claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:44:08.296Z",
-    "elapsed_minutes": 26.964583333333334,
-    "stage": "ABIDES public price/size/side mark feature projection 2 negative tests, exact Python CI pending",
+    "latest_clock_utc": "2026-11-22T19:45:17.165Z",
+    "elapsed_minutes": 28.1124,
+    "stage": "Final scientific audit: source-free 366/366 and ABIDES public marked trade feature omission limitation",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "b683656098349bfc704387cc11f351390fc6a2e6",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45062183157",
-    "result": "364/364 public source-free Python tests + full source-free constructed LL/compact metadata CLI; no new original simulation sources"
+    "sha": "46ced41f8b93d5938788b5ac1484604adb44ce0d",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266",
+    "result": "366/366 exact Python source-free tests; two public marked-trade nonidentifiability negatives passed, provenance CI success"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",

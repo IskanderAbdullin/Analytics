@@ -51,3 +51,6 @@
 
 
 **ABIDES lossy CSV exact-ns LL partial identifiability (2026-11-22):** [exact Python source-free CI 364/364 #45062183157](https://github.com/IskanderAbdullin/Analytics/actions/runs/45062183157). [Pinned ABIDES scientific NO-GO audit](docs/ABIDES_SOURCE_FAMILY_CAUSAL_READINESS_AUDIT_20261122.md) now integrates public original capture-profile hard-stop, constructed 1ns-vs-CSV source-time LL bias +0.18232156 and sharp microsecond-bucket LL identification set [-0.192678,-0.010357]. This is NOT a CI or new original source case; real market FDR/owners and original 160-case M1v4 replay remain unknown/unreconstructable.
+
+
+**Further public trade mark projection many-to-one result:** [exact source-free 366/366 CI #45062443266](https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266). [ABIDES source-family NO-GO scientific report](docs/ABIDES_SOURCE_FAMILY_CAUSAL_READINESS_AUDIT_20261122.md): two public trade tapes can differ in visible price/quantity/aggressor side while sharing exact event times and sparse book; timing-only M1v4 produces identical projected-feature source hash and heldout LL. Private agent fields are rejected. This is NOT full public source authentication or physical-owner identity. No new market source/seed/FDR.
