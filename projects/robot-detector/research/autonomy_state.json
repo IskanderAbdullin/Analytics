@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement full-window fixed-rate heldout log likelihood under docs/CONDITIONAL_FIXED_INTENSITY_HELDOUT_LL_PREREG_20261122.md; compare identical source-free constructed non-target tapes with M0/M1v2/M2 and exact CI. No real market p-values or new ABIDES seeds.",
+  "resume_instruction": "NEXT_ACTION: verify exact public Python CI for full-window heldout log likelihood, including 10 new negative/unit tests; fix any fail-closed numeric/quality issue. Then compare frozen M0/M1-v2/M2 heldout source-free score on 3 constructed non-target tapes, without inventing p-values or owner labels. No new genuine source seeds.",
   "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:35:00.052Z",
-    "elapsed_minutes": 17.413133333333334,
+    "latest_clock_utc": "2026-11-22T15:35:45.513Z",
+    "elapsed_minutes": 18.170816666666667,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Exact cross-model ambiguity panel Python 131/131 PASS; preregister fixed-rate heldout LL before coding",
+    "stage": "Source-free full-window M0 and M1-v2 held-out predictive LL implementation; 10 adversarial cases authored, CI pending",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",

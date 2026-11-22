@@ -26,6 +26,8 @@ on:
       - 'projects/robot-detector/tests/test_public_m1_dynamic_l2.py'
       - 'projects/robot-detector/tools/public_m0_m1_m2_ambiguity_panel.py'
       - 'projects/robot-detector/tests/test_public_m0_m1_m2_ambiguity_panel.py'
+      - 'projects/robot-detector/tools/public_fixed_intensity_likelihood.py'
+      - 'projects/robot-detector/tests/test_public_fixed_intensity_likelihood.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
