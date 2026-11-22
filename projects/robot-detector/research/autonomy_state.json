@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "c296ed35332a3683f174149642442668a2ae960c",
+  "last_verified_base_commit": "923cbaabe32574f99c1feb2097401227a7758db4",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify exact HEAD provenance CI discovers test_public_intensity_quality_guard.py four new cases with earlier 46 current-stage tests; if fail investigate without weakening preregistered strict previous-only L2 or 1ms diagnostic quality. Then preregister a distinct nontrivial dependence-preserving candidate with full source-free negative controls and no p-values before any new source experiment. No raw market data, no owner inference; issue #72 open.",
-  "last_session_result": "2026-11-22 active inline research: exact provenance CI #44996216864 PASS for preceding c296ed35 new 4 L2 ambiguity tests (plus 8 preexisting prior-L2), no new independent ABIDES or exchange source. Frozen pretest issue #97 comment 7075657012; built separate conservative 1ms precision and strictly prior L2 wrapper for uncalibrated 500ms candidate C, with four additional adversarial source-free tests 4/4 pass on local transcription, exact new-HEAD CI pending. Existing 500ms protocol/seed unchanged; real market FDR and owners unknown.",
+  "resume_instruction": "NEXT_ACTION: Verify latest HEAD provenance CI includes test_public_microburst_block_null.py 4/4 with previous 50 source-free tests; confirm no expensive genuine ABIDES source reruns were manually dispatched. Then freeze a genuinely distinct long-period descriptive statistic and hard-negative 20s periodic family to test D's usefulness without claiming robot owners or market p-values. Keep #72 OPEN.",
+  "last_session_result": "2026-11-22: source-only current-stage CI #44996367981 PASS with 50 explicit timing/L2/ABC tests including 4 quality-wrapper tests on previous SHA 923cbaab. Registered candidate D in issue #97 comment 7075675938 before code: fixed 5s cells, <=10ms microburst blocks, random weak slack compositions, same seed404/64 replicas. Four local source-equivalent negative tests pass; D changes inter-burst spacing while preserving short gaps: Poisson186, momentum168 and periodic0 exactly across all 64. Thus zero power for that conditioned statistic; no calibrated p-values or real-market FDR, no new ABIDES.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T06:51:04Z",
@@ -225,6 +225,12 @@
         "stage_end_time_utc": "2026-11-22T07:01:05Z",
         "elapsed_minutes": 10.0167,
         "tests": "4 new local source-equivalent regression groups pass; previous L2 exact CI verified"
+      },
+      {
+        "stage": "precommitted D microburst-block relocation, falsified short-gap identification power",
+        "stage_end_time_utc": "2026-11-22T07:03:13Z",
+        "elapsed_minutes": 12.15,
+        "tests": "4 new local source-equivalent negative tests pass; short-gap count invariant 186/168/0 across 64 D replicas"
       }
     ],
     "final_elapsed_minutes": null,

@@ -507,6 +507,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-22 | After registering #97 comment 7075657012, added optional conservative C quality wrapper: 1ms declared print precision plus strict previous-only public L2 needed before source-free sampling; all missing, coarse, ambiguous or private-field examples fail closed. No frozen candidate C parameters changed. | Engineering source-free diagnostic; exact new CI pending |
 
+| 2026-11-22 | Added prospectively described D 10ms microburst-block relocation (#97 comment 7075675938), preserving short gaps but allowing greater between-burst timing support than B; D exactly conserves <=10ms gap count in Poisson/momentum/periodic constructed controls, so that statistic has no inferential power under D. | Technical source-free method development only; CI pending |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -678,4 +680,31 @@ quality checks, not proof of real exchange completeness or p-values.
 NEXT_ACTION: confirm four new wrapper tests by exact CI and prevent
 label-leak/coverage assumptions; then freeze a more informative
 dependence-preserving null comparison before adding more source data.
+
+### 2026-11-22 — source-free candidate D, microburst-block relocation
+
+[Preregistered exploratory implementation comment](https://github.com/IskanderAbdullin/Analytics/issues/97#issuecomment-7075675938)
+freezes a *new* D sensitivity comparator. In every 5s UTC cell,
+consecutive timestamp groups separated by <=10ms are joined into
+ordered microburst blocks. Each block retains exact intra-block offsets
+and split-fill multiplicities, while random weak compositions of slack
+relocate the between-block intervals without merging blocks. The two
+synthetic 8-event bursts retain 14 adjacent <=10ms gaps; B's interburst
+boundary remains fixed at 1993ms, D's varies across 64 replicates.
+On already inspected A/B/C constructed controls, D preserves the
+short-gap statistic exactly (Poisson-like 186, momentum-like 168,
+unrelated periodic 0) in every replicate, a **negative falsification
+of D's usefulness for calibrating that statistic**.
+See [MICROBURST_BLOCK_TIMING_NULL_NEGATIVE_20261122.md](MICROBURST_BLOCK_TIMING_NULL_NEGATIVE_20261122.md).
+Four constructed source-equivalent tests locally PASS (4/4);
+exact committed CI pending. Separate previous
+[provenance CI #44996367981](https://github.com/IskanderAbdullin/Analytics/actions/runs/44996367981)
+confirmed four new precision/prior-L2-wrapper tests on the preceding
+SHA; this is technical, not source-validation of real timestamp
+accuracy. No new ABIDES or market source data, no p-values, owner
+labels or real market FDR.
+
+NEXT_ACTION: verify exact latest D CI, then predeclare separate
+long-period statistic and fixed periodic hard-negative family
+to audit whether D's extra support has useful identification limits.
 
