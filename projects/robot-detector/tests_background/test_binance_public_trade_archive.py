@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Bounded no-network public trade source/integrity/license regression fixtures."""
 import io
+from datetime import datetime, timedelta, timezone
 import json
 from hashlib import sha256
 from pathlib import Path
@@ -219,7 +220,8 @@ class RealTradeArchiveTests(unittest.TestCase):
         for symbol,day in (
             ("../../etc",DAY),("ltcusdt",DAY),("LTCUSDT","2026-11-31"),
             ("LTCUSDT","2026-11-18/extra"),
-            ("LTCUSDT","2099-01-01"),("LTCUSDT","2026-11-21"),
+            ("LTCUSDT","2099-01-01"),
+            ("LTCUSDT",(datetime.now(timezone.utc).date()+timedelta(days=1)).isoformat()),
         ):
             with self.subTest(symbol=symbol,day=day),self.assertRaises(ValueError):
                 frozen_source(symbol,day)
