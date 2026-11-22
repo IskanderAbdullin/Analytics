@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Read-only reconstruction of one Babid01 position discrepancy window.
 
-The script correlates order/fill rows with available logs. It does NOT
+The script correlates order/fill rows with available logs, but preserves
+separate source-native event order and clock domains: exchange-reported fill
+execution time is not robot log observation/processing time. It does NOT
 contact T-Invest, cancel orders, reset risk, or change journal state.
 """
 from __future__ import annotations
@@ -69,6 +71,7 @@ def examine_fills(source: Path, start: str, end: str):
             total_sell += lots if sign == -1 else 0
             rows.append(dict(timestamp=row["time_msk"], source="fills.csv", level="FILL",
                              category="synthetic" if row.get("synthetic") == "1" else "execution",
+                             clock_domain="broker_reported_execution", source_sequence=line_no,
                              order=row.get("order", ""), trade_id=row["trade_id"],
                              side=side, lots=lots, net_lots=net,
                              detail=f"price={row.get('price','')}; role={row.get('kind','')}; realized={row.get('realized','')}"))
@@ -93,7 +96,8 @@ def examine_logs(folder: Path, start: str, end: str):
                             else "order" if re.search(r"Order \d+:", message)
                             else "connection" if "stream" in message.lower() else "other")
                 events.append(dict(timestamp=at, source=path.name, level=level,
-                                   category=category, order="", trade_id="",
+                                   category=category, clock_domain="robot_log_observation",
+                                   source_sequence=line_no, order="", trade_id="",
                                    side="", lots="", net_lots="", detail=message[:700]))
                 if "position outside" in message.lower():
                     match_position, match_delta = BROKER.search(message), OUTSIDE.search(message)
@@ -122,10 +126,15 @@ def run(root: Path, state_name: str, logs_name: str,
     fills, dupes, gaps, buy, sell, last_net = examine_fills(
         state / "fills.csv", start, end)
     events, checks = examine_logs(logs, start, end)
-    all_events = sorted(fills + events, key=lambda r: (r["timestamp"], r["source"]))
+    # These are distinct clocks. Do NOT merge-sort by timestamp: a delayed
+    # broker execution can predate a cancel that the engine observed first.
+    # Preserve ledger physical row order and each robot log's native line order.
+    all_events = sorted(fills + events, key=lambda r: (
+        r["clock_domain"], r["source"], r["source_sequence"]))
     output.mkdir(parents=True, exist_ok=False)
     output_csv(output / "incident_evidence.csv",
-               ["timestamp", "source", "level", "category", "order", "trade_id", "side",
+               ["timestamp", "clock_domain", "source_sequence", "source", "level", "category",
+                "order", "trade_id", "side",
                 "lots", "net_lots", "detail"], all_events)
     output_csv(output / "broker_journal_checks.csv",
                ["timestamp", "log", "line", "broker_lots", "journal_lots",
@@ -147,7 +156,15 @@ def run(root: Path, state_name: str, logs_name: str,
                    full_fills_last_net_lots=last_net,
                    duplicate_trade_ids=len(dupes), fill_continuity_gaps=len(gaps),
                    position_check_events=len(checks), log_events=len(events),
-                   risk_snapshot=risk, result="evidence only: no causal claim without broker trades")
+                   risk_snapshot=risk, result="evidence only: no causal claim without broker trades",
+                   source_native_order_preserved=True,
+                   cross_clock_temporal_causality="not_inferred",
+                   clock_domains={
+                       "fills.csv": "reported execution timestamp; ledger physical rows retained",
+                       "logs": "robot log observation timestamp; file line order retained",
+                   },
+                   timeline_limitation="incident_evidence.csv groups by time domain and native "
+                                       "record order, not a merged causal timeline")
     (output / "summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     return summary

@@ -186,3 +186,9 @@
 Статически установлено: `Order.Filled=max(FilledByState,FilledByFills)`, `FillsSynchronized = FilledByFills>=FilledByState`, а `PruneOrders` удаляет лишь terminal zero-filled Settled (grace=5s, no NeedsCheck/ResyncNeeded/QueryInFlight). Поэтому Cancel/0 мог перейти в eligible state через 5 секунд, оставляя 33.285 секунды до обработки Sell2 **только при отсутствии запрещающих событий**. Silent FilledByState>0 до Prune делает удаление невозможным для данного состояния. Реальные `UpdatedUtc`/флаги/ArchivedUtc не наблюдались.
 
 **T22 (synthetic):** 9 тестов условного предиката и счёта (отдельный `late_fill_paths.py`, не C# эмулятор), включая grace, статусную precredit, нехватку синхронизации, флаги и требуемое раннее смещение счёта для гипотезы H-007. На исторических данных гипотезы не подтверждены. Робот не изменялся.
+
+## 14. P0-S8 — независимые оси часов в аналитическом инцидентном отчёте (E-044)
+
+Старый `position_forensics.py` создавал `incident_evidence.csv`, сортируя вместе broker-reported timestamp из fills.csv и локальную метку сообщения логгера. Это не причинная хронология: ledger содержит trade event time, а лог — receipt/processing observation time. Анализатор теперь маркирует clock_domain, source_sequence и группирует output в source-native order; сводка содержит явный `not_inferred` для междоменных причинных связей. Старые приватные отчёты повторно применять для RCA только после пересчёта, не переставляя физические строки fills.csv по времени исполнения.
+
+**T23 (synthetic):** две записи ledger в физическом порядке с инверсией reported trade timestamps плюс отдельные строки отмены и позднего FILL в robot log. Проверить независимые clock-domain/source-sequence, absence joint sort и отсутствие утверждения о причинности. Реальные данные и робот не задействованы.
