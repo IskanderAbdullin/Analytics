@@ -51,3 +51,46 @@ def rescaled_cluster_gaps(print_times_ms, exposure):
             raise Abstain("ZERO_OR_INVALID_INTEGRATED_INTENSITY")
         out.append(integral)
     return tuple(out)
+
+# Public-source input contract: this is a provenance/eligibility gate, not a
+# statistical calibration or a proof of real-world source completeness.
+PUBLIC_FIELDS = frozenset({"timestamp_ms", "side", "quantity", "price"})
+L2_FIELDS = frozenset({"timestamp_ms", "bid_price", "ask_price", "complete"})
+
+def validate_public_inputs(prints, l2_snapshots, *, timestamp_resolution_ms):
+    """Fail closed on hidden fields, coarse clocks and non-previous L2.
+
+    Returns the sorted public print times. Does not fit an intensity model.
+    A timestamp is eligible only if a strictly earlier complete L2 snapshot
+    exists; no forward fill from simultaneous/future book states.
+    """
+    if type(timestamp_resolution_ms) is not int or not (0 < timestamp_resolution_ms <= 1):
+        raise Abstain("UNVERIFIED_OR_COARSE_CLOCK_PRECISION")
+    if not isinstance(prints, (tuple, list)) or not isinstance(l2_snapshots, (tuple, list)):
+        raise Abstain("INVALID_PUBLIC_RECORDS")
+    def checked(record, allowed, required):
+        if not isinstance(record, dict) or not required.issubset(record) or set(record) - allowed:
+            raise Abstain("FORBIDDEN_OR_MISSING_PUBLIC_FIELD")
+        t = record["timestamp_ms"]
+        if type(t) is not int or t < 0 or t % timestamp_resolution_ms:
+            raise Abstain("INVALID_PUBLIC_TIMESTAMP")
+        return t
+    times = [checked(p, PUBLIC_FIELDS, {"timestamp_ms"}) for p in prints]
+    books = [checked(b, L2_FIELDS, {"timestamp_ms", "complete"}) for b in l2_snapshots]
+    if times != sorted(times) or books != sorted(books):
+        raise Abstain("UNSORTED_PUBLIC_EVENTS")
+    if len(set(times)) < 2:
+        raise Abstain("INSUFFICIENT_UNIQUE_CLUSTERS")
+    if not books:
+        raise Abstain("NO_PRIOR_L2")
+    j = 0
+    prior = None
+    for t in sorted(set(times)):
+        while j < len(books) and books[j] < t:
+            if type(l2_snapshots[j]["complete"]) is not bool:
+                raise Abstain("INVALID_L2_COMPLETENESS")
+            prior = l2_snapshots[j]
+            j += 1
+        if prior is None or not prior["complete"]:
+            raise Abstain("NO_COMPLETE_STRICTLY_PRIOR_L2")
+    return tuple(times)
