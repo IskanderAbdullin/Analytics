@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: check exact Python CI for new source-free M1-v2 dynamic lagged BBO stratification/negative tests; fix without changing frozen 1000ms lag/10s staleness/exposure-weighted median. Compare M1-v2 coverage with original M1 on synthetic changing-book fixtures; no real-source validity or owner/FDR claims.",
-  "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
+  "resume_instruction": "NEXT_ACTION: confirm exact Python CI after M1-v2 fail-closed numeric handling and repaired invalid negative fixtures; if green, perform an independent source-free comparison of old M1 stable-window vs new M1-v2 changing-book coverage, with all ABSTAIN and non-target negatives retained. No real source or simulator seeds before independent protocol.",
+  "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:30:16.859Z",
-    "elapsed_minutes": 12.69325,
+    "latest_clock_utc": "2026-11-22T15:31:04.636Z",
+    "elapsed_minutes": 13.489533333333334,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "M1-v2 dynamic lagged L2 training and exposure source-free implementation; exact GitHub CI pending",
+    "stage": "M1-v2 numeric integrity error and two invalid test premises repaired, exact GitHub CI pending",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",

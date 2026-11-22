@@ -80,7 +80,7 @@ class DynamicLaggedL2Tests(unittest.TestCase):
         m=fit_m1_dynamic_train_only(training())
         for w in (replace(eval_window(),snapshots=(book(19500),)),
                   replace(eval_window(),snapshots=(book(1000),)),
-                  replace(eval_window(),snapshots=(book(18500),))):
+                  replace(eval_window(),snapshots=(book(12000),))):
             with self.subTest(w=w),self.assertRaises(Abstain):
                 predict_m1_dynamic_exposure(m,w)
 
@@ -121,6 +121,7 @@ class DynamicLaggedL2Tests(unittest.TestCase):
         with self.assertRaisesRegex(Abstain,"STRATUM"):
             fit_m1_dynamic_train_only(rr)
         rr=training();rr[0]=replace(rr[0],cluster_times_ms=())
+        rr[1]=replace(rr[1],cluster_times_ms=(11000,))
         with self.assertRaisesRegex(Abstain,"STRATUM"):
             fit_m1_dynamic_train_only(rr)
 

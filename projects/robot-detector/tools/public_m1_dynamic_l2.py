@@ -56,7 +56,12 @@ def _valid_ms(t):
 
 
 def _valid_quote(v):
-    return type(v) in (int, float) and isfinite(v) and v > 0
+    if type(v) not in (int, float):
+        return False
+    try:
+        return isfinite(v) and v > 0
+    except (OverflowError, TypeError, ValueError):
+        return False
 
 
 def _quality_segments(run):
