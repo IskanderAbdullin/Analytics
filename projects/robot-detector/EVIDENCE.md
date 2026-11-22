@@ -39,3 +39,6 @@
 
 
 **2026-11-22 exact-ns visible type4 source pipeline:** GitHub [public Python CI #45056270305](https://github.com/IskanderAbdullin/Analytics/actions/runs/45056270305) PASS 257/257, post-event-only lagged M1-v3, source-bound original training with consistent visible type4 process, all mathematical tests synthetic. [Scientific independent-source NO-GO audit](docs/NS_VISIBLE_TYPE4_SOURCE_READINESS_AUDIT_20261122.md) lists unresolved real original type4 clock precision, market completeness, rights and power. No true actor labels, real market FDR or new original seeds.
+
+
+**Model-specific exact-time observability limit:** [source readiness scientific audit](docs/NS_VISIBLE_TYPE4_SOURCE_READINESS_AUDIT_20261122.md) now states that multiple simultaneous visible type4 executions can map to one unique-nanosecond event cluster. The cluster-intensity likelihood is invariant to exact duplicate print timestamps with fixed causal book exposure; raw public visible execution count is reported separately, physical number of parent orders/owners unknown. This is a source-free mathematical limit, not market FDR.
