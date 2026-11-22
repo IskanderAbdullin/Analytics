@@ -196,12 +196,20 @@
     "do_not_close_master_issue_after_single_stage": true
   },
   "resume_instruction": "NEXT_ACTION: Verify exact-source Python CI for strict exposure flags, then implement deterministic causal M0/M1/M2 fit/predict interfaces with train-only parameter estimation and negative tests (zero rates, lookahead, timestamp clusters, missing L2). Freeze independent run-level train/calibration/test allocation before any new source seeds. Preserve 3301–3340 as spent; real FDR/owners unknown.",
-  "last_session_result": "2026-11-22T11:12Z: audited remote HEAD cae5aa4f and successful existing PR CI; found fail-open Exposure.complete/causal flags accepting truthy non-booleans; prepared strict type guard and source-free regression. No new source simulation or holdout.",
+  "last_session_result": "2026-11-22 11:12:33–11:13:33 UTC: fail-closed causal exposure flag check and regression committed; exact Python CI queued #45016249439, other workflows queued; no new ABIDES source or real-market inference.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T11:12:33Z",
     "deadline_utc": "2026-11-22T12:02:33Z",
-    "measured_checkpoints": [],
-    "note": "Current active run; exact stage-end times will be added after remote verification."
+    "measured_checkpoints": [
+      {
+        "stage": "Remote HEAD/CI and full project recovery; strict causal exposure flag negative guard",
+        "stage_end_time_utc": "2026-11-22T11:13:33Z",
+        "elapsed_minutes": 1,
+        "tests": "Regression authored; exact Python CI queued, no source experiments"
+      }
+    ],
+    "note": "Measured UTC 11:12:33 to 11:13:33 (60 seconds); early bounded run, not 50 minutes.",
+    "final_elapsed_minutes": 1
   }
 }
