@@ -195,7 +195,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify GitHub CI and committed test discovery on latest HEAD after constructed tape chronology fix; local source-equivalent four tests passed with observed 42 gaps, uniform 0..2, offset-preserving 42..42. Preregister intensity-conditioned null and Poisson/momentum negatives before any new source seeds. No p-values, real-market FDR or owner attribution.",
-  "last_session_result": "2026-11-22: Found real constructed burst fixture bug (split-fill duplicates appended after later timestamps); strict sampler correctly rejected unsorted input. Fixed with tape.sort() before sampling, not by relaxing validation. Local source-equivalent 4/4 tests pass; constructed 64-replicate gap ranges uniform 0..2, offset 42..42, observed 42. New HEAD CI still needs confirmation. No new source runs.",
+  "resume_instruction": "NEXT_ACTION: Verify GitHub CI and exact committed four burst tests after chronology fix; implement preregistered 500ms intensity-conditioned candidate C from docs/INTENSITY_CONDITIONED_NULL_PREREG_20261122.md, with Poisson/momentum/burst/periodic hard negatives, strict occupancy/cluster invariants and no p-values. Original 3301-3340 spent.",
+  "last_session_result": "2026-11-22: Corrected constructed burst fixture chronology (strict input rejection preserved); local source-equivalent 4/4 adversarial tests passed with 42 observed short gaps, uniform range 0..2, rigid-offset 42..42. Added pre-implementation intensity-conditioned 500ms subcell null preregistration, no new ABIDES seeds, no market p-values. Latest CI to verify.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
