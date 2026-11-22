@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from public_conditional_timing_null import conditional_sample, cell_occupancy
+from public_conditional_timing_null import conditional_sample, cell_occupancy, conditional_cluster_sample
 
 
 class ConditionalTimingTests(unittest.TestCase):
@@ -43,6 +43,28 @@ class ConditionalTimingTests(unittest.TestCase):
         tape = [100 + i*5000 for i in range(6)]
         self.assertEqual([b-a for a,b in zip(tape, tape[1:])], [5000]*5)
         self.assertEqual(cell_occupancy(conditional_sample(tape, seed=12)), cell_occupancy(tape))
+
+
+    def test_cluster_multiplicity_per_cell(self):
+        from collections import Counter
+        tape = [100, 100, 100, 120, 120, 4999, 5001, 5001, 5010]
+        for replicate in range(12):
+            sampled = conditional_cluster_sample(tape, seed=77, replicate=replicate)
+            self.assertEqual(len(sampled), len(tape))
+            self.assertEqual(
+                {cell: sorted(n for t, n in Counter(tape).items()
+                              if t // 5000 == cell)
+                 for cell in (0, 1)},
+                {cell: sorted(n for t, n in Counter(sampled).items()
+                              if t // 5000 == cell)
+                 for cell in (0, 1)}
+            )
+            self.assertEqual(sampled, sorted(sampled))
+
+    def test_cluster_sample_rejects_invalid_inputs(self):
+        for tape in ([20, 10], [-1, 2], [True, 5]):
+            with self.subTest(tape=tape), self.assertRaises(ValueError):
+                conditional_cluster_sample(tape, seed=1)
 
 
 if __name__ == "__main__":
