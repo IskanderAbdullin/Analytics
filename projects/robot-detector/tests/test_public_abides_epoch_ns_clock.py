@@ -22,8 +22,10 @@ def sample(*offsets):
     return tuple(origin()+34200*NS+x for x in offsets)
 
 
-def tape(times=None,**kw):
-    return qualify(sample(1,2,2) if times is None else times,
+DEFAULT_TAPE=object()
+
+def tape(times=DEFAULT_TAPE,**kw):
+    return qualify(sample(1,2,2) if times is DEFAULT_TAPE else times,
                    simulation_date=kw.pop("simulation_date","20210205"),**kw)
 
 
