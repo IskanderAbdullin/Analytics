@@ -25,6 +25,20 @@ class ExactBoundsTests(unittest.TestCase):
             with self.subTest(k=k, n=n, a=a), self.assertRaises(ValueError):
                 upper_one_sided(k, n, a)
 
+    def test_invalid_alpha_also_rejected_when_no_eligible_data(self):
+        for alpha in (0, 1, True, None, "0.05", float("nan"), float("inf"), 10**500):
+            with self.subTest(alpha=repr(alpha)), self.assertRaisesRegex(ValueError, "INVALID_ALPHA"):
+                conservative_outcome_bounds(0, 0, 10, alpha)
+
+    def test_unbounded_denominators_fail_closed_not_overflow(self):
+        for n in (1001, 10**500):
+            for k in (0, 1):
+                with self.subTest(n=str(n)[:12], k=k), self.assertRaisesRegex(ValueError, "BOUNDED_STUDY"):
+                    upper_one_sided(k, n)
+            with self.assertRaisesRegex(ValueError, "BOUNDED_STUDY"):
+                conservative_outcome_bounds(0, 0, n)
+        self.assertGreater(upper_one_sided(0, 1000), 0)
+
     def test_missing_coverage_not_relabelled_as_success(self):
         r = conservative_outcome_bounds(90, 90, 100)
         self.assertEqual(r['abstentions'], 10)

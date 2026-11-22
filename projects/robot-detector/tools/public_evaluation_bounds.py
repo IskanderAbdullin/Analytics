@@ -1,11 +1,17 @@
 """Source-free exact binomial bounds; descriptive only, not real-market FDR."""
 import math
 
+MAX_INDEPENDENT_WORLDS = 1000  # bounded source-free study guard, never truncate data
+
 
 def _validate(k, n, alpha):
     if type(k) is not int or type(n) is not int or n <= 0 or not 0 <= k <= n:
         raise ValueError("INVALID_COUNTS")
-    if not isinstance(alpha, (float, int)) or isinstance(alpha, bool) or not math.isfinite(alpha) or not 0 < alpha < 1:
+    if n > MAX_INDEPENDENT_WORLDS:
+        raise ValueError("DENOMINATOR_OUTSIDE_BOUNDED_STUDY")
+    # Compare the interval first: avoids OverflowError converting huge int to
+    # float inside isfinite(). Booleans are never valid alpha estimates.
+    if type(alpha) not in (int, float) or not 0 < alpha < 1 or not math.isfinite(alpha):
         raise ValueError("INVALID_ALPHA")
 
 
@@ -62,6 +68,8 @@ def conservative_outcome_bounds(alarms, eligible, total, alpha=0.05):
             raise ValueError("INVALID_COUNTS")
     if not (alarms <= eligible <= total) or total == 0:
         raise ValueError("INVALID_COVERAGE")
+    # Validate study size and alpha even with zero eligible observations.
+    _validate(0, total, alpha)
     if eligible == 0:
         return {"status": "ABSTAIN", "abstentions": total, "upper_alarm": None, "lower_alarm_all": 0.0}
     return {"status": "ELIGIBLE", "abstentions": total - eligible,

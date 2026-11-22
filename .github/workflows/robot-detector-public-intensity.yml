@@ -14,6 +14,10 @@ on:
       - 'projects/robot-detector/tests/test_public_m2_train_only.py'
       - 'projects/robot-detector/tools/public_run_allocation_gate.py'
       - 'projects/robot-detector/tests/test_public_run_allocation_gate.py'
+      - 'projects/robot-detector/tools/public_evaluation_bounds.py'
+      - 'projects/robot-detector/tests/test_public_evaluation_bounds.py'
+      - 'projects/robot-detector/tools/public_paired_seed_inference.py'
+      - 'projects/robot-detector/tests/test_public_paired_seed_inference.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:

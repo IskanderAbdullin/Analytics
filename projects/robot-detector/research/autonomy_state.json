@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement separately preregistered source-free exact-binomial numeric fail-closed gates and world-clustered conservative paired control inference; run exact Python tests and preserve negative controls. No new market source seeds or trading. Check remote HEAD and CI/automation before edits.",
-  "last_session_result": "2026-11-22 new active run started 15:17:35 UTC, remote HEAD 29bd4b80 with three completed success workflows; inspected source-free bounds 5 tests in provenance CI #45026003166. Found two source-free code-inspection numeric/coverage failure risks and froze two prospective preregs BEFORE new code. No source jobs or seeds.",
+  "resume_instruction": "NEXT_ACTION: inspect exact public Python CI on new bounds and paired-seed source-only tests; repair failures without changing preregistered 1000-world guard, 4-test Bonferroni or worst-case abstention. Then audit source-world power/resource assumptions and independently freeze real source protocol; NO new ABIDES seeds without source-rights/coverage approval.",
+  "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:19:41.541Z",
-    "elapsed_minutes": 2.104616666666667,
+    "latest_clock_utc": "2026-11-22T15:20:48.793Z",
+    "elapsed_minutes": 3.2254833333333335,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Source-free prospective paired-seed-world and binomial numeric gate preregistration",
+    "stage": "Source-free exact numeric guards and paired seed-world inference authored; exact GitHub CI pending",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
