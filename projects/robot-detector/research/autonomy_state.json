@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement preregistered exact ABIDES simulated-UTC-ns whole observation-window sparse L2 exposure gate, fail when last quote too old even if all observed trades have eligible prior quote. 1sec lag, max10sec end-of-segment source age; cheap Python negative CI.",
-  "last_session_result": "2026-11-22 19:17 UTC active: ABIDES native epoch ns precision CI 279/279 succeeded; separate public-only original source-free sparse-L2 EXEC family screen written under earlier precommitted protocol, with explicit 1s quote lag, 10s age, book ties, 14 negative tests. No original source/simulator jobs; CI pending.",
+  "resume_instruction": "NEXT_ACTION: verify exact public Python CI for ABIDES source-free full-window quote-time exposure; preserve event-only PASS vs full-window stale NO-GO negative, repair source-free fixtures only if needed. Then prereg independent-source evidence/eligibility manifest that cannot self-attest true exchange completeness.",
+  "last_session_result": "19:17 UTC session: 293/293 ABIDES epoch+public sparse L2 tests confirmed, then strict full observation-window quote-age exposure prereg 1e7080e6, source-free code + 12 adversarial tests written, CI pending. Existing source-only original worlds not rerun, no new seeds or market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:25:06.736Z",
-    "elapsed_minutes": 7.938583333333334,
-    "stage": "Source-free 293/293 ABIDES sparse L2 tests confirmed; precommit distinct full-window exposure vs per-event eligibility gap",
+    "latest_clock_utc": "2026-11-22T19:25:59.430Z",
+    "elapsed_minutes": 8.816816666666666,
+    "stage": "ABIDES full-window causal quote exposure source-free 12 tests built; exact CI pending",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
