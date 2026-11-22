@@ -29,7 +29,8 @@ def rescaled_cluster_gaps(print_times_ms, exposure):
     segments=sorted(exposure,key=lambda s:s.start_ms)
     for s in segments:
         if (type(s.start_ms) is not int or type(s.end_ms) is not int or
-            s.start_ms>=s.end_ms or type(s.rate_per_second) not in (int, float) or\n            not isfinite(s.rate_per_second) or
+            s.start_ms>=s.end_ms or type(s.rate_per_second) not in (int, float) or
+            not isfinite(s.rate_per_second) or
             s.rate_per_second<0 or not s.complete or not s.causal):
             raise Abstain("INVALID_OR_NONCAUSAL_EXPOSURE")
     if any(a.end_ms>b.start_ms for a,b in zip(segments,segments[1:])):
