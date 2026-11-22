@@ -784,3 +784,8 @@ without PYTHONPATH to validate. Exact corrected GitHub CI PENDING.
 ### 2026-11-22 — prospective conditional-intensity design (new protocol; no data evaluated)
 
 [Preregistration](CONDITIONAL_INTENSITY_PREREG_20261122.md) specifies a public unique-timestamp-cluster conditional-intensity rescaling diagnostic with strictly previous-only L2, exposure gaps, fail-closed abstentions and eight mandatory adversarial cases. M0 activity baseline, M1 causal L2, and M2 self-excitation are competing hypotheses, not validated detectors. Original 3301–3340 remain spent; no new holdout or p-values. Corrected HEAD 8fd4590a CI five workflows successful; this addition is design-only and requires implementation/tests. NEXT_ACTION: implement rescaling core and negative controls, then freeze truly independent source allocation before evaluation.
+
+
+### 2026-11-22 — fail-closed conditional-intensity rescaling prototype
+
+Implemented `tools/public_intensity_rescaling.py` with public unique-cluster timestamps, piecewise externally fixed nonnegative causal rates, complete exposure tiling and explicit abstention on missing/overlapping/noncausal/zero-intensity input. Added `tests/test_public_intensity_rescaling.py` (12 source-free negative/unit cases). A locally transcribed source-equivalent implementation passed 11/11 before commit; exact GitHub test run still pending. This does **not** fit M0/M1/M2, validate model exchangeability, establish p-values, detect actors or calibrate real-market FDR. NEXT_ACTION: verify exact CI, integrate strict precision and previous-only L2 gates, then freeze independent training/evaluation allocation.

@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Implement deterministic fail-closed causal conditional-intensity rescaling core with eight source-free adversarial cases from docs/CONDITIONAL_INTENSITY_PREREG_20261122.md. Before any new source/holdout, freeze independent market-run allocation and full model-selection/threshold protocol. Verify latest CI. Keep master #72 open.",
-  "last_session_result": "2026-11-22: corrected HEAD 8fd4590a has five successful GitHub Actions runs (including provenance); new prospective conditional-intensity design registered, without experiments, new seeds, inferential claims or market FDR.",
+  "resume_instruction": "NEXT_ACTION: Verify exact-HEAD source-free rescaling tests in cheap GitHub CI; add model-input source allowlist, strict timestamp precision and previous-only L2 eligibility integration. Then freeze M0/M1/M2 fitting and independent source allocation BEFORE new ABIDES seeds. Do not call current rescaler a calibrated null. Master #72 stays open.",
+  "last_session_result": "2026-11-22: prospective causal intensity protocol committed; deterministic source-free piecewise constant rescaling prototype and 12 adversarial unit tests added. Earlier local source-equivalent 11 tests passed, but exact committed GitHub CI still needs verification. No new ABIDES, p-values, market FDR or owner claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T08:16:57Z",
