@@ -15,3 +15,6 @@
 
 
 **M2 engineering (not yet independently verified):** preregistration commit `167d9174` precedes source-free scorer `tools/public_m2_train_only.py` and 12 authored tests. Local stand-alone equivalent passed 12/12; exact GitHub Python CI pending. Model fit is NOT market calibration or an actor detector.
+
+
+**M2 exact CI and later negative:** Python run [#45024579897](https://github.com/IskanderAbdullin/Analytics/actions/runs/45024579897) PASS **63/63** on `8a28d374`, including 12 new M2 tests. Later `10**500` malformed timestamp/rate found uncontrolled OverflowError, added explicit safe-exact-range ABSTAIN and 2 tests; local equivalent 14/14 pass, new GitHub CI pending. Original M2 source data/calibration still absent.

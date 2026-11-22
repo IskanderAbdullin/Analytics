@@ -91,6 +91,21 @@ class M2PredictabilityTests(unittest.TestCase):
         self.assertEqual([s.run_id for s in scored],["fixed20","momentum","poisson_like"])
         self.assertFalse(hasattr(scored[0],"owner_id"))
 
+    def test_extreme_timestamp_exposure_and_event_abstain_not_overflow(self):
+        with self.assertRaisesRegex(Abstain, "SAFE_EXACT_RANGE"):
+            fit_m2_train_only([M2Run("large", 0, 10**500, (100,))])
+        m = fit_m2_train_only(train())
+        with self.assertRaisesRegex(Abstain, "SAFE_EXACT_RANGE"):
+            evaluate_m2_run(m, M2Run("eval", 0, 10**500, (100,)))
+        with self.assertRaisesRegex(Abstain, "SAFE_EXACT_RANGE"):
+            evaluate_m2_run(m, M2Run("eval", 0, 10**500 + 200, (10**500,)))
+
+    def test_extreme_forged_rate_abstains_not_overflow(self):
+        m = fit_m2_train_only(train())
+        for field in ("mu_per_second", "amplitude_per_second", "tau_seconds"):
+            with self.subTest(field=field), self.assertRaisesRegex(Abstain, "INVALID_M2_PARAMETERS"):
+                evaluate_m2_run(replace(m, **{field: 10**500}), M2Run("eval", 0, 1000, (300,)))
+
     def test_no_observed_eval_events_is_scored_not_fabricated_as_owners(self):
         m=fit_m2_train_only(train())
         result=evaluate_m2_run(m,M2Run("empty_eval",0,1000,()))

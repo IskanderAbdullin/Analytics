@@ -151,7 +151,8 @@
       "Checkpoint, tests, CI, push and next scientific stage",
       "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains",
       "Prospective M2 predictable-history exponential intensity candidate preregistration (2026-11-22; design-only)",
-      "Train-only M2 predictable-history model (exact GitHub CI pending), no independent sources"
+      "Train-only M2 predictable-history model (exact GitHub CI pending), no independent sources",
+      "M2 finite/overflow fail-closed fix with two new adversarial tests, exact CI pending"
     ],
     "acceptance": [
       "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
@@ -198,8 +199,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact M2 source-free 12 unit/negative tests in public GitHub Python CI for new HEAD; repair failures without changing frozen 1.0s tau, 3x3 training grid, source gates or holdout. Then preregister independently allocated original-run train/calibration/evaluation with hard negatives and source-rights gate before any fresh simulator seeds; preserve 3301–3340 as spent.",
-  "last_session_result": "2026-11-22: migrated original project and preserved AGENTS; M1 passed exact 51/51 Python CI #45024195498 and provenance corrected #45024279130. M2 prereg committed at 167d9174 BEFORE source-free code. 12 new M2 tests passed locally on source-equivalent stub; exact M2 GitHub CI pending. No source data/seed/market FDR/owner claims.",
+  "resume_instruction": "NEXT_ACTION: inspect exact public Python CI for two new M2 extreme-numeric fail-closed tests; if passed, preregister independent original-market-run train/calibration/evaluation allocation and all hard negatives (Poisson, unrelated fixed20, momentum, missingness) before any fresh ABIDES seed/source. Do not claim M0/M1/M2 statistical significance, exchange completeness, owner identity or real-market FDR.",
+  "last_session_result": "2026-11-22 migration 83d9be1c; M1 exact 51/51 #45024195498; provenance regression fixed 24f2e8ff; M2 prereg first 167d9174, M2 exact 63/63 #45024579897. Subsequent extreme-number negative found unhandled OverflowError in M2 (10**500), fail-closed fix and 2 tests now committed; local 14/14 source-equivalent PASS, exact new GitHub CI pending. No market sources/new seeds/owner/FDR claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
@@ -227,9 +228,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "0f3728e137ca093304d11349fba02bab2d3fbdfa",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024195498",
-    "result": "PASS 51 exact-source Python tests (12 M1; 9 M0). Source-free technical checks only; M1 source validation/calibration absent."
+    "sha": "8a28d374bb09497d63488ffe63d2ec1d696b9924",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024579897",
+    "result": "PASS 63/63 exact Python tests including 12 M2; new extreme-number regression pending on next SHA"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
@@ -251,8 +252,8 @@
     "notes": "No duplicate Info project, no raw vendor data, no private Actions/Computer Use."
   },
   "last_confirmed_provenance_ci": {
-    "sha": "24f2e8ff408ab9f457266b36024b92bcedfd6d43",
-    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024279130",
+    "sha": "8a28d374bb09497d63488ffe63d2ec1d696b9924",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024579964",
     "status": "success"
   },
   "last_session_clock": {

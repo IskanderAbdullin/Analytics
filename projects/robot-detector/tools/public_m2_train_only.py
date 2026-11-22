@@ -12,6 +12,16 @@ TAU_SECONDS = 1.0
 MU_MULTIPLIERS = (0.5, 1.0, 2.0)
 EXCITATION_AMPLITUDES = (0.0, 0.2, 0.4)
 MAX_UNIQUE_CLUSTERS = 100_000
+MAX_SAFE_TIMESTAMP_MS = 2**53 - 1  # integer milliseconds exactly representable as float
+
+
+def _finite_real(value):
+    if type(value) not in (int, float):
+        return False
+    try:
+        return isfinite(value)
+    except (OverflowError, ValueError, TypeError):
+        return False
 
 
 @dataclass(frozen=True)
@@ -51,6 +61,8 @@ def _validate_run(run):
     if (type(run.start_ms) is not int or type(run.end_ms) is not int or
         run.start_ms < 0 or run.start_ms >= run.end_ms):
         raise Abstain("INVALID_EXPOSURE_WINDOW")
+    if run.start_ms > MAX_SAFE_TIMESTAMP_MS or run.end_ms > MAX_SAFE_TIMESTAMP_MS:
+        raise Abstain("TIMESTAMP_OUTSIDE_SAFE_EXACT_RANGE")
     if (type(run.source_precision_ms) is not int or run.source_precision_ms != 1 or
         type(run.interval_complete) is not bool or not run.interval_complete):
         raise Abstain("UNVERIFIED_PRECISION_OR_COVERAGE")
@@ -59,6 +71,8 @@ def _validate_run(run):
         raise Abstain("INVALID_OR_EXCESSIVE_PUBLIC_EVENTS")
     if any(type(t) is not int or t < 0 for t in ts) or list(ts) != sorted(ts):
         raise Abstain("INVALID_OR_UNSORTED_PUBLIC_TIMESTAMPS")
+    if any(t > MAX_SAFE_TIMESTAMP_MS for t in ts):
+        raise Abstain("TIMESTAMP_OUTSIDE_SAFE_EXACT_RANGE")
     if any(not (run.start_ms < t < run.end_ms) for t in ts):
         raise Abstain("EVENT_OUTSIDE_EXPOSURE")
     return tuple(dict.fromkeys(ts))
@@ -66,7 +80,7 @@ def _validate_run(run):
 
 def _strictly_previous_score(run, unique, mu, a, tau):
     """O(N) exact log likelihood; each event contributes only AFTER itself."""
-    if any(type(x) not in (int, float) or not isfinite(x) for x in (mu, a, tau)):
+    if any(not _finite_real(x) for x in (mu, a, tau)):
         raise Abstain("INVALID_M2_PARAMETERS")
     if mu <= 0 or a < 0 or tau != TAU_SECONDS or a * tau >= 1:
         raise Abstain("UNSTABLE_OR_INVALID_M2_PARAMETERS")
