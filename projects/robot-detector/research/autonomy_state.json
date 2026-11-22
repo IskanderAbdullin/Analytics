@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: confirm exact checked-out public Python CI after exact field-key vs substring regression test correction, and source-free CLI safe aggregate output. Then update main/stage issues and checkpoint with actual 30min UTC end, no further new source job.",
+  "resume_instruction": "NEXT_ACTION: first audit genuine market/source clock completeness and permitted source rights, then pre-register feasible independent original-world split with original ABIDES source semantics and adequate sample power. Current M1-v3 only source-free on type4-like simulated fixtures. Do not run any source job, re-download historical LOBSTER, allocate ABIDES seeds, or infer physical owner/FDR. Read project map and science NO-GO.",
   "last_session_result": "2026-11-22 18:46 UTC: public Python CI #45056956264 FAILED 1/267 only due to incorrect forbidden substring owner_id being found inside allowed explicit negative declaration physical_owner_identity_known=false. Exact output allowlist and math test passed. Fixed test to inspect prohibited exact keys, retaining explicit owner status false. New CI pending; no data/seed/model changes.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:46:43.703Z",
-    "elapsed_minutes": 25.7406,
-    "stage": "One-command source-free exact CI had 1 invalid test substring false positive; fixed to exact key inspection",
+    "latest_clock_utc": "2026-11-22T18:48:30.982Z",
+    "elapsed_minutes": 27.528583333333334,
+    "stage": "Project recovery map updated with exact source-free ns pipeline and strict external original-source no-go",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "89022576181ed0e3e405774af02d0186a68f9161",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45056820387",
-    "result": "265/265 source-free Python tests, including 8 source-study no-auto-execution blocks"
+    "sha": "366cd1c311c34367a0e74b2ad985a92e8dc92f5a",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45057011095",
+    "result": "267/267 source-free Python tests and one-command aggregate-only demo; provenance CI succeeded at same SHA"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
