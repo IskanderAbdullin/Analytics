@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
+      - 'projects/robot-detector/tools/public_evaluation_bounds.py'
+      - 'projects/robot-detector/tests/test_public_evaluation_bounds.py'
       - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
       - 'projects/robot-detector/tools/abides_split_half_momentum_holdout.py'
       - 'projects/robot-detector/tools/public_timing_phase_tied_fills.py'
@@ -144,6 +146,8 @@ on:
   pull_request:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
+      - 'projects/robot-detector/tools/public_evaluation_bounds.py'
+      - 'projects/robot-detector/tests/test_public_evaluation_bounds.py'
       - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
       - 'projects/robot-detector/tools/abides_split_half_momentum_holdout.py'
       - 'projects/robot-detector/tools/public_timing_phase_tied_fills.py'
@@ -301,6 +305,7 @@ jobs:
       - name: Validate known spent seeds and no source constant drift
         run: |
           python -m unittest discover -s tests_research -p 'test_*.py' -v
+          python -m unittest discover -s tests -p 'test_public_evaluation_bounds.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
           python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
           python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
