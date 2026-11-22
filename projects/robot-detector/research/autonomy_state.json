@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: prospectively define strict original ABIDES capture-profile/source-clock certificate on source-free documentation with explicit missing/external attestation and original world train/calibration/eval integrity, without granting source access. Then review independent study power/cost; no original seeds, historical vendor ZIP, real FDR/owners.",
+  "resume_instruction": "NEXT_ACTION: implement pure source-free ABIDES original capture profile preflight under docs/ABIDES_SOURCE_CAPTURE_PREFLIGHT_PREREG_20261122.md. Require explicit UTC simulation date, pinned source revision, TRADE_ATTRIBUTION+L2_SERIES, sparse_l2, 5 depth, and four external source attestations. ALWAYS deny execution despite self-claims. Exact cheap CI, then reconcile source readiness audit and final checkpoint.",
   "last_session_result": "Active 2026-11-22T19:17Z: ABIDES native Unix-ns source-free clock, sparse L2 and full-time causal quote, M0/M1v4, non-target positive LL +0.171965, old original 160-case metadata no-reanalysis; exact 335/335 CI. Separate source-family scientific readiness audit NO-GO, no new source seeds/data.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:35:59.573Z",
-    "elapsed_minutes": 18.8192,
-    "stage": "Pinned ABIDES source-family readiness and old genuine 160-case compact NO-GO scientific audit after 335/335 CI",
+    "latest_clock_utc": "2026-11-22T19:36:50.073Z",
+    "elapsed_minutes": 19.660866666666667,
+    "stage": "ABIDES pinned source capture-profile metadata and external evidence NO-GO prereg, before implementation",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
