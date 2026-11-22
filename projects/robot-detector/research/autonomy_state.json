@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement pure source-free ABIDES original capture profile preflight under docs/ABIDES_SOURCE_CAPTURE_PREFLIGHT_PREREG_20261122.md. Require explicit UTC simulation date, pinned source revision, TRADE_ATTRIBUTION+L2_SERIES, sparse_l2, 5 depth, and four external source attestations. ALWAYS deny execution despite self-claims. Exact cheap CI, then reconcile source readiness audit and final checkpoint.",
-  "last_session_result": "Active 2026-11-22T19:17Z: ABIDES native Unix-ns source-free clock, sparse L2 and full-time causal quote, M0/M1v4, non-target positive LL +0.171965, old original 160-case metadata no-reanalysis; exact 335/335 CI. Separate source-family scientific readiness audit NO-GO, no new source seeds/data.",
+  "resume_instruction": "NEXT_ACTION: verify checked-out Python source-free CI for strict ABIDES original capture-profile structural preflight (346 expected tests), preserve all external rights/coverage/independence UNKNOWN. No original source jobs, seed allocation or source license claims. Then update issue #97/master #72 and final UTC checkpoint near 19:47:10Z.",
+  "last_session_result": "2026-11-22T19:17 UTC active: after 335/335 public CI, source-family readiness NO-GO and capture-profile precommit 2d3b453f, implemented public-only ABIDES source revision/date/TRADE_ATTRIBUTION+L2_SERIES exact profile and four external attestation claims that never authorize source; 11 tests, CI pending.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:36:50.073Z",
-    "elapsed_minutes": 19.660866666666667,
-    "stage": "ABIDES pinned source capture-profile metadata and external evidence NO-GO prereg, before implementation",
+    "latest_clock_utc": "2026-11-22T19:37:34.230Z",
+    "elapsed_minutes": 20.396816666666666,
+    "stage": "Source-free ABIDES source capture profile original-world NO-GO with 11 negative tests, exact CI pending",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0

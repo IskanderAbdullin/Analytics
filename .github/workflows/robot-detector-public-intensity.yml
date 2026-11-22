@@ -64,6 +64,8 @@ on:
       - 'projects/robot-detector/tests/test_public_abides_m1v4_nontarget_panel.py'
       - 'projects/robot-detector/tools/public_abides_compact_160_eligibility.py'
       - 'projects/robot-detector/tests/test_public_abides_compact_160_eligibility.py'
+      - 'projects/robot-detector/tools/public_abides_source_capture_preflight.py'
+      - 'projects/robot-detector/tests/test_public_abides_source_capture_preflight.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
