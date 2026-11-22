@@ -865,3 +865,8 @@ A **design-only** precision/coverage and safety gate was added in [INDEPENDENT_S
 
 
 **Source-free evaluation-bounds implementation (2026-11-22):** `tools/public_evaluation_bounds.py` and `tests/test_public_evaluation_bounds.py` add one-sided exact Clopper–Pearson bounds, fail-closed missing coverage and negative cases for zero alarms, invalid denominators, nonfinite alpha and abstentions. Commit `adbb776f` (after `02f9a90d`). **Tests and CI not yet independently verified on these commits; no original source runs.** The exact-binomial formula assumes independent original seed-world units and cannot be applied to repeated fills or paired-cohort differences without cluster-aware analysis. Next: verify CI, then implement paired seed-clustered inference and multiplicity controls before freezing any new source protocol.
+
+
+### 2026-11-22 — prospective numeric and paired-seed negative-control registrations (NO DATA)
+
+Before new source-free code/tests, registered [numeric coverage/overflow gates](EVALUATION_BOUNDS_NUMERIC_GATES_PREREG_20261122.md) and [paired original seed-world Bonferroni/conditional sign control protocol](PAIRED_SEED_CLUSTER_INFERENCE_PREREG_20261122.md). Parent HEAD `29bd4b80` verified: provenance, ABIDES and .NET all successful; explicit five bounds unit tests present in provenance log, but zero-coverage alpha and extreme denominator adversarial cases not yet exercised. New procedures require worst-case ABSTAIN, all three non-target backgrounds, no fill-level pseudoreplication, no source or owner identity claims. Design-only preregistration precedes any new code, market data or seeds; no statistical power/calibration implied. NEXT_ACTION: implement source-free guards and paired controls with honest CI and negative outcomes.
