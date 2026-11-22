@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement source-free exact-ns public type4 projection + frozen M1-v3 trained model + heldout LL with same-source book tuple gate, no evaluation print fitting. Test 5 rows/1 visible cluster/integral 2.875/LL ln(.75)-2.875 and 1ns trade distinctness. Exact Python CI, no original vendor source jobs or new seeds.",
-  "last_session_result": "2026-11-22 18:30 UTC exact source-free Python 219/219. New preregistration freezes 5 public messages, 2 visible type4 same-time, 1 hidden type5, 2 other, 3 BBO timestamps and LL=ln(.75)-2.875, no real data. Integrated source book/event identity gate must reject mismatched projections. Trade-only 1ms collision fraction remains unknown for original LOBSTER.",
+  "resume_instruction": "NEXT_ACTION: inspect exact public Python CI for source-free 5-message ns visible trade post-event BBO / M1v3 heldout pipeline; expected LL ln(.75)-2.875 and 1ns trade cluster distinction. Preserve and correct any invalid fixture, then audit train-eval original source linkage and coverage restrictions before new source experiments.",
+  "last_session_result": "2026-11-22 ~18:31 UTC, integrated ns LOBSTER-style source-free visible trade-only projected prints to fixed ns M1-v3 causal BBO prediction and typed heldout LL. Precommit protocol 93f997a6, initial 11 tests, CI pending. No original vendor ZIP or ABIDES source, no actor/FDR inference.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:31:24.763Z",
-    "elapsed_minutes": 10.424933333333334,
-    "stage": "Source-free public ns visible type4 projection exact CI 219/219; prereg integrated M1-v3 heldout source alignment and exact toy score",
+    "latest_clock_utc": "2026-11-22T18:32:12.331Z",
+    "elapsed_minutes": 11.217733333333333,
+    "stage": "Preregistered all-public ns message-to-type4-to-M1v3-to-LL 11 source-free hard negatives, exact CI pending",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
