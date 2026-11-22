@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: exact Python CI for source-study 9 evidence hard-stop gate and 8 tests; preserve failure, confirm statuses always NOT_AUTHORIZED_FOR_SOURCE_EXECUTION. Then finalize source NO-GO checkpoint and stage #97/master #72 issue, verify remote HEAD, CI and real 30min elapsed from 18:20:59 UTC. No source jobs, seeds or real trading.",
+  "resume_instruction": "NEXT_ACTION: implement prerecorded one-command source-free ns M1v3 from bound type4-only training originals to bound independent eval as aggregate-only JSON, strict 2 new tests and cheap CLI CI. Preserve all blockers and source inactivity, then update stage #97 + main #72 and final checkpoint after actual 30min target.",
   "last_session_result": "2026-11-22 18:20 UTC continuation: 257/257 source-free CI plus science readiness NO-GO; implemented prospective planning-only hard stop 9 external source evidence claims, all statuses deny auto data access/execution; 8 source-free negative tests, CI pending. No actual original source read/seeds/market owner/FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:44:45.398Z",
-    "elapsed_minutes": 23.76885,
-    "stage": "Source-study hard-stop NO-AUTO-EXECUTION planning gate and 8 source-free negatives, CI pending",
+    "latest_clock_utc": "2026-11-22T18:45:35.561Z",
+    "elapsed_minutes": 24.6049,
+    "stage": "Source-free source-execution hard-stop exact CI 265/265, freeze single-command full pipeline reproduction before coding",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "3462d88cba6d875b645e95a3a61a4763951d080a",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45056270305",
-    "result": "257/257 source-free Python tests including 14 bound type4-only source training controls"
+    "sha": "89022576181ed0e3e405774af02d0186a68f9161",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45056820387",
+    "result": "265/265 source-free Python tests, including 8 source-study no-auto-execution blocks"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
