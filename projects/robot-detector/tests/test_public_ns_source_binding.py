@@ -122,9 +122,15 @@ class PublicNsStructuralSourceBindingTests(unittest.TestCase):
         again=source()
         self.assertEqual(a.source_public_sha256,again.source_public_sha256)
         shifted=list(a_rows())
-        shifted[1]=dict(shifted[1],timestamp_ns=shifted[1]["timestamp_ns"]+1)
+        shifted[3]=dict(shifted[3],timestamp_ns=shifted[3]["timestamp_ns"]+1)
         b=source(shifted,rid="eval-B")
         self.assertNotEqual(a.source_public_sha256,b.source_public_sha256)
+
+    def test_out_of_order_source_timestamp_is_explicitly_rejected(self):
+        malformed=list(a_rows())
+        malformed[1]=dict(malformed[1],timestamp_ns=malformed[1]["timestamp_ns"]+1)
+        with self.assertRaisesRegex(Abstain,"UNSORTED"):
+            source(malformed,rid="malformed-source")
 
     def test_public_projection_mutation_after_binding_fails_closed(self):
         a=source()
