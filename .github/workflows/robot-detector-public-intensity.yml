@@ -32,6 +32,8 @@ on:
       - 'projects/robot-detector/tests/test_public_crossmodel_heldout_ll.py'
       - 'projects/robot-detector/tools/public_post_event_bbo_projector.py'
       - 'projects/robot-detector/tests/test_public_post_event_bbo_projector.py'
+      - 'projects/robot-detector/tools/public_lobster_clock_lag_audit.py'
+      - 'projects/robot-detector/tests/test_public_lobster_clock_lag_audit.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:

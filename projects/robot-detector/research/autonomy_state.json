@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement and test a source-free exact-Decimal LOBSTER AMZN message/post-event book timing audit as preregistered in docs/LOBSTER_PUBLIC_CLOCK_LAG_ELIGIBILITY_PREREG_20261122.md. One bounded original official demo source-only run only after negative tests and source/rights gate, no raw zip or prints/artifacts. Do not use this retrospective sample for bot truth/FDR.",
+  "resume_instruction": "NEXT_ACTION: verify exact Python CI for public LOBSTER Decimal clock/lag source-free tests, preserve any negative test failure. If green, perform ONE bounded pinned official public demo source-only aggregate run via public GitHub Actions; original ZIP confined to RAM and never published. Inspect counts and then convert workflow to dispatch-only. This is retrospective source eligibility, not new independent model calibration.",
   "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:48:06.799Z",
-    "elapsed_minutes": 30.525583333333334,
+    "latest_clock_utc": "2026-11-22T15:49:23.569Z",
+    "elapsed_minutes": 31.805083333333332,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Prospective exact-Decimal historical AMZN sample timestamp/L2 eligibility source-only prereg; no vendor fetch yet",
+    "stage": "Exact Decimal source-only LOBSTER clock and lagged quote audit code, 10 source-free negatives; CI pending; no external sample download yet",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
