@@ -40,7 +40,7 @@ class PostEventCausalityTests(unittest.TestCase):
 
     def test_future_book_does_not_change_preexisting_predictable_intensity(self):
         x=checked([row(1000),row(2000,104.),row(3000)])
-        y=checked([row(1000),row(2000,104.),row(3000),row(4000,106.)])
+        y=checked([row(1000),row(2000,104.),row(3000),row(3300,106.)])
         w=M1DynamicEvaluationWindow("eval",2500,3500,x.snapshots)
         self.assertEqual(predict_m1_dynamic_exposure(model(),w),
                          predict_m1_dynamic_exposure(model(),replace(w,snapshots=y.snapshots)))
