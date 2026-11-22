@@ -11,7 +11,7 @@
     {
       "id": "B-009",
       "kind": "private_order_context_pending",
-      "description": "Нет разрешённой проверенной frozen-копии и статусной хронологии: новый публичный analysis/freeze_evidence.py + 8 синтетических тестов подготовлен, но на локальном ПК ещё не запускался; межфайловая атомарность и полнота stream не гарантированы."
+      "description": "Условное окно Prune после пятисекундного grace до позднего Sell2 — 33.285 с. Чтобы различить H-006 и H-007, нужны frozen runtime flags (FilledByState/FilledByFills, NeedsCheck/ResyncNeeded/QueryInFlight, UpdatedUtc), факт Housekeeping/Archived, status chronology и независимый broker execution report."
     },
     {
       "id": "B-007",
@@ -44,7 +44,8 @@
     "Разделять брокерскую метку времени исполнения из ReportedFill и локальное время получения/логирования; статус Cancel/0 не доказывает отсутствие ранее датированной сделки",
     "В этом запуске syntax-only pc_script вернул HTTP 400; это не доказательство выполнения или пригодности команды; sandbox pin/policy не обходить",
     "Использовать подготовленный анализатор freeze_evidence.py только для read-only источника, с отдельным private output вне исходного проекта. В публичном CI только вымышленные файлы.",
-    "PC Agent staged frozen-input utility и её synthetic-only тест на MYPC без реального запуска; script endpoint всё ещё HTTP 404. Не считать наличие файла доказательством его исполнения."
+    "PC Agent staged frozen-input utility и её synthetic-only тест на MYPC без реального запуска; script endpoint всё ещё HTTP 404. Не считать наличие файла доказательством его исполнения.",
+    "Математический модельный предикат late_fill_paths.py не запускает и не заменяет C# engine, не доказывает факт удаления заказа из журнала"
   ],
   "next_command": "После подтверждения доступного разрешённого канала: сначала запустить `python analysis/freeze_evidence.py --source-root <local Babid01-TInvest copy> --private-root <local babid-cloud-analysis/reports/private> --label nvda-20261121-verified` из Analytics на MYPC. Сверить SHA256 manifest и исходные файловые сигнатуры; только затем запускать адаптированный приватный экстрактор на `reports/private/nvda-20261121-verified/` (НЕ на рабочем LIVE каталоге). Все данные оставить локально. Если pc_script по-прежнему HTTP400 и копия недоступна — остановить эту ветку, не обходить ограничения.",
   "expected_artifacts": [
