@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement frozen strictly predictable M2 inter-event integrated-residual z_i formula in docs/CONDITIONAL_M2_RESCALED_GAPS_PREREG_20261122.md; adversarial source-free tests and exact GitHub CI. Then compare on fixed negative periodic/momentum toy streams, preserving all results. Do not launch new ABIDES source cases; the >=100-world release design is unpowered for the hypothesized p_neg>=1% as documented.",
+  "resume_instruction": "NEXT_ACTION: verify exact checked-out Python CI for newly introduced 9 M2-rescaled-gap tests and fix any source-free failures without changing the frozen M2 model. Then compare M0/M2 under fixed non-target periodic/momentum toy settings, no calibration claims; audit exchange completeness and practical source feasibility before any seed allocation.",
   "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:26:25.220Z",
-    "elapsed_minutes": 8.8326,
+    "latest_clock_utc": "2026-11-22T15:27:19.164Z",
+    "elapsed_minutes": 9.731666666666667,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Hypothetical power feasibility audit and prospective M2 rescaled-gap diagnostic pre-registration",
+    "stage": "M2 strictly predictable rescaled-gap implementation plus 9 negative/unit cases; exact CI pending",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
