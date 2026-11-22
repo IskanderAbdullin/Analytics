@@ -537,3 +537,9 @@ After confirming three successful GitHub workflow runs on `b2c461b8`, froze a **
 ### 2026-11-22 — conditional sampler source-free implementation checkpoint
 
 Implemented `tools/public_conditional_timing_null.py` with deterministic seeded within-5s-cell millisecond sampling and `tests_background/test_public_conditional_timing_null.py` with six constructed checks (occupancy, split-fill invariance, reproducibility, interval change, invalid inputs, non-target periodic hard negative). The sampler returns no p-value and **does not preserve within-cell autocorrelation or prove exchangeability**; tests are not independent market evidence. At this checkpoint committed test execution/CI remains **unverified**. NEXT_ACTION: execute the committed six tests in GitHub CI; add self-exciting within-cell falsification and cluster-size-vector preservation to the sampler; do not infer owners or market FDR.
+
+
+### 2026-11-22 — cluster-multiplicity-preserving diagnostic (method development, not validation)
+Implemented `conditional_cluster_sample` on top of the predeclared 5-second timestamp-cell sampler. Each exact-time public print cluster remains intact, with its multiplicity attached by original within-cell event rank; counts and cluster-size vectors per cell are preserved. Added adversarial tests for preservation, deterministic cell boundaries, and invalid timestamps. This is a technical invariance change only: within-cell exchangeability remains unvalidated, Hawkes/self-exciting bursts remain an obligatory falsification case, and no p-values, owner attribution, real-market FDR, fresh source seeds, or new ABIDES evidence are claimed. CI for the new tests must be verified before marking them passed.
+
+NEXT_ACTION: confirm latest-HEAD cheap CI and the two new tests; build an explicit constructed self-exciting clustered-burst falsification against the uniform-within-cell sampler and compare a within-cell-offset-preserving alternative. Keep issue #72 open.
