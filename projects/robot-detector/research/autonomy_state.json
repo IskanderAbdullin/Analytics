@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement source-free three-tape fixed ABIDES original public EXEC events A one exact, B duplicate exact, C one nanosecond apart, compare old microsecond CSV loss versus fixed M0/M1v4 LL with expected delta log(.75/.625)=+0.18232156; negative test, aggregate only, cheap CI. No original source jobs or seeds.",
-  "last_session_result": "2026-11-22T19:17 UTC active: after 335/335 public CI, source-family readiness NO-GO and capture-profile precommit 2d3b453f, implemented public-only ABIDES source revision/date/TRADE_ATTRIBUTION+L2_SERIES exact profile and four external attestation claims that never authorize source; 11 tests, CI pending.",
+  "resume_instruction": "NEXT_ACTION: verify exact GitHub Python CI for ABIDES one-ns-vs-old-CSV loss LL falsifier and safe CLI, expect 354/354 tests. Preserve negative outcomes. Then sync source-family scientific NO-GO + issue #97/master #72 and final UTC time checkpoint near 19:47:10Z. No original source jobs/seed allocation.",
+  "last_session_result": "2026-11-22 UTC active: source-free 346/346 exact Python CI confirmed, then prereg b44669f2 and source-free 3-case ABIDES exact one-ns versus legacy CSV microsecond coarsening LL panel coded with 8 adversarial tests and CLI; source-free actual CI pending. Never claim old 160 original used this CSV.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:38:39.559Z",
-    "elapsed_minutes": 21.485633333333332,
-    "stage": "346/346 ABIDES capture profile source-free CI, prereg exact 1ns-vs-CSV-microsecond LL quantization counterexample",
+    "latest_clock_utc": "2026-11-22T19:39:22.368Z",
+    "elapsed_minutes": 22.199116666666665,
+    "stage": "ABIDES old microsecond CSV vs exact ns model LL 3-case constructed panel, 8 tests, safe CLI, CI pending",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0

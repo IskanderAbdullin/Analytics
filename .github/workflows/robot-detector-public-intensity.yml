@@ -66,6 +66,8 @@ on:
       - 'projects/robot-detector/tests/test_public_abides_compact_160_eligibility.py'
       - 'projects/robot-detector/tools/public_abides_source_capture_preflight.py'
       - 'projects/robot-detector/tests/test_public_abides_source_capture_preflight.py'
+      - 'projects/robot-detector/tools/public_abides_export_precision_ll.py'
+      - 'projects/robot-detector/tests/test_public_abides_export_precision_ll.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
@@ -85,6 +87,9 @@ jobs:
       - name: Audit committed ABIDES 160 original compact metadata sufficiency only
         working-directory: projects/robot-detector
         run: python -m tools.public_abides_compact_160_eligibility
+      - name: Emit ABIDES legacy CSV submicrosecond loss source-free likelihood falsifier
+        working-directory: projects/robot-detector
+        run: python -m tools.public_abides_export_precision_ll
       - name: Emit ABIDES non-target LL falsifier source-free aggregate
         working-directory: projects/robot-detector
         run: python -m tools.public_abides_m1v4_nontarget_panel
