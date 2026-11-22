@@ -195,27 +195,20 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify exact-source Python CI for strict exposure flags, then implement deterministic causal M0/M1/M2 fit/predict interfaces with train-only parameter estimation and negative tests (zero rates, lookahead, timestamp clusters, missing L2). Freeze independent run-level train/calibration/test allocation before any new source seeds. Preserve 3301–3340 as spent; real FDR/owners unknown.",
-  "last_session_result": "2026-11-22 11:12:33–11:13:51 UTC: strict boolean-only causal exposure provenance guard and negative regression committed; exact-source Python CI SUCCESS #45016249439 on ae937c2f; checkpoint and issue #97 synchronized. No new source seeds or market FDR/owner claims.",
+  "resume_instruction": "NEXT_ACTION: Verify exact-source CI for train-only M0 baseline (commit 4f812ecc), fix failures if any. Then preregister M1 strictly previous-only L2 covariates and M2 predictable self-excitation with run-level disjoint fitting; add source-free adversarial controls and calibration before reserving new independent source seeds. Original 3301–3340 remain spent; no real-market FDR or owner claims.",
+  "last_session_result": "2026-11-22 12:08:52–12:09:50 UTC (measured stage): recovered remote HEAD 25201e77, 3 prior CI success; preregistered train-only M0, authored model and 9 tests, extended exact-source Python CI. New HEAD 4f812ecc; CI pending. No new source simulations.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
-    "start_time_utc": "2026-11-22T11:12:33Z",
-    "deadline_utc": "2026-11-22T12:02:33Z",
+    "start_time_utc": "2026-11-22T12:08:52Z",
+    "deadline_utc": "2026-11-22T12:58:52Z",
     "measured_checkpoints": [
       {
-        "stage": "Remote HEAD/CI and full project recovery; strict causal exposure flag negative guard",
-        "stage_end_time_utc": "2026-11-22T11:13:33Z",
-        "elapsed_minutes": 1,
-        "tests": "Regression authored; exact Python CI queued, no source experiments"
-      },
-      {
-        "stage": "Exact-source Python CI verification and issue synchronization",
-        "stage_end_time_utc": "2026-11-22T11:13:51Z",
-        "elapsed_minutes": 1.3,
-        "tests": "GitHub public intensity source tests SUCCESS run 45016249439 at ae937c2f; no new source simulations"
+        "stage": "Remote HEAD/CI recovery and preregistered train-only M0 implementation with adversarial tests",
+        "stage_end_time_utc": "2026-11-22T12:09:50Z",
+        "elapsed_minutes": 0.9667,
+        "tests": "Nine new tests authored; CI pending; no source runs"
       }
     ],
-    "note": "Measured UTC 11:12:33–11:13:51, 78 seconds; early bounded end, not 50 minutes.",
-    "final_elapsed_minutes": 1.3
+    "note": "Current run measured from UTC clock; not 50 minutes."
   }
 }
