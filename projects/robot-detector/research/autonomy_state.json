@@ -194,7 +194,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify GitHub CI/discovery of eight new tests in tests_background/test_public_period_l2_gate.py and previous seven public scan tests. Repair any failures. Then preregister a burst-preserving conditional timing null with exact exchangeability limits and source-free adversarial falsification; do not claim timing p-values without calibration, and do not rebrand spent 3301-3340 seeds. Keep #72 open.",
-  "last_session_result": "2026-11-22: At original HEAD aae15635 all three observed PR CI checks green. Added strict previous-only L2 quality gate and eight source-free adversarial test cases, and updated master plan. CI for newly committed gate not yet verified. No new ABIDES runs, market FDR, owner IDs, or p-values.",
+  "resume_instruction": "NEXT_ACTION: Confirm latest HEAD CI including repaired UTC-relative future-date negative test, seven period-scan tests, eight prior-L2 tests. Fix any new failures; then preregister burst-preserving timing null and falsification suite before any new source seed or p-value. Keep master #72 open.",
+  "last_session_result": "2026-11-22: At original HEAD aae15635 all three observed PR CI checks green. Added strict previous-only L2 quality gate and eight source-free adversarial test cases, and updated master plan. CI for newly committed gate not yet verified. No new ABIDES runs, market FDR, owner IDs, or p-values. CI provenance failure at intermediate commit traced to stale test treating 2026-11-21 as future after UTC rollover; replaced with tomorrow UTC (commit bad36b75). New HEAD CI not yet confirmed.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
