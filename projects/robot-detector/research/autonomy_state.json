@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact GitHub Python source-free CI and aggregate-only CLI for all three ABIDES non-target LL score cases (including positive regular background ΔLL and no owner labels); preserve hard negatives. Then independent original-source readiness and bounded power/cost review, no new seeds/source.",
+  "resume_instruction": "NEXT_ACTION: implement read-only pinned original 160-case compact aggregate sufficiency checker with 40 seed labels/4 cohorts/old negative outcomes, no event timestamp/L2 vectors, and two constructed same-count different-LL counterexample. Exact Python CI, no source workflows/new seeds.",
   "last_session_result": "2026-11-22 19:17 UTC session: source-free 317/317 CI green, ABIDES positive M1-v4 non-target LL prereg a71f2a9c, all-three constructed hard-negative public streams source-free panel & 8 tests coded, exact Python CI pending. No original source jobs/new seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:30:40.967Z",
-    "elapsed_minutes": 13.5091,
-    "stage": "Three fixed ABIDES source-free non-target positive/negative LL panel + 8 tests/CLI, exact CI pending",
+    "latest_clock_utc": "2026-11-22T19:32:07.885Z",
+    "elapsed_minutes": 14.957733333333334,
+    "stage": "Non-target LL panel 325/325 green; prereg original ABIDES 160 compact-only source cannot reconstruct M1v4 due to missing public timestamps/L2",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "67f5888d55f4afd5f81fffb320041c4996de64db",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060985918",
-    "result": "317/317 source-free Python tests including 12 ABIDES M0/M1-v4 complete-window LL negatives"
+    "sha": "398fd06f81cdb6e142ada430d2f9f6f9c28b64fa",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45061171405",
+    "result": "325/325 source-free Python tests and complete three constructed ABIDES non-target LL aggregate CLI"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
