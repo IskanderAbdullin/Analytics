@@ -1,0 +1,87 @@
+{
+  "schema_version": "robot-detector-real-spot-transfer-precommit-v1",
+  "precommit_date_utc": "2026-11-21",
+  "branch": "agent/robot-detector-l2-binphase-20261121",
+  "development_sources_already_inspected": [
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-18",
+      "trades": 116446
+    },
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-19",
+      "trades": 161957
+    }
+  ],
+  "frozen_new_sources_before_any_archive_download": [
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-20",
+      "role": "prospective_next_day_same_instrument"
+    },
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-20",
+      "role": "prospective_same_day_distinct_spot_instrument"
+    }
+  ],
+  "source_provider": "Binance Vision official raw spot daily trades archive + published ZIP SHA-256",
+  "noncommercial_license": "CC BY-NC-SA 4.0, Binance Vision Dataset Terms 2026-08-26; scientific/noncommercial only",
+  "nulls": [
+    {
+      "key": "public_within_minute_weak_direction_null_v1",
+      "type": "per_print_shuffle_within_exact_UTC_minute"
+    },
+    {
+      "key": "public_within_minute_cluster_direction_null_v1",
+      "type": "equal_timestamp_joint_side_vectors_swapped_only_with_equal_size_groups_in_same_minute"
+    }
+  ],
+  "fixed_rng_seeds": [
+    32001,
+    32003,
+    32009,
+    32027,
+    32029,
+    32051,
+    32057,
+    32063
+  ],
+  "same_timestamp_cluster_unit": "whole joint side vector moves to a different same-size cluster timestamp (not original timestamp identity), timestamps and total side counts per minute fixed",
+  "complete_bin_width_seconds": 30,
+  "clock_offsets_seconds": [
+    0,
+    10,
+    20
+  ],
+  "primary_endpoint": "at phase 0, actual count of single-sided complete 30-second public-print bins is strictly greater than MAX across eight fixed STRONG cluster-preserving null shuffles; report success or failure without retuning",
+  "secondary_endpoints": [
+    "phase10/phase20 strong-null envelope",
+    "weak per-print null phase0/10/20",
+    "event count and UTC-edge conservation",
+    "clustered-print and equal-timestamp group counts when available"
+  ],
+  "study_type": "prospective descriptive transfer of frozen public-print diagnostic; not prospective labelled robot detector test",
+  "no_hypothesis_or_threshold_fitting_on_new_sources": true,
+  "no_data_dependent_phase_selection": true,
+  "missing_source_handling": "fail closed, record missing exact precommitted source; do NOT substitute symbol/date after observing failure",
+  "stop_conditions": [
+    "unavailable ZIP or checksum",
+    "provider checksum mismatch",
+    "malformed or unbounded archive",
+    "unrecognized microsecond timestamp unit",
+    "time reversal/duplicate trade ID",
+    "unexpected null test failure",
+    "license change restricting noncommercial research"
+  ],
+  "truth_caveats": [
+    "trade-print clusters do not imply parent orders or physical owners",
+    "same day across assets is not independent market regime",
+    "eight shuffles not a calibrated null or p-value",
+    "no L2 depth history",
+    "cannot estimate real-market FDR",
+    "no commercial or live trading authorization"
+  ],
+  "publish": "only compact aggregate/source provenance JSON; never raw ZIP/trades/timestamp arrays"
+}

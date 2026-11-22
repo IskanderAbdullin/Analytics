@@ -1,0 +1,100 @@
+{
+  "schema_version": "abides_multiscale_public_l2_precommit_v1",
+  "registered_before_simulation": true,
+  "frozen_at_date_utc": "2026-11-21",
+  "source": "genuine ABIDES-NG pinned commit ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "market": "ABM",
+  "start": "09:30:00",
+  "end": "09:38:00",
+  "l2_levels_each_side": 5,
+  "local_ledger_unused_seed_candidates": [
+    2901,
+    2902,
+    2903
+  ],
+  "global_blind_status": "not established; seed novelty only checked against local registry",
+  "cohorts": [
+    "poisson_noise_null",
+    "fixed_20s_noise_hard_negative",
+    "momentum_noise_hard_negative",
+    "twap_45s_positive"
+  ],
+  "cohort_definitions": {
+    "poisson_noise_null": {
+      "noise_agents": 60,
+      "noise_wake": "20s",
+      "noise_poisson": true,
+      "twap_agents": 0,
+      "momentum_agents": 0
+    },
+    "fixed_20s_noise_hard_negative": {
+      "noise_agents": 60,
+      "noise_wake": "20s",
+      "noise_poisson": false,
+      "twap_agents": 0,
+      "momentum_agents": 0
+    },
+    "momentum_noise_hard_negative": {
+      "noise_agents": 50,
+      "noise_wake": "20s",
+      "noise_poisson": true,
+      "momentum_agents": 10,
+      "momentum_wake": "25s",
+      "momentum_poisson": true,
+      "short_window": 5,
+      "long_window": 15,
+      "twap_agents": 0
+    },
+    "twap_45s_positive": {
+      "noise_agents": 60,
+      "noise_wake": "20s",
+      "noise_poisson": true,
+      "twap_agents": 1,
+      "twap_frequency_seconds": 45,
+      "twap_quantity_lots": 1200,
+      "twap_start_offset_seconds": 60,
+      "twap_end_offset_seconds": 60,
+      "twap_style": "market",
+      "twap_direction": "BID",
+      "momentum_agents": 0
+    }
+  },
+  "original_matching_engine_runs": 12,
+  "public_only_multiscale_features": {
+    "grid_periods_seconds": [
+      10,
+      20,
+      45,
+      90
+    ],
+    "fixed_anchor_exchange_local_seconds_after_midnight": 34260,
+    "fraction_window_ms": 250,
+    "max_threshold_optimization": false,
+    "descriptive_lift_baseline": "fraction_on_grid / (2*250ms / period), purely descriptive, NOT a probability or p-value",
+    "l2_lagged_bin_seconds": [
+      30,
+      60
+    ],
+    "max_quote_age_seconds_equals_bin_seconds": true,
+    "min_eligible_lagged_bins_for_spearman": 5
+  },
+  "legacy_frozen_10s_alarm": {
+    "period_seconds": 10,
+    "phase_origin_seconds": 0,
+    "tolerance_ms": 250,
+    "threshold_fraction": 0.22,
+    "expected_prior_original_result": "2/2 fixed-cadence background false positives; 2/2 injected TWAP misses; no reuse of that as blind validation"
+  },
+  "required_research_contrasts": [
+    "45s fixed-clock public fraction in TWAP cohort compared with all negative cohorts, without best-phase selection",
+    "20s fixed-clock fraction in fixed-noise null vs TWAP cohort, retaining false alarms",
+    "strict previous-completed L2 bin coverage at 30s and 60s, including abstentions",
+    "controlled TWAP posthoc fills only after full public feature computation"
+  ],
+  "no_oracle_agent_id_in_public_feature": true,
+  "source_synthetic_only": true,
+  "not_real_market_accuracy_or_FDR": true,
+  "negative_cases_must_never_be_filtered": true,
+  "raw_market_trades_books_or_oracle_ids_exported": false,
+  "single_bounded_public_workflow_then_manual_only": true
+}

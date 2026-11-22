@@ -1,0 +1,95 @@
+name: Robot Detector new uninspected spot print transfer 2026-11-20
+
+# The source symbols/dates, 8 original null seeds and 0s primary / 10/20s
+# sensitivity endpoints were PRECOMMITTED in commit ae0d013645e4 before
+# running this one-time source acquisition. Not a robot FDR benchmark.
+# After original successful network run, make manual-only to avoid repeats.
+# One-time frozen original data run #44920626852 completed successfully.
+# Costs/re-downloads controlled: future executions require manual dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-next-day-and-cross-instrument-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: No-network original source and precommit contract tests
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests_background -p 'test_real_spot_transfer_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+      - name: Load exact frozen source #1 (LTCUSDT 2026-11-20 UTC)
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-20 \
+            --clock-origin-study --direction-null-study --cluster-preserving-null-study \
+            --output /tmp/frozen-ltcusdt-20261120-public-aggregate.json
+      - name: Load exact frozen source #2 (BCHUSDT 2026-11-20 UTC)
+        run: |
+          set -euo pipefail
+          python tools/binance_public_trade_archive.py \
+            --symbol BCHUSDT --date 2026-11-20 \
+            --clock-origin-study --direction-null-study --cluster-preserving-null-study \
+            --output /tmp/frozen-bchusdt-20261120-public-aggregate.json
+      - name: Reconcile every source, checksum, phase and original control
+        run: |
+          set -euo pipefail
+          python tools/real_spot_transfer_review.py \
+            --ltc-report /tmp/frozen-ltcusdt-20261120-public-aggregate.json \
+            --bch-report /tmp/frozen-bchusdt-20261120-public-aggregate.json \
+            --output /tmp/frozen-public-transfer-20261120-reviewed.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/frozen-public-transfer-20261120-reviewed.json').read_text())
+          assert r['schema_version']=='robot-detector-real-spot-transfer-audited-v1'
+          assert r['true_distinct_market_sessions']==2 and r['distinct_utc_dates']==1
+          assert r['source_count_total']>0 and len(r['reports'])==2
+          assert r['no_l2_or_known_physical_owner_truth'] is True
+          assert r['no_fdr_or_statistical_significance_claimed'] is True
+          assert r['not_licensed_for_live_or_commercial_trading'] is True
+          assert r['no_source_raw_tapes_or_print_ids_exported'] is True
+          for c in r['reports']:
+              assert len(c['source_zip_sha256'])==64
+              assert c['provider_sha256_matched']
+              assert len(c['clock_bin_comparisons'])==3
+              print('PROSPECTIVE_PUBLIC_PRINT_TRANSFER_CASE',json.dumps({
+                  'symbol':c['symbol'], 'date':c['utc_day'],
+                  'real_source_trades':c['source_prints'],
+                  'provider_zip_sha256':c['source_zip_sha256'],
+                  'phase0_strong_envelope_hypothesis_met':c['phase0_strong_envelope_hypothesis_met'],
+                  'phase0_strong_null':c['clock_bin_comparisons'][0]['null_controls'][1],
+                  'phase0_observed_one_sided':c['clock_bin_comparisons'][0]['observed_one_sided_bins'],
+                  'physical_robot_owner_accuracy_proven':False
+              },sort_keys=True))
+          print('PROSPECTIVE_PUBLIC_PRINT_TRANSFER_SUMMARY',json.dumps({
+              'sample_count':2,'same_UTC_day':True,
+              'total_public_trades':r['source_count_total'],
+              'phase0_positive_both':r['primary_strong_envelope_met_in_all_precommitted_sources'],
+              'true_detection_FDR_calibrated':False,
+              'physical_owner_count_known':False
+          },sort_keys=True))
+          PY
+      - name: Save compact provenance and summary, never raw provider ZIP or trades
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-frozen-real-print-transfer-20261120
+          path: |
+            /tmp/frozen-public-transfer-20261120-reviewed.json
+            /tmp/frozen-ltcusdt-20261120-public-aggregate.json
+            /tmp/frozen-bchusdt-20261120-public-aggregate.json
+          if-no-files-found: error
+          retention-days: 7

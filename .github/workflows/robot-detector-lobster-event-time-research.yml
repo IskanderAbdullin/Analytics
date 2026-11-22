@@ -1,0 +1,100 @@
+name: Robot Detector historical LOBSTER event-time features - original demo
+# The method and retrospective protocol were committed before this replay.
+# Single source audit only, no re-publication of source events or quotes.
+# Switch to manual-only on first success. Underlying historical demo
+# was previously inspected for structure, NOT a new independent holdout.
+# Original event-time real L2 sample replay succeeded in Actions #44925498585.
+# Subsequent re-fetches require intentional manual dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-bounded-event-time-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate replay and negative controls offline
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests_background -p 'test_lobster_public_sample_format_audit.py' -v
+          python -m unittest discover -s tests_background -p 'test_lobster_event_time_features.py' -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.lobster_event_time_features import (
+              LOCALLY_PINNED_SAMPLE_SHA256, SOURCE_URL
+          )
+          # Ensure import works both as a Python package and direct CLI
+          from tools.lobster_event_time_features import OUTPUT_ALLOWED_TOP_FIELDS
+          assert len(OUTPUT_ALLOWED_TOP_FIELDS)>35
+          p=json.loads(Path('research/lobster_event_time_protocol_20261121.json').read_text())
+          assert p['schema_version']=='lobster-event-time-10level-public-demo-retrospective-v1'
+          assert p['source']==SOURCE_URL
+          assert p['source_local_sha256_known_from_previous_format_audit']==LOCALLY_PINNED_SAMPLE_SHA256
+          assert p['dataset_historical_date']=='2012-06-21'
+          assert p['source_digest_is_provider_published_or_signed'] is False
+          assert p['sample_known_before_new_feature_protocol'] is True
+          assert p['event_type_4_aggressor_opposite_resting_side'] is True
+          assert p['hidden_event_type_5_aggressor_not_assumed'] is True
+          assert p['binned_summary_seconds']==1800
+          assert p['binned_summary_bins']==13
+          assert p['expected_source_event_rows_from_prior_qa']==269748
+          assert p['expected_visible_execution_events_from_prior_qa']==8974
+          PY
+      - name: One read-only local-digest-pinned official demo source replay
+        run: |
+          set -euo pipefail
+          python tools/lobster_event_time_features.py \
+            --output /tmp/lobster-amzn-original-event-time-features.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/lobster-amzn-original-event-time-features.json').read_text())
+          assert r['schema_version']=='lobster-event-time-10level-descriptive-replay-v1'
+          assert r['event_count']==269748
+          assert r['paired_l2_post_event_states']==269748
+          assert r['event_type_counts']['4']==8974
+          assert r['visible_aggressor_buy_executions']==4808
+          assert r['visible_aggressor_sell_executions']==4166
+          assert r['hidden_executions_resting_side_not_aggressor']==2445
+          assert r['same_timestamp_repeated_event_pairs']==8483
+          assert r['top_bid_ask_price_change_after_event']==27557
+          assert len(r['half_hour_event_counts'])==13
+          assert sum(r['half_hour_event_counts'])==269748
+          assert r['event_time_gap_zero']+r['event_time_gap_positive']==269747
+          assert r['original_locally_pinned_sha256_matched']
+          assert r['raw_event_rows_exported'] is False
+          assert r['source_order_reference_ids_exported'] is False
+          assert r['event_timestamp_or_price_series_exported'] is False
+          assert r['individual_agent_labels_available'] is False
+          assert r['real_market_robot_accuracy_or_FDR_calibrated'] is False
+          assert r['provider_signed_checksum_available'] is False
+          assert r['commercial_trade_or_signal_authorized'] is False
+          print('REAL_EVENT_TIME_REPLAY_DESCRIPTIVE_RESULT',json.dumps({
+              'actual_paired_market_events':r['event_count'],
+              'half_hour_counts':r['half_hour_event_counts'],
+              'mean_spread_x10000':r['mean_event_weighted_spread_x10000'],
+              'mean_top_imbalance':r['mean_event_weighted_top_imbalance'],
+              'visible_quote_changes':r['visible_execution_prepost_quote_price_change'],
+              'same_time_quote_changes':r['same_timestamp_prepost_quote_price_change'],
+              'owner_identification_established':False,
+              'market_FDR_calibrated':False
+          },sort_keys=True))
+          PY
+      - name: Only anonymous compact aggregates, no raw event/book data
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-public-lobster-event-time-aggregate-20120621
+          path: /tmp/lobster-amzn-original-event-time-features.json
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,78 @@
+{
+  "schema_version": "real-public-spot-timestamp-cluster-null-observations-v1",
+  "original_run_id": 44919058627,
+  "original_artifact_id": 14713261444,
+  "symbol": "LTCUSDT",
+  "source": "Binance Vision SPOT trades",
+  "data_license": "CC BY-NC-SA 4.0; noncommercial research",
+  "sample_is_previously_inspected_development_not_new_heldout": true,
+  "actual_distinct_market_days": 2,
+  "same_timestamp_side_vectors_preserved_in_controls": true,
+  "shuffles_per_day": 8,
+  "origin_seconds": [
+    0,
+    10,
+    20
+  ],
+  "statistical_FDR_calibrated": false,
+  "physical_owner_identified": false,
+  "commercial_trading_permitted": false,
+  "cases": [
+    {
+      "utc_date": "2026-11-18",
+      "zip_sha256": "2fbf1fe2f85c813b3d5e4922d674799adced6f306effe0e5cf9add62a57e6522",
+      "public_trades": 116446,
+      "phases": [
+        {
+          "origin_seconds": 0,
+          "observed_one_sided": 173,
+          "cluster_control_min": 120,
+          "cluster_control_median": 136.5,
+          "cluster_control_max": 148
+        },
+        {
+          "origin_seconds": 10,
+          "observed_one_sided": 161,
+          "cluster_control_min": 118,
+          "cluster_control_median": 128,
+          "cluster_control_max": 141
+        },
+        {
+          "origin_seconds": 20,
+          "observed_one_sided": 177,
+          "cluster_control_min": 117,
+          "cluster_control_median": 132,
+          "cluster_control_max": 146
+        }
+      ]
+    },
+    {
+      "utc_date": "2026-11-19",
+      "zip_sha256": "9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a",
+      "public_trades": 161957,
+      "phases": [
+        {
+          "origin_seconds": 0,
+          "observed_one_sided": 135,
+          "cluster_control_min": 96,
+          "cluster_control_median": 105,
+          "cluster_control_max": 111
+        },
+        {
+          "origin_seconds": 10,
+          "observed_one_sided": 113,
+          "cluster_control_min": 82,
+          "cluster_control_median": 92.5,
+          "cluster_control_max": 100
+        },
+        {
+          "origin_seconds": 20,
+          "observed_one_sided": 135,
+          "cluster_control_min": 90,
+          "cluster_control_median": 97,
+          "cluster_control_max": 110
+        }
+      ]
+    }
+  ]
+}

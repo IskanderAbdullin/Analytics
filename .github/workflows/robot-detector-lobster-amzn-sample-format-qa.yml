@@ -1,0 +1,83 @@
+name: Robot Detector one-time official LOBSTER AMZN ten-level sample format QA
+
+# Original exact source and NO ML/trading rights preregistered in
+# c864b763e3535810e3720c729710fc9ec84e9f0e on 2026-11-21.
+# Public DEMO only, bounded single source, not labelled robot detection.
+# After one successful run change to workflow_dispatch only.
+# Original vendor demonstration format QA #44922750898 PASSED.
+# Subsequent network retrieval requires intentional manual dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-paired-nasdaq-amzn-ten-level-demo-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test ZIP security, event alignment and direction semantics offline
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests_background -p 'test_lobster_public_sample_format_audit.py' -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          spec=json.loads(Path('research/lobster_amzn_sample_format_precommit_20261121.json').read_text())
+          from tools.lobster_public_sample_format_audit import SOURCE_URL
+          assert spec['exact_source_url']==SOURCE_URL
+          assert spec['levels']==10 and spec['ticker']=='AMZN'
+          assert spec['source_published_sha256_available'] is False
+          assert spec['full_data_training_authorized'] is False
+          assert spec['commercial_use_authorized'] is False
+          assert spec['no_raw_archive_or_events_in_repository_or_artifacts'] is True
+          PY
+      - name: Fetch exact publicly offered vendor demonstration and check only file-format integrity
+        run: |
+          set -euo pipefail
+          python tools/lobster_public_sample_format_audit.py \
+            --output /tmp/original-lobster-amzn-20120621-ten-level-demo-qa-only.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('/tmp/original-lobster-amzn-20120621-ten-level-demo-qa-only.json').read_text())
+          assert a['schema_version']=='lobster-public-vendor-demo-paired-l2-format-audit-v1'
+          assert a['sample_symbol']=='AMZN' and a['sample_date']=='2012-06-21'
+          assert a['levels_per_side']==10 and a['book_columns']==40
+          assert a['paired_event_and_book_rows']>0
+          assert a['all_message_book_rows_aligned']
+          assert a['event_counts_by_type']['4']==(
+              a['visible_exec_resting_sell_implies_buy_aggressor']+
+              a['visible_exec_resting_buy_implies_sell_aggressor'])
+          assert a['raw_market_messages_or_book_states_exported'] is False
+          assert a['event_order_reference_ids_exported'] is False
+          assert a['source_contract_terms_not_publicly_standalone']
+          assert not a['provider_signed_sha256_available']
+          assert not a['provider_published_SHA256_checksum_matched']
+          assert not a['permission_to_train_ml_robot_classifier_confirmed']
+          assert not a['commercial_data_use_or_trading_authorized']
+          assert not a['independent_real_market_bot_labels_available']
+          assert not a['market_false_discovery_rate_calibrated']
+          assert not a['full_depth_market_orderbook_claimed']
+          print('OFFICIAL_LOBSTER_AMZN_TEN_LEVEL_FORMAT_VALIDATED',json.dumps({
+              'rows_of_paired_real_events_and_L2_states':a['paired_event_and_book_rows'],
+              'original_vendor_demo_zip_sha256_local_observation':a['raw_vendor_zip_sha256_observed_by_this_client'],
+              'vendor_checksum_signed':False,'ML_training_license_confirmed':False,
+              'release_for_trading':False
+          },sort_keys=True))
+          PY
+      - name: Keep only a small source-schema quality-control aggregate, no vendor message or book rows
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-official-lobster-amzn-sample-format-only
+          path: /tmp/original-lobster-amzn-20120621-ten-level-demo-qa-only.json
+          if-no-files-found: error
+          retention-days: 7

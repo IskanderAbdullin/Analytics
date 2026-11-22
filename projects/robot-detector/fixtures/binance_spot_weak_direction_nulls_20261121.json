@@ -1,0 +1,77 @@
+{
+  "schema_version": "real-public-spot-fixed-weak-minute-null-observations-v1",
+  "original_run_id": 44918585645,
+  "original_artifact_id": 14713021082,
+  "symbol": "LTCUSDT",
+  "source": "Binance Vision SPOT trades",
+  "source_license": "CC BY-NC-SA 4.0; noncommercial research",
+  "experiments_after_the_two_market_days_were_already_inspected": true,
+  "actual_distinct_utc_market_days": 2,
+  "shuffles_per_day": 8,
+  "phase_offsets_seconds": [
+    0,
+    10,
+    20
+  ],
+  "null_type": "within_minute_side_shuffle_without_timestamp_cluster_preservation",
+  "no_physical_bot_count_or_real_market_fdr": true,
+  "original_archive_source_verified_against_provider_sha256": true,
+  "cases": [
+    {
+      "day": "2026-11-18",
+      "provider_zip_sha256": "2fbf1fe2f85c813b3d5e4922d674799adced6f306effe0e5cf9add62a57e6522",
+      "source_public_prints": 116446,
+      "phases": [
+        {
+          "origin_seconds": 0,
+          "observed_one_sided": 173,
+          "weak_null_min": 65,
+          "weak_null_median": 74,
+          "weak_null_max": 81
+        },
+        {
+          "origin_seconds": 10,
+          "observed_one_sided": 161,
+          "weak_null_min": 46,
+          "weak_null_median": 56.5,
+          "weak_null_max": 68
+        },
+        {
+          "origin_seconds": 20,
+          "observed_one_sided": 177,
+          "weak_null_min": 49,
+          "weak_null_median": 59,
+          "weak_null_max": 67
+        }
+      ]
+    },
+    {
+      "day": "2026-11-19",
+      "provider_zip_sha256": "9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a",
+      "source_public_prints": 161957,
+      "phases": [
+        {
+          "origin_seconds": 0,
+          "observed_one_sided": 135,
+          "weak_null_min": 51,
+          "weak_null_median": 58.5,
+          "weak_null_max": 67
+        },
+        {
+          "origin_seconds": 10,
+          "observed_one_sided": 113,
+          "weak_null_min": 45,
+          "weak_null_median": 51,
+          "weak_null_max": 57
+        },
+        {
+          "origin_seconds": 20,
+          "observed_one_sided": 135,
+          "weak_null_min": 40,
+          "weak_null_median": 47,
+          "weak_null_max": 55
+        }
+      ]
+    }
+  ]
+}

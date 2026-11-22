@@ -1,0 +1,92 @@
+{
+  "schema_version": "public-time-precision-and-lagged-l2-adversarial-precommit-v1",
+  "frozen_date_utc": "2026-11-21",
+  "scientific_stage": "RD-PUBLIC-CONDITIONAL-NULL-16",
+  "focused_subissue": 98,
+  "primary_stage_issue": 97,
+  "source_mode": "SOURCE_FREE_DETERMINISTIC_PUBLIC_ONLY_TOY_NO_NEW_ENGINE_OR_MARKET_DATA",
+  "origin_original_source_run": 44944144915,
+  "original_inspected_source_seed_range": [
+    3301,
+    3340
+  ],
+  "new_source_seed_values": [],
+  "fixed_source_generation": {
+    "exchange_session_start_second_local": 34200,
+    "exchange_session_end_second_local_exclusive": 34680,
+    "public_prints_base": 240,
+    "base_timestamp_centers": 120,
+    "base_center_step_ns": 4000000000,
+    "base_center_jitter_formula": "(7*i % 100) * 1000000 nanoseconds for i=0..119",
+    "within_center_print_offsets_ns": [
+      0,
+      200000
+    ],
+    "base_lots_by_j": [
+      5,
+      7
+    ],
+    "base_reported_sides_by_j": [
+      "BUY",
+      "SELL"
+    ],
+    "variants": [
+      "paired_background_null",
+      "split_100_at_45sec_only_null",
+      "near_boundary_45sec_null",
+      "sparse_public_45sec_positive"
+    ],
+    "split_variant_added_print_count": 100,
+    "split_variant_timestamp_second_local": 34305,
+    "split_variant_print_lots": 1,
+    "near_boundary_added_count": 9,
+    "near_boundary_timestamp_formula": "34260+45*i seconds + 255000000 nanoseconds, i=0..8",
+    "near_boundary_print_lots": 1,
+    "sparse_positive_added_count": 9,
+    "sparse_positive_timestamp_formula": "34260+45*i seconds, i=0..8",
+    "sparse_positive_print_lots": 1,
+    "allow_private_parent_or_agent_ids_in_input": false
+  },
+  "fixed_public_scoring": {
+    "clock_anchor_second_local": 34260,
+    "grid_periods_seconds": [
+      20,
+      45
+    ],
+    "grid_tolerance_ns": 250000000,
+    "ratio_threshold_greater_equal": 0.6,
+    "min_public_prints": 200,
+    "min_public_20sec_clock_hits": 8,
+    "min_unique_timestamp_20sec_hits": 8,
+    "min_prior_completed_30sec_l2_bins": 5,
+    "prior_l2_bins_test_values": [
+      4,
+      5,
+      10
+    ],
+    "proven_source_timestamp_resolution_ceiling_ns": 1000000,
+    "unknown_or_coarser_precision_status": "ABSTAIN",
+    "no_oracle_in_public_features": true
+  },
+  "precision_grid_ns": [
+    1,
+    1000000,
+    10000000,
+    100000000
+  ],
+  "precision_transformation": "floor each non-negative UTC nanosecond timestamp to multiple of quantum, never modify side/lots/print multiplicity; all source variants and all precision values must be reported",
+  "controlled_outcomes_before_experiment": [
+    "original_print_count_and_lots_conserved_for_every_precision",
+    "source_public_time_order_monotonic_after_rounding",
+    "distinct_exact_timestamp_count_nonincreasing_with_coarser_nested_quantum",
+    "same_timestamp_cluster_membership_does_not_prove_common_parent",
+    "no_target_split_fill_can_inflate_per_print_ratio_vs_unique_grouped",
+    "coarse_or_unknown_precision_abstains_even_if_numeric_ratio_high",
+    "less_than_5_previous_completed_L2_bins_abstains_without_using_future_or_oracle",
+    "each_variant_and_quantum_including_negative_results_is_preserved"
+  ],
+  "pre_specified_evaluation": "Descriptive score stability/coverage only; no detection significance, no true market owner/FDR, no new source holdout, no phase or threshold tuning",
+  "no_real_trading_or_external_data": true,
+  "frozen_after_source_3301_3340_inspection": true,
+  "do_not_use_as_independent_real_market_or_new_ABIDES_evidence": true
+}

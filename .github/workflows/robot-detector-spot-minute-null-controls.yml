@@ -1,0 +1,88 @@
+name: Robot Detector bounded existing-source minute-shuffle research
+
+# Source dates and null-control seed set were committed BEFORE any
+# side-permutation results were observed. One original run only;
+# after success, change to manual-only to avoid repeated downloads.
+# Original genuine public-source result succeeded in Actions #44918585645.
+# Repeat network fetch of already inspected samples only on explicit dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fixed-weak-controls-for-two-observed-real-days:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate weak-null invariants and previous real archive source policy
+        run: |
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_public_trade_pair_review.py' -v
+      - name: Re-read provider-verified, previously inspected exchange tape
+        run: |
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-18 --clock-origin-study \
+            --direction-null-study --output /tmp/spot-20181118-weak-controls.json
+          python tools/binance_public_trade_archive.py \
+            --symbol LTCUSDT --date 2026-11-19 --clock-origin-study \
+            --direction-null-study --output /tmp/spot-20181119-weak-controls.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          pairs=(
+              ('2026-11-18',116446,'2fbf1fe2f85c813b3d5e4922d674799adced6f306effe0e5cf9add62a57e6522','/tmp/spot-20181118-weak-controls.json'),
+              ('2026-11-19',161957,'9208231cbd6b55e4de42d04d9c07aa636be235be6d1c08ddb3c6953dbc6f3c1a','/tmp/spot-20181119-weak-controls.json'),
+          )
+          for day, expected_count, sha, filename in pairs:
+              r=json.loads(Path(filename).read_text())
+              assert r['utc_date']==day and r['symbol']=='LTCUSDT'
+              assert r['source_zip_sha256']==sha and r['provider_published_checksum_matched']
+              assert r['public_trade_count']==expected_count
+              assert not r['l2_orderbook_present'] and not r['real_world_owner_count_known']
+              assert not r['commercial_use_allowed_without_license']
+              n=r['public_within_minute_weak_direction_null_v1']
+              p=r['clock_origin_descriptive_v1']
+              assert n['source_event_count']==expected_count
+              assert n['clock_phases_seconds']==[0,10,20]
+              assert not n['market_false_discovery_rate_calibrated']
+              assert not n['physical_robot_identification_validated']
+              assert not n['optimal_phase_selected'] and not n['commercial_or_live_trading_allowed']
+              assert len(n['variants'])==3
+              for a,b in zip(n['variants'],p['variants']):
+                  assert a['origin_seconds']==b['origin_seconds']
+                  assert a['observed_one_sided_bins']==b['strictly_buy_one_sided_bins_or_sell_one_sided_bins']
+                  assert a['observed_prints_in_full_bins']==b['public_prints_in_full_bins']
+                  assert a['excluded_utc_edge_prints']==b['boundary_trades_excluded']
+                  assert a['num_predeclared_weak_null_replicates']==8
+              print('REAL_WEAK_MINUTE_NULL_SOURCE_VERIFIED',json.dumps({
+                  'day':day,'source_trades':expected_count,
+                  'zip_sha256':sha,
+                  'origin_weak_controls':[{
+                     'origin_seconds':v['origin_seconds'],
+                     'observed_one_sided_bins':v['observed_one_sided_bins'],
+                     'weak_null_min':v['null_one_sided_bin_count_min'],
+                     'weak_null_median':v['null_one_sided_bin_count_median'],
+                     'weak_null_max':v['null_one_sided_bin_count_max']
+                  } for v in n['variants']],
+                  'independent_market_accuracy_established':False
+              },sort_keys=True))
+          PY
+      - name: Upload compact aggregate-only reports, not raw source tapes
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-real-public-weak-direction-nulls
+          path: |
+            /tmp/spot-20181118-weak-controls.json
+            /tmp/spot-20181119-weak-controls.json
+          if-no-files-found: error
+          retention-days: 7

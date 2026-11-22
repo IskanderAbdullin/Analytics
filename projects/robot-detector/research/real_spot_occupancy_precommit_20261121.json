@@ -1,0 +1,78 @@
+{
+  "schema_version": "robot-detector-real-spot-occupancy-precommit-v1",
+  "freeze_utc_day": "2026-11-21",
+  "development_sources_already_inspected": [
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-18"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-19"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-20"
+    },
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-20"
+    }
+  ],
+  "new_source_pairs_frozen_before_any_download": [
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-17",
+      "role": "new_uninspected_earlier_calendar_day_same_instrument"
+    },
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-17",
+      "role": "new_uninspected_earlier_calendar_day_second_instrument"
+    }
+  ],
+  "source_type": "Binance Vision official raw daily spot public trades, noncommercial CC BY-NC-SA research only",
+  "source_day_is_earlier_than_development_days": true,
+  "not_prospective_forward_time_holdout": true,
+  "bin_width_seconds": 30,
+  "predeclared_phase_origins_seconds": [
+    0,
+    10,
+    20
+  ],
+  "primary_origin_seconds": 0,
+  "occupancy_mutually_exclusive_classes": [
+    "1",
+    "2",
+    "3-4",
+    "5-9",
+    "10+"
+  ],
+  "primary_occupancy_filter_min_prints_per_bin": 5,
+  "fixed_null_family": "within-minute whole same-timestamp joint side-vector shuffle among same-size clusters",
+  "fixed_eight_null_seeds": [
+    32001,
+    32003,
+    32009,
+    32027,
+    32029,
+    32051,
+    32057,
+    32063
+  ],
+  "primary_metric": "in complete full-UTC-day 30s bins at phase0 with >=5 real public prints, count all-BUY or all-SELL bins and compare to MAX of 8 fixed strong equal-timestamp-cluster null controls; report success iff observed > max, for BOTH frozen source pairs without alternative thresholds",
+  "secondary_metrics": [
+    "all 1,2,3-4,5-9,10+ per-bin occupancy class denominators and one-sided numbers vs 8 strong shuffles",
+    "exact 10s/20s phase sensitivity without choosing best",
+    "unconditional one-sided count and exact UTC-edge exclusions",
+    "1-print bins are 100% one-sided in every null and must not be called bots"
+  ],
+  "stop_if_provider_source_unavailable": true,
+  "no_symbol_date_or_threshold_substitution": true,
+  "no_source_raw_trades_in_git_or_artifacts": true,
+  "not_a_real_market_robot_FDR_or_physical_owner_detector": true,
+  "not_for_live_or_commercial_trading": true,
+  "licence": "CC BY-NC-SA 4.0; Binance Vision Dataset Terms 2026-08-26",
+  "source_sha256_must_match_provider_published_checksum": true,
+  "report_both_positive_and_negative_case_results": true
+}

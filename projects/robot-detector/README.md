@@ -1,7 +1,350 @@
 # Market Robot Detector — самостоятельный проект внутри Analytics
 
+**[Единый живой научный план и подробное ТЗ](docs/MASTER_RESEARCH_PLAN.md)** —
+что уже доказано, что предстоит проверить, как выбирать,
+пересматривать и обосновывать следующие исследования.
+Обязателен для всех агентов и почасовых продолжений;
+см. также [AGENTS.md](AGENTS.md) и
+[текущий checkpoint](research/autonomy_state.json).
+
+## Цепочка научных этапов: работа продолжена после checkpoints
+
+- [160 настоящих ABIDES matching-engine запусков на 40 новых seeds](docs/ABIDES_160_ORIGINAL_SOURCE_AUDIT_20261121.md):
+  156 234 prints, 144 908 временных кластеров,
+  253 386 L2 snapshots, 617 posthoc TWAP fills.
+  **Poisson false alarms 7/40 vs 6/40** и
+  **momentum 7/40 vs 7/40** (per-print vs grouped);
+  **TWAP 39/40 vs 32/40**, 7 дополнительных
+  пропусков grouped и 1 abstain.
+  Два CI прогона побайтово совпали — **это
+  проверка воспроизводимости, не 320 новых
+  случаев**. Продолжение [#97](https://github.com/IskanderAbdullin/Analytics/issues/97).
+
+- [Аудит малой мощности и парного сравнения двух классификаторов](
+  docs/ABIDES_MATCHED_UNCERTAINTY_20261121.md):
+  при четырёх синтетических seeds на одну
+  когорту даже **0/4** ошибок допускает
+  номинальную верхнюю 95% CP границу **0,6024**,
+  а **4/4** удачных случаев — нижнюю **0,3976**
+  (лишь под IID simulator assumptions). Один
+  grouped TWAP miss; улучшения нет.
+  Продолжение: [#96](https://github.com/IskanderAbdullin/Analytics/issues/96).
+
+- [Новый genuine ABIDES 16-run эксперимент: по prints и по exact timestamp](docs/ABIDES_PUBLIC_CLUSTER_COMPARISON_20261121.md):
+  **16 142** исполнений, **14 801** уникальных timestamps,
+  61 posthoc TWAP fills. Naive print 4/4 TWAP, grouped
+  3/4 TWAP, Poisson false alarm 1/4 у **обоих** методов.
+  Нет специфичностного улучшения; следующий научный
+  этап [#95](https://github.com/IskanderAbdullin/Analytics/issues/95).
+
+- [Точный conditional toy-null размера timestamp-кластера](
+  docs/PUBLIC_CLUSTER_SIZE_CONDITIONAL_NULL_20261121.md):
+  при **13** неизменных публичных timestamps и
+  мультимножестве размеров кластеров
+  **12×1 + 1×100** наивное print ratio даёт
+  **2/13 ложных тревог** в строго synthetic toy
+  перестановках; grouped timestamps дают **0/13**.
+  Это **не** реальная рыночная FDR.
+  Следующий этап: genuine ABIDES [#94](
+  https://github.com/IskanderAbdullin/Analytics/issues/94).
+
+- [Фиксированные фазы и псевдорепликация частичных исполнений](
+  docs/PUBLIC_PHASE_TIED_FILLS_NEGATIVE_20261121.md):
+  **13** уникальных timestamps; после 100 prints
+  с одним timestamp naïve ratio вырос
+  **0,1667 → 8,4167** без target. Grouped
+  timestamps возвращают исходный результат;
+  ±300 ms нарушают 250 ms допуск (ABSTAIN).
+  Следующий conditional null [#93](
+  https://github.com/IskanderAbdullin/Analytics/issues/93).
+
+- [16-run genuine ABIDES split-half momentum robustness](
+  docs/ABIDES_SPLIT_HALF_MOMENTUM_20261121.md):
+  **3/4 TWAP alarms** и 1/4 abstain, во всех
+  трёх фонах 0 false alarms, но по одному abstain.
+  По сравнению с исходным ratio на тех же
+  seeds улучшение специфичности не показано;
+  произошло **снижение покрытия**.
+  Этап #92 подтверждён source-free CI, текущая задача — #93.
+
+- [Новый независимый ABIDES 16-run ratio baseline и отрицательные momentum-контроли](
+  docs/ABIDES_BACKGROUND_RATIO_HOLDOUT_20261121.md):
+  **4/4 TWAP обнаружены** при 74 posthoc-fills,
+  **0/8** ложных тревог на Poisson/fixed-20s,
+  но **2/4 ложных тревоги** на momentum-фоне.
+  Не real-market FDR. Следующий этап — #91.
+
+- [Проверено математическое aliasing 20s фоновой стратегии с 45s clock grid](
+  docs/PUBLIC_CLOCK_ALIASING_NEGATIVE_20261121.md):
+  при полном отсутствии TWAP **1/9** фоновых событий
+  попадает в «TWAP-подобную» 45s сетку; подмена
+  detector specificity невозможна. Новый ratio
+  baseline выбран **после** старых 2901–2903,
+  предзарегистрирован **до** новых 3001–3004 и
+  ждёт независимой симуляционной проверки.
+
+- [ABIDES genuine 12-run multiscale и L2, отрицательная переносимость](
+  docs/ABIDES_MULTISCALE_PUBLIC_L2_20261121.md):
+  на seeds 2901–2903 **67** posthoc TWAP fills;
+  fixed-20s фон без target дал **0,0820**
+  доли на 45s сетке против **0,0302** у TWAP,
+  а legacy 10s baseline **3/3** ложно сработал
+  на fixed-noise и **3/3** пропустил TWAP.
+  Следующий этап — анализ harmonic aliasing и holdout #90.
+
+- [Независимый genuine ABIDES-NG тест переносимости](
+  docs/GENUINE_ABIDES_FIXED_CLOCK_TRANSFER_20261121.md):
+  заранее зафиксированный 10-секундный детектор дал
+  **2/2 ложных тревоги** на регулярном фоне
+  и **2/2 пропуска** на genuine injected TWAP
+  (29 подтверждённых controlled executions).
+  Это отрицательный результат: clock grid не
+  идентифицирует целевого исполнителя.
+
+- [Ключевой hard-negative результат публичной
+  10-секундной регулярности](
+  docs/TOY_PUBLIC_EXECUTION_RHYTHM_HARD_NEGATIVE_20261121.md):
+  **4/4 ложных тревог** на периодическом
+  синтетическом фоне без target, при **4/4**
+  истинных срабатываниях в positive toy-case;
+  публичные ленты отрицательных периодических
+  и положительных случаев совпадают. Из одного
+  ритма нельзя доказать наличие конкретного робота.
+
+- [Воспроизводимость одним offline-командным запуском](
+  docs/OFFLINE_REPRODUCIBILITY_20261121.md):
+  **14 наборов / 113 synthetic/offline tests**
+  по оригинальным исходникам плюс 8 агрегатных
+  source/provenance fixtures без скачивания рынка.
+  Отдельный network replay нужен только для
+  оригинальных vendor файлов; offline CI не
+  является независимой real-market валидацией.
+
+- [Проверка качества source/L2 и запрет недоказанной полноты](
+  docs/EXCHANGE_L2_COVERAGE_ABSTENTION_20261121.md):
+  абсолютная нумерация сообщений требуется для покрытия;
+  без неё реальный источник остаётся **UNKNOWN**, а
+  пропуски или несогласованные snapshots — **ABSTAIN**,
+  не «роботов нет». Пример 5/5 vs 4/5 синтетических
+  событий отличает полный oracle source от разрыва.
+
+- [Исторический 10-уровневый NASDAQ L2 event-time replay](docs/LOBSTER_EVENT_TIME_FEATURES_20261121.md):
+  **269 748** настоящих пар событий/стакана,
+  исходный source-анализ успешно подтверждён.
+- [Ретроспективное время vs количество событий](docs/LOBSTER_CLOCK_VS_EVENT_WEIGHTING_20261121.md):
+  event-weighted spread **1308,62**, clock-weighted
+  **1284,85** в единицах цены ×10000. Ошибка выбора
+  знаменателя реальна; контрольные тесты исключают
+  lookahead и фиктивное время вне наблюдения.
+- [Контрпример неидентифицируемости владельца](docs/SYNTHETIC_L2_OWNER_NONIDENTIFIABILITY_20261121.md):
+  две синтетические реальности с одинаковыми
+  шестью публичными событиями и всеми 10 уровнями
+  стакана, но **одним и тремя приватными
+  владельцами**. Следовательно, уникальное
+  число владельцев не восстанавливается по
+  публичному order reference без дополнительных меток.
+  Это не препятствует исследованию наблюдаемых
+  алгоритмических паттернов.
+
+После каждого этапа агент выбирает и начинает
+следующий, а master issue #72 остаётся открытым.
+Текущий этап определяется **только** актуальным
+[checkpoint](research/autonomy_state.json), а не историческим
+списком выше. Пререгистрированный 12-run ABIDES multiscale
+эксперимент [#89](https://github.com/IskanderAbdullin/Analytics/issues/89)
+**успешно выполнен**, его **отрицательные результаты**
+подтверждены. Источник #90 теперь успешно проверен на исходных
+16 matching-engine runs. Исходные проверки #90 и #91 завершены с сохранением
+отрицательных результатов. Следующий этап —
+[public phase/split-fill robustness #92](
+https://github.com/IskanderAbdullin/Analytics/issues/92).
+Фактический current_stage всегда в checkpoint.
+
+## Постоянная исследовательская программа и автоматическое продолжение
+
+**Конечная цель:** открытая воспроизводимая научная система
+обнаружения наблюдаемых алгоритмических торговых паттернов
+в публичных сделках и L2 с честными negative controls,
+проверкой устойчивости и явной неопределённостью.
+Число коммитов, зелёный CI и успешная проверка одной
+гипотезы не означают завершения проекта.
+
+- [ТЗ автономного многоэтапного выполнения](docs/AUTONOMOUS_RESEARCH_TZ.md)
+- [Checkpoint: фактическое состояние и NEXT_ACTION](research/autonomy_state.json)
+- [Открытый контрольный issue #72](https://github.com/IskanderAbdullin/Analytics/issues/72)
+
+После каждого этапа агент фиксирует результат, тесты и commit/push,
+пересматривает приоритеты и **сразу начинает следующий этап**
+в пределах активного запуска, без временного отчёта.
+При завершении запуска оставляет воспроизводимый checkpoint:
+следующий агент не должен выяснять заново, на чём остановилась работа.
+Исследование может продолжаться отдельными **почасовыми
+запусками планировщика**. Каждый запуск восстанавливает
+актуальный GitHub state; между запусками программа
+не обязана физически исполняться. Не выдавать
+сам факт расписания за подтверждённый результат.
+
+## Historical NASDAQ real 10-level L2 format validation — demo only
+
+[Original official LOBSTER public AMZN 10-level sample
+format test](https://github.com/IskanderAbdullin/Analytics/actions/runs/44922750898)
+successfully audited **269,748** event-aligned NASDAQ
+historical AMZN limit-order book state pairs for
+**2012-06-21**, with 6-field event messages and
+40-field post-event L2 quotes. Sample includes
+**8,974 visible resting-order executions**, **2,445 hidden
+executions**, **27,557 best-quote changes**, and
+**8,483 adjacent events with equal exchange timestamps**.
+
+**The completed stage is structural and format QA only, not
+a robot-detector performance test.** The vendor
+[explicitly publishes demonstration samples](
+https://php.lobsterdata.com/info/DataSamples.php) and research
+examples. Its separate [contractual academic subscription terms](
+https://php.lobsterdata.com/termsAndConditions.php) do not, by
+themselves, prohibit **noncommercial scientific experiments
+with publicly downloadable sample files**. Further exploratory
+research with these demos and publication of OUR code,
+aggregate statistics and figures is therefore **not blocked
+solely for lack of a paid subscription**. We do not claim
+that raw source redistribution, commercial use or additional
+subscription datasets are openly licensed. The original
+**4.8MB compressed** demo ZIP was NOT committed to GitHub
+or uploaded as a workflow artifact, only compact metadata.
+We calculated a local original ZIP SHA-256 but the
+vendor does **not** provide a published/signed checksum
+for independent authentication. The 2012 data are
+historic reconstruction with only **10 occupied price
+levels per side**, not full-depth current L2.
+
+The [source contracts and full original event-type counts
+are documented](docs/LOBSTER_AMZN_PUBLIC_SAMPLE_FORMAT_AUDIT_20261121.md).
+The paired event/book structural validator
+`tools/lobster_public_sample_format_audit.py`
+runs on Python stdlib, with synthetic no-network negative
+tests. The once-successful public CI source fetch is
+**manual-only** thereafter, while cheap parser tests run on push.
+
+## Extended source-verified real spot print panel: 776,007 public executions
+
+The project has verified **8 independent exchange daily SPOT public trade
+source archives** from Binance Vision: **LTCUSDT and BCHUSDT** on
+**each UTC day 2026-11-17 through 2026-11-20**, totalling **776,007
+public executions** (LTC 581,371; BCH 194,636). The four observed
+daily public trade-ID ranges are exactly consecutive for each symbol,
+and every original provider ZIP passed its published SHA-256 check.
+This is **provider dataset continuity**, not independent proof every
+matching-engine event was captured, and not full L2.
+
+The frozen stronger null preserves whole equal-timestamp-side-vector
+execution groups inside one-minute shuffle controls and separately
+conditions on **>=5 public trades per complete 30s bin**.
+Results are **not transferable uniformly across markets**.
+For BCHUSDT, original phase-0 five-print minimum source days
+Nov17/18/19/20 observed one-sided counts **504/610/541/334**,
+versus strong-null eight-shuffle maximums **519/626/539/343**:
+only **Nov19** exceeds the eight-controls envelope.
+The two new BCH Nov18–19 sources were fixed before inspection:
+one failed and one narrowly passed. A selected 20s alternative
+phase must **not** replace the fixed primary 0s outcome.
+
+[Four-day BCH panel, original source links, full per-origin stats,
+licensing and negative results](docs/BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md)
+· [Exact 17 Nov five-print occupancy protocol](docs/REAL_SPOT_OCCUPANCY_TRANSFER_20261117.md)
+· [Earlier LTC/BCH real 20 Nov transfer](docs/REAL_SPOT_PRECOMMITTED_TRANSFER_20261120.md).
+
+**No actual robot owner truth, real-market accuracy/FDR, independent
+complete historical L2 or commercial trading entitlement.** Binance
+Vision source data is noncommercial research use only under
+CC BY-NC-SA 4.0/provider terms. All original source-acquisition
+GitHub Actions were converted to **manual-only** after their
+successful original runs, with tiny aggregate-only artifacts.
+The authorized Windows PC-Agent was not needed for these small,
+bounded experiments.
+
+## Real-public-trade negative controls: clock and partial-fill preservation
+
+**Executed twice on the same two inspected real LTCUSDT UTC days.**
+Research-only per-print within-minute side shuffling initially left
+observed one-sided 30s intervals far above its weak background.
+A second, more conservative control shuffled whole equal-size,
+equal-timestamp execution side-vector clusters instead. With the
+original 30-second origin, the **eight-control medians** rose from
+**74 to 136.5** (2026-11-18) and from **58.5 to 105**
+(2026-11-19), while real counts were **173 and 135**.
+This demonstrates the importance of preserving split-fill
+clustering before interpreting time-series concentration.
+Eight permutations of two previously inspected days are **not**
+calibrated significance, FDR, causal inference or physical
+owner detection. [Frozen source provenance, all six clock offsets
+and limitations](docs/REAL_PUBLIC_SPOT_TRADE_ARCHIVE_2026-11-21.md).
+
+[Weak control original CI #44918585645](https://github.com/IskanderAbdullin/Analytics/actions/runs/44918585645)
+and [stronger cluster-preserving original CI #44919058627](https://github.com/IskanderAbdullin/Analytics/actions/runs/44919058627)
+both succeeded. The original source ZIP checksums match both
+original providers' audited archives. All expensive repeated
+source-fetch workflow schedules are now **manual-only**; only
+small deterministic source/tests auto-run on push.
+
+## New REAL public trade evidence — November 2026, research only
+
+**New live-provider archive downloads succeeded** through public GitHub
+Actions, not the Windows PC. Exactly **278,403 real exchange executed
+spot prints** were verified with the original provider ZIP SHA-256 files:
+LTCUSDT **116,446 on 2026-11-18 UTC** and **161,957 on 2026-11-19 UTC**.
+The observed trade IDs are strictly sequential even across the
+consecutive-day boundary; that is not independent proof of market
+archive completeness. [Scientific provenance and original actions runs](docs/REAL_PUBLIC_SPOT_TRADE_ARCHIVE_2026-11-21.md).
+
+The second predeclared UTC session was used for *descriptive*
+30-second clock-origin binning at **0/10/20 seconds**. Changing
+only the analytical bin offset changes counts of buy/sell-dominant
+and one-sided intervals; none of this identifies physical robots.
+All three phase views are correlated. **Historical full L2 is not
+included** and quote-based detection remains BLOCKED_BY_L2_DATA.
+
+The source dataset is restricted to **non-commercial CC BY-NC-SA 4.0
+research** under Binance Vision terms, not authorized for trading
+execution or commercial deployment. Raw trades are **never** committed
+or uploaded as workflow artifacts. The original source workflows
+were made manual-only immediately after successful first runs.
+
+
 **Версия проекта:** 0.3 (исследовательская) · **Обновлено:** 2026-11-21 · **Статус:** исторический прототип с импортом 121 920 обезличенных сделок SBER (17.11.2026), симуляциями настоящего ABIDES-NG и 134 автоматическими проверками. Точность распознавания роботов на реальном рынке не установлена.
 
+
+## New controlled TWAP versus background genuine ABIDES L2 experiment
+
+The preregistered development-only `tools/abides_l2_twap_phase_contrast.py`
+adds exactly **one known TWAP execution strategy** to a Poisson background
+and compares its public depth-five L2/print timing against a background-only
+configuration at fixed 0/10/20s origins. Two source-registered development
+seeds (2401/2402), two scenarios and three **correlated** views per
+simulated market imply **4 genuine market runs, not 12 independent markets**.
+The instrument is synthetic ABM, not MOEX or SPB; real market owner count
+and accuracy remain unknown. Both the contrast and the new
+`abides_l2_phase_fragility.py` use only public analytics; simulated
+controlled agent IDs are inspected *after* features, only to check
+execution actually occurred.
+
+[Exact frozen experimental protocol, failure gates and provenance](docs/ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+The `public_tape_fingerprint.py` now verifies **ordered full L2 snapshots
+plus executed prints** under known clock shifts. Earlier ABIDES phase
+archives fingerprinted only prints, so historical book content equality
+cannot be independently reconstructed from those aggregate-only results.
+
+The executed controlled TWAP-versus-background study provides a
+**phase-choice overfitting counterexample**: the two synthetic cohorts
+are perfectly separated by observed rho ranges at **10s and 20s**,
+but **not at 0s** and not across all origins. No threshold is fitted,
+no real-market recognition accuracy follows.
+[Observed data and scientific limitations](docs/ABIDES_L2_TWAP_PHASE_CONTRAST.md).
+
+## Genuine ABIDES public L2 30-second clock-origin sensitivity
+
+The new **pre-registered** `tools/abides_l2_binphase_sensitivity.py` evaluates the same anonymous ABIDES depth-five book/trade tape at three **30-second clock origins (0, 10 and 20 seconds)**. Exactly **four new genuine market simulations** (seeds 2101/2102 × Poisson/fixed-cadence backgrounds) produce twelve **correlated** views. Relative public event times, quantities and reported sides are conserved; no phase is selected as a best model and no private execution actor is identified. The two new seeds are registered as spent in the research provenance ledger.
+
+[Precommitted source, genuine ABIDES results and scientific limits](docs/ABIDES_L2_BINPHASE_SENSITIVITY.md). [Successful CI #44912441330](https://github.com/IskanderAbdullin/Analytics/actions/runs/44912441330) found Poisson-background two-seed median rho **−0.014/−0.161/−0.181** and fixed-cadence **−0.218/−0.195/−0.493** for offsets **0/10/20s**. This is clock-origin sensitivity, **not** owner recognition or a real-market trading signal.
 
 ## Reproducible public-feed invariant stress tests
 
@@ -31,7 +374,7 @@ Added a conservative optional **two-stream metadata gate**: the previous complet
 
 The new **read-only** `research/seed_registry.json` records already inspected ABIDES and deliberately constructed toy seeds, including explicit **non-independent replays**. `tools/research_seed_registry.py` checks the historical seed list against four frozen experiment scripts using Python AST, **without importing or running those experiments**, rejects source-plan drift and flags any proposed seed that has already been spent. A previously *unlisted* seed is **not automatically proven globally new or a valid blind holdout**. A lightweight Python-only CI audit runs when relevant source constants or ledger entries change.
 
-[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **29 known spent seeds across 11 canonical studies**, **4 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
+[Known seed list, provenance, successful source CI #44903479712 and limits](docs/RESEARCH_SEED_REGISTRY.md). The lightweight audit verified **31 known spent seeds across 12 canonical studies**, **5 pinned seed constants**, **1 explicitly non-independent replay**, and passed **7/7 pure-Python tests**. It cannot certify any new seed as globally unused. No private agent truth, real market data, GUI or orders.
 
 ## Genuine ABIDES public-L2 time-bin robustness experiment
 

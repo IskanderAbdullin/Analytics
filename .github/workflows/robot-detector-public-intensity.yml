@@ -1,0 +1,101 @@
+name: Robot Detector public intensity source tests
+on:
+  push:
+    branches:
+      - agent/robot-detector-l2-binphase-20261121
+    paths:
+      - 'projects/robot-detector/tools/public_intensity_rescaling.py'
+      - 'projects/robot-detector/tests/test_public_intensity_rescaling.py'
+      - 'projects/robot-detector/tools/public_m0_train_only.py'
+      - 'projects/robot-detector/tests/test_public_m0_train_only.py'
+      - 'projects/robot-detector/tools/public_m1_train_only.py'
+      - 'projects/robot-detector/tests/test_public_m1_train_only.py'
+      - 'projects/robot-detector/tools/public_m2_train_only.py'
+      - 'projects/robot-detector/tests/test_public_m2_train_only.py'
+      - 'projects/robot-detector/tools/public_run_allocation_gate.py'
+      - 'projects/robot-detector/tests/test_public_run_allocation_gate.py'
+      - 'projects/robot-detector/tools/public_evaluation_bounds.py'
+      - 'projects/robot-detector/tests/test_public_evaluation_bounds.py'
+      - 'projects/robot-detector/tools/public_paired_seed_inference.py'
+      - 'projects/robot-detector/tests/test_public_paired_seed_inference.py'
+      - 'projects/robot-detector/tools/public_hypothetical_power_grid.py'
+      - 'projects/robot-detector/tests/test_public_hypothetical_power_grid.py'
+      - 'projects/robot-detector/tools/public_m2_rescaled_gaps.py'
+      - 'projects/robot-detector/tests/test_public_m2_rescaled_gaps.py'
+      - 'projects/robot-detector/tools/public_m1_dynamic_l2.py'
+      - 'projects/robot-detector/tests/test_public_m1_dynamic_l2.py'
+      - 'projects/robot-detector/tools/public_m0_m1_m2_ambiguity_panel.py'
+      - 'projects/robot-detector/tests/test_public_m0_m1_m2_ambiguity_panel.py'
+      - 'projects/robot-detector/tools/public_fixed_intensity_likelihood.py'
+      - 'projects/robot-detector/tests/test_public_fixed_intensity_likelihood.py'
+      - 'projects/robot-detector/tools/public_crossmodel_heldout_ll.py'
+      - 'projects/robot-detector/tests/test_public_crossmodel_heldout_ll.py'
+      - 'projects/robot-detector/tools/public_post_event_bbo_projector.py'
+      - 'projects/robot-detector/tests/test_public_post_event_bbo_projector.py'
+      - 'projects/robot-detector/tools/public_lobster_clock_lag_audit.py'
+      - 'projects/robot-detector/tests/test_public_lobster_clock_lag_audit.py'
+      - 'projects/robot-detector/tools/public_lobster_ns_time.py'
+      - 'projects/robot-detector/tests/test_public_lobster_ns_time.py'
+      - 'projects/robot-detector/tools/public_m1_v3_ns_l2.py'
+      - 'projects/robot-detector/tests/test_public_m1_v3_ns_l2.py'
+      - 'projects/robot-detector/tools/public_ns_heldout_likelihood.py'
+      - 'projects/robot-detector/tests/test_public_ns_heldout_likelihood.py'
+      - 'projects/robot-detector/tools/public_ns_visible_exec_projector.py'
+      - 'projects/robot-detector/tests/test_public_ns_visible_exec_projector.py'
+      - 'projects/robot-detector/tools/public_ns_visible_integrated_ll.py'
+      - 'projects/robot-detector/tests/test_public_ns_visible_integrated_ll.py'
+      - 'projects/robot-detector/tools/public_ns_source_binding.py'
+      - 'projects/robot-detector/tests/test_public_ns_source_binding.py'
+      - 'projects/robot-detector/tools/public_ns_visible_train_only.py'
+      - 'projects/robot-detector/tests/test_public_ns_visible_train_only.py'
+      - 'projects/robot-detector/tools/public_source_study_hard_stop.py'
+      - 'projects/robot-detector/tests/test_public_source_study_hard_stop.py'
+      - 'projects/robot-detector/tools/public_ns_repro_demo.py'
+      - 'projects/robot-detector/tests/test_public_ns_repro_demo.py'
+      - 'projects/robot-detector/tools/public_abides_epoch_ns_clock.py'
+      - 'projects/robot-detector/tests/test_public_abides_epoch_ns_clock.py'
+      - 'projects/robot-detector/tools/public_abides_sparse_l2_screen.py'
+      - 'projects/robot-detector/tests/test_public_abides_sparse_l2_screen.py'
+      - 'projects/robot-detector/tools/public_abides_full_window_exposure.py'
+      - 'projects/robot-detector/tests/test_public_abides_full_window_exposure.py'
+      - 'projects/robot-detector/tools/public_abides_m0_m1v4_ll.py'
+      - 'projects/robot-detector/tests/test_public_abides_m0_m1v4_ll.py'
+      - 'projects/robot-detector/tools/public_abides_m1v4_nontarget_panel.py'
+      - 'projects/robot-detector/tests/test_public_abides_m1v4_nontarget_panel.py'
+      - 'projects/robot-detector/tools/public_abides_compact_160_eligibility.py'
+      - 'projects/robot-detector/tests/test_public_abides_compact_160_eligibility.py'
+      - 'projects/robot-detector/tools/public_abides_source_capture_preflight.py'
+      - 'projects/robot-detector/tests/test_public_abides_source_capture_preflight.py'
+      - 'projects/robot-detector/tools/public_abides_export_precision_ll.py'
+      - 'projects/robot-detector/tests/test_public_abides_export_precision_ll.py'
+      - 'projects/robot-detector/tools/public_abides_us_clock_ll_bounds.py'
+      - 'projects/robot-detector/tests/test_public_abides_us_clock_ll_bounds.py'
+      - 'projects/robot-detector/tests/test_public_abides_mark_projection_limit.py'
+      - '.github/workflows/robot-detector-public-intensity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run exact checked-out Python source tests (no external data)
+        working-directory: projects/robot-detector
+        run: python -m unittest discover -s tests -p 'test_public_*py' -v
+      - name: Reproduce fixed ns public visible-type4 source-free aggregate
+        working-directory: projects/robot-detector
+        run: python -m tools.public_ns_repro_demo
+      - name: Audit committed ABIDES 160 original compact metadata sufficiency only
+        working-directory: projects/robot-detector
+        run: python -m tools.public_abides_compact_160_eligibility
+      - name: Emit ABIDES legacy CSV submicrosecond loss source-free likelihood falsifier
+        working-directory: projects/robot-detector
+        run: python -m tools.public_abides_export_precision_ll
+      - name: Emit ABIDES non-target LL falsifier source-free aggregate
+        working-directory: projects/robot-detector
+        run: python -m tools.public_abides_m1v4_nontarget_panel
+      - name: Emit frozen three-tape aggregate-only LL panel (source-free; not owner inference)
+        working-directory: projects/robot-detector
+        run: python -m tools.public_crossmodel_heldout_ll

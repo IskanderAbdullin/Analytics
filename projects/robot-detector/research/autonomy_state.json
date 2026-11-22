@@ -1,0 +1,320 @@
+{
+  "schema_version": "robot-detector-autonomous-state-v1",
+  "updated_utc_date": "2026-11-22",
+  "repository": "IskanderAbdullin/Analytics",
+  "project_root": "projects/robot-detector",
+  "branch": "agent/robot-detector-l2-binphase-20261121",
+  "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
+  "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
+  "status": "ACTIVE_RESEARCH_NOT_RELEASED",
+  "last_verified_base_commit": "32caf2c191571cbc07ffb0e359e72a32a547cf9d",
+  "last_known_verified_results": [
+    {
+      "stage_id": "RD-ABIDES-POWER-15",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44944144915",
+      "result": "Original 160 genuine ABIDES seed/cohort cases (40 local seeds 3301–3340), repeated identical replay #44944168231; source SHA 55394e5dfda274613cb081ee4ad44e9b2b8e051eb2e0f0c361e4ee8016431d62. 156234 executions, 144908 unique timestamps, 253386 L2 snapshots, 617 oracle TWAP fills. Poisson FP naive 7/40 grouped 6/40; momentum FP 7/40 both; fixed 0/40 both +1 abstain; injected TWAP naive alarms 39/40, grouped 32/40 (7 extra misses)+1 abstain. Synthetic only, no market FDR.",
+      "status": "VERIFIED_GENUINE_ABIDES_160_NEGATIVE_TRANSFER_NO_REAL_MARKET_FDR"
+    },
+    {
+      "stage_id": "RD-MATCHED-UNCERTAINTY-14",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44943333914",
+      "result": "Retrospective exact 4-seed synthetic source matched confidence audit: nominal Clopper-Pearson 95% 0/4 upper=0.60236464, 4/4 lower=0.39763536 assuming hypothetical IID simulator trials, 1 discordant positive TWAP seed 3204 (print-only), same Poisson source false alarm both; 25 suites/190 source-free tests. No new source runs or market FDR.",
+      "status": "VERIFIED_RETROSPECTIVE_SYNTHETIC_SMALL_N_UNCERTAINTY_NOT_MARKET_PRECISION"
+    },
+    {
+      "stage_id": "RD-CLUSTER-MARKET-13",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44938991772",
+      "result": "16 original ABIDES matching-engine cases seeds 3201–3204, 16,142 synthetic public prints, 14,801 unique timestamps, 61 posthoc controlled TWAP fills. Per-print original 4/4 TWAP detections and 1/4 Poisson false; grouped timestamp 3/4 TWAP (miss 3204), same 1/4 Poisson false; fixed20/momentum 0/8 false in both, 0/16 abstain. No specificity improvement and sensitivity loss. Artifact 14720831681 SHA e75c089f...",
+      "status": "VERIFIED_GENUINE_ABIDES_NEGATIVE_TRANSFER_TIMESTAMP_GROUPING_NOT_MARKET_FDR"
+    },
+    {
+      "stage_id": "RD-CONDITIONAL-NULL-12",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44938416432",
+      "result": "Exact 13-position synthetic timestamp-cluster size permutation, source free: naive print-weighted 2/13 FALSE alarms from a 100-fill cluster placed at 45-only or 20+45 timestamps, grouped unique timestamp 0/13 alarms; 23 suites/174 tests. Strong toy exchangeability assumption, not market FDR/pvalue.",
+      "status": "VERIFIED_EXACT_CONDITIONAL_TOY_ONLY_NOT_REAL_MARKET_SIGNIFICANCE"
+    },
+    {
+      "stage_id": "RD-PHASE-ROBUSTNESS-11",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44937958809",
+      "result": "Precommitted source-free public timestamp counterexample: same 13 unique timestamps, splitting one 45s-only print into 100 raises hits45/hits20 0.16666667→8.41666667 without target, grouping exact timestamps restores 0.16666667. ±300ms shift vs tolerance 250ms yields 0 denominator ABSTAIN. Offline 22 suites/168 passed tests.",
+      "status": "VERIFIED_SYNTHETIC_PSEUDOREPLICATION_NEGATIVE_NOT_REAL_BOT_FDR"
+    },
+    {
+      "stage_id": "RD-MOMENTUM-NEGATIVE-10",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44937478576",
+      "result": "Original 16 genuine ABIDES engine cases 3101..3104: 3/4 injected TWAP alarms and 1/4 TWAP abstain (72 oracle fills). Each negative cohort Poisson/fixed-20s/momentum had 0/4 false alarms but 1/4 abstain. Same-seed original full session ratio: 4/4 positives and 0/12 false alarms. New split-half reduces coverage without observed specificity gain.",
+      "status": "VERIFIED_SPLIT_HALF_NONIMPROVEMENT_WITH_SOURCE_ABSTAINS"
+    },
+    {
+      "stage_id": "RD-SYNTHETIC-HOLDOUT-09.B",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44936592641",
+      "result": "Genuine 16 independent ABIDES matching runs, local seeds 3001-3004: 4/4 TWAP positives detected (74 oracle-confirmed fills), 0/4 Poisson false alarms, 0/4 fixed-20s false alarms, 2/4 MOMENTUM false alarms, 0/16 abstentions. Ratio .60 from previously inspected development. Synthetic only, real FDR unknown.",
+      "status": "VERIFIED_NEW_SOURCE_SYNTHETIC_HOLDOUT_MOMENTUM_FALSE_POSITIVES"
+    },
+    {
+      "stage_id": "RD-SYNTHETIC-HOLDOUT-09.A",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44935804124",
+      "result": "Source-free 20s periodic background overlaps fixed 45s grid exactly every lcm(20,45)=180sec, so 10 of 90 periodic events look like 45s clock hits with ZERO target. Shift background by +1s gives 0 of 90. Frozen original ABIDES hard-negative 45s fraction remains greater than positive TWAP.",
+      "status": "VERIFIED_SYNTHETIC_MODULAR_ALIASING_NEGATIVE_NOT_REAL_MARKET_PROBABILITY"
+    },
+    {
+      "stage_id": "RD-ABIDES-MULTISCALE-08",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44935340284",
+      "result": "Original genuine ABIDES 12 matching engine runs on 2901-2903: public 45s fraction fixed-20s background 0.08201092 (no target) > injected TWAP 0.03022026; legacy 10s 3/3 fixed-cadence false alarms and 3/3 missed TWAP despite 67 posthoc controlled fills. 12568 public executed prints/21675 L2 snapshots; negative specificity confirmed.",
+      "status": "VERIFIED_GENUINE_ABIDES_NEGATIVE_SPECIFICITY_NOT_REAL_MARKET_FDR"
+    },
+    {
+      "stage_id": "RD-ABIDES-INDEPENDENT-07",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44928306325",
+      "result": "Six source-pinned genuine ABIDES matching simulations on seeds 2801/2802: fixed 10s public rhythm false positives 2/2 fixed-cadence background; missed both genuine injected 45s TWAP positives (29 posthoc controlled fills), Poisson null 0/2 alarms. Negative transfer confirmed.",
+      "status": "VERIFIED_GENUINE_ABIDES_NEGATIVE_TRANSFER_NOT_REAL_MARKET_ACCURACY"
+    },
+    {
+      "stage_id": "RD-SYNTHETIC-TEMPORAL-06",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44927619509",
+      "result": "Frozen 4-seed toy holdout: random-noise null 0/4 alarms, periodic non-target background 4/4 FALSE alarms, injected periodic target 4/4 hits; hard negative and positive public streams identical per seed. Real-market accuracy unknown.",
+      "status": "VERIFIED_NEGATIVE_CONSTRUCTED_TOY_NOT_GENUINE_ABIDES"
+    },
+    {
+      "stage_id": "RD-REPRO-05",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44927111552",
+      "result": "One-command offline repro covers 14 explicit negative/unit suites, 113 passed source-free tests, 8 pinned aggregate provenance fixtures, no network or vendor raw data. Not a scientific detector release.",
+      "status": "VERIFIED_OFFLINE_ONLY_NOT_ORIGINAL_MARKET_SOURCE_REAUTHENTICATION"
+    },
+    {
+      "stage_id": "RD-ROBUSTNESS-04",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926821602",
+      "result": "Source-event observability gate strictly separates synthetic oracle-attested 1.0 coverage, known missing-event 0.8 abstention, and real-like untrusted sequence UNKNOWN. Missing books, time gaps and order-ID confusion explicitly blocked.",
+      "status": "VERIFIED_SYNTHETIC_COVERAGE_NOT_REAL_EXCHANGE_COMPLETENESS"
+    },
+    {
+      "stage_id": "RD-SYNTHETIC-BLIND-03",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926352634",
+      "result": "Constructive synthetic owner-count nonidentifiability: same 6 public market messages and 10-level books, SHA 565b03387e80..., but distinct private oracle owner counts 1 vs 3. No real actor identity or market FDR claim.",
+      "status": "VERIFIED_CONSTRUCTIVE_COUNTEREXAMPLE_NOT_REAL_MARKET_VALIDATION"
+    },
+    {
+      "stage_id": "RD-L2-RESEARCH-02",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44926012965",
+      "result": "Real AMZN source was replayed with no-lookahead quote-time weighting. Event-weighted spread 1308.61693136 vs clock-weighted 1284.85015986 (price x10000); imbalance 0.10299666 vs 0.12135973; 23399.941900033s observed; no data/actor truth extrapolation.",
+      "status": "VERIFIED_HISTORICAL_RETROSPECTIVE_DESCRIPTIVE_NOT_ROBOT_FDR"
+    },
+    {
+      "stage_id": "RD-L2-RESEARCH-01",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44925498585",
+      "result": "Real historical LOBSTER 10-level paired event-time research passed: 269748 event/book states, 27557 BBO price changes, 4239 following visible type4 executions, mean event-weighted spread 1308.61693136 (price*10000), imbalance 0.10299666; no robot ground truth or raw output.",
+      "status": "VERIFIED_SOURCE_RESEARCH_RETROSPECTIVE_NOT_REAL_ROBOT_CLASSIFICATION"
+    },
+    {
+      "stage_id": "AUTONOMY-OPERATING-CONTRACT-01",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44924357143",
+      "result": "Permanent multi-stage research TZ, master issue #72, project AGENTS and README references, machine-readable checkpoint, autonomous offline validation; first research stage #73 queued",
+      "status": "CHECKPOINT_VALIDATED_ON_CI"
+    },
+    {
+      "stage_id": "SOURCE-BINANCE-8",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/blob/agent/robot-detector-l2-binphase-20261121/projects/robot-detector/docs/BCH_FOUR_DAY_OCCUPANCY_PANEL_20261121.md",
+      "result": "Eight original exchange spot archives across LTC/BCH and four UTC days, 776007 prints; cross-market single-sided concentration has repeated negative results",
+      "status": "VERIFIED_RESEARCH_EVIDENCE_NOT_OWNER_TRUTH"
+    },
+    {
+      "stage_id": "SOURCE-LOBSTER-SAMPLE-10",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44922750898",
+      "result": "Original publicly downloadable LOBSTER AMZN 2012-06-21 10-level sample format audit, 269748 aligned message/book rows; research performance not yet tested",
+      "status": "VERIFIED_FORMAT_ONLY"
+    },
+    {
+      "stage_id": "RD-SOURCE-PRECISION-16A",
+      "evidence_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/44945044597",
+      "result": "Preregistered source-free 4 toy tapes x 4 precision x3 previous-only L2 plus 4 unknown precision controls: 52 dependent views, 0 new source runs. 8 adversarial tests green. Split-fill no-target print false positive/group no, sparse 45s cadence missed by both; 36 quality abstentions. Hypothetical precision 1ms ceiling not independently validated on real feeds.",
+      "status": "VERIFIED_SOURCE_FREE_TECHNICAL_NEGATIVE_ONLY"
+    }
+  ],
+  "current_stage": {
+    "id": "RD-PUBLIC-CONDITIONAL-NULL-16",
+    "status": "IN_PROGRESS",
+    "title": "Source-domain gap audit and new period-agnostic timestamp-cluster/lagged-L2 conditional null",
+    "why_next": "Frozen 160-source ABIDES study shows Poisson and momentum false alarms remain and exact-time grouping loses 7 additional TWAP positives. Tuning threshold 0.60 after seeing 3301-3340 cannot establish independent validation; we need a source-free measurement-limit audit and new period-agnostic public null.",
+    "inputs": [
+      "docs/ABIDES_160_ORIGINAL_SOURCE_AUDIT_20261121.md",
+      "fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json",
+      "tools/abides_160_original_audit.py",
+      "docs/MASTER_RESEARCH_PLAN.md",
+      "docs/PUBLIC_CONDITIONAL_NULL_IDENTIFIABILITY_20261121.md",
+      "docs/BURST_PRESERVING_TIMING_NULL_PREREG_20261122.md"
+    ],
+    "deliverables": [
+      "Source-free domain gap negative cases (timestamp resolution, split fills, missing prior L2, periodic/momentum nulls, non-identifiability)",
+      "Freeze candidate period-agnostic public conditional-null family with occupancy and cluster preservation",
+      "Strict public feature/oracle separation and no posthoc threshold/source selection",
+      "New separate source-holdout protocol only after sufficient adversarial tests",
+      "Checkpoint, tests, CI, push and next scientific stage",
+      "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains",
+      "Prospective M2 predictable-history exponential intensity candidate preregistration (2026-11-22; design-only)",
+      "Train-only M2 predictable-history model (exact GitHub CI pending), no independent sources",
+      "M2 finite/overflow fail-closed fix with two new adversarial tests, exact CI pending",
+      "Source-free prospective original-run split integrity gate, fake fixtures, no seeds reserved, exact CI pending"
+    ],
+    "acceptance": [
+      "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
+      "No real market actor count/FDR or seed rebranding as new",
+      "No one timestamp equals one parent/owner assumption",
+      "Source-free negative tests, bounded action and review of subsequent independent source"
+    ],
+    "issue_url": "https://github.com/IskanderAbdullin/Analytics/issues/97"
+  },
+  "backlog": [
+    {
+      "id": "RD-READONLY-06",
+      "status": "QUEUED",
+      "priority": 3,
+      "title": "Optional research-only real-time read-only connector and OsEngine integration after offline validity gates"
+    },
+    {
+      "id": "RD-SCIENCE-AUDIT-08",
+      "status": "QUEUED",
+      "priority": 2,
+      "title": "Cross-source identifiability, calibration/coverage, limitations and coherent science manuscript release gate"
+    }
+  ],
+  "blockers": [
+    {
+      "scope": "Real physical owner identification and market false-discovery rate",
+      "status": "UNIDENTIFIABLE_FROM_AVAILABLE_ANONYMOUS_PUBLIC_DATA",
+      "safe_workaround": "Synthetic oracle-labelled evaluation and descriptive real market robustness"
+    },
+    {
+      "scope": "Further paid/vendor market datasets",
+      "status": "REQUIRES_SEPARATE_SOURCE_ACCESS_RIGHTS",
+      "safe_workaround": "Use openly offered sample for noncommercial scientific study, never redistribute original vendor files"
+    }
+  ],
+  "operational_constraints": {
+    "continue_to_next_stage_without_intermediate_reply_within_active_run": true,
+    "do_not_promise_execution_between_chats_without_scheduler": true,
+    "no_force_push": true,
+    "no_live_broker_orders": true,
+    "no_github_actions_in_private_repositories": true,
+    "only_small_bounded_one_time_real_market_data_workflows": true,
+    "no_raw_proprietary_market_archives_in_repo": true,
+    "pc_agent_only_with_explicit_user_approval": true,
+    "do_not_close_master_issue_after_single_stage": true
+  },
+  "resume_instruction": "NEXT_ACTION: do NOT run new original ABIDES seeds/source jobs from this checkpoint. Independently verify source legal research rights, source capture with actual TRADE_ATTRIBUTION+L2_SERIES (including public price/volume/side marked tape), exact original UTC clock/provenance and lagged full no-trade quote coverage, pinned dependencies and signed/attested full public tape identity. Pre-register economically feasible disjoint original-world train/calibration/evaluation seed allocation, power, model freeze and classifier thresholds BEFORE any new sources. Source-free future work can separately preregister richer PUBLIC marked point-process model and compare to timestamp-only M0/M1v4 with adversarial negative controls. Do not treat old compact 160 as new M1v4 data, microsecond LL bound as CI, predictive gain as bot detection, or infer owner count/real FDR. Master #72 open until independent release audit.",
+  "last_session_result": "SECOND measured active research session UTC 2026-11-22T19:17:10.421Z to 2026-11-22T19:47:24.649Z (30.237 min), 11 substantive source-free prereg/coding/audit stages: pinned ABIDES Unix-ns exact clock (old standalone CSV loses submicro but genuine original 160 used in-memory), sparse public EXEC+L2 1s lag, 10s whole-time coverage, distinct ABIDES M0/M1v4 train-only LL, positive +0.171965 LL on unrelated regular non-target public background, original spent 160 compact no event/L2 vectors for new M1v4 reanalysis, external source capture NO-GO, 1ns clock loss relative LL +0.182322, microsecond partial-identification LL interval [-0.192678,-0.010357], public price/quantity/side marks omitted from timing-only source feature SHA. 366/366 source-free Python CI green at code SHA 46ced41f; all old failures/negatives retained; no new original ABIDES seeds/data/trades/PC/real market owners/FDR. Stage #97 and master #72 remain open.",
+  "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
+  "active_run_time_log": {
+    "start_time_utc": "2026-11-22T19:17:10.421Z",
+    "deadline_utc": "2026-11-22T19:47:10.421Z",
+    "latest_clock_utc": "2026-11-22T19:47:24.649Z",
+    "elapsed_minutes": 30.237133333333333,
+    "stage": "SECOND_30_MINUTE_RESEARCH_RUN_COMPLETED_SOURCE_FREE_ABIDES_NO_GO",
+    "previous_run_state_preserved_in_master_plan": true,
+    "new_original_source_runs": 0,
+    "new_simulator_seeds_allocated": 0,
+    "end_time_utc": "2026-11-22T19:47:24.649Z",
+    "completed_substantive_stages": 11,
+    "source_free_python_ci": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266",
+    "tested_code_sha": "46ced41f8b93d5938788b5ac1484604adb44ce0d",
+    "source_free_test_count": 366,
+    "genuine_original_engine_source_runs_created": 0,
+    "novel_source_seeds_allocated": 0,
+    "Computer_Use_invoked": false
+  },
+  "project_goal": "GOAL.md",
+  "project_map": "PROJECT_MAP.md",
+  "evidence_index": "EVIDENCE.md",
+  "next_action_canonical": "resume_instruction",
+  "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
+  "last_confirmed_source_free_ci": {
+    "sha": "46ced41f8b93d5938788b5ac1484604adb44ce0d",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266",
+    "result": "366/366 exact source-free Python tests, aggregate-only CLIs, public ABIDES mark projection hard negatives, no original source"
+  },
+  "last_confirmed_ci_at_base": {
+    "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
+    "workflows": [
+      45020935082,
+      45020935078,
+      45020935086
+    ],
+    "result": "SUCCESS three workflows; M1 design-only"
+  },
+  "standard_upgrade": {
+    "date_utc": "2026-11-22",
+    "reason": "UPDATE_EXISTING_CHAT.md",
+    "working_branch": "agent/robot-detector-l2-binphase-20261121",
+    "pre_upgrade_head": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
+    "canonical_plan": "docs/MASTER_RESEARCH_PLAN.md",
+    "canonical_state": "research/autonomy_state.json",
+    "history_preserved": "existing master scientific chronology, issue #72/#97, git commits and archived AGENTS",
+    "notes": "No duplicate Info project, no raw vendor data, no private Actions/Computer Use."
+  },
+  "last_confirmed_provenance_ci": {
+    "sha": "32caf2c191571cbc07ffb0e359e72a32a547cf9d",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008831",
+    "status": "success"
+  },
+  "last_session_clock": {
+    "start_time_utc": "2026-11-22T12:42:11Z",
+    "original_deadline_utc": "2026-11-22T13:32:11Z",
+    "next_hourly_overlap_guard": "Stop before scheduled 13:12 UTC hourly research run",
+    "recorded_stage_checks": [
+      {
+        "stage": "Recovery/migration and original AGENTS preservation",
+        "clock_check_utc": "2026-11-22T12:45:20Z",
+        "elapsed_minutes": 3.15
+      },
+      {
+        "stage": "M1 prereg+source-free implementation and initial tests",
+        "clock_check_utc": "2026-11-22T12:48:39Z",
+        "elapsed_minutes": 6.47
+      },
+      {
+        "stage": "M1 exact CI / provenance regression fix",
+        "clock_check_utc": "2026-11-22T12:49:38Z",
+        "elapsed_minutes": 7.45
+      },
+      {
+        "stage": "M2 prereg/code and source-free Python tests",
+        "clock_check_utc": "2026-11-22T12:54:59Z",
+        "elapsed_minutes": 12.8,
+        "tests": "63/63 Python exact CI #45024579897; no original source runs"
+      },
+      {
+        "stage": "M2 overflow safety and prospective run-split negative controls",
+        "clock_check_utc": "2026-11-22T12:58:59Z",
+        "elapsed_minutes": 16.8,
+        "tests": "75/75 exact Python CI #45025008917; provenance CI #45025008831; 0 new source runs"
+      }
+    ],
+    "current_stage": "M2 prereg",
+    "note": "Clock checks are measured environment UTC samples, not evidence of continuous activity between tools; do not confuse this chat with the hourly agent.",
+    "measured_final_checkpoint_time_utc": "2026-11-22T12:59:14Z",
+    "measured_elapsed_minutes": 17.05,
+    "stop_reason": "Reached safe completed source-free stage and checkpoint before next independently scheduled 13:12 UTC hourly agent (avoid overlap); no claim of 50 minutes.",
+    "completed_major_stages": [
+      "Existing-project standard migration without duplicate",
+      "Conservative M1 prereg and implementation with 51/51 exact Python tests",
+      "AGENTS regression repair and successful provenance CI",
+      "M2 prospective prereg/implementation, strict numeric failure repair with exact tests",
+      "Prospective source-run split integrity pre-registration/implementation and exact 75/75 Python CI"
+    ]
+  },
+  "last_confirmed_historical_lobster_clock_audit": {
+    "sha": "349d07672c8eade01a96f86b87f334508cd141c2",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45040590585",
+    "artifact_id": 14761716634,
+    "source_sha256_locally_pinned": "5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f",
+    "source_event_book_rows": 269748,
+    "distinct_exact_timestamps": 261265,
+    "rows_with_submillisecond_fraction": 269747,
+    "distinct_timestamps_collapsed_if_floor_to_ms": 110818,
+    "visible_exec_locally_eligible": 8927,
+    "visible_abstain_no_prior": 43,
+    "visible_abstain_stale": 4,
+    "source_is_independent_new_holdout": false,
+    "source_clock_lossless_ms": false,
+    "real_market_fdr_known": false
+  }
+}

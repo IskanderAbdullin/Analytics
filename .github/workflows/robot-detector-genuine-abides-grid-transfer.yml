@@ -1,0 +1,79 @@
+name: Robot Detector preregistered genuine ABIDES public 10s grid transfer
+# Frozen source protocol in commit e8f5f05bc000 before any genuine
+# new-seed simulation. ABIDES matching engine commit pinned, 6 simulations,
+# real source-free negative tests, no raw events or private agent IDs uploaded.
+# After ONE original run convert to workflow_dispatch only.
+# Preregistered genuine original ABIDES new-seed #44928306325 succeeded.
+# Subsequent reruns require explicit workflow_dispatch, never automatic re-run.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-abides-new-seed-public-only-grid-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify frozen source design, seed registry and tamper negatives
+        run: |
+          set -euo pipefail
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_fixed_clock_transfer.py' -v
+          python -m unittest discover -s tests_background -p 'test_toy_public_execution_rhythm.py' -v
+          python -m unittest discover -s tests_research -p 'test_research_seed_registry.py' -v
+      - name: Install pinned actual ABIDES-NG matching engine
+        run: |
+          set -euo pipefail
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run all 6 frozen source engine cases and preserve FAIL outcomes
+        run: |
+          set -euo pipefail
+          python tools/abides_fixed_clock_transfer.py \
+            --output /tmp/genuine-abides-new-seeds-frozen-public-grid-report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/genuine-abides-new-seeds-frozen-public-grid-report.json').read_text())
+          assert r['schema_version']=='genuine-abides-frozen-public-clock-transfer-v1'
+          assert r['independent_matching_engine_runs']==6
+          assert len(r['source_public_tape_cases'])==6
+          assert [x['seed'] for x in r['source_public_tape_cases']]==[2801]*3+[2802]*3
+          assert all(x['genuine_ABIDES_matching_engine_simulation'] for x in r['source_public_tape_cases'])
+          assert all(x['original_public_l2_snapshots']>0 for x in r['source_public_tape_cases'])
+          assert all(x['posthoc_source_controlled_trade_count']>0 for x in
+                     r['source_public_tape_cases'] if x['posthoc_injected_target_present'])
+          assert r['private_agent_identifiers_read_only_after_public_feature']
+          assert r['raw_source_trade_or_l2_book_rows_exported'] is False
+          assert r['threshold_or_phase_selected_after_results'] is False
+          assert r['real_market_robot_precision_or_FDR_calibrated'] is False
+          assert r['no_market_personal_identity_or_trading_signal'] is True
+          for x in r['source_public_tape_cases']:
+              print('GENUINE_ABIDES_FIXED_GRID_ORIGINAL_CASE',json.dumps({
+                'seed':x['seed'],'cohort':x['cohort'],
+                'public_trades':x['original_public_prints'],
+                'public_l2':x['original_public_l2_snapshots'],
+                'frozen_fraction':x['public_fraction_within_frozen_grid'],
+                'fixed_threshold_alarm':x['fixed_threshold_0_22_alarm'],
+                'source_controlled_posthoc_trades':x['posthoc_source_controlled_trade_count'],
+                'false_alarm_on_background':x['false_alarm_on_background'],
+                'true_real_market_robot_accuracy_established':False
+              },sort_keys=True))
+          PY
+      - name: Upload only small aggregates, no raw order or trade tapes
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-genuine-abides-new-seeds-frozen-grid
+          path: /tmp/genuine-abides-new-seeds-frozen-public-grid-report.json
+          retention-days: 7
+          if-no-files-found: error

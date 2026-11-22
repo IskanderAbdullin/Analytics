@@ -1,0 +1,99 @@
+name: Robot Detector genuine ABIDES multiscale L2 preregistered 12-case source
+# Frozen source protocol and seed reservation on preceding commits.
+# Exactly 3 fixed seeds x 4 genuine matching-engine background/target cohorts.
+# Original one-time source run: convert push trigger to workflow_dispatch after success.
+# Original 12 genuine ABIDES matching-engine source runs #44935340284 PASSED.
+# Subsequent source reruns require intentional workflow_dispatch only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-abides-public-only-multiscale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Frozen plan, source provenance and all required negative controls
+        run: |
+          set -euo pipefail
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_multiscale_public_l2.py' -v
+          python -m unittest discover -s tests_background -p 'test_master_research_plan.py' -v
+          python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
+          python - <<'PY'
+          from tools.abides_export import UPSTREAM_COMMIT
+          import json
+          from pathlib import Path
+          config=json.loads(Path('research/abides_multiscale_public_l2_protocol_20261121.json').read_text())
+          assert config['source']=="genuine ABIDES-NG pinned commit "+UPSTREAM_COMMIT
+          assert config["registered_before_simulation"]
+          assert config["local_ledger_unused_seed_candidates"]==[2901,2902,2903]
+          assert config["original_matching_engine_runs"]==12
+          assert config["no_oracle_agent_id_in_public_feature"]
+          assert config["negative_cases_must_never_be_filtered"]
+          assert not config["raw_market_trades_books_or_oracle_ids_exported"]
+          PY
+      - name: Install original pinned genuine ABIDES-NG matching engine
+        run: |
+          set -euo pipefail
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run all 12 ORIGINAL matching-engine source cases without selecting winners
+        run: |
+          set -euo pipefail
+          python tools/abides_multiscale_public_l2.py \
+            --output /tmp/abides-multiscale-l2-original-source-aggregates.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/abides-multiscale-l2-original-source-aggregates.json').read_text())
+          assert d['schema_version']=='genuine-abides-public-only-multiscale-l2-research-v1'
+          assert d['completed_independent_source_engine_runs']==12
+          assert len(d['all_original_source_cases'])==12
+          keys={"poisson_noise_null","fixed_20s_noise_hard_negative",
+                "momentum_noise_hard_negative","twap_45s_positive"}
+          assert set(d["cohort_aggregates"])==keys
+          assert d["thresholds_selected_from_new_results"] is False
+          assert d["source_global_seed_novelty_certified"] is False
+          assert d["market_user_identity_or_real_FDR_established"] is False
+          assert d["no_raw_source_market_trades_or_agent_ids_uploaded"] is True
+          for x in d['all_original_source_cases']:
+              assert x['public_only_feature_input_type_verified']
+              assert not x['real_market_bot_FDR_known']
+              assert not x['actual_private_agent_ids_accessed']
+              assert not x['private_id_leakage_from_L2_features']
+              assert x['public_prints']>0 and x['public_l2_snapshots']>0
+              assert set(x['grid_fractions'])=={'10','20','45','90'}
+              assert set(x['l2_binned_lagged'])=={'30','60'}
+              if x['cohort']=="twap_45s_positive":
+                  assert x['controlled_twap_fills_posthoc']>0
+              else:
+                  assert x['controlled_twap_fills_posthoc']==0
+              print("ORIGINAL_ABIDES_MULTISCALE_CASE",json.dumps({
+                  'seed':x['seed'],'cohort':x['cohort'],
+                  'public_executions':x['public_prints'],
+                  'public_l2_snapshot_events':x['public_l2_snapshots'],
+                  'grid_fractions':x['grid_fractions'],
+                  'lagged_30':x['l2_binned_lagged']['30']['eligible_previous_completed_book_bins'],
+                  'lagged_60':x['l2_binned_lagged']['60']['eligible_previous_completed_book_bins'],
+                  'controlled_fills_posthoc':x['controlled_twap_fills_posthoc'],
+                  'real_owner_truth_known':False
+              },sort_keys=True))
+          PY
+      - name: Store small research aggregates only, no private agent IDs or vendor tapes
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-genuine-abides-12case-multiscale-source-only
+          path: /tmp/abides-multiscale-l2-original-source-aggregates.json
+          retention-days: 7
+          if-no-files-found: error

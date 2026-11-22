@@ -1,0 +1,89 @@
+name: Robot Detector original 160 ABIDES source-only frozen grid replication
+# ONE bounded public original matching-engine run. Freeze 40 x four cohorts before source.
+# After a successful run, remove push trigger and keep only workflow_dispatch.
+# No raw public trades, L2 rows, or private agent IDs in artifacts.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: robot-detector-abides-grid-160-original-once
+  cancel-in-progress: false
+
+jobs:
+  original-160-case-synthetic-public-grid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Frozen source plan, ledger, and negative controls (no vendor network)
+        run: |
+          set -euo pipefail
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_grid_replication_160.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_matched_smalln_audit.py' -v
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'tools')
+          from abides_grid_replication_160 import SEEDS, COHORTS, THRESHOLD, frozen_protocol, check_ledger
+          p=frozen_protocol()
+          check_ledger()
+          assert len(SEEDS)==40 and SEEDS==tuple(range(3301,3341))
+          assert len(COHORTS)==4
+          assert THRESHOLD==0.60
+          assert p['source_status_at_design']=='NOT_RUN'
+          assert p['planned_engine_cases']==160
+          assert p['original_actions_workflow_bounded_then_manual_only']
+          assert p['no_raw_trades_L2_rows_private_agent_or_order_ids_in_artifact']
+          PY
+      - name: Install pinned original genuine ABIDES-NG engine
+        run: |
+          set -euo pipefail
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Execute all 160 preregistered genuine synthetic matching-engine cases ONCE
+        run: |
+          set -euo pipefail
+          python tools/abides_grid_replication_160.py --output /tmp/abides-grid-160-original-source-only.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/abides-grid-160-original-source-only.json')
+          x=json.loads(p.read_text(encoding='utf-8'))
+          assert x['schema_version']=='genuine-abides-public-clock-160source-replication-original-v1'
+          assert x['original_matching_engine_source_case_count']==160
+          rows=x['all_original_160_anonymous_case_aggregates']
+          assert len(rows)==160 and len({(r['source_seed'],r['source_cohort']) for r in rows})==160
+          assert len(x['local_new_source_seeds_not_certified_globally_blind'])==40
+          assert all(x[k] is False for k in (
+              'physical_owner_or_real_market_FDR_calibrated',
+              'raw_source_trades_L2_books_private_agent_IDs_exported',
+              'source_complete_exchange_sequence_certified',
+              'original_source_cases_or_false_alarms_omitted',
+              'frozen_thresholds_and_grid_phases_modified_after_inspection'))
+          assert set(x['source_cohorts'])=={
+              'poisson_noise_null','fixed_20s_noise_hard_negative',
+              'momentum_noise_hard_negative','twap_45s_positive'}
+          assert all(y['independent_local_seed_engine_runs']==40
+                     for y in x['source_cohorts'].values())
+          for c, s in x['source_cohorts'].items():
+              assert s['injected_TWAP_without_controlled_execution_cases']+s['injected_TWAP_with_controlled_execution_cases']==(40 if c=='twap_45s_positive' else 0)
+          print('ORIGINAL_SOURCE_ONLY_AGGREGATE_BYTES',p.stat().st_size)
+          PY
+          sha256sum /tmp/abides-grid-160-original-source-only.json
+      - name: Publish ONLY short source-only aggregate JSON (7-day TTL)
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-abides-160-original-public-source-only
+          path: /tmp/abides-grid-160-original-source-only.json
+          retention-days: 7
+          if-no-files-found: error

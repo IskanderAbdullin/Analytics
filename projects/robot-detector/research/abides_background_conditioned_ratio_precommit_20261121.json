@@ -1,0 +1,63 @@
+{
+  "schema_version": "genuine-abides-public-background-conditioned-ratio-precommit-v1",
+  "protocol_date_utc": "2026-11-21",
+  "derived_from_inspected_source_run": 44935340284,
+  "hypothesis_origin": "POSTHOC_EXPLORATORY_FROM_PREVIOUS_2901_2903_SOURCE_NOT_INDEPENDENT",
+  "new_evaluation_source_status": "NOT_RUN",
+  "upstream_abides_commit": "ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242",
+  "source_type": "genuine ABIDES-NG matching engine synthetic only",
+  "local_new_seed_candidates": [
+    3001,
+    3002,
+    3003,
+    3004
+  ],
+  "local_ledger_newness_only": true,
+  "globally_blind_independence_not_certified": true,
+  "simulator_cohorts": [
+    "poisson_noise_null",
+    "fixed_20s_noise_hard_negative",
+    "momentum_noise_hard_negative",
+    "twap_45s_positive"
+  ],
+  "original_independent_source_runs_planned": 16,
+  "abides_symbol": "ABM",
+  "start": "09:30:00",
+  "end": "09:38:00",
+  "book_capture_levels_per_side": 5,
+  "grid_anchor_exchange_local_seconds_after_midnight": 34260,
+  "grid_period_seconds": [
+    20,
+    45
+  ],
+  "grid_tolerance_milliseconds": 250,
+  "feature": "ratio = count of public executions within fixed 45s grid / count within fixed 20s grid",
+  "target_positive_if_ratio_greater_or_equal": 0.6,
+  "threshold_source": "Chosen after seeing source development seeds 2901-2903, requires new independent preregistered evaluation to assess synthetic transfer.",
+  "minimum_public_execution_prints": 200,
+  "minimum_20s_grid_hits_for_classification": 8,
+  "minimum_eligible_previous_completed_30s_L2_bins": 5,
+  "abstain_if_any_coverage_requirement_not_met": true,
+  "oracle_target_labels_only_after_public_inference": true,
+  "private_agent_or_order_reference_IDs_prohibited_in_features": true,
+  "preregistered_source_results_must_include_all_cohorts_and_seeds": true,
+  "primary_metrics": [
+    "true_positive_positive_synthetic_cohort",
+    "false_negative_positive_synthetic_cohort",
+    "false_positive_every_no_target_background",
+    "true_negative_each_background",
+    "abstain_reason_counts_by_cohort",
+    "original_public_data_coverage",
+    "comparison_to_legacy_10second_fraction_alarm"
+  ],
+  "secondary_controls": [
+    "original unoptimized 45s grid fraction",
+    "fixed 20s negative cadence",
+    "momentum background",
+    "Poisson background",
+    "30s previous-bin book eligibility"
+  ],
+  "no_real_owner_accuracy_or_market_FDR_claim": true,
+  "no_raw_public_or_private_source_tapes_in_repository": true,
+  "use_bounded_original_public_GitHub_Actions_then_manual_only": true
+}

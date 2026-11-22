@@ -1,0 +1,62 @@
+name: Robot Detector genuine ABIDES public L2 clock-origin phase sensitivity
+
+# Retrospective reproducibility only. These already-spent seeds do not
+# become independent trials when automatically rerun on every PR or push.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preregistered-same-tape-phase-study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify fixed design and non-independent view accounting before matching engine
+        run: python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
+      - name: Install pinned genuine ABIDES matching engine
+        run: |
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run exactly four genuine market simulations and three source-fixed clock phases
+        run: |
+          python tools/abides_l2_binphase_sensitivity.py \
+            --output /tmp/abides-public-binphase.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/abides-public-binphase.json',encoding='utf-8'))
+          plan=r['frozen_plan']
+          assert plan['seeds']==[2101,2102],plan
+          assert plan['backgrounds']==['poisson','fixed_cadence'],plan
+          assert plan['phases_seconds']==[0,10,20],plan
+          assert r['actual_matching_engine_simulations']==4,r
+          assert r['non_independent_analytical_views']==12,r
+          assert len(r['cases'])==12 and len(r['cohorts'])==6,r
+          assert r['private_truth_used'] is False,r
+          assert r['independent_provider_completeness_verified'] is False,r
+          assert r['real_market_accuracy_calibrated'] is False,r
+          assert r['physical_owner_count_known'] is False,r
+          for x in r['cases']:
+              assert x['public_prints']>0 and x['l2_snapshots']>0,x
+              assert x['eligible_lagged_bins']+x['abstained_bins']==x['populated_trade_bins'],x
+              assert not x['private_identity_accessed'] and not x['model_selected'],x
+          for x in r['cohorts']:
+              assert x['simulations']==2 and x['real_market_false_alarm_rate'] is None,x
+              print('ABIDES_PUBLIC_PHASE_COEFFICIENT',json.dumps(x,sort_keys=True))
+          PY
+      - name: Upload anonymous aggregate-only phase experiment
+        uses: actions/upload-artifact@v4
+        with:
+          name: abides-public-l2-binphase
+          path: /tmp/abides-public-binphase.json
+          retention-days: 7
+          if-no-files-found: error

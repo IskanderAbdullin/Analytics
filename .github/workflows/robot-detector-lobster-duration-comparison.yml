@@ -1,0 +1,93 @@
+name: Robot Detector retrospective AMZN post-event clock-vs-event duration research
+# Source and metrics fixed before this replay; original 2012 sample already
+# seen, no blind testing or market actor validation.
+# One cheap public demo replay; after success use workflow_dispatch only.
+# Source-verifying original scientific run #44926012965 succeeded.
+# Re-fetch previously inspected public demo only when manually requested.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  event-to-clock-weighted-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline no-lookahead and negative/source boundary tests
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests_background -p 'test_l2_duration_weighting.py' -v
+          python -m unittest discover -s tests_background -p 'test_lobster_event_time_features.py' -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.lobster_event_time_features import LOCALLY_PINNED_SAMPLE_SHA256
+          p=json.loads(Path('research/lobster_clock_weighted_protocol_20261121.json').read_text())
+          assert p['schema_version']=='lobster-public-demo-right-censored-clock-bbo-study-v1'
+          assert p['source_locally_pinned_sha256']==LOCALLY_PINNED_SAMPLE_SHA256
+          assert p['previously_inspected_retrospective_sample'] is True
+          assert p['book_semantics'].startswith('Book state after event i persists')
+          assert p['stale_gap_diagnostic_seconds']==30
+          assert p['known_prior_source_rows']==269748
+          assert p['raw_derived_event_level_results_forbidden'] is True
+          PY
+      - name: Real historic source right-censored event versus wall-clock replay
+        run: |
+          set -euo pipefail
+          python tools/lobster_event_time_features.py \
+            --output /tmp/lobster-amzn-original-duration-compared-20120621.json
+          python - <<'PY'
+          import json
+          from decimal import Decimal
+          from pathlib import Path
+          s=json.loads(Path('/tmp/lobster-amzn-original-duration-compared-20120621.json').read_text())
+          d=s['post_event_clock_weighted_bbo']
+          assert s['event_count']==269748
+          assert s['original_locally_pinned_sha256_matched']
+          assert d['input_post_event_snapshots']==269748
+          assert d['schema_version']=='l2-post-event-right-continuous-clock-weight-v1'
+          assert d['positive_time_intervals']+d['zero_duration_same_timestamp_intervals']==269747
+          assert d['zero_duration_same_timestamp_intervals']==8483
+          assert (Decimal(d['valid_two_sided_non_crossed_quote_seconds'])+
+                  Decimal(d['missing_quote_seconds'])+
+                  Decimal(d['locked_or_crossed_quote_seconds'])==
+                  Decimal(d['observation_clock_interval_seconds']))
+          assert Decimal(d['observation_clock_interval_seconds'])>0
+          assert Decimal(d['observation_clock_interval_seconds'])<=Decimal(23400)
+          assert s['mean_event_weighted_spread_x10000'] is not None
+          assert d['time_weighted_spread_x10000'] is not None
+          assert d['previous_post_event_snapshot_used_without_future_lookahead']
+          assert d['no_pre_first_event_or_post_last_event_extrapolation']
+          assert d['same_timestamp_zero_time_weight']
+          assert d['raw_market_event_snapshots_or_timestamps_exported'] is False
+          assert s['source_order_reference_ids_exported'] is False
+          assert s['real_market_robot_accuracy_or_FDR_calibrated'] is False
+          print('REAL_LOBSTER_EVENT_VS_CLOCK_WEIGHTING',json.dumps({
+              'source_paired_events':s['event_count'],
+              'event_mean_spread':s['mean_event_weighted_spread_x10000'],
+              'clock_mean_spread':d['time_weighted_spread_x10000'],
+              'event_mean_top_imbalance':s['mean_event_weighted_top_imbalance'],
+              'clock_mean_top_imbalance':d['time_weighted_top_depth_imbalance'],
+              'clock_valid_exposure_seconds':d['valid_two_sided_non_crossed_quote_seconds'],
+              'clock_observed_exposure_seconds':d['observation_clock_interval_seconds'],
+              'max_held_quote_seconds':d['max_positive_quote_hold_seconds'],
+              'stale_gaps_over_30sec_count':d['intervals_exceeding_30_seconds'],
+              'not_independent_bot_classifier_validation':True
+          },sort_keys=True))
+          PY
+      - name: Small aggregate output only, no vendor event/book rows
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-amzn-public-timeweight-retrospective-20120621
+          path: /tmp/lobster-amzn-original-duration-compared-20120621.json
+          if-no-files-found: error
+          retention-days: 7

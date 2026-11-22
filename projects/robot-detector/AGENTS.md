@@ -1,39 +1,13 @@
-# Agent engineering contract — Market Robot Detector
+# AGENTS — Market Robot Detector (scoped to `projects/robot-detector/`)
 
-Этот файл относится **только** к `projects/robot-detector/`. Проект независим от IPO Analytics.
+**Быстрое восстановление:** [PROJECT_MAP.md](PROJECT_MAP.md) → [GOAL.md](GOAL.md) → [research/autonomy_state.json](research/autonomy_state.json) (`current_stage`, `resume_instruction`) → актуальный remote branch HEAD/CI → [единый живой план](docs/MASTER_RESEARCH_PLAN.md) и [issue #72](https://github.com/IskanderAbdullin/Analytics/issues/72). Для активного этапа читать его prereg/issue и [операционное ТЗ](docs/AUTONOMOUS_RESEARCH_TZ.md); для источников — [лицензии](docs/REAL_SOURCE_LICENSE_GATES.md), [seed registry](research/seed_registry.json). Прежние подробные правила **сохранены без потери** в [архивном AGENTS](docs/AGENTS_LEGACY_20261122.md); читать его при спорных/узких вопросах, а не на каждом микроэтапе.
 
-## Строгие ограничения
+**Цель:** научно обоснованные **НАБЛЮДАЕМЫЕ** анонимные паттерны, сильные отрицательные контроли и честная неопределённость, **не** установление владельцев. Synthetic oracle — только post-public-feature assessment; real-market owner count/FDR без независимых меток неизвестны. Master issue #72 до независимого release audit не закрывать.
 
-1. НЕ менять `src/ipo_forecast/`, существующие Python модели/CLI IPO, `pyproject.toml` корневого IPO проекта и текущие источники данных IPO, если отдельного явного запроса нет.
-2. НЕ внедрять торговую функциональность. Работать только с обезличенными публичными рыночными данными, read-only потоками, локальным replay и экспортом аналитики. Не запрашивать доступ к счетам, портфелю или заявкам.
-3. НЕ выводить «N настоящих роботов/владельцев»: только различимые алгоритмические паттерны с неопределённостью и исследовательским объяснением. Не приписывать стороне пассивной заявки направление потока без проверки семантики провайдера.
-4. НЕ помещать в коммиты токены, сырые рыночные архивы с сомнительной лицензией, реальные торговые персональные данные. В .gitignore проекта исключить data/raw, data/normalized, data/results, .env, traces и build artifacts.
-5. Все эмпирические метрики привязать к конкретной выборке/seed/версии модели, не выдумывать confidence и backtest.
-6. Сначала воспроизводимая baseline и stage-2 validity, потом streaming и ML. Сложный модуль не должен переписывать общий data contract без версии и теста миграции.
-7. Не добавлять runtime dependency на OsEngine в Core. Адаптер OsEngine отдельный и опциональный.
-8. Существующие данные и ошибки не исправлять «молчаливой очисткой»; quarantine + coverage flags + provenance.
+**Автономная адаптация и decision log:** самостоятельно выбирать следующий научно полезный этап, открыто сохранять отрицательные результаты, пререгистрировать новые версии, обновлять decision log в MASTER_RESEARCH_PLAN и checkpoint в state. Не переписывать original frozen protocols и spent holdouts; в conflict сначала проверить remote SHA и evidence.
 
-## Обязательный порядок при реализации
+**В одном активном запуске:** проверить удалённый HEAD/CI и конкурирующих агентов; зафиксировать UTC start/deadline (+50 минут максимум при возможности, но не перекрывать почасового агента); выбрать наиболее ценный незаблокированный этап; preregister hypothesis/seeds/threshold/split **до** эксперимента; код и negative tests; проверить и сохранить все исходы; commit+fast-forward push **без force**; синхронно обновить MASTER_RESEARCH_PLAN, `autonomy_state.json` и issue; продолжать следующий полезный этап до настоящей границы времени/среды. После каждого этапа проверять реальные часы. Не выдавать промежуточный научный отчёт между этапами; по окончании оставить единственный точный NEXT_ACTION в state.
 
-- Прочитать README и ARCHITECTURE, затем документ текущего этапа, RESEARCH и [RESEARCH_EXPANSION_2026-11-18.md](docs/RESEARCH_EXPANSION_2026-11-18.md). В первую очередь изучить код прямых аналогов TWAP (Crypto Lake и binance_l3_est), без копирования ошибок нерегулярной временной шкалы.
-- Создать issue/короткий change-plan: цель, точные файлы, тесты, риски.
-- Делать минимальные осмысленные коммиты по предложенному порядку этапа; перед каждым push прогонять relevant unit tests. Нет force-push.
-- Добавлять synthetic fixture, unit test, negative test, null model и измеримую acceptance criterion для каждого detector feature.
-- В отчёте указывать branch, commit SHA, запущенные проверки, результаты, незакрытые вопросы и что **не** тестировалось.
-- Любая внешняя научная статья: хранить URL, дату обращения, какие фрагменты реализованы, какие ограничены недоступностью MBO.
-- Перед живым подключением проверять актуальную документацию провайдера и отсутствие методов торговли.
+**Запреты:** не переписывать frozen/holdout после просмотра; не считать фазы одного seed независимыми; не разглашать source raw vendor data, agent/private oracle identifiers, токены, сделки/личные данные; не управлять ПК/Computer Use без отдельного явного разрешения; не торговать/выставлять заявки; не менять соседние IPO-проекты; никакого GitHub Actions в private. В публичном репозитории только дешёвые/ограниченные релевантные проверки; оригинальные дорогие ABIDES запускаются только по prereg и при необходимости. Отсутствие полного L2/часовой точности = ABSTAIN/UNKNOWN, не «робота нет».
 
-## Приоритет задач
-
-1. Stage 1: data schema, history import, normalization, fixed-volume cadence, no-double-count, CLI/reports.
-2. Stage 2: null models, synthetic truth, blinded calibration, forecast scoring.
-3. Stage 3: robust T-Invest stream, UI, API and optional OsEngine adapter.
-4. Stage 4: variable TWAP, book heuristics, model comparison, metaorder experiments.
-
-Если source capability недоказана, помечать `BLOCKED_BY_DATA`, описывать альтернативы и продолжать независимые synthetic tests; не объявлять работу завершённой без проверок.
-
-## Новые обязательные проверки перед реализацией (18.11.2026)
-
-Прочитать [Research Part 2](docs/RESEARCH_EXPANSION_2026-11-18_PART2.md) перед сравнением TWAP/VWAP/POV или L2. На stage 2 сделать отдельную blinded ABIDES-NG проверку с internal truth и T-Invest-like public projection. Нельзя обучать или настраивать детектор на privileged agent ID и затем объявлять out-of-sample качество. При разработке `QuoteOscillationDetector` исключать заявления об идентификации владельца/манипуляции по одной котировочной осцилляции.
-
-В любых release notes отдельно показывать: `source_observation`, `hypothesis`, `validated_pattern`, `physical_owner_count_unknown`. Отсутствие данных или пропуск book updates — блокер для подтверждения, а не отсутствие активности.
+**Истина:** [план и журнал научных решений](docs/MASTER_RESEARCH_PLAN.md) — единственный большой адаптивный PLAN; [checkpoint](research/autonomy_state.json) — единственный STATE/NEXT_ACTION; [EVIDENCE.md](EVIDENCE.md) — навигация, не вторые метрики. Не создавать дубликаты GOAL/STATE в `Info`.

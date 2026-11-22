@@ -1,0 +1,28 @@
+# Frozen, bounded LOBSTER public demo timestamp and lagged-book eligibility audit (2026-11-22)
+
+**PRE-SOURCE IMPLEMENTATION / PRE-RUN DESIGN FREEZE.** This is a **retrospective source feasibility audit**, NOT a model performance/robot classification/independent holdout test. The public historical 2012-06-21 AMZN LOBSTER 10-level sample has already been inspected earlier in this project and CANNOT be called unseen. No new ABIDES seeds, commercial use or redistribution. Source link: https://php.lobsterdata.com/info/sample/LOBSTER_SampleFile_AMZN_2012-06-21_10.zip . Existing locally observed compressed ZIP SHA256 `5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f` is **not a vendor-signed checksum**.
+
+## Hypothesis and method
+
+Directly applying new M1-v2 (integer millisecond timestamp source and full-event continuity flags) to existing public LOBSTER event-time data may be unsound: official LOBSTER [output](https://php.lobsterdata.com/info/DataStructure.php) defines `orderbook_i` as **post-event**, with message timestamps in decimal seconds and precision potentially finer than milliseconds. We predeclare **all** following source-only, no-label aggregates without selecting favorable days, phases or individual events:
+
+- One original source run; bound ZIP member sizes/row count, safely read in memory, exact historical local source SHA match, existing format QA, 269,748 aligned message and 10-level post-event book rows as an **expected check**, not a new result.
+- Process **Decimal source seconds exactly**, with no rounding for causal comparisons. Count all rows, count exact same-timestamp adjacent event pairs, count timestamps exactly on integer-millisecond grid vs with a nonzero sub-millisecond remainder, count adjacent distinct original source times collapsed into the same millisecond bucket by integer truncation (diagnostic only, NEVER use truncation as approved normalization). Count unique exact source times; count strictly positive gap >10s. Count total type-4 visible and type-5 hidden executions separately; original passive-side semantics remain unchanged.
+- Evaluate local **counterfactual source-eligibility for public visible type-4 executions only**, not a bot detector: a post-event BBO at `u` becomes eligible at `u+1.0 seconds` using only earlier event rows; source quote must be valid and not older than 10.0 seconds at execution `t`. At each trade, before queuing its own post-event book, classify `eligible_local_prior_quote`, `abstain_no_lagged_quote`, `abstain_stale`, or `abstain_invalid_book`. Source snapshot updates tied at equal original time remain in source row order and **cannot** influence same-time prints. All counts must conserve visible executions.
+- Even eligible by local timestamp/age does **NOT** certify complete exchange events, 1ms fidelity, source license to use commercially, true labels, calibration or real-market FDR. All model fits, threshold tuning, significance tests and private owner interpretation remain BLOCKED in this stage. No single tick, price, order identifier, timestamp sequence, original ZIP/CSV, raw books or vendor row will be uploaded as a CI artifact, printed or committed.
+- The only allowed publication is a short aggregate JSON with strict allowlist of counts/source-status fields, source URL and **locally observed digest**. No private identifiers or per-event data.
+- Technical source rights: publicly distributed LOBSTER demo for **noncommercial scientific analysis** only, with attribution and without vendor raw redistribution. Not an assertion that paid subscription or commercial reuse is licensed. Source network only once in public Actions from fixed official URL, then return workflow to manual-only.
+
+## Negative controls and source-free acceptance (before empirical source)
+
+Constructed toy event/book sequences under exact Decimal seconds:
+1. visible execution at t=0.5s with only earlier post-event t=0 → ABSTAIN (1s lag not elapsed).
+2. visible at t=1.1s with preceding **post-event** t=0 valid → locally eligible.
+3. visible at t=12s with prior t=0 → ABSTAIN_STALE (not treat absent activity as true negative).
+4. same-timestamp execution and book update cannot source current event's prestate; hidden type-5 counted separately.
+5. 0.0001s sub-ms difference changes exact event chronology but both floor to same integer ms; count **coarsening collision**, no silent rounding.
+6. Raw invalid quote, unsorted time, unaligned message/book rows, unbounded ZIP, source SHA mismatch, malformed decimal and forbidden output field must raise explicit errors/ABSTAIN. Test both source-free fixture and independent source-only aggregate path.
+
+**Acceptance:** deterministic negative/unit tests on exact committed public source-free code, then at most one bounded original vendor demo source job (zero new seeds) with the exact preregistered counts and all observations. If external official demo is unavailable, preserve BLOCKED_SOURCE not fabricate numbers. The first source workflow must be manual-only after its original success. No private Actions, broker trades, real market actor/FDR claims.
+
+NEXT_ACTION: implement source-free source-eligibility and strict aggregate-only CLI using existing audited download and parsing helpers; test, run once bounded original public demo if technically and legally permissible, preserve all negative counts and source limitation in master/state/issue.

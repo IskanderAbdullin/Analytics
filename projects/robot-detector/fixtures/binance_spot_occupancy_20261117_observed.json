@@ -1,0 +1,227 @@
+{
+  "schema_version": "real-public-spot-occupancy-observed-20261117-v1",
+  "precommit_sha": "c64303eac0aa9da8ee9de97f8af4381bbd7fcd1f",
+  "original_run_id": 44921288804,
+  "artifact_id": 14714090863,
+  "original_provider_sha256_matched_both": true,
+  "frozen_archive_dates": "2026-11-17",
+  "frozen_distinct_instruments": 2,
+  "same_market_utc_day": true,
+  "source_public_trades_total": 150466,
+  "source_data_research_only_cc_by_nc_sa": true,
+  "primary_occupancy_min_public_prints_per_30s_bin": 5,
+  "primary_fixed_utc_phase_seconds": 0,
+  "precommitted_joint_primary_both_pass": false,
+  "no_p_values_real_world_actor_FDR_or_trading_claim": true,
+  "not_forward_chronological_test": true,
+  "cases": [
+    {
+      "symbol": "LTCUSDT",
+      "utc_day": "2026-11-17",
+      "public_trades": 107788,
+      "sha256": "2b17c1d697815615bcd15c42119ec40ae8c918da85373afc8f573ecfca85a6ce",
+      "primary_pass": true,
+      "phases": [
+        {
+          "origin_seconds": 0,
+          "observed_all_one_sided": 162,
+          "eligible_ge5": 2827,
+          "observed_ge5_one_sided": 133,
+          "null_ge5_min": 88,
+          "null_ge5_median": 98.5,
+          "null_ge5_max": 103,
+          "precommitted_strong_null_envelope_pass": true,
+          "occupancy_bin_classes": [
+            "1",
+            "2",
+            "3-4",
+            "5-9",
+            "10+"
+          ],
+          "occupancy_bin_counts": [
+            4,
+            8,
+            37,
+            150,
+            2677
+          ],
+          "occupancy_one_sided_counts": [
+            4,
+            5,
+            20,
+            35,
+            98
+          ]
+        },
+        {
+          "origin_seconds": 10,
+          "observed_all_one_sided": 149,
+          "eligible_ge5": 2835,
+          "observed_ge5_one_sided": 127,
+          "null_ge5_min": 87,
+          "null_ge5_median": 94.5,
+          "null_ge5_max": 104,
+          "precommitted_strong_null_envelope_pass": true,
+          "occupancy_bin_classes": [
+            "1",
+            "2",
+            "3-4",
+            "5-9",
+            "10+"
+          ],
+          "occupancy_bin_counts": [
+            6,
+            7,
+            29,
+            137,
+            2698
+          ],
+          "occupancy_one_sided_counts": [
+            6,
+            6,
+            10,
+            26,
+            101
+          ]
+        },
+        {
+          "origin_seconds": 20,
+          "observed_all_one_sided": 160,
+          "eligible_ge5": 2834,
+          "observed_ge5_one_sided": 138,
+          "null_ge5_min": 75,
+          "null_ge5_median": 92.5,
+          "null_ge5_max": 100,
+          "precommitted_strong_null_envelope_pass": true,
+          "occupancy_bin_classes": [
+            "1",
+            "2",
+            "3-4",
+            "5-9",
+            "10+"
+          ],
+          "occupancy_bin_counts": [
+            4,
+            9,
+            30,
+            155,
+            2679
+          ],
+          "occupancy_one_sided_counts": [
+            4,
+            8,
+            10,
+            47,
+            91
+          ]
+        }
+      ],
+      "first_observed_trade_id": 608078470,
+      "last_observed_trade_id": 608186257
+    },
+    {
+      "symbol": "BCHUSDT",
+      "utc_day": "2026-11-17",
+      "public_trades": 42678,
+      "sha256": "dca1e3983106d787d10a80e6a8a6b7fd9dc4866afef6ea25379e065abdae1b53",
+      "primary_pass": false,
+      "phases": [
+        {
+          "origin_seconds": 0,
+          "observed_all_one_sided": 953,
+          "eligible_ge5": 2025,
+          "observed_ge5_one_sided": 504,
+          "null_ge5_min": 502,
+          "null_ge5_median": 509.5,
+          "null_ge5_max": 519,
+          "precommitted_strong_null_envelope_pass": false,
+          "occupancy_bin_classes": [
+            "1",
+            "2",
+            "3-4",
+            "5-9",
+            "10+"
+          ],
+          "occupancy_bin_counts": [
+            90,
+            160,
+            323,
+            801,
+            1224
+          ],
+          "occupancy_one_sided_counts": [
+            90,
+            140,
+            219,
+            334,
+            170
+          ]
+        },
+        {
+          "origin_seconds": 10,
+          "observed_all_one_sided": 958,
+          "eligible_ge5": 2012,
+          "observed_ge5_one_sided": 495,
+          "null_ge5_min": 476,
+          "null_ge5_median": 503.5,
+          "null_ge5_max": 537,
+          "precommitted_strong_null_envelope_pass": false,
+          "occupancy_bin_classes": [
+            "1",
+            "2",
+            "3-4",
+            "5-9",
+            "10+"
+          ],
+          "occupancy_bin_counts": [
+            103,
+            159,
+            335,
+            797,
+            1215
+          ],
+          "occupancy_one_sided_counts": [
+            103,
+            142,
+            218,
+            313,
+            182
+          ]
+        },
+        {
+          "origin_seconds": 20,
+          "observed_all_one_sided": 971,
+          "eligible_ge5": 2003,
+          "observed_ge5_one_sided": 503,
+          "null_ge5_min": 473,
+          "null_ge5_median": 488.5,
+          "null_ge5_max": 500,
+          "precommitted_strong_null_envelope_pass": true,
+          "occupancy_bin_classes": [
+            "1",
+            "2",
+            "3-4",
+            "5-9",
+            "10+"
+          ],
+          "occupancy_bin_counts": [
+            93,
+            153,
+            357,
+            744,
+            1259
+          ],
+          "occupancy_one_sided_counts": [
+            93,
+            138,
+            237,
+            316,
+            187
+          ]
+        }
+      ],
+      "first_observed_trade_id": 296851413,
+      "last_observed_trade_id": 296894090
+    }
+  ]
+}

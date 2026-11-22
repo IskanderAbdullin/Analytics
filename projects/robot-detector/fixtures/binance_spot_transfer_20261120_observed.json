@@ -1,0 +1,108 @@
+{
+  "schema_version": "real-spot-prospective-transfer-observed-20261120-v1",
+  "source_original_workflow_run_id": 44920626852,
+  "artifact_id": 14713741159,
+  "precommit_sha": "ae0d013645e4d7a1ab84757438c69ddff256dfbe",
+  "precommit_path": "research/real_spot_transfer_precommit_20261121.json",
+  "source_provider": "Binance Vision official daily raw spot trades",
+  "original_exchange_zip_provider_checksums_matched": true,
+  "source_research_license": "CC BY-NC-SA 4.0, non-commercial scientific research only",
+  "predeclared_primary": "observed one-sided fully contained 30s 0-second-origin bin count > maximum of 8 fixed equal-timestamp-cluster-preserving side shuffles",
+  "independent_utc_market_dates": 1,
+  "distinct_market_instruments": 2,
+  "distinct_instrument_utc_sessions": 2,
+  "total_source_real_public_trade_prints": 268459,
+  "original_predeclared_all_cases_success": false,
+  "cases": [
+    {
+      "symbol": "LTCUSDT",
+      "day": "2026-11-20",
+      "source_zip_sha256": "98eaafeb4f814f36f1d59de203e5cf74e4e7b3e7dd3cd93f2ca3153d32100a5a",
+      "public_trade_count": 195180,
+      "first_observed_trade_id": 608464661,
+      "last_observed_trade_id": 608659840,
+      "observed_minute_bins_with_trades": 1440,
+      "first_primary_strong_control_envelope_met": true,
+      "origins": [
+        {
+          "origin_seconds": 0,
+          "observed_one_sided_bins": 68,
+          "weak_per_print_median": 23,
+          "strong_equal_timestamp_control_median": 49,
+          "strong_equal_timestamp_control_max": 53,
+          "observed_above_all_8_strong_controls": true,
+          "nonempty_complete_bins": 2880,
+          "utc_edge_excluded_prints": 0
+        },
+        {
+          "origin_seconds": 10,
+          "observed_one_sided_bins": 53,
+          "weak_per_print_median": 15,
+          "strong_equal_timestamp_control_median": 44.5,
+          "strong_equal_timestamp_control_max": 47,
+          "observed_above_all_8_strong_controls": true,
+          "nonempty_complete_bins": 2879,
+          "utc_edge_excluded_prints": 25
+        },
+        {
+          "origin_seconds": 20,
+          "observed_one_sided_bins": 57,
+          "weak_per_print_median": 16.5,
+          "strong_equal_timestamp_control_median": 43.5,
+          "strong_equal_timestamp_control_max": 50,
+          "observed_above_all_8_strong_controls": true,
+          "nonempty_complete_bins": 2878,
+          "utc_edge_excluded_prints": 45
+        }
+      ]
+    },
+    {
+      "symbol": "BCHUSDT",
+      "day": "2026-11-20",
+      "source_zip_sha256": "553421be8eaf1e339eb0e111a25604ce7d2965e85ad15cea1650ffa0d012e46c",
+      "public_trade_count": 73279,
+      "first_observed_trade_id": 296972770,
+      "last_observed_trade_id": 297046048,
+      "observed_minute_bins_with_trades": 1438,
+      "first_primary_strong_control_envelope_met": false,
+      "origins": [
+        {
+          "origin_seconds": 0,
+          "observed_one_sided_bins": 511,
+          "weak_per_print_median": 248.5,
+          "strong_equal_timestamp_control_median": 504,
+          "strong_equal_timestamp_control_max": 528,
+          "observed_above_all_8_strong_controls": false,
+          "nonempty_complete_bins": 2805,
+          "utc_edge_excluded_prints": 0
+        },
+        {
+          "origin_seconds": 10,
+          "observed_one_sided_bins": 507,
+          "weak_per_print_median": 223,
+          "strong_equal_timestamp_control_median": 525.5,
+          "strong_equal_timestamp_control_max": 539,
+          "observed_above_all_8_strong_controls": false,
+          "nonempty_complete_bins": 2820,
+          "utc_edge_excluded_prints": 4
+        },
+        {
+          "origin_seconds": 20,
+          "observed_one_sided_bins": 515,
+          "weak_per_print_median": 232.5,
+          "strong_equal_timestamp_control_median": 518,
+          "strong_equal_timestamp_control_max": 538,
+          "observed_above_all_8_strong_controls": false,
+          "nonempty_complete_bins": 2814,
+          "utc_edge_excluded_prints": 4
+        }
+      ]
+    }
+  ],
+  "not_blind_actual_robot_classifier_test": true,
+  "not_calibrated_FDR_or_p_value": true,
+  "not_evidence_of_parent_order_or_individual_owner": true,
+  "full_public_l2_available": false,
+  "raw_public_trade_archive_in_git": false,
+  "commercial_trading_licence_granted": false
+}

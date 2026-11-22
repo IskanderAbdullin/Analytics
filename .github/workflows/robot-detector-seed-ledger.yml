@@ -4,22 +4,286 @@ on:
   push:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
+      - 'projects/robot-detector/tools/public_evaluation_bounds.py'
+      - 'projects/robot-detector/tests/test_public_evaluation_bounds.py'
+      - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/tools/abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/tools/public_timing_phase_tied_fills.py'
+      - 'projects/robot-detector/tools/public_cluster_conditional_toy_null.py'
+      - 'projects/robot-detector/tools/abides_clustered_grid_holdout.py'
+      - 'projects/robot-detector/tools/abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/tools/abides_grid_replication_160.py'
+      - 'projects/robot-detector/tools/public_time_precision_coverage_null.py'
+      - 'projects/robot-detector/tools/public_interarrival_period_scan_negative.py'
+      - 'projects/robot-detector/tests_background/test_public_interarrival_period_scan_negative.py'
+      - 'projects/robot-detector/research/public_interarrival_period_scan_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/public_interarrival_period_scan_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_public_time_precision_coverage_null.py'
+      - 'projects/robot-detector/research/public_time_precision_coverage_precommit_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_grid_replication_160.py'
+      - 'projects/robot-detector/tools/abides_160_original_audit.py'
+      - 'projects/robot-detector/tests_background/test_abides_160_original_audit.py'
+      - 'projects/robot-detector/fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json'
+      - 'projects/robot-detector/research/abides_public_grid_160case_precommit_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/research/abides_matched_uncertainty_audit_protocol_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_clustered_grid_original_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_clustered_grid_holdout.py'
+      - 'projects/robot-detector/research/abides_clustered_grid_source_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/public_cluster_conditional_toy_null_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_public_cluster_conditional_toy_null.py'
+      - 'projects/robot-detector/research/public_cluster_permutation_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/public_phase_tied_fills_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_public_timing_phase_tied_fills.py'
+      - 'projects/robot-detector/research/public_phase_tied_fills_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_split_half_momentum_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/research/abides_split_half_momentum_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/research/abides_background_conditioned_ratio_precommit_20261121.json'
+      - 'projects/robot-detector/AGENTS.md'
+      - 'projects/robot-detector/docs/AUTONOMOUS_RESEARCH_TZ.md'
+      - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
+      - 'projects/robot-detector/tools/public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_equivalence_class.py'
+      - 'projects/robot-detector/tests_background/test_public_period_l2_ambiguity.py'
+      - 'projects/robot-detector/tools/public_intensity_quality_guard.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_quality_guard.py'
+      - 'projects/robot-detector/tools/public_microburst_block_null.py'
+      - 'projects/robot-detector/tests_background/test_public_microburst_block_null.py'
+      - 'projects/robot-detector/tools/public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tests_background/test_public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tools/public_allperiod_abcd_report.py'
+      - 'projects/robot-detector/tests_background/test_public_allperiod_abcd_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
+      - 'projects/robot-detector/tests_background/test_public_conditional_timing_null.py'
+      - 'projects/robot-detector/tools/public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tools/public_burst_null_falsification.py'
+      - 'projects/robot-detector/tools/public_conditional_timing_null.py'
+      - 'projects/robot-detector/tests_background/test_public_period_scan.py'
+      - 'projects/robot-detector/tests_background/test_public_period_l2_gate.py'
+      - 'projects/robot-detector/tests_background/test_master_research_plan.py'
+      - 'projects/robot-detector/research/abides_multiscale_public_l2_protocol_20261121.json'
+      - 'projects/robot-detector/research/autonomy_state.json'
+      - 'projects/robot-detector/tools/autonomy_checkpoint.py'
+      - 'projects/robot-detector/tests_background/test_autonomy_checkpoint.py'
       - 'projects/robot-detector/tools/research_seed_registry.py'
       - 'projects/robot-detector/tests_research/**'
       - 'projects/robot-detector/tools/directional_shift_frozen_replication.py'
       - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tools/public_tape_fingerprint.py'
+      - 'projects/robot-detector/tests_background/test_public_tape_fingerprint.py'
+      - 'projects/robot-detector/tools/abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tools/abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/fixtures/abides_l2_twap_phase_observed_20261121.json'
+      - 'projects/robot-detector/tools/abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tools/binance_public_trade_archive.py'
+      - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
+      - 'projects/robot-detector/tools/public_trade_direction_null.py'
+      - 'projects/robot-detector/tests_background/test_public_trade_direction_null.py'
+      - 'projects/robot-detector/fixtures/binance_spot_weak_direction_nulls_20261121.json'
+      - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
+      - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
+      - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/research/fixed_clock_toy_rhythm_precommit_20261121.json'
+      - 'projects/robot-detector/research/genuine_abides_fixed_clock_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/tests_background/test_public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/fixtures/abides_multiscale_public_l2_observed_20261121.json'
+      - 'projects/robot-detector/tools/abides_multiscale_public_l2.py'
+      - 'projects/robot-detector/tests_background/test_abides_multiscale_public_l2.py'
+      - 'projects/robot-detector/tools/abides_fixed_clock_transfer.py'
+      - 'projects/robot-detector/tests_background/test_abides_fixed_clock_transfer.py'
+      - 'projects/robot-detector/fixtures/toy_public_rhythm_hard_negative_holdout_20261121.json'
+      - 'projects/robot-detector/tools/toy_public_execution_rhythm.py'
+      - 'projects/robot-detector/tests_background/test_toy_public_execution_rhythm.py'
+      - 'projects/robot-detector/tools/offline_research_reproducer.py'
+      - 'projects/robot-detector/tests_background/test_offline_research_reproducer.py'
+      - 'projects/robot-detector/tools/public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/fixtures/l2_synthetic_owner_worlds_observed_20261121.json'
+      - 'projects/robot-detector/tools/public_l2_ownership_nonidentifiability.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_ownership_nonidentifiability.py'
+      - 'projects/robot-detector/tools/l2_duration_weighting.py'
+      - 'projects/robot-detector/tests_background/test_l2_duration_weighting.py'
+      - 'projects/robot-detector/tools/lobster_event_time_features.py'
+      - 'projects/robot-detector/tests_background/test_lobster_event_time_features.py'
+      - 'projects/robot-detector/fixtures/lobster_amzn_event_time_observed_20261121.json'
+      - 'projects/robot-detector/research/lobster_event_time_protocol_20261121.json'
+      - 'projects/robot-detector/tools/lobster_public_sample_format_audit.py'
+      - 'projects/robot-detector/tests_background/test_lobster_public_sample_format_audit.py'
+      - 'projects/robot-detector/fixtures/lobster_amzn_20120621_10level_format_observed_20261121.json'
+      - 'projects/robot-detector/tools/real_bch_four_day_panel_review.py'
+      - 'projects/robot-detector/tests_background/test_real_bch_four_day_panel_review.py'
+      - 'projects/robot-detector/fixtures/binance_bch_four_day_public_panel_20261121.json'
+      - 'projects/robot-detector/research/real_spot_occupancy_precommit_20261121.json'
+      - 'projects/robot-detector/tools/real_spot_occupancy_review.py'
+      - 'projects/robot-detector/tests_background/test_real_spot_occupancy_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_occupancy_20261117_observed.json'
+      - 'projects/robot-detector/research/real_spot_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/real_spot_transfer_review.py'
+      - 'projects/robot-detector/tests_background/test_real_spot_transfer_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_transfer_20261120_observed.json'
+      - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
+      - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261119.json'
+      - 'projects/robot-detector/tools/abides_l2_phase_review.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
+      - 'projects/robot-detector/fixtures/abides_l2_phase_observed_scalars_20261121.json'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   pull_request:
     paths:
       - 'projects/robot-detector/research/seed_registry.json'
+      - 'projects/robot-detector/tools/public_evaluation_bounds.py'
+      - 'projects/robot-detector/tests/test_public_evaluation_bounds.py'
+      - 'projects/robot-detector/tools/abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/tools/abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/tools/public_timing_phase_tied_fills.py'
+      - 'projects/robot-detector/tools/public_cluster_conditional_toy_null.py'
+      - 'projects/robot-detector/tools/abides_clustered_grid_holdout.py'
+      - 'projects/robot-detector/tools/abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/tools/abides_grid_replication_160.py'
+      - 'projects/robot-detector/tools/public_time_precision_coverage_null.py'
+      - 'projects/robot-detector/tools/public_interarrival_period_scan_negative.py'
+      - 'projects/robot-detector/tests_background/test_public_interarrival_period_scan_negative.py'
+      - 'projects/robot-detector/research/public_interarrival_period_scan_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/public_interarrival_period_scan_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_public_time_precision_coverage_null.py'
+      - 'projects/robot-detector/research/public_time_precision_coverage_precommit_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_grid_replication_160.py'
+      - 'projects/robot-detector/tools/abides_160_original_audit.py'
+      - 'projects/robot-detector/tests_background/test_abides_160_original_audit.py'
+      - 'projects/robot-detector/fixtures/abides_grid_160_source_aggregate_reconciled_20261121.json'
+      - 'projects/robot-detector/research/abides_public_grid_160case_precommit_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_matched_smalln_audit.py'
+      - 'projects/robot-detector/research/abides_matched_uncertainty_audit_protocol_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_clustered_grid_original_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_clustered_grid_holdout.py'
+      - 'projects/robot-detector/research/abides_clustered_grid_source_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/public_cluster_conditional_toy_null_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_public_cluster_conditional_toy_null.py'
+      - 'projects/robot-detector/research/public_cluster_permutation_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/public_phase_tied_fills_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_public_timing_phase_tied_fills.py'
+      - 'projects/robot-detector/research/public_phase_tied_fills_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_split_half_momentum_observed_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_split_half_momentum_holdout.py'
+      - 'projects/robot-detector/research/abides_split_half_momentum_precommit_20261121.json'
+      - 'projects/robot-detector/fixtures/abides_background_ratio_original_20261121.json'
+      - 'projects/robot-detector/tests_background/test_abides_background_ratio_holdout.py'
+      - 'projects/robot-detector/research/abides_background_conditioned_ratio_precommit_20261121.json'
+      - 'projects/robot-detector/AGENTS.md'
+      - 'projects/robot-detector/docs/AUTONOMOUS_RESEARCH_TZ.md'
+      - 'projects/robot-detector/docs/MASTER_RESEARCH_PLAN.md'
+      - 'projects/robot-detector/tools/public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_report.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_equivalence_class.py'
+      - 'projects/robot-detector/tests_background/test_public_period_l2_ambiguity.py'
+      - 'projects/robot-detector/tools/public_intensity_quality_guard.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_quality_guard.py'
+      - 'projects/robot-detector/tools/public_microburst_block_null.py'
+      - 'projects/robot-detector/tests_background/test_public_microburst_block_null.py'
+      - 'projects/robot-detector/tools/public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tests_background/test_public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tools/public_allperiod_abcd_report.py'
+      - 'projects/robot-detector/tests_background/test_public_allperiod_abcd_report.py'
+      - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
+      - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
+      - 'projects/robot-detector/tests_background/test_public_conditional_timing_null.py'
+      - 'projects/robot-detector/tools/public_intensity_conditioned_null.py'
+      - 'projects/robot-detector/tools/public_burst_null_falsification.py'
+      - 'projects/robot-detector/tools/public_conditional_timing_null.py'
+      - 'projects/robot-detector/tests_background/test_public_period_scan.py'
+      - 'projects/robot-detector/tests_background/test_public_period_l2_gate.py'
+      - 'projects/robot-detector/tests_background/test_master_research_plan.py'
+      - 'projects/robot-detector/research/abides_multiscale_public_l2_protocol_20261121.json'
+      - 'projects/robot-detector/research/autonomy_state.json'
+      - 'projects/robot-detector/tools/autonomy_checkpoint.py'
+      - 'projects/robot-detector/tests_background/test_autonomy_checkpoint.py'
       - 'projects/robot-detector/tools/research_seed_registry.py'
       - 'projects/robot-detector/tests_research/**'
       - 'projects/robot-detector/tools/directional_shift_frozen_replication.py'
       - 'projects/robot-detector/tools/abides_execution_baseline_holdout.py'
       - 'projects/robot-detector/tools/abides_l2_background_nulls.py'
       - 'projects/robot-detector/tools/abides_l2_binwidth_sensitivity.py'
+      - 'projects/robot-detector/tools/abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tools/public_tape_fingerprint.py'
+      - 'projects/robot-detector/tests_background/test_public_tape_fingerprint.py'
+      - 'projects/robot-detector/tools/abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_fragility.py'
+      - 'projects/robot-detector/tools/abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_phase_contrast.py'
+      - 'projects/robot-detector/fixtures/abides_l2_twap_phase_observed_20261121.json'
+      - 'projects/robot-detector/tools/abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_twap_separability.py'
+      - 'projects/robot-detector/tools/binance_public_trade_archive.py'
+      - 'projects/robot-detector/tests_background/test_binance_public_trade_archive.py'
+      - 'projects/robot-detector/tools/public_trade_direction_null.py'
+      - 'projects/robot-detector/tests_background/test_public_trade_direction_null.py'
+      - 'projects/robot-detector/fixtures/binance_spot_weak_direction_nulls_20261121.json'
+      - 'projects/robot-detector/fixtures/binance_spot_cluster_preserving_nulls_20261121.json'
+      - 'projects/robot-detector/research/real_bch_full_panel_precommit_20261121.json'
+      - 'projects/robot-detector/research/lobster_amzn_sample_format_precommit_20261121.json'
+      - 'projects/robot-detector/research/fixed_clock_toy_rhythm_precommit_20261121.json'
+      - 'projects/robot-detector/research/genuine_abides_fixed_clock_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/tests_background/test_public_clock_aliasing_negative.py'
+      - 'projects/robot-detector/fixtures/abides_multiscale_public_l2_observed_20261121.json'
+      - 'projects/robot-detector/tools/abides_multiscale_public_l2.py'
+      - 'projects/robot-detector/tests_background/test_abides_multiscale_public_l2.py'
+      - 'projects/robot-detector/tools/abides_fixed_clock_transfer.py'
+      - 'projects/robot-detector/tests_background/test_abides_fixed_clock_transfer.py'
+      - 'projects/robot-detector/fixtures/toy_public_rhythm_hard_negative_holdout_20261121.json'
+      - 'projects/robot-detector/tools/toy_public_execution_rhythm.py'
+      - 'projects/robot-detector/tests_background/test_toy_public_execution_rhythm.py'
+      - 'projects/robot-detector/tools/offline_research_reproducer.py'
+      - 'projects/robot-detector/tests_background/test_offline_research_reproducer.py'
+      - 'projects/robot-detector/tools/public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_feed_coverage_gate.py'
+      - 'projects/robot-detector/fixtures/l2_synthetic_owner_worlds_observed_20261121.json'
+      - 'projects/robot-detector/tools/public_l2_ownership_nonidentifiability.py'
+      - 'projects/robot-detector/tests_background/test_public_l2_ownership_nonidentifiability.py'
+      - 'projects/robot-detector/tools/l2_duration_weighting.py'
+      - 'projects/robot-detector/tests_background/test_l2_duration_weighting.py'
+      - 'projects/robot-detector/tools/lobster_event_time_features.py'
+      - 'projects/robot-detector/tests_background/test_lobster_event_time_features.py'
+      - 'projects/robot-detector/fixtures/lobster_amzn_event_time_observed_20261121.json'
+      - 'projects/robot-detector/research/lobster_event_time_protocol_20261121.json'
+      - 'projects/robot-detector/tools/lobster_public_sample_format_audit.py'
+      - 'projects/robot-detector/tests_background/test_lobster_public_sample_format_audit.py'
+      - 'projects/robot-detector/fixtures/lobster_amzn_20120621_10level_format_observed_20261121.json'
+      - 'projects/robot-detector/tools/real_bch_four_day_panel_review.py'
+      - 'projects/robot-detector/tests_background/test_real_bch_four_day_panel_review.py'
+      - 'projects/robot-detector/fixtures/binance_bch_four_day_public_panel_20261121.json'
+      - 'projects/robot-detector/research/real_spot_occupancy_precommit_20261121.json'
+      - 'projects/robot-detector/tools/real_spot_occupancy_review.py'
+      - 'projects/robot-detector/tests_background/test_real_spot_occupancy_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_occupancy_20261117_observed.json'
+      - 'projects/robot-detector/research/real_spot_transfer_precommit_20261121.json'
+      - 'projects/robot-detector/tools/real_spot_transfer_review.py'
+      - 'projects/robot-detector/tests_background/test_real_spot_transfer_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_transfer_20261120_observed.json'
+      - 'projects/robot-detector/tools/real_public_trade_pair_review.py'
+      - 'projects/robot-detector/tests_background/test_real_public_trade_pair_review.py'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261118.json'
+      - 'projects/robot-detector/fixtures/binance_spot_ltcusdt_real_observed_20261119.json'
+      - 'projects/robot-detector/tools/abides_l2_phase_review.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_binphase_sensitivity.py'
+      - 'projects/robot-detector/tests_background/test_abides_l2_phase_review.py'
+      - 'projects/robot-detector/fixtures/abides_l2_phase_observed_scalars_20261121.json'
       - '.github/workflows/robot-detector-seed-ledger.yml'
   workflow_dispatch:
 
@@ -41,6 +305,54 @@ jobs:
       - name: Validate known spent seeds and no source constant drift
         run: |
           python -m unittest discover -s tests_research -p 'test_*.py' -v
+          python -m unittest discover -s tests -p 'test_public_evaluation_bounds.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_binphase_sensitivity.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_phase_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_binance_public_trade_archive.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_trade_direction_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_public_trade_pair_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_spot_transfer_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_spot_occupancy_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_real_bch_four_day_panel_review.py' -v
+          python -m unittest discover -s tests_background -p 'test_lobster_public_sample_format_audit.py' -v
+          python -m unittest discover -s tests_background -p 'test_lobster_event_time_features.py' -v
+          python -m unittest discover -s tests_background -p 'test_l2_duration_weighting.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_l2_ownership_nonidentifiability.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_l2_feed_coverage_gate.py' -v
+          python -m unittest discover -s tests_background -p 'test_offline_research_reproducer.py' -v
+          python -m unittest discover -s tests_background -p 'test_toy_public_execution_rhythm.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_fixed_clock_transfer.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_multiscale_public_l2.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_background_ratio_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_split_half_momentum_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_timing_phase_tied_fills.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_cluster_conditional_toy_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_clustered_grid_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_matched_smalln_audit.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_grid_replication_160.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_time_precision_coverage_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_interarrival_period_scan_negative.py' -v
+          python tools/public_interarrival_period_scan_negative.py --output data/results/public-interarrival-frozen-negative.json
+          python tools/public_time_precision_coverage_null.py --output data/results/public-precision-coverage-52views.json
+          python -m unittest discover -s tests_background -p 'test_abides_160_original_audit.py' -v
+          python tools/abides_160_original_audit.py
+          python tools/abides_matched_smalln_audit.py --output data/results/abides-matched-uncertainty.json
+          python tools/public_cluster_conditional_toy_null.py --output data/results/public-cluster-conditional-toy-null.json
+          python tools/public_timing_phase_tied_fills.py --output data/results/public-phase-tied-fill-diagnostic.json
+          python -m unittest discover -s tests_background -p 'test_public_clock_aliasing_negative.py' -v
+          python tools/public_clock_aliasing_negative.py
+          python tools/toy_public_execution_rhythm.py --output data/results/heldout-public-rhythm-hard-negative.json
+          python tools/offline_research_reproducer.py --output data/results/reproduction-offline-source-free.json
+          python tools/public_l2_feed_coverage_gate.py
+          python tools/public_l2_ownership_nonidentifiability.py
+          python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
+          python -m unittest discover -s tests_background -p 'test_master_research_plan.py' -v
+          python tools/autonomy_checkpoint.py
+          python tools/real_public_trade_pair_review.py --output data/results/two-days-source-provenance.json
+          python -m unittest discover -s tests_background -p 'test_public_tape_fingerprint.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_phase_fragility.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_twap_phase_contrast.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_l2_twap_separability.py' -v
           python tools/research_seed_registry.py
           python - <<'PY'
           from tools.research_seed_registry import read_ledger, audit_sources, assess_proposed_seeds
@@ -50,10 +362,42 @@ jobs:
           spent=assess_proposed_seeds(ledger,[1801,1901])
           assert len(spent['known_spent_overlap'])==2,spent
           assert spent['eligible_for_claim_of_fresh_blind_test'] is False,spent
-          candidate=assess_proposed_seeds(ledger,[2101,2102])
+          candidate=assess_proposed_seeds(ledger,[2201,2202])
           assert candidate['not_previously_listed_in_project_ledger'] is True,candidate
           assert candidate['globally_unused_or_unseen_elsewhere_verified'] is False,candidate
           print('SEED_LEDGER_GUARD_VALIDATED',
                 {'canonical_spent_seeds':audit['canonical_spent_seeds'],
                  'frozen_source_checks':len(audit['source_constant_checks'])})
           PY
+          # Cheap source-free current-stage tests (not ABIDES simulations).
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_conditional_timing_null.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_burst_null_falsification.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_conditioned_null.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_scan.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_l2_gate.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_abc_constructed_controls.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_abc_report.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_equivalence_class.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_l2_ambiguity.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_quality_guard.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_microburst_block_null.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_positive_harmonics_v2.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_allperiod_abcd_report.py' -v
+          PYTHONPATH=tools python tools/public_allperiod_abcd_report.py --output data/results/abcd-positive-harmonics-source-free.json
+          PYTHONPATH=tools python tools/public_abc_report.py --output data/results/abc-constructed-source-free.json
+      - name: Upload bounded constructed A/B/C aggregate only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-abc-constructed-${{ github.run_id }}
+          path: projects/robot-detector/data/results/abc-constructed-source-free.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: Upload bounded A/B/C/D positive-harmonic aggregate only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-abcd-periods-${{ github.run_id }}
+          path: projects/robot-detector/data/results/abcd-positive-harmonics-source-free.json
+          retention-days: 3
+          if-no-files-found: error

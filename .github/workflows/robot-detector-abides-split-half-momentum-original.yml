@@ -1,0 +1,118 @@
+name: Robot Detector original ABIDES 16-case split-half momentum control
+# Frozen source protocol before new seeds 3101..3104.
+# First source CI #44937339312 stopped BEFORE any model result: source
+# timestamp absolute 2021 day was incorrectly compared with seconds-since-
+# midnight. Correct to exchange-local nanosecond modulo day; no threshold,
+# seed or hypothesis was changed. Source-only rerun remains confirmatory.
+# One bounded genuine matching-engine replay, no real broker access,
+# no source raw tape/order or private agent labels in artifact.
+# Switch to workflow_dispatch only after first successful source run.
+# Original source replay #44937478576 SUCCEEDED, all 16 cases retained.
+# Manual-only from now on to avoid duplicate expensive simulations.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genuine-source-public-half-momentum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Frozen protocol, canonical seed registry and negative tests
+        run: |
+          set -euo pipefail
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_split_half_momentum_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_abides_background_ratio_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'tools')
+          from abides_split_half_momentum_holdout import (
+              SEEDS,COHORTS,BEGIN_NS,SPLIT_NS,END_NS,
+              HALF_MIN_PRINTS,HALF_MIN_HITS20,HALF_MIN_ELIGIBLE_LAG,
+              RATIO_THRESHOLD,frozen_plan,check_seeds
+          )
+          p=frozen_plan()
+          check_seeds()
+          assert SEEDS==(3101,3102,3103,3104)
+          assert len(COHORTS)==4
+          assert (BEGIN_NS,SPLIT_NS,END_NS)==(
+              34_200_000_000_000,34_440_000_000_000,34_680_000_000_000)
+          assert (HALF_MIN_PRINTS,HALF_MIN_HITS20,HALF_MIN_ELIGIBLE_LAG)==(100,4,2)
+          assert RATIO_THRESHOLD==0.60
+          assert p['original_previous_source_run_inspected']==44936592641
+          assert not p['globally_blind_unseen_seed_claim']
+          assert p['original_matching_engine_cases_planned']==16
+          assert p['raw_source_trade_snapshots_or_agent_ids_must_not_be_exported']
+          PY
+      - name: Install original pinned genuine ABIDES matching engine
+        run: |
+          set -euo pipefail
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run 16 original simulations; never filter abstentions or false alarms
+        run: |
+          set -euo pipefail
+          python tools/abides_split_half_momentum_holdout.py \
+            --output /tmp/abides-original-split-half-momentum-16.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/abides-original-split-half-momentum-16.json')
+          r=json.loads(p.read_text(encoding='utf-8'))
+          assert r['schema_version']=='genuine-abides-split-half-momentum-16case-original-v1'
+          assert r['original_matching_engine_cases']==16
+          assert r['new_local_seed_set_without_global_blindness_claim']==[3101,3102,3103,3104]
+          assert len(r['all_cases'])==16
+          assert r['experiment_frozen_after_prior_3001_3004_source_inspection']
+          assert r['real_market_FDR_or_actor_owners_unknown']
+          assert r['all_original_cohorts_negative_results_preserved']
+          assert not r['source_complete_exchange_order_sequence_certified']
+          assert not r['injected_agent_or_account_IDs_in_public_data']
+          assert not r['no_real_trading_or_order_placement'] is False
+          for c in r['all_cases']:
+              assert c['public_executed_prints']>0
+              assert c['public_l2_snapshots']>0
+              assert c['new_split_half_decision'] in (
+                  'ABSTAIN','TARGET_PATTERN','NO_TARGET_PATTERN')
+              assert [x['half'] for x in c['per_half_public_only']]==['early','late']
+              assert sum(x['public_execution_prints'] for x in
+                         c['per_half_public_only'])==c['public_executed_prints']
+              assert not c['public_feature_touched_private_agent_IDs']
+              assert not c['real_market_owner_FDR_or_accuracy_calibrated']
+              if c['cohort']=='twap_45s_positive':
+                  assert c['posthoc_controlled_twap_execution_count']>0
+              else:
+                  assert c['posthoc_controlled_twap_execution_count']==0
+              print('SOURCE_PUBLIC_SPLIT_HALF_ORIGINAL_CASE',json.dumps({
+                'seed':c['seed'],'cohort':c['cohort'],
+                'whole_ratio':c['original_whole_session_ratio_45_over_20'],
+                'whole_decision':c['original_whole_session_baseline_decision'],
+                'half_ratios':[x['observed_hit_ratio_45_over_20'] for x in
+                               c['per_half_public_only']],
+                'half20':[x['fixed_20s_grid_hits'] for x in c['per_half_public_only']],
+                'half45':[x['fixed_45s_grid_hits'] for x in c['per_half_public_only']],
+                'new_decision':c['new_split_half_decision'],
+                'abstain_reason':c['new_split_half_abstain_reason'],
+                'posthoc_controlled_fills':c['posthoc_controlled_twap_execution_count'],
+                'real_market_owner_labels':False
+              },sort_keys=True))
+          PY
+      - name: Upload only compact synthetic-source aggregate, 7 days
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-genuine-abides-16-split-half-source-only
+          path: /tmp/abides-original-split-half-momentum-16.json
+          retention-days: 7
+          if-no-files-found: error

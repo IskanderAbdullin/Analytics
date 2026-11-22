@@ -1,0 +1,177 @@
+{
+  "schema_version": "bch-spot-four-day-original-occupancy-observed-v1",
+  "original_run_id": 44921851326,
+  "original_artifact_id": 14714440828,
+  "precommit_sha": "a71958e59f8195852a2f664a82c3969c934d26f5",
+  "precommit_amendment_sha": "e2a71147990659a19e43c4949be33795045398e1",
+  "frozen_new_sources_before_original_download": [
+    "2026-11-18",
+    "2026-11-19"
+  ],
+  "previously_inspected_development_days": [
+    "2026-11-17",
+    "2026-11-20"
+  ],
+  "source_data_license": "CC BY-NC-SA 4.0; Binance Vision Dataset Terms 2026-08-26",
+  "total_public_real_trades": 194636,
+  "source_zip_provider_checksums_matched": true,
+  "provider_ids_contiguous_between_all_three_adjacent_date_boundaries": [
+    true,
+    true,
+    true
+  ],
+  "precommitted_new_case_primary_passes": 1,
+  "precommitted_new_case_primary_total": 2,
+  "not_a_real_robot_FDR_or_owner_count_test": true,
+  "not_for_live_or_commercial_trading": true,
+  "cases": [
+    {
+      "day": "2026-11-17",
+      "new_precommitted_source": false,
+      "public_trade_count": 42678,
+      "first_id": 296851413,
+      "last_id": 296894090,
+      "sha": "dca1e3983106d787d10a80e6a8a6b7fd9dc4866afef6ea25379e065abdae1b53",
+      "clock_phases": [
+        {
+          "origin_seconds": 0,
+          "one_sided_ge5": 504,
+          "strong_null_ge5_median": 509.5,
+          "strong_null_ge5_max": 519,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 953,
+          "eligible_ge5": 2025
+        },
+        {
+          "origin_seconds": 10,
+          "one_sided_ge5": 495,
+          "strong_null_ge5_median": 503.5,
+          "strong_null_ge5_max": 537,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 958,
+          "eligible_ge5": 2012
+        },
+        {
+          "origin_seconds": 20,
+          "one_sided_ge5": 503,
+          "strong_null_ge5_median": 488.5,
+          "strong_null_ge5_max": 500,
+          "above_all_eight_strong_controls": true,
+          "unconditional_one_sided": 971,
+          "eligible_ge5": 2003
+        }
+      ]
+    },
+    {
+      "day": "2026-11-18",
+      "new_precommitted_source": true,
+      "public_trade_count": 28466,
+      "first_id": 296894091,
+      "last_id": 296922556,
+      "sha": "52db334a1d9bd96e2f6ea1673a8e8f0f39aa2f9872d0482121bd174f9090fed5",
+      "clock_phases": [
+        {
+          "origin_seconds": 0,
+          "one_sided_ge5": 610,
+          "strong_null_ge5_median": 620.5,
+          "strong_null_ge5_max": 626,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 1094,
+          "eligible_ge5": 1885
+        },
+        {
+          "origin_seconds": 10,
+          "one_sided_ge5": 638,
+          "strong_null_ge5_median": 637,
+          "strong_null_ge5_max": 644,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 1140,
+          "eligible_ge5": 1888
+        },
+        {
+          "origin_seconds": 20,
+          "one_sided_ge5": 637,
+          "strong_null_ge5_median": 619.5,
+          "strong_null_ge5_max": 635,
+          "above_all_eight_strong_controls": true,
+          "unconditional_one_sided": 1115,
+          "eligible_ge5": 1889
+        }
+      ]
+    },
+    {
+      "day": "2026-11-19",
+      "new_precommitted_source": true,
+      "public_trade_count": 50213,
+      "first_id": 296922557,
+      "last_id": 296972769,
+      "sha": "bea94c8e9280824ced48ceb5aeccfa322662e8c96203eb6b9cf74f2e58b264c3",
+      "clock_phases": [
+        {
+          "origin_seconds": 0,
+          "one_sided_ge5": 541,
+          "strong_null_ge5_median": 530.5,
+          "strong_null_ge5_max": 539,
+          "above_all_eight_strong_controls": true,
+          "unconditional_one_sided": 886,
+          "eligible_ge5": 2183
+        },
+        {
+          "origin_seconds": 10,
+          "one_sided_ge5": 557,
+          "strong_null_ge5_median": 552.5,
+          "strong_null_ge5_max": 562,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 901,
+          "eligible_ge5": 2219
+        },
+        {
+          "origin_seconds": 20,
+          "one_sided_ge5": 553,
+          "strong_null_ge5_median": 545.5,
+          "strong_null_ge5_max": 558,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 879,
+          "eligible_ge5": 2212
+        }
+      ]
+    },
+    {
+      "day": "2026-11-20",
+      "new_precommitted_source": false,
+      "public_trade_count": 73279,
+      "first_id": 296972770,
+      "last_id": 297046048,
+      "sha": "553421be8eaf1e339eb0e111a25604ce7d2965e85ad15cea1650ffa0d012e46c",
+      "clock_phases": [
+        {
+          "origin_seconds": 0,
+          "one_sided_ge5": 334,
+          "strong_null_ge5_median": 323.5,
+          "strong_null_ge5_max": 343,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 511,
+          "eligible_ge5": 2562
+        },
+        {
+          "origin_seconds": 10,
+          "one_sided_ge5": 308,
+          "strong_null_ge5_median": 322,
+          "strong_null_ge5_max": 332,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 507,
+          "eligible_ge5": 2551
+        },
+        {
+          "origin_seconds": 20,
+          "one_sided_ge5": 322,
+          "strong_null_ge5_median": 319,
+          "strong_null_ge5_max": 340,
+          "above_all_eight_strong_controls": false,
+          "unconditional_one_sided": 515,
+          "eligible_ge5": 2557
+        }
+      ]
+    }
+  ]
+}

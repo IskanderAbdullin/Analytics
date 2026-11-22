@@ -1,0 +1,116 @@
+name: Robot Detector original 16 ABIDES public print-vs-exact-timestamp-cluster comparison
+# One public source run, 4 new local seeds x 4 frozen cohorts.
+# Frozen protocol from earlier committed SHA; simulator pinned to vendor
+# Git revision; original source-private oracle never in features/artifacts.
+# Convert to manual-only after source success to conserve GitHub Actions.
+# Original source run #44938991772 SUCCEEDED on frozen 3201-3204.
+# Manual-only to avoid duplicate 16-case engine runs.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-public-timestamp-cluster-source-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: projects/robot-detector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read frozen protocol and source-free adversarial tests
+        run: |
+          set -euo pipefail
+          python tools/research_seed_registry.py
+          python -m unittest discover -s tests_background -p 'test_abides_clustered_grid_holdout.py' -v
+          python -m unittest discover -s tests_background -p 'test_public_cluster_conditional_toy_null.py' -v
+          python -m unittest discover -s tests_background -p 'test_autonomy_checkpoint.py' -v
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'tools')
+          from abides_clustered_grid_holdout import (
+              SEEDS,COHORTS,THRESHOLD,CLUSTER_MIN_HITS20,
+              frozen_plan,check_seed_registry
+          )
+          p=frozen_plan()
+          check_seed_registry()
+          assert SEEDS==(3201,3202,3203,3204)
+          assert COHORTS==('poisson_noise_null','fixed_20s_noise_hard_negative',
+                           'momentum_noise_hard_negative','twap_45s_positive')
+          assert (THRESHOLD,CLUSTER_MIN_HITS20)==(0.60,8)
+          assert p['planned_independent_matching_engine_runs']==16
+          assert p['motivating_exact_toy_source_ci']==44938416432
+          assert p['new_source_status']=='NOT_RUN'
+          assert p['posthoc_private_TWAP_agent_labels_only_after_both_public_scores']
+          assert p['no_raw_execution_tape_l2_snapshots_or_private_oracle_agent_ID_export']
+          assert p['not_real_market_owner_precision_pvalue_or_FDR_calibration']
+          PY
+      - name: Install exact original ABIDES-NG revision
+        run: |
+          set -euo pipefail
+          git clone --no-tags --filter=blob:none https://github.com/GabrieleDiCorato/abides-ng.git /tmp/abides-ng
+          git -C /tmp/abides-ng checkout --detach ac7a2a7bf6e406cd2bbed887e22c5a5a790bb242
+          python -m pip install --disable-pip-version-check -e /tmp/abides-ng/abides-core -e /tmp/abides-ng/abides-markets
+      - name: Run ALL sixteen original simulator cohorts and retain every failure
+        run: |
+          set -euo pipefail
+          python tools/abides_clustered_grid_holdout.py \
+            --output /tmp/abides-public-timestamp-clusters-16-original.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/abides-public-timestamp-clusters-16-original.json')
+          x=json.loads(p.read_text(encoding='utf-8'))
+          assert x['schema_version']=='genuine-abides-public-clustered-timestamp-16case-original-v1'
+          assert x['independent_genuine_matching_engine_cases']==16
+          assert x['locally_new_seed_values_not_globally_blind']==[3201,3202,3203,3204]
+          assert len(x['original_anonymous_case_aggregates'])==16
+          assert x['same_timestamp_group_does_not_prove_same_parent_market_order']
+          assert x['private_simulated_oracle_used_only_after_public_inference']
+          assert not x['real_market_owner_FDR_or_precision_calibrated']
+          assert not x['raw_event_l2_rows_or_private_agent_IDs_exported']
+          assert set(x['source_cohort_comparison'])=={
+              'poisson_noise_null','fixed_20s_noise_hard_negative',
+              'momentum_noise_hard_negative','twap_45s_positive'}
+          for r in x['original_anonymous_case_aggregates']:
+              assert r['public_execution_prints']>0
+              assert r['public_l2_snapshot_events']>0
+              assert r['distinct_execution_timestamp_clusters']>0
+              assert (r['public_execution_prints']-r['distinct_execution_timestamp_clusters']==
+                      r['dependent_same_timestamp_extra_prints'])
+              assert r['original_per_print_decision'] in (
+                  'ABSTAIN','TARGET_PATTERN','NO_TARGET_PATTERN')
+              assert r['grouped_timestamp_decision'] in (
+                  'ABSTAIN','TARGET_PATTERN','NO_TARGET_PATTERN')
+              assert not r['public_feature_touched_private_agent_IDs']
+              assert not r['real_market_FDR_calibrated']
+              if r['cohort']=='twap_45s_positive':
+                  assert r['posthoc_source_controlled_TWAP_fills']>0
+              else:
+                  assert r['posthoc_source_controlled_TWAP_fills']==0
+              print('ABIDES_PUBLIC_CLUSTER_ORIGINAL_CASE',json.dumps({
+                  'seed':r['seed'],'cohort':r['cohort'],
+                  'prints':r['public_execution_prints'],
+                  'unique_time_groups':r['distinct_execution_timestamp_clusters'],
+                  'max_same_timestamp_cluster':r['largest_exact_timestamp_cluster'],
+                  'source_L2':r['public_l2_snapshot_events'],
+                  'naive_per_print_ratio':r['per_print_observed_ratio'],
+                  'grouped_ratio':r['per_unique_timestamp_observed_ratio'],
+                  'naive_classification':r['original_per_print_decision'],
+                  'grouped_classification':r['grouped_timestamp_decision'],
+                  'posthoc_TWAP_fills':r['posthoc_source_controlled_TWAP_fills'],
+                  'real_market_FDR_known':False
+              },sort_keys=True))
+          PY
+      - name: Publish only short provenance/aggregate results, 7-day TTL
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-genuine-abides-16-timestamp-grouping-source-only
+          path: /tmp/abides-public-timestamp-clusters-16-original.json
+          retention-days: 7
+          if-no-files-found: error
