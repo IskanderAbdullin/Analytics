@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact checked-out public Python CI for 14 new ABIDES sparse L2 EXEC source-free controls. Preserve negative results, correct invalid test premises without changing prereg lag or age. Next independently freeze full-window source coverage proof and hard source-data stop before any actual ABIDES source runs.",
+  "resume_instruction": "NEXT_ACTION: implement preregistered exact ABIDES simulated-UTC-ns whole observation-window sparse L2 exposure gate, fail when last quote too old even if all observed trades have eligible prior quote. 1sec lag, max10sec end-of-segment source age; cheap Python negative CI.",
   "last_session_result": "2026-11-22 19:17 UTC active: ABIDES native epoch ns precision CI 279/279 succeeded; separate public-only original source-free sparse-L2 EXEC family screen written under earlier precommitted protocol, with explicit 1s quote lag, 10s age, book ties, 14 negative tests. No original source/simulator jobs; CI pending.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:24:01.290Z",
-    "elapsed_minutes": 6.847816666666667,
-    "stage": "ABIDES public exec + sparse L2 strict prior-1s source-free screen 14 adversarial tests CI pending",
+    "latest_clock_utc": "2026-11-22T19:25:06.736Z",
+    "elapsed_minutes": 7.938583333333334,
+    "stage": "Source-free 293/293 ABIDES sparse L2 tests confirmed; precommit distinct full-window exposure vs per-event eligibility gap",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "e24ab53376fbefc2dfd1e445328cb87191ce898b",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060315347",
-    "result": "279/279 source-free Python tests, includes 12 ABIDES source clock/legacy microsecond negatives"
+    "sha": "e607253648e011749e583dd125311930b7ac3039",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060553826",
+    "result": "293/293 source-free Python tests including 14 ABIDES sparse L2 trade/prior-quote causal guards"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
