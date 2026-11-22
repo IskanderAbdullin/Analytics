@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: test separate public price/qty/aggressor-side mark changes leave existing ABIDES timestamp+L2 conditional LL and projected-source SHA unchanged (not a full public source hash) under frozen docs/ABIDES_MARK_PROJECTION_LIMIT_PREREG_20261122.md; 2 source-free tests and cheap CI, no source jobs. Then final UTC checkpoint by 19:47:10Z.",
-  "last_session_result": "Active 2026-11-22T19:17:10Z session: source-free exact ABIDES UTC clock/sparse L2 full-time quality, separate public EXEC M0/M1v4, unrelated regular non-target positive LL falsifier, old 160 compact no reanalysis, source capture preflight hard stop, 1ns-vs-CSV quantization LL +0.182322, sharp one-bucket microsecond-clock LL partial identification. Exact 364/364 source-free CI; original independent market/simulator validation still NO-GO.",
+  "resume_instruction": "NEXT_ACTION: verify exact public Python source-free CI for public trade marks omitted from ABIDES timing-only feature source hash (366 tests expected). Clarify hash is projected-feature identity not full source authenticity. Then save exact UTC final checkpoint near 19:47:10Z and master issue #72 / stage #97 remarks. No source jobs/seeds.",
+  "last_session_result": "2026-11-22T19:17 UTC run: source-free 364/364 LL identification set then precommitted public marked-trade projection limitation 60c04657 and 2 tests: differing PUBLIC trade price/qty/side with identical public timing/lagged book produce identical M1v4 LL and internal feature fingerprint; private agent IDs rejected. Exact GitHub CI pending.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:43:36.082Z",
-    "elapsed_minutes": 26.427683333333334,
-    "stage": "ABIDES public price/qty/side mark omission from timestamp+laggedL2 source feature hash prereg before negative tests",
+    "latest_clock_utc": "2026-11-22T19:44:08.296Z",
+    "elapsed_minutes": 26.964583333333334,
+    "stage": "ABIDES public price/size/side mark feature projection 2 negative tests, exact Python CI pending",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
