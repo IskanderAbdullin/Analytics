@@ -1,0 +1,21 @@
+name: Robot Detector public intensity source tests
+on:
+  push:
+    branches:
+      - agent/robot-detector-l2-binphase-20261121
+    paths:
+      - 'projects/robot-detector/tools/public_intensity_rescaling.py'
+      - 'projects/robot-detector/tests/test_public_intensity_rescaling.py'
+      - '.github/workflows/robot-detector-public-intensity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run exact checked-out Python source tests (no external data)
+        working-directory: projects/robot-detector
+        run: python -m unittest discover -s tests -p 'test_public_intensity_rescaling.py' -v
