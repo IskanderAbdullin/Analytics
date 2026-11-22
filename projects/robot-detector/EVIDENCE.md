@@ -33,3 +33,6 @@
 
 
 **Real-source capability audit:** [2026-11-22 source rights/causal L2 report](docs/SOURCE_CAPABILITY_AND_CAUSAL_GATES_20261122.md), based on official LOBSTER output/sample docs, previous source QA and ABIDES evidence. Unverified 1ms event clock/full L2 continuity prevents treating a source-only M1-v2 toy as real-market validated; LOBSTER's book row i is POST-event i. No data/raw source export or new independent model validation.
+
+
+**Major real historical source-quality negative:** [LOBSTER clock/lag run #45040590585](https://github.com/IskanderAbdullin/Analytics/actions/runs/45040590585), exact original pinned sample, aggregate-only artifact `14761716634`. [Complete report](docs/LOBSTER_PUBLIC_CLOCK_LAG_NEGATIVE_20261122.md): 269747/269748 sub-ms timestamps; 110818 distinct exact source timestamps would merge by floor-to-ms (42.4% groups); 8927/8974 visible executions locally eligible after fixed 1s post-event L2 lag, 43 no prior,4 stale; no labels/FDR. Source workflow manual-only after one run; no raw data export.

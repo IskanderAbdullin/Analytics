@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect ONE initial pinned historical public LOBSTER 2012 AMZN source-only audit workflow, verify safe aggregate, all abstentions and timestamp precision, never raw vendor output. If successful, immediately convert this workflow to manual-only and archive negative source-quality results; if failed, record exact blocker, no repeated expensive source attempts. No model performance/owner/FDR claim.",
+  "resume_instruction": "NEXT_ACTION: implement separately frozen lossless Decimal-seconds to exact integer nanosecond source-time normalization with strict no-rounding/no-future/duplicated-ties negatives. Do not feed original LOBSTER sample through existing millisecond M1-v2/M2 as if precise: 110818 distinct exact timestamps collapse on 1ms flooring. Use no additional original vendor download or fresh source seeds; real data completeness and market FDR remain unknown.",
   "last_session_result": "2026-11-22 active run: source-free post-event projector CI #45040155021 failed 1 test: test supplied post-event book t=4000 outside M1-v2 [2500,3500) evaluation, correctly rejected as INVALID_FUTURE_OR_INCOMPLETE_L2. Decimal source-only new 10 tests added and #45040422015 ran 169 tests with identical prior fixture error, otherwise successful. Corrected fixture to t=3300 within evaluation but model-effective 4300 beyond it, preserving frozen 1000ms lag and no-lookahead; new CI pending. No new empirical source.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:51:16.231Z",
-    "elapsed_minutes": 33.68278333333333,
+    "latest_clock_utc": "2026-11-22T15:53:29.933Z",
+    "elapsed_minutes": 35.91115,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Source-free 169/169 CI verified; one bounded original public AMZN LOBSTER clock source-only workflow scheduled by its own initial push",
+    "stage": "Original historical source-only decimal timestamp audit confirmed and source workflow made manual-only",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
@@ -291,5 +291,21 @@
       "M2 prospective prereg/implementation, strict numeric failure repair with exact tests",
       "Prospective source-run split integrity pre-registration/implementation and exact 75/75 Python CI"
     ]
+  },
+  "last_confirmed_historical_lobster_clock_audit": {
+    "sha": "349d07672c8eade01a96f86b87f334508cd141c2",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45040590585",
+    "artifact_id": 14761716634,
+    "source_sha256_locally_pinned": "5cff62a609b27aef82285382ad646c4c2facc0a692a60bedda633de64c4aa54f",
+    "source_event_book_rows": 269748,
+    "distinct_exact_timestamps": 261265,
+    "rows_with_submillisecond_fraction": 269747,
+    "distinct_timestamps_collapsed_if_floor_to_ms": 110818,
+    "visible_exec_locally_eligible": 8927,
+    "visible_abstain_no_prior": 43,
+    "visible_abstain_stale": 4,
+    "source_is_independent_new_holdout": false,
+    "source_clock_lossless_ms": false,
+    "real_market_fdr_known": false
   }
 }
