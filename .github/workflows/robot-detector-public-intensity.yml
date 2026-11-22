@@ -40,6 +40,8 @@ on:
       - 'projects/robot-detector/tests/test_public_m1_v3_ns_l2.py'
       - 'projects/robot-detector/tools/public_ns_heldout_likelihood.py'
       - 'projects/robot-detector/tests/test_public_ns_heldout_likelihood.py'
+      - 'projects/robot-detector/tools/public_ns_visible_exec_projector.py'
+      - 'projects/robot-detector/tests/test_public_ns_visible_exec_projector.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
