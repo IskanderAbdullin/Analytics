@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: scientifically qualify an externally documented original ABIDES matched EXEC plus L2 source (capture profile, true full time provenance/clock exactness, immutable engine revision, legal rights) and feasible independent original-world disjoint train/calibration/evaluation power before any new source seeds. Do not reuse 3301..3340, no old compact pseudo reanalysis, no microsecond point-LL estimate, no robot/owner/FDR classification. Preserve all source-free negatives and sharp identification set.",
+  "resume_instruction": "NEXT_ACTION: test separate public price/qty/aggressor-side mark changes leave existing ABIDES timestamp+L2 conditional LL and projected-source SHA unchanged (not a full public source hash) under frozen docs/ABIDES_MARK_PROJECTION_LIMIT_PREREG_20261122.md; 2 source-free tests and cheap CI, no source jobs. Then final UTC checkpoint by 19:47:10Z.",
   "last_session_result": "Active 2026-11-22T19:17:10Z session: source-free exact ABIDES UTC clock/sparse L2 full-time quality, separate public EXEC M0/M1v4, unrelated regular non-target positive LL falsifier, old 160 compact no reanalysis, source capture preflight hard stop, 1ns-vs-CSV quantization LL +0.182322, sharp one-bucket microsecond-clock LL partial identification. Exact 364/364 source-free CI; original independent market/simulator validation still NO-GO.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:42:18.455Z",
-    "elapsed_minutes": 25.1339,
-    "stage": "ABIDES clock loss original source partial-identification and metadata NO-GO audit, 364/364 source-free CI",
+    "latest_clock_utc": "2026-11-22T19:43:36.082Z",
+    "elapsed_minutes": 26.427683333333334,
+    "stage": "ABIDES public price/qty/side mark omission from timestamp+laggedL2 source feature hash prereg before negative tests",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
