@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact checked-out Python CI for newly introduced 9 M2-rescaled-gap tests and fix any source-free failures without changing the frozen M2 model. Then compare M0/M2 under fixed non-target periodic/momentum toy settings, no calibration claims; audit exchange completeness and practical source feasibility before any seed allocation.",
+  "resume_instruction": "NEXT_ACTION: implement dynamically lagged M1-v2 exposure and training-only spread strata strictly per docs/CONDITIONAL_M1_DYNAMIC_LAGGED_L2_PREREG_20261122.md; run bounded source-free negative tests and exact GitHub Python CI. Preserve original stable-BBO M1 and all frozen holdouts. No new ABIDES seeds before source validity.",
   "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:27:19.164Z",
-    "elapsed_minutes": 9.731666666666667,
+    "latest_clock_utc": "2026-11-22T15:29:00.933Z",
+    "elapsed_minutes": 11.427816666666667,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "M2 strictly predictable rescaled-gap implementation plus 9 negative/unit cases; exact CI pending",
+    "stage": "M2 exact-source 109/109 Python tests confirmed; M1-v2 dynamic delayed L2 preregistration BEFORE implementation",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "e085fac53e1bd5492949b863e0e18230371431a9",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45038045732",
-    "result": "100/100 exact Python tests; 8 preregistered hypothetical power grid tests"
+    "sha": "79a4fedea17e4e6bef2a7f5edf7910e1b1ffe78d",
+    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45038410925",
+    "result": "109/109 Python tests, including 9 strictly predictable M2 integrated residuals"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
