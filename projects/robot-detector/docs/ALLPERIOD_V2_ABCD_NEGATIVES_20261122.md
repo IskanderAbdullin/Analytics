@@ -34,7 +34,7 @@ is uploaded to 3-day-retention GitHub Actions artifacts;
 no raw vendor archives or private IDs.
 
 Three report-integrity tests passed locally on source-equivalent
-transcribed code **3/3**. Committed new-HEAD CI PENDING.
+transcribed code **3/3**. Commit b1dbd166 initially FAILED provenance CI #44996834864 and #44996830341 after all three report tests PASSED: the direct CLI lacked project-root import path and raised ModuleNotFoundError for tools.public_period_positive_harmonics_v2. A follow-up importer-only fix adds project ROOT to sys.path; verified the direct CLI locally without PYTHONPATH; corrected exact-HEAD CI pending. No scientific results, threshold, seed or frozen protocol altered.
 The previous version's five v2 tests independently passed in
 [provenance CI #44996649423](https://github.com/IskanderAbdullin/Analytics/actions/runs/44996649423).
 

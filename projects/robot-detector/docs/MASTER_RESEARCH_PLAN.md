@@ -767,3 +767,15 @@ NEXT_ACTION: confirm exact current CI/aggregate artifact;
 then register a scientifically independent new synthetic
 source or derive and falsify exchangeability conditions.
 
+**CI engineering correction (no experimental changes):** Exact
+provenance runs [#44996834864](https://github.com/IskanderAbdullin/Analytics/actions/runs/44996834864)
+and #44996830341 FAILED after all **three new report unit
+tests passed**: the direct CLI \`python tools/public_allperiod_abcd_report.py\`
+lacked the project ROOT on \`sys.path\`; importing
+\`tools.public_period_positive_harmonics_v2\` raised
+\`ModuleNotFoundError: No module named 'tools'\`.
+No changes to frozen seeds, data, 7 periods, tolerances or observed
+negative outcomes were made. Corrected CLI path bootstrap using
+\`sys.path.insert(0,str(ROOT))\`, and executed direct CLI locally
+without PYTHONPATH to validate. Exact corrected GitHub CI PENDING.
+

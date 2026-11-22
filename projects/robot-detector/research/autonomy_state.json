@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact new-HEAD source-free provenance CI executes test_public_allperiod_abcd_report.py 3/3 and all-period aggregate output, inspect bounded artifact and confirm no raw trade rows. Then undertake prospective independent synthetic source protocol or strong mathematical exchangeability falsification before any inference. Check updated remote HEAD and avoid overlapping hourly session; no force, keep master #72 open.",
-  "last_session_result": "2026-11-22: exact provenance CI #44996649423 PASS five v2 tests; subsequently preregistered full v2 A/B/C/D three-scenario seven-period 64-replicate source-free comparison in issue #97 comment 7075711877. Non-target momentum shows 23/191 5s hits; unrelated non-target 20s gives 5/5 5/10/20s observed vs 5s randomization means A=.109375 B=.125 C=.796875 D=.078125; no exchangeability or owners proven. Local source-equivalent new report tests 3/3 PASS; exact new-HEAD CI pending. No fresh ABIDES, no p-values, real-market FDR or trading.",
+  "resume_instruction": "NEXT_ACTION: Check corrected new HEAD provenance CI and confirm direct CLI generation of abcd-positive-harmonics-source-free.json plus three report tests and aggregate-only 3-day artifact. If still failing, examine job logs and fix without altering frozen method/results. Next science: prospective conditional-intensity/time-rescaling model with preregistered source-free falsifications and independent seeds. Do not overlap next hourly automation or claim market p-values. Master #72 open.",
+  "last_session_result": "2026-11-22: full A/B/C/D source-free v2 period report tests 3/3 succeeded on GitHub at b1dbd166, BUT provenance CI #44996834864 and #44996830341 FAILED on direct CLI import ModuleNotFoundError: No module named tools. Direct CLI bootstrap was corrected without changing data/protocol and validated locally without PYTHONPATH; corrected exact-HEAD CI pending. Previous v2 suite #44996649423 PASS. No source simulation nor real-market FDR/owners.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T06:51:04Z",
@@ -243,6 +243,12 @@
         "stage_end_time_utc": "2026-11-22T07:06:32Z",
         "elapsed_minutes": 15.4667,
         "tests": "3 source-equivalent report tests pass; observed momentum23 5s hits and unrelated20s 5/5 5s/10s/20s"
+      },
+      {
+        "stage": "diagnosed failed direct CLI import after 3/3 GitHub unit tests; corrected only project-root sys.path",
+        "stage_end_time_utc": "2026-11-22T07:09:20Z",
+        "elapsed_minutes": 18.2667,
+        "tests": "all 3 GitHub report unit tests pass but workflow fails direct CLI import; corrected standalone CLI source-equivalent locally"
       }
     ],
     "final_elapsed_minutes": null,

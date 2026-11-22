@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
+# A direct 'python tools/...' invocation has tools/, not project root, on sys.path.
+sys.path.insert(0,str(ROOT))
 sys.path.insert(0,str(ROOT/'tools'))
 sys.path.insert(0,str(ROOT/'tests_background'))
 from test_public_abc_constructed_controls import constructed_controls
