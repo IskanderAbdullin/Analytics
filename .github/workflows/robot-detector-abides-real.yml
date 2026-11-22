@@ -8,13 +8,6 @@ on:
       - 'projects/robot-detector/tests_python/**'
       - 'projects/robot-detector/tests/RobotDetector.SelfTests/**'
       - '.github/workflows/robot-detector-abides-real.yml'
-  pull_request:
-    paths:
-      - 'projects/robot-detector/src/**'
-      - 'projects/robot-detector/tools/abides_export.py'
-      - 'projects/robot-detector/tests_python/**'
-      - 'projects/robot-detector/tests/RobotDetector.SelfTests/**'
-      - '.github/workflows/robot-detector-abides-real.yml'
   workflow_dispatch:
 
 permissions:

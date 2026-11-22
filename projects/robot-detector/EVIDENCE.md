@@ -27,3 +27,6 @@
 
 
 **Hypothetical source-free power negative:** [CI #45038045732](https://github.com/IskanderAbdullin/Analytics/actions/runs/45038045732) exact SHA `e085fac5` PASS 100/100; full 6×3×4 grid code plus [audited selected outcomes](docs/INDEPENDENT_POWER_FEASIBILITY_AUDIT_20261122.md). At n=100, assumed p_pos=.90/p_neg=.02, simultaneous gate power is bounded above by .1326 under any cohort dependence. NOT a measured market/source rate; no new seeds or ABIDES cases. Existing synthetic background false positives remain a larger science risk.
+
+
+**New negative predictive result (constructed, source-free):** [Exact Python CI #45039673176](https://github.com/IskanderAbdullin/Analytics/actions/runs/45039673176) PASS 149/149 and complete aggregate-only output. [Full report](docs/CROSSMODEL_HELDOUT_LL_NEGATIVE_20261122.md): all 3 non-target tapes M0 LL −3, M2 identical (training chose amplitude 0), M1-v2 worse than M0 in all 3 (ΔLL −0.62266, −0.95913, −0.62266). This is a negative toy result, not independently validated FDR or actor signal.
