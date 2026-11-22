@@ -43,3 +43,26 @@ def conditional_sample(
 def cell_occupancy(timestamp_ms: Sequence[int]) -> dict[int, int]:
     """Number of unique public timestamps per fixed five-second cell."""
     return dict(sorted(Counter(t // CELL_MS for t in set(timestamp_ms)).items()))
+
+
+def conditional_cluster_sample(
+    timestamp_ms: Sequence[int], *, seed: int, replicate: int = 0
+) -> list[int]:
+    """Resample timestamps while preserving simultaneous print multiplicities.
+
+    Each original exact-time print cluster remains intact and in its original
+    five-second cell. Cluster sizes follow the within-cell event rank.
+    This is an uncalibrated sensitivity diagnostic, NOT a market null p-value.
+    """
+    sampled_unique = conditional_sample(timestamp_ms, seed=seed, replicate=replicate)
+    original_unique = sorted(set(timestamp_ms))
+    multiplicity = Counter(timestamp_ms)
+    if len(sampled_unique) != len(original_unique):
+        raise AssertionError("unique event count changed")
+    if any(a // CELL_MS != b // CELL_MS
+           for a, b in zip(original_unique, sampled_unique)):
+        raise AssertionError("event crossed a fixed cell")
+    return [
+        t for t, original in zip(sampled_unique, original_unique)
+        for _ in range(multiplicity[original])
+    ]
