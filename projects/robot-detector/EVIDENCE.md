@@ -24,3 +24,6 @@
 
 
 **Verified final source-free branch CI:** [#45025008917](https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008917) exact SHA `32caf2c1` **75/75 Python PASS**, including the two fail-closed M2 overflow tests and all ten allocation-integrity tests with full project ledger. [Provenance #45025008831](https://github.com/IskanderAbdullin/Analytics/actions/runs/45025008831) SUCCESS. Other workflows may remain in progress; no source experiments, independent holdout, market p-values, true actors or real FDR established.
+
+
+**Hypothetical source-free power negative:** [CI #45038045732](https://github.com/IskanderAbdullin/Analytics/actions/runs/45038045732) exact SHA `e085fac5` PASS 100/100; full 6×3×4 grid code plus [audited selected outcomes](docs/INDEPENDENT_POWER_FEASIBILITY_AUDIT_20261122.md). At n=100, assumed p_pos=.90/p_neg=.02, simultaneous gate power is bounded above by .1326 under any cohort dependence. NOT a measured market/source rate; no new seeds or ABIDES cases. Existing synthetic background false positives remain a larger science risk.

@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact Python CI for newly preregistered hypothetical power grid 6x3x4 including zero/low joint-power negative scenarios. If green, archive full aggregate output and compare to n=100 proposal; investigate any implausible thresholds without changing frozen p grids. Then verify ABIDES source cost/license and power feasibility BEFORE any new seed generation.",
+  "resume_instruction": "NEXT_ACTION: implement frozen strictly predictable M2 inter-event integrated-residual z_i formula in docs/CONDITIONAL_M2_RESCALED_GAPS_PREREG_20261122.md; adversarial source-free tests and exact GitHub CI. Then compare on fixed negative periodic/momentum toy streams, preserving all results. Do not launch new ABIDES source cases; the >=100-world release design is unpowered for the hypothesized p_neg>=1% as documented.",
   "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:23:21.567Z",
-    "elapsed_minutes": 5.771716666666666,
+    "latest_clock_utc": "2026-11-22T15:26:25.220Z",
+    "elapsed_minutes": 8.8326,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Prospective 6x3x4 independent-world feasibility table implementation; exact CI pending",
+    "stage": "Hypothetical power feasibility audit and prospective M2 rescaled-gap diagnostic pre-registration",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "9777e50f05743727db19035cdf673bf6dd2eb0c1",
-    "url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45037801535",
-    "result": "92/92 Python source-free tests incl bounds and paired seed-world controls"
+    "sha": "e085fac53e1bd5492949b863e0e18230371431a9",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45038045732",
+    "result": "100/100 exact Python tests; 8 preregistered hypothetical power grid tests"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
