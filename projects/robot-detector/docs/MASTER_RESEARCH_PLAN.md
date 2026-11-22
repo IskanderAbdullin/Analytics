@@ -503,6 +503,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-22 | Preregistered issue #97 paired 500ms occupancy-equivalence tapes; C's conditional resamples collapse different local gap structures (6 vs 0 observed) by construction, B is gap-preserving by construction; 10ms quantization erases dense short-gap evidence. Prior exact CI #44995874723 confirmed 38 source-free tests; new 4 exact tests CI pending. | Source-free identifiability limit, not statistical calibration |
 
+| 2026-11-22 | Preregistered L2 ambiguity/tied-snapshot counterexamples (#97 comment 7075629666), conservatively block fallback to older covered L2 after a newer overlapping-precision sample; resolve input-order-dependent same-time conflicting coverage with deterministic ABSTAIN. Frozen thresholds untouched. | Source-free regression; new CI pending |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -627,4 +629,28 @@ CI for this next SHA is PENDING.
 NEXT_ACTION: verify exact-HEAD new 4 tests and inspect CI; then design
 a dependence-preserving but non-degenerate prospective comparison
 without source/threshold retuning or real-market FDR claims.
+
+### 2026-11-22 — strict previous-only L2 causal ambiguity guard (source-free)
+
+[Pre-test frozen issue #97 comment](https://github.com/IskanderAbdullin/Analytics/issues/97#issuecomment-7075629666)
+records two causal quality threats in \`public_period_l2_gate.py\`: a
+known newer quote overlapping a public print under recorded timestamp
+precision could be ignored in favour of an older covered quote; and
+conflicting same-time L2 coverage samples had input-order-dependent
+selection. The conservative fail-closed implementation adds
+\`AMBIGUOUS_NEWER_L2_ORDER\` and
+\`CONFLICTING_TIED_L2_SNAPSHOTS\`, with four new adversarial controls.
+No change to 1000ms age, previous-only test or source allowlist.
+The old eight tests and new four passed 12/12 on locally transcribed
+source-equivalent code, **not yet on exact committed checkout**.
+[Negative finding & fixtures](PREVIOUS_L2_AMBIGUITY_NEGATIVE_20261122.md).
+Prior exact provenance CI #44996020719 independently verified all
+**42** source-free current-stage tests including the paired 500ms
+equivalence-class negative (4 tests). The new four tests now require
+separate exact-HEAD CI. This does not validate external market
+completeness, owner count, market FDR or timing-null p-values.
+
+NEXT_ACTION: verify new four causal L2 regression tests in cheap CI,
+then register stronger input completeness/precision missingness
+abstention scenarios before any new synthetic or real source run.
 
