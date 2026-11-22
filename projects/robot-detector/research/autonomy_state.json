@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement prerecorded one-command source-free ns M1v3 from bound type4-only training originals to bound independent eval as aggregate-only JSON, strict 2 new tests and cheap CLI CI. Preserve all blockers and source inactivity, then update stage #97 + main #72 and final checkpoint after actual 30min target.",
-  "last_session_result": "2026-11-22 18:20 UTC continuation: 257/257 source-free CI plus science readiness NO-GO; implemented prospective planning-only hard stop 9 external source evidence claims, all statuses deny auto data access/execution; 8 source-free negative tests, CI pending. No actual original source read/seeds/market owner/FDR.",
+  "resume_instruction": "NEXT_ACTION: verify exact Python CI and one-command source-free aggregate CLI under SHA, expect 267/267 tests and known LL log(.75)-2.875. Document permanent scientific NO-GO and issue #97/#72, save one checkpoint at actual UTC >=18:50:59 if possible, no vendor source/seeds, no promise after chat.",
+  "last_session_result": "30-minute 2026-11-22 18:20 UTC run: source-free pipeline, original-run source binding, type4 train-only, 265/265 CI, scientific source NO-GO and draft source study; one-command deterministic source-free integrated end-to-end CLI and 2 regression tests added under prior prereg, exact CI pending.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:45:35.561Z",
-    "elapsed_minutes": 24.6049,
-    "stage": "Source-free source-execution hard-stop exact CI 265/265, freeze single-command full pipeline reproduction before coding",
+    "latest_clock_utc": "2026-11-22T18:46:07.680Z",
+    "elapsed_minutes": 25.140216666666667,
+    "stage": "One-command source-free public ns type4 trained model and heldout LL reproducibility CLI committed, exact 267 tests/CLI smoke pending",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },

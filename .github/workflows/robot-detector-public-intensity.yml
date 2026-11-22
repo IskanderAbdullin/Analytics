@@ -50,6 +50,8 @@ on:
       - 'projects/robot-detector/tests/test_public_ns_visible_train_only.py'
       - 'projects/robot-detector/tools/public_source_study_hard_stop.py'
       - 'projects/robot-detector/tests/test_public_source_study_hard_stop.py'
+      - 'projects/robot-detector/tools/public_ns_repro_demo.py'
+      - 'projects/robot-detector/tests/test_public_ns_repro_demo.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
@@ -63,6 +65,9 @@ jobs:
       - name: Run exact checked-out Python source tests (no external data)
         working-directory: projects/robot-detector
         run: python -m unittest discover -s tests -p 'test_public_*py' -v
+      - name: Reproduce fixed ns public visible-type4 source-free aggregate
+        working-directory: projects/robot-detector
+        run: python -m tools.public_ns_repro_demo
       - name: Emit frozen three-tape aggregate-only LL panel (source-free; not owner inference)
         working-directory: projects/robot-detector
         run: python -m tools.public_crossmodel_heldout_ll
