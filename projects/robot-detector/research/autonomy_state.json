@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact public Python source-free CI for LOBSTER-style public type4-only and post-event BBO projection with 12 adversarial cases. Correct any test premise without changing source event types and lag. Then build a synthetic source-only integrated pipeline with explicit source coverage and provenance, maintain unknown trade-only original collision rate.",
-  "last_session_result": "2026-11-22 18:29 UTC: prior 207/207 ns heldout CI green and corrected full-message source coarsening denominator. Separate event-type-aware ns projector written after prior prereg, type4 visible execution clusters vs type5 hidden, ALL post-event BBO for future lagged M1v3; 12 source-free tests added, CI pending. No original source download or new seeds.",
+  "resume_instruction": "NEXT_ACTION: implement source-free exact-ns public type4 projection + frozen M1-v3 trained model + heldout LL with same-source book tuple gate, no evaluation print fitting. Test 5 rows/1 visible cluster/integral 2.875/LL ln(.75)-2.875 and 1ns trade distinctness. Exact Python CI, no original vendor source jobs or new seeds.",
+  "last_session_result": "2026-11-22 18:30 UTC exact source-free Python 219/219. New preregistration freezes 5 public messages, 2 visible type4 same-time, 1 hidden type5, 2 other, 3 BBO timestamps and LL=ln(.75)-2.875, no real data. Integrated source book/event identity gate must reject mismatched projections. Trade-only 1ms collision fraction remains unknown for original LOBSTER.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:30:13.282Z",
-    "elapsed_minutes": 9.233583333333334,
-    "stage": "Strict public ns execution vs message projector, source-free 12 hard negative cases, exact CI pending",
+    "latest_clock_utc": "2026-11-22T18:31:24.763Z",
+    "elapsed_minutes": 10.424933333333334,
+    "stage": "Source-free public ns visible type4 projection exact CI 219/219; prereg integrated M1-v3 heldout source alignment and exact toy score",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "7d9f502df73326756b92e5619a2a89d573df1232",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45055220540",
-    "result": "207/207 source-free Python tests, ns heldout LL analytic unit agreement and 1ns distinctness"
+    "sha": "bc72eda12e939a32428e2bf8c62199135e9fa083",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45055453897",
+    "result": "219/219 public source-free Python tests incl 12 event-type-aware ns projector hard negatives"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
