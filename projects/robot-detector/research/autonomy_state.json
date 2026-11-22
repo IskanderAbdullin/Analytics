@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact source-free CI after last-tied-row +1ns sensitivity fixture correction, expect 243/243 tests. Preserve SHA structural-only source identity counterexample (same BBO with different type4 counts). Then independent source plan and checkpoint/issue updates, no original vendor samples or ABIDES seeds.",
-  "last_session_result": "Initial source provenance CI #45055899020 FAILED 1/242 methods: test moved FIRST among tied source event timestamps +1ns, leaving subsequent rows earlier; public projector properly rejected UNSORTED. Kept production source validation unchanged, updated fixture to shift LAST tied row +1ns (chronological), and added explicit out-of-order negative regression; new CI pending.",
+  "resume_instruction": "NEXT_ACTION: implement source-free M1-v3 train-only adapter from bound public ns type4 projections using two fixed toy original public histories, assert low3/high2 over4sec each and reject source-run/clock/replay/trade-outside-window. Verify exact Python CI, no new vendor source or seed allocation.",
+  "last_session_result": "2026-11-22 18:36 UTC: exact source-free 243/243 CI on SHA e2965287; first 242 had invalid 1ns source fixture that broke chronological order; correction + explicit negative retained. New prereg M1-v3 type4-only training bound to public message/book tape, so model fitted on same event process as visible-type4 evaluation. No new vendor data or seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:35:31.553Z",
-    "elapsed_minutes": 14.5381,
-    "stage": "One source-only SHA ns sensitivity fixture violated original event chronological order; corrected to last tied row, added ABSTAIN assertion",
+    "latest_clock_utc": "2026-11-22T18:37:09.229Z",
+    "elapsed_minutes": 16.166033333333335,
+    "stage": "Corrected original source SHA source-free tests pass 243/243; prereg visible-type4-only training event definition to prevent train/eval estimand mismatch",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "7061876404e4ee7c67edd2c8f74535c61078246e",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45055649580",
-    "result": "230/230 exact public source-free Python tests including 11 end-to-end type4->M1v3->LL controls"
+    "sha": "e2965287924281f4561cc07837450338ba104af3",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45055970989",
+    "result": "243/243 public Python source-free tests incl 13 source-provenance structural controls"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
