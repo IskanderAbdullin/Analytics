@@ -68,6 +68,8 @@ on:
       - 'projects/robot-detector/tests/test_public_abides_source_capture_preflight.py'
       - 'projects/robot-detector/tools/public_abides_export_precision_ll.py'
       - 'projects/robot-detector/tests/test_public_abides_export_precision_ll.py'
+      - 'projects/robot-detector/tools/public_abides_us_clock_ll_bounds.py'
+      - 'projects/robot-detector/tests/test_public_abides_us_clock_ll_bounds.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
