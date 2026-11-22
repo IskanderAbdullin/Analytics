@@ -195,7 +195,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify latest-HEAD provenance/.NET/ABIDES CI and the two new conditional_cluster_sample adversarial tests. Then implement source-free self-exciting burst falsification of within-5-second exchangeability and an offset-preserving alternative. Preserve all negative outcomes; no p-values, new source seeds, owner attribution or real-market FDR.",
-  "last_session_result": "2026-11-22: Added exact-timestamp split-fill multiplicity-preserving within-cell conditional sampler and two adversarial tests, updated living plan. No local tests executed in this session; CI must be verified. The exchangeability assumption remains unvalidated and no ABIDES/source experiments were run.",
+  "resume_instruction": "NEXT_ACTION: Verify CI and execute four tests in tests_background/test_public_burst_null_falsification.py, including deterministic observed 42 short gaps and uniform sampler falsification. Repair any test failures. Then preregister intensity-conditioned alternatives with strong momentum and Poisson negatives before new ABIDES source seeds; no p-values or real-market FDR.",
+  "last_session_result": "2026-11-22: Added constructed 6-cell millisecond burst negative and 64-replicate uniform vs offset-preserving diagnostic with four adversarial tests. No local test execution or new ABIDES source simulation in this session; latest CI must be verified. Uniform within-cell exchangeability is intentionally challenged, not validated.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
