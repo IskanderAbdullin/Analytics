@@ -196,8 +196,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact checked-out GitHub public intensity Python CI for newly added test_public_m1_train_only.py (12 source-free tests), fix failures without retrospective prereg edits. Then preregister M2 predictable history intensity and train/calibration/evaluation original-source-run split with hard negative Poisson/fixed20/momentum and coverage/abstention. Current M1 is one-stable-prior-BBO window ONLY and relies on externally asserted continuity; dynamic L2 abstains. No new seeds before independent protocol; no real-market owner/FDR claims.",
-  "last_session_result": "2026-11-22 12:42 UTC existing-chat-standard migration completed at 83d9be1c; source-free M1 prereg addendum at f3d78068 then 12 new local standalone M1 tests PASS; exact full-project GitHub M1 CI pending. No source experiments, no new seeds, no market FDR/owner claims.",
+  "resume_instruction": "NEXT_ACTION: check exact provenance CI after restoring the AGENTS living-plan contract, then register and implement prospective M2 predictable history intensity on training-only independent runs with source-free Poisson/fixed-period/momentum negatives; first audit M1's asserted-stable-book precondition, not real L2 continuity. No fresh seeds before run-disjoint protocol and no owner/FDR inference.",
+  "last_session_result": "2026-11-22 12:42 UTC project-standard migration in 83d9be1c; M1 prereg f3d78068; source-free M1 code/tests 0f3728e1; 51/51 exact-source Python tests verified at CI #45024195498. Master plan regression provenance FAILED on AGENTS missing archival autonomous/decision keywords; remediation in next commit, exact provenance CI pending. No source/holdout, owner labels or market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
@@ -225,9 +225,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "4f812ecc20e995e162250748fe3003ecbabde3a4",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45020856671",
-    "result": "PASS 39 Python tests incl 9 M0; source/test paths unchanged through 8bd5a83b"
+    "sha": "0f3728e137ca093304d11349fba02bab2d3fbdfa",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45024195498",
+    "result": "PASS 51 exact-source Python tests (12 M1; 9 M0). Source-free technical checks only; M1 source validation/calibration absent."
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
