@@ -22,6 +22,8 @@ on:
       - 'projects/robot-detector/tests/test_public_hypothetical_power_grid.py'
       - 'projects/robot-detector/tools/public_m2_rescaled_gaps.py'
       - 'projects/robot-detector/tests/test_public_m2_rescaled_gaps.py'
+      - 'projects/robot-detector/tools/public_m1_dynamic_l2.py'
+      - 'projects/robot-detector/tests/test_public_m1_dynamic_l2.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
