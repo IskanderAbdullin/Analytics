@@ -36,3 +36,6 @@
 
 
 **Major real historical source-quality negative:** [LOBSTER clock/lag run #45040590585](https://github.com/IskanderAbdullin/Analytics/actions/runs/45040590585), exact original pinned sample, aggregate-only artifact `14761716634`. [Complete report](docs/LOBSTER_PUBLIC_CLOCK_LAG_NEGATIVE_20261122.md): 269747/269748 sub-ms timestamps; 110818 distinct exact source timestamps would merge by floor-to-ms (42.4% groups); 8927/8974 visible executions locally eligible after fixed 1s post-event L2 lag, 43 no prior,4 stale; no labels/FDR. Source workflow manual-only after one run; no raw data export.
+
+
+**2026-11-22 exact-ns visible type4 source pipeline:** GitHub [public Python CI #45056270305](https://github.com/IskanderAbdullin/Analytics/actions/runs/45056270305) PASS 257/257, post-event-only lagged M1-v3, source-bound original training with consistent visible type4 process, all mathematical tests synthetic. [Scientific independent-source NO-GO audit](docs/NS_VISIBLE_TYPE4_SOURCE_READINESS_AUDIT_20261122.md) lists unresolved real original type4 clock precision, market completeness, rights and power. No true actor labels, real market FDR or new original seeds.
