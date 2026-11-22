@@ -24,3 +24,7 @@
 
 ## Future synthetic acceptance T24
 A historical order query returns no data; an operations event appears late and carries a different trade ID namespace. The matcher must abstain from a unique link without stronger order/instrument/time/quantity evidence. No actual broker calls or live trading.
+
+## Implemented synthetic-only matcher (E-046)
+
+`analysis/broker_reconcile_synthetic.py` + `test_broker_reconcile_synthetic.py` implement 12 self-contained tests of a strict TradeFact classifier. This is **not** an authenticated data collector and does not parse broker report formats. Only a same-namespace unique exact-ID match with compatible account/instrument/side/lots/price/UTC time is labelled `confirmed_id` **within supplied facts**. Cross-namespace matches remain candidates, duplicates ambiguous, and missing broker facts unmatched. No unresolved two-lot broker discrepancy is treated as solved by these tests. Adapt the importer privately to an actually authorized source before use.

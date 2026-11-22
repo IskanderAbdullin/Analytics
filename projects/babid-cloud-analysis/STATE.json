@@ -50,7 +50,8 @@
     "E-042",
     "E-043",
     "E-044",
-    "E-045"
+    "E-045",
+    "E-046"
   ],
   "hypotheses": [
     {
@@ -290,6 +291,13 @@
       "description": "Официально подтверждена семантика UTC-времени сделки vs время создания сообщения, а также ограничение GetOrderState (>1 day may be missing). Подготовлен независимый brokerage reconciliation-source план с GetOperationsByCursor, broker report и осторожным join разных trade_id namespaces; брокерских вызовов не было.",
       "evidence_refs": [
         "E-045"
+      ]
+    },
+    {
+      "id": "M-026",
+      "description": "Добавлен консервативный synthetic-only брокерский matcher с 12 локально прошедшими тестами. Явно различает confirmed_id в предоставленных одинаковых ID namespace, кросс-namespace candidate, неоднозначность и отсутствие пары; не осуществляет брокерский доступ/CSV импорт, A-001 не решён.",
+      "evidence_refs": [
+        "E-046"
       ]
     }
   ],
