@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement preregistered source-study hard-stop planning gate with exactly 9 external evidence statuses and 5 provider/source families; all results NOT_AUTHORIZED_FOR_SOURCE_EXECUTION. Test all-unknown, single-failed, all-documented, blocked providers and malformed/oracle fields. Exact cheap CI, no original source.",
-  "last_session_result": "2026-11-22 18:20 UTC source-free 257/257 tests, source independent NO-GO and draft new independent source study. Prospective fail-closed planning gate preregistration written BEFORE code to prevent accidental source execution due to self-declared evidence.",
+  "resume_instruction": "NEXT_ACTION: exact Python CI for source-study 9 evidence hard-stop gate and 8 tests; preserve failure, confirm statuses always NOT_AUTHORIZED_FOR_SOURCE_EXECUTION. Then finalize source NO-GO checkpoint and stage #97/master #72 issue, verify remote HEAD, CI and real 30min elapsed from 18:20:59 UTC. No source jobs, seeds or real trading.",
+  "last_session_result": "2026-11-22 18:20 UTC continuation: 257/257 source-free CI plus science readiness NO-GO; implemented prospective planning-only hard stop 9 external source evidence claims, all statuses deny auto data access/execution; 8 source-free negative tests, CI pending. No actual original source read/seeds/market owner/FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:44:06.440Z",
-    "elapsed_minutes": 23.11955,
-    "stage": "Precommitted source-study structural hard-stop to prevent green toy CI being read as authorization",
+    "latest_clock_utc": "2026-11-22T18:44:45.398Z",
+    "elapsed_minutes": 23.76885,
+    "stage": "Source-study hard-stop NO-AUTO-EXECUTION planning gate and 8 source-free negatives, CI pending",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },

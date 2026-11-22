@@ -48,6 +48,8 @@ on:
       - 'projects/robot-detector/tests/test_public_ns_source_binding.py'
       - 'projects/robot-detector/tools/public_ns_visible_train_only.py'
       - 'projects/robot-detector/tests/test_public_ns_visible_train_only.py'
+      - 'projects/robot-detector/tools/public_source_study_hard_stop.py'
+      - 'projects/robot-detector/tests/test_public_source_study_hard_stop.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
