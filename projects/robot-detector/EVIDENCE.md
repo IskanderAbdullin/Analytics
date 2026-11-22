@@ -42,3 +42,6 @@
 
 
 **Model-specific exact-time observability limit:** [source readiness scientific audit](docs/NS_VISIBLE_TYPE4_SOURCE_READINESS_AUDIT_20261122.md) now states that multiple simultaneous visible type4 executions can map to one unique-nanosecond event cluster. The cluster-intensity likelihood is invariant to exact duplicate print timestamps with fixed causal book exposure; raw public visible execution count is reported separately, physical number of parent orders/owners unknown. This is a source-free mathematical limit, not market FDR.
+
+
+**Final measured active-run checkpoint:** 2026-11-22 18:20:59.267 UTC to 2026-11-22T18:51:15.899Z (30.277 min), no original vendor/simulator source data. [Exact Python source-free CI 267/267 + one-command CLI #45057011095](https://github.com/IskanderAbdullin/Analytics/actions/runs/45057011095); all external-source NO-GO and issue #72/#97 open. Additional retrospective constructed toy check: M0 LL=-2.970004, M1v3 LL=-3.162682, delta=-0.192678 (negative predictive gain, not a market result). Source-clock all-message vs visible type4 distinction and no physical owner/FDR assertion retained.
