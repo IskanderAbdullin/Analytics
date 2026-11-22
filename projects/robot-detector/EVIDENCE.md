@@ -12,3 +12,6 @@
 **Не подтверждено:** real-market FDR, число физических роботов, обменность кандидатных timing nulls, статистическая значимость M0/M1/M2, фактическое качество конкретного коммерческого источника L2. Нельзя распространять raw vendor archives/секреты.
 
 **Further verified repair:** [provenance CI #45024279130](https://github.com/IskanderAbdullin/Analytics/actions/runs/45024279130) on SHA `24f2e8ff` SUCCESS after restoring living-plan/decision-log markers in concise AGENTS. [M2 preregistration](docs/CONDITIONAL_M2_PREDICTABLE_HISTORY_PREREG_20261122.md) remains DESIGN-ONLY: no tests or source results.
+
+
+**M2 engineering (not yet independently verified):** preregistration commit `167d9174` precedes source-free scorer `tools/public_m2_train_only.py` and 12 authored tests. Local stand-alone equivalent passed 12/12; exact GitHub Python CI pending. Model fit is NOT market calibration or an actor detector.

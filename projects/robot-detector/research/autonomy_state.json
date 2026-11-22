@@ -150,7 +150,8 @@
       "New separate source-holdout protocol only after sufficient adversarial tests",
       "Checkpoint, tests, CI, push and next scientific stage",
       "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains",
-      "Prospective M2 predictable-history exponential intensity candidate preregistration (2026-11-22; design-only)"
+      "Prospective M2 predictable-history exponential intensity candidate preregistration (2026-11-22; design-only)",
+      "Train-only M2 predictable-history model (exact GitHub CI pending), no independent sources"
     ],
     "acceptance": [
       "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
@@ -197,8 +198,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement exact source-free train-only M2 predictable-history log-likelihood scoring per docs/CONDITIONAL_M2_PREDICTABLE_HISTORY_PREREG_20261122.md; verify strict <t, split-fill invariance, no evaluation leakage and negative Poisson/fixed20/momentum controls. Compare with M0/M1 only after original-run allocation frozen. No new ABIDES seeds before preregistered run-disjoint source protocol. Check remote SHA/CI and conflicts first.",
-  "last_session_result": "2026-11-22 migration 83d9be1c (original AGENTS archived), M1 prereg f3d78068, M1 implementation 0f3728e1 with 51/51 exact Python tests CI #45024195498. Provenance regression from short AGENTS detected and fixed at 24f2e8ff; provenance CI #45024279130 SUCCESS. Newly frozen M2 design only; no M2 tests or source data, no new seeds, no owner/FDR claims.",
+  "resume_instruction": "NEXT_ACTION: verify exact M2 source-free 12 unit/negative tests in public GitHub Python CI for new HEAD; repair failures without changing frozen 1.0s tau, 3x3 training grid, source gates or holdout. Then preregister independently allocated original-run train/calibration/evaluation with hard negatives and source-rights gate before any fresh simulator seeds; preserve 3301–3340 as spent.",
+  "last_session_result": "2026-11-22: migrated original project and preserved AGENTS; M1 passed exact 51/51 Python CI #45024195498 and provenance corrected #45024279130. M2 prereg committed at 167d9174 BEFORE source-free code. 12 new M2 tests passed locally on source-equivalent stub; exact M2 GitHub CI pending. No source data/seed/market FDR/owner claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
