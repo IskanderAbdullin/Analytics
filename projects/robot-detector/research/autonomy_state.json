@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: do NOT execute original data/new seeds. Review frozen DRAFT for a source-specific ABIDES trade/book clock adapter with independent source time, type4 vs other execution semantics, market completeness attestation and source permissions; then pre-register a bounded simulator/source study only after independent power/cost feasibility and full test negatives. Master #72 open.",
-  "last_session_result": "2026-11-22 18:20 UTC continuation completed exact source-free pipeline test 257/257 and scientific source no-go audit; prepared scientifically bounded source-family-specific prospective train/calibration/eval draft, no source run authorization, no seed allocations, no market FDR.",
+  "resume_instruction": "NEXT_ACTION: implement preregistered source-study hard-stop planning gate with exactly 9 external evidence statuses and 5 provider/source families; all results NOT_AUTHORIZED_FOR_SOURCE_EXECUTION. Test all-unknown, single-failed, all-documented, blocked providers and malformed/oracle fields. Exact cheap CI, no original source.",
+  "last_session_result": "2026-11-22 18:20 UTC source-free 257/257 tests, source independent NO-GO and draft new independent source study. Prospective fail-closed planning gate preregistration written BEFORE code to prevent accidental source execution due to self-declared evidence.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:43:22.335Z",
-    "elapsed_minutes": 22.38446666666667,
-    "stage": "Independent source original-world M1-v3/type4 train-calibration-evaluation planning DRAFT; source execution still NO-GO",
+    "latest_clock_utc": "2026-11-22T18:44:06.440Z",
+    "elapsed_minutes": 23.11955,
+    "stage": "Precommitted source-study structural hard-stop to prevent green toy CI being read as authorization",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
