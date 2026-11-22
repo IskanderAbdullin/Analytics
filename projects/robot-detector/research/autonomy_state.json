@@ -200,18 +200,26 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: require independently attested original ABIDES trade-plus-L2 source capture and proper full PUBLIC marked tape provenance (not projected-feature hash), legal rights/clock exactness/full no-trade quote coverage, and feasible prospective independent train/calibration/evaluation original-world power before any new source execution. If building richer public marked point-process model, preregister and test as separate source-free version; do not retune old spent cohorts. No original source jobs or real-market FDR/owner claims.",
-  "last_session_result": "Active 2026-11-22T19:17Z: native ABIDES Unix-ns source clock, strict sparse L2 causal full-window, M0/M1v4, unrelated non-target positive LL, old genuine 160 compact no new source reanalysis, capture-profile preflight NO-GO, constructed 1ns vs microsecond LL bias and partial identification set, public price/qty/side mark omission from timing-only feature source SHA. Exact public source-free CI 366/366 PASS. No original data/seeds or physical owner/FDR claims.",
+  "resume_instruction": "NEXT_ACTION: do NOT run new original ABIDES seeds/source jobs from this checkpoint. Independently verify source legal research rights, source capture with actual TRADE_ATTRIBUTION+L2_SERIES (including public price/volume/side marked tape), exact original UTC clock/provenance and lagged full no-trade quote coverage, pinned dependencies and signed/attested full public tape identity. Pre-register economically feasible disjoint original-world train/calibration/evaluation seed allocation, power, model freeze and classifier thresholds BEFORE any new sources. Source-free future work can separately preregister richer PUBLIC marked point-process model and compare to timestamp-only M0/M1v4 with adversarial negative controls. Do not treat old compact 160 as new M1v4 data, microsecond LL bound as CI, predictive gain as bot detection, or infer owner count/real FDR. Master #72 open until independent release audit.",
+  "last_session_result": "SECOND measured active research session UTC 2026-11-22T19:17:10.421Z to 2026-11-22T19:47:24.649Z (30.237 min), 11 substantive source-free prereg/coding/audit stages: pinned ABIDES Unix-ns exact clock (old standalone CSV loses submicro but genuine original 160 used in-memory), sparse public EXEC+L2 1s lag, 10s whole-time coverage, distinct ABIDES M0/M1v4 train-only LL, positive +0.171965 LL on unrelated regular non-target public background, original spent 160 compact no event/L2 vectors for new M1v4 reanalysis, external source capture NO-GO, 1ns clock loss relative LL +0.182322, microsecond partial-identification LL interval [-0.192678,-0.010357], public price/quantity/side marks omitted from timing-only source feature SHA. 366/366 source-free Python CI green at code SHA 46ced41f; all old failures/negatives retained; no new original ABIDES seeds/data/trades/PC/real market owners/FDR. Stage #97 and master #72 remain open.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:45:17.165Z",
-    "elapsed_minutes": 28.1124,
-    "stage": "Final scientific audit: source-free 366/366 and ABIDES public marked trade feature omission limitation",
+    "latest_clock_utc": "2026-11-22T19:47:24.649Z",
+    "elapsed_minutes": 30.237133333333333,
+    "stage": "SECOND_30_MINUTE_RESEARCH_RUN_COMPLETED_SOURCE_FREE_ABIDES_NO_GO",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
-    "new_simulator_seeds_allocated": 0
+    "new_simulator_seeds_allocated": 0,
+    "end_time_utc": "2026-11-22T19:47:24.649Z",
+    "completed_substantive_stages": 11,
+    "source_free_python_ci": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266",
+    "tested_code_sha": "46ced41f8b93d5938788b5ac1484604adb44ce0d",
+    "source_free_test_count": 366,
+    "genuine_original_engine_source_runs_created": 0,
+    "novel_source_seeds_allocated": 0,
+    "Computer_Use_invoked": false
   },
   "project_goal": "GOAL.md",
   "project_map": "PROJECT_MAP.md",
@@ -221,7 +229,7 @@
   "last_confirmed_source_free_ci": {
     "sha": "46ced41f8b93d5938788b5ac1484604adb44ce0d",
     "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266",
-    "result": "366/366 exact Python source-free tests; two public marked-trade nonidentifiability negatives passed, provenance CI success"
+    "result": "366/366 exact source-free Python tests, aggregate-only CLIs, public ABIDES mark projection hard negatives, no original source"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",

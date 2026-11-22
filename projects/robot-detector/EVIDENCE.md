@@ -54,3 +54,6 @@
 
 
 **Further public trade mark projection many-to-one result:** [exact source-free 366/366 CI #45062443266](https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266). [ABIDES source-family NO-GO scientific report](docs/ABIDES_SOURCE_FAMILY_CAUSAL_READINESS_AUDIT_20261122.md): two public trade tapes can differ in visible price/quantity/aggressor side while sharing exact event times and sparse book; timing-only M1v4 produces identical projected-feature source hash and heldout LL. Private agent fields are rejected. This is NOT full public source authentication or physical-owner identity. No new market source/seed/FDR.
+
+
+**SECOND measured source-free continuation complete:** UTC 2026-11-22T19:17:10.421Z to 2026-11-22T19:47:24.649Z (30.237min); [exact Python CI #45062443266](https://github.com/IskanderAbdullin/Analytics/actions/runs/45062443266) PASS 366/366 (code SHA 46ced41f). [Pinned ABIDES source-family NO-GO science report](docs/ABIDES_SOURCE_FAMILY_CAUSAL_READINESS_AUDIT_20261122.md), new non-target LL positive despite no bot, coarse-microsecond partial-identification set (NOT CI), public mark feature-hash omission, original 160 compact not re-scored. No original simulation world, market owner/FDR, new seeds or vendor raw data; master #72 remains open.
