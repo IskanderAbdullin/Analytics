@@ -1,0 +1,70 @@
+name: Robot Detector pinned public LOBSTER clock source-only audit
+on:
+  push:
+    branches:
+      - agent/robot-detector-l2-binphase-20261121
+    paths:
+      - '.github/workflows/robot-detector-lobster-clock-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  one-bounded-original-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run frozen source-free adversarial checks before any download
+        working-directory: projects/robot-detector
+        run: python -m unittest discover -s tests -p 'test_public_lobster_clock_lag_audit.py' -v
+      - name: Read exact pinned official historical public demo and export aggregate only
+        working-directory: projects/robot-detector
+        run: python -m tools.public_lobster_clock_lag_audit --output data/results/lobster-clock-lag-source-only.json
+      - name: Verify allowlist and complete source-only count conservation
+        working-directory: projects/robot-detector
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          obj=json.loads(Path("data/results/lobster-clock-lag-source-only.json").read_text())
+          allowed={
+              "status","paired_source_event_book_rows","distinct_exact_exchange_event_timestamps",
+              "exact_same_timestamp_adjacent_event_pairs",
+              "raw_source_rows_with_submillisecond_decimal_remainder",
+              "adjacent_distinct_exact_times_merged_by_millisecond_floor",
+              "original_event_gaps_strictly_over_10_seconds",
+              "visible_type4_executions","hidden_type5_executions",
+              "visible_executions_locally_eligible_lagged_bbo",
+              "visible_executions_abstain_no_lagged_bbo",
+              "visible_executions_abstain_stale_over_10s",
+              "visible_executions_abstain_invalid_post_event_bbo",
+              "post_event_book_used_as_same_event_prestatement",
+              "integer_millisecond_normalization_automatically_approved",
+              "publisher_signed_zip_checksum_available",
+              "source_event_completeness_independently_certified",
+              "physical_owner_identity_known","real_market_fdr_known",
+              "raw_vendor_rows_or_order_references_exported",
+              "official_demo_source_url","local_unsigned_source_zip_sha256",
+              "original_sample_row_count_crosschecked","frozen_design_before_reanalysis",
+              "new_original_ABIDES_or_exchange_source_runs",
+          }
+          assert set(obj)==allowed, "Unapproved raw or missing aggregate field"
+          assert obj["paired_source_event_book_rows"]==269748
+          assert obj["visible_type4_executions"]==8974
+          assert obj["visible_type4_executions"]==sum(obj[k] for k in (
+              "visible_executions_locally_eligible_lagged_bbo",
+              "visible_executions_abstain_no_lagged_bbo",
+              "visible_executions_abstain_stale_over_10s",
+              "visible_executions_abstain_invalid_post_event_bbo"))
+          assert obj["raw_vendor_rows_or_order_references_exported"] is False
+          assert obj["real_market_fdr_known"] is False
+          assert obj["new_original_ABIDES_or_exchange_source_runs"]==0
+          print("SOURCE_ONLY_AGGREGATE_ALLOWLIST_OK")
+          PY
+      - name: Retain only source-free aggregate (never original ZIP, prints or book rows)
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-original-lobster-clock-aggregate-only
+          path: projects/robot-detector/data/results/lobster-clock-lag-source-only.json
+          if-no-files-found: error
+          retention-days: 7

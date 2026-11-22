@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact Python CI after correcting only invalid future-book negative fixture. If 169/169 PASS, run one preregistered bounded original public LOBSTER AMZN 2012 demo clock/lag aggregate audit using pinned unsigned SHA, then make its source workflow manual-only. Retain all sub-ms, coarsening and ABSTAIN outputs, never vendor raw rows/owner claims.",
+  "resume_instruction": "NEXT_ACTION: inspect ONE initial pinned historical public LOBSTER 2012 AMZN source-only audit workflow, verify safe aggregate, all abstentions and timestamp precision, never raw vendor output. If successful, immediately convert this workflow to manual-only and archive negative source-quality results; if failed, record exact blocker, no repeated expensive source attempts. No model performance/owner/FDR claim.",
   "last_session_result": "2026-11-22 active run: source-free post-event projector CI #45040155021 failed 1 test: test supplied post-event book t=4000 outside M1-v2 [2500,3500) evaluation, correctly rejected as INVALID_FUTURE_OR_INCOMPLETE_L2. Decimal source-only new 10 tests added and #45040422015 ran 169 tests with identical prior fixture error, otherwise successful. Corrected fixture to t=3300 within evaluation but model-effective 4300 beyond it, preserving frozen 1000ms lag and no-lookahead; new CI pending. No new empirical source.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:50:20.121Z",
-    "elapsed_minutes": 32.747616666666666,
+    "latest_clock_utc": "2026-11-22T15:51:16.231Z",
+    "elapsed_minutes": 33.68278333333333,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Correct invalid future-book adversarial fixture while preserving causal exclusion of truly out-of-window L2; source-only Decimal tests already pass; exact corrected CI pending",
+    "stage": "Source-free 169/169 CI verified; one bounded original public AMZN LOBSTER clock source-only workflow scheduled by its own initial push",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "7328a6a52d8c0fa3ad438a6122bbb701a6342cfc",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45039673176",
-    "result": "149/149 Python tests PASS plus exact source-free aggregate-only CLI output; LL M0=-3 all, M2=-3 all (a=0), M1v2=-3.62266 periodic/irregular and -3.95913 momentum"
+    "sha": "79c6053ec88a353620f0954dc6682abc71e7211e",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45040506780",
+    "result": "169/169 exact Python source-free tests, incl 10 paired post-event BBO and 10 Decimal source timing negatives"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
