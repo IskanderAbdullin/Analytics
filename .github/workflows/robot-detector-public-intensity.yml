@@ -43,3 +43,6 @@ jobs:
       - name: Run exact checked-out Python source tests (no external data)
         working-directory: projects/robot-detector
         run: python -m unittest discover -s tests -p 'test_public_*py' -v
+      - name: Emit frozen three-tape aggregate-only LL panel (source-free; not owner inference)
+        working-directory: projects/robot-detector
+        run: python -m tools.public_crossmodel_heldout_ll
