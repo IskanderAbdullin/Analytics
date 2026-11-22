@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact public Python CI for full-window heldout log likelihood, including 10 new negative/unit tests; fix any fail-closed numeric/quality issue. Then compare frozen M0/M1-v2/M2 heldout source-free score on 3 constructed non-target tapes, without inventing p-values or owner labels. No new genuine source seeds.",
+  "resume_instruction": "NEXT_ACTION: implement source-free three-frozen-tape M0/M1v2/M2 heldout log likelihood panel according to docs/CONDITIONAL_CROSSMODEL_HELDOUT_LL_PREREG_20261122.md, run exact CI; report negative non-target model gains honestly, do not classify actors. Then audit original-market source validity before new seeds.",
   "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:35:45.513Z",
-    "elapsed_minutes": 18.170816666666667,
+    "latest_clock_utc": "2026-11-22T15:37:39.168Z",
+    "elapsed_minutes": 20.065066666666667,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Source-free full-window M0 and M1-v2 held-out predictive LL implementation; 10 adversarial cases authored, CI pending",
+    "stage": "Heldout M0/M1v2 exact source-free 141/141 CI verified; preregister crossmodel frozen non-target LL comparison before computation",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "fafbb3c84fb54427321c09133ad1b9f1050619b5",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45038996901",
-    "result": "131/131 Python source-free tests, 8 new cross-model identifiability controls"
+    "sha": "3b26412d2f4d666a34c409e353617757c4868a5e",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45039198363",
+    "result": "141/141 exact source-free Python tests including 10 full-window fixed intensity heldout likelihood methods"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
