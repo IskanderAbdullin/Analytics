@@ -152,7 +152,8 @@
       "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains",
       "Prospective M2 predictable-history exponential intensity candidate preregistration (2026-11-22; design-only)",
       "Train-only M2 predictable-history model (exact GitHub CI pending), no independent sources",
-      "M2 finite/overflow fail-closed fix with two new adversarial tests, exact CI pending"
+      "M2 finite/overflow fail-closed fix with two new adversarial tests, exact CI pending",
+      "Source-free prospective original-run split integrity gate, fake fixtures, no seeds reserved, exact CI pending"
     ],
     "acceptance": [
       "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
@@ -199,8 +200,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact public Python CI for two new M2 extreme-numeric fail-closed tests; if passed, preregister independent original-market-run train/calibration/evaluation allocation and all hard negatives (Poisson, unrelated fixed20, momentum, missingness) before any fresh ABIDES seed/source. Do not claim M0/M1/M2 statistical significance, exchange completeness, owner identity or real-market FDR.",
-  "last_session_result": "2026-11-22 migration 83d9be1c; M1 exact 51/51 #45024195498; provenance regression fixed 24f2e8ff; M2 prereg first 167d9174, M2 exact 63/63 #45024579897. Subsequent extreme-number negative found unhandled OverflowError in M2 (10**500), fail-closed fix and 2 tests now committed; local 14/14 source-equivalent PASS, exact new GitHub CI pending. No market sources/new seeds/owner/FDR claims.",
+  "resume_instruction": "NEXT_ACTION: inspect exact Python public-intensity CI on newest HEAD, confirming M2 two extreme-numeric negative tests and 10 original-run split-integrity negatives against full GitHub seed_registry.json. Resolve any failure. Then preregister statistically meaningful independent-run sample size/power and train/calibration/evaluation criteria incl source rights/revision before allocating any new seeds or evaluating market data. Do not confuse structural split gate or deterministic unit tests with scientific calibration.",
+  "last_session_result": "2026-11-22: migrated existing project (83d9be1c, no duplicate); M1 51/51 CI #45024195498, M2 63/63 CI #45024579897, provenance green #45024579964. M2 numerical fail-open repaired a90b8e2 (local 14/14, exact CI pending). Original-run split integrity prereg fe591340 BEFORE code; 10 source-free tests passed against minimal local ledger fixture (exact committed CI/full ledger pending). All 3301–3340 remain spent, no new sources or owner/FDR claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",

@@ -18,3 +18,6 @@
 
 
 **M2 exact CI and later negative:** Python run [#45024579897](https://github.com/IskanderAbdullin/Analytics/actions/runs/45024579897) PASS **63/63** on `8a28d374`, including 12 new M2 tests. Later `10**500` malformed timestamp/rate found uncontrolled OverflowError, added explicit safe-exact-range ABSTAIN and 2 tests; local equivalent 14/14 pass, new GitHub CI pending. Original M2 source data/calibration still absent.
+
+
+**Original-run allocation integrity (pre-source, no holdout created):** [prereg](docs/CONDITIONAL_SOURCE_RUN_ALLOCATION_INTEGRITY_PREREG_20261122.md) committed before implementation (`fe591340`); source-free checker/tests reject split leakage, replay phases, spent local seeds, missing hard-negative cohorts, oracle fields and malformed registry. Local minimal-ledger 10/10 PASS; exact GitHub full-ledger CI pending. No globally fresh seed claim.
