@@ -200,14 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement source-free exact binomial confidence bounds and seed-clustered paired inference tests on synthetic fake fixtures; include zero-event, missing-L2 abstention, and duplicate-source replay rejection. Review power, multiplicity, licenses and pinned ABIDES revision before freezing independent source protocol or reserving seeds. Proposed design docs/INDEPENDENT_SOURCE_EVALUATION_DESIGN_20261122.md is DESIGN ONLY, no new original source jobs. Verify latest HEAD/CI and avoid overlap.",
+  "resume_instruction": "NEXT_ACTION: verify CI/tests for new exact bounds code (adbb776f), fix if necessary; then implement paired seed-world clustered inference and multiplicity adjustment, fake-fixture duplicate/replay rejection, coverage/abstention negative tests. Do not use per-fill binomial independence or run new source cases; independently review power/licensing before freezing source protocol.",
   "last_session_result": "2026-11-22 UTC single active chat session: updated existing Analytics/projects/robot-detector to UPDATE_EXISTING_CHAT standard without duplicate (83d9be1c), archived original AGENTS; M1 prereg f3d78068 and implementation 0f3728e1 (exact 51/51 Python PASS); restored provenance AGENTS contract 24f2e8ff (CI PASS); M2 prereg 167d9174 and implementation 8a28d374 (exact 63/63 Python PASS); overflow negative caught and corrected a90b8e2 (source-free CI PASS); prereg original-run split-integrity fe591340 before code 32caf2c1; latest exact public Python CI 75/75 PASS and provenance PASS. New source simulations/seeds=0; no market p-values, owner identity or real-market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T13:07:30Z",
     "deadline_utc": "2026-11-22T13:57:30Z",
     "note": "Active run constrained by next hourly overlap guard at approximately 13:12 UTC; no 50-minute claim",
-    "stage": "Prospective independent source evaluation design; no source runs, tests not executed"
+    "stage": "Prospective source evaluation design and exact binomial bounds with adversarial source-free tests; CI pending; no source jobs",
+    "measured_stage_checkpoint_utc": "2026-11-22T13:08:55Z",
+    "elapsed_minutes": 1.4167
   },
   "project_goal": "GOAL.md",
   "project_map": "PROJECT_MAP.md",
