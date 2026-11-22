@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact GitHub Python CI and aggregate-only CLI for original 160-case compact source sufficiency, preserve NO-REANALYSIS; fix any code/fixture error without altering spent seeds/outcomes. Then scientific source family readiness report & independent world/pragmatic power blockers; no original source.",
-  "last_session_result": "19:17 UTC session: 325/325 source-free tests, then prereg compact 160 source sufficiency at e1d36113. Read-only metadata gate validates spent 40x4 original worlds, old false alarm/miss labels and replay SHA, refuses new M1v4 LL without original aligned execution and quote times; 10 tests+CLI added CI pending.",
+  "resume_instruction": "NEXT_ACTION: prospectively define strict original ABIDES capture-profile/source-clock certificate on source-free documentation with explicit missing/external attestation and original world train/calibration/eval integrity, without granting source access. Then review independent study power/cost; no original seeds, historical vendor ZIP, real FDR/owners.",
+  "last_session_result": "Active 2026-11-22T19:17Z: ABIDES native Unix-ns source-free clock, sparse L2 and full-time causal quote, M0/M1v4, non-target positive LL +0.171965, old original 160-case metadata no-reanalysis; exact 335/335 CI. Separate source-family scientific readiness audit NO-GO, no new source seeds/data.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:33:06.315Z",
-    "elapsed_minutes": 15.931566666666667,
-    "stage": "Original public ABIDES 160-case compact-only read/no-reanalysis source-free gate, 10 negative tests + CLI, CI pending",
+    "latest_clock_utc": "2026-11-22T19:35:59.573Z",
+    "elapsed_minutes": 18.8192,
+    "stage": "Pinned ABIDES source-family readiness and old genuine 160-case compact NO-GO scientific audit after 335/335 CI",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "398fd06f81cdb6e142ada430d2f9f6f9c28b64fa",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45061171405",
-    "result": "325/325 source-free Python tests and complete three constructed ABIDES non-target LL aggregate CLI"
+    "sha": "500aa043bf6bceca955b248631a60226f9d5cc75",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45061407632",
+    "result": "335/335 source-free Python tests and old 160-case compact plus three-nontarget source-free aggregate CLIs"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
