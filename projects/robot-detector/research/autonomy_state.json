@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact public Python CI for ABIDES source-free full-window quote-time exposure; preserve event-only PASS vs full-window stale NO-GO negative, repair source-free fixtures only if needed. Then prereg independent-source evidence/eligibility manifest that cannot self-attest true exchange completeness.",
+  "resume_instruction": "NEXT_ACTION: implement separate source-free ABIDES-native public EXEC M0 vs M1v4 train-only exact ns event-cluster LL with source-independent-labelled toy worlds. Expected M1v4 LL worse by about -0.192678. Strict source/clock/exposure mismatch ABSTAIN. Exact cheap CI; no actual source.",
   "last_session_result": "19:17 UTC session: 293/293 ABIDES epoch+public sparse L2 tests confirmed, then strict full observation-window quote-age exposure prereg 1e7080e6, source-free code + 12 adversarial tests written, CI pending. Existing source-only original worlds not rerun, no new seeds or market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:25:59.430Z",
-    "elapsed_minutes": 8.816816666666666,
-    "stage": "ABIDES full-window causal quote exposure source-free 12 tests built; exact CI pending",
+    "latest_clock_utc": "2026-11-22T19:27:34.948Z",
+    "elapsed_minutes": 10.408783333333334,
+    "stage": "Exact full-window ABIDES exposure 305/305 CI; separate M0-vs-M1v4 descriptive negative LL frozen before code",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "e607253648e011749e583dd125311930b7ac3039",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060553826",
-    "result": "293/293 source-free Python tests including 14 ABIDES sparse L2 trade/prior-quote causal guards"
+    "sha": "c243bcb8bc0bd1788ed8610b5e2f3d8eba1e75dd",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060740356",
+    "result": "305/305 source-free Python tests incl 12 full-window age/gap quote exposure guards"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
