@@ -34,6 +34,14 @@ class TestRescaling(unittest.TestCase):
     def test_invalid_rate(self):
         with self.assertRaisesRegex(Abstain,"INVALID_OR_NONCAUSAL"):
             run([0,1000],[Exposure(0,1000,float("nan"))])
+    def test_nonnumeric_hazard_abstains(self):
+        for bad in ("1.0", None, True, [], {}):
+            with self.subTest(rate=repr(bad)):
+                with self.assertRaisesRegex(Abstain, "INVALID_OR_NONCAUSAL"):
+                    run([0,1000],[Exposure(0,1000,bad)])
+    def test_negative_hazard_abstains(self):
+        with self.assertRaisesRegex(Abstain, "INVALID_OR_NONCAUSAL"):
+            run([0,1000],[Exposure(0,1000,-1)])
     def test_public_owner_nonidentifiability(self):
         tape=[0,1000,2000]
         e=[Exposure(0,2000,1)]
