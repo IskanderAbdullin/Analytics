@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "923cbaabe32574f99c1feb2097401227a7758db4",
+  "last_verified_base_commit": "415138e897c8c96867e1b0befe8ff67c6cf3b438",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify latest HEAD provenance CI includes test_public_microburst_block_null.py 4/4 with previous 50 source-free tests; confirm no expensive genuine ABIDES source reruns were manually dispatched. Then freeze a genuinely distinct long-period descriptive statistic and hard-negative 20s periodic family to test D's usefulness without claiming robot owners or market p-values. Keep #72 OPEN.",
-  "last_session_result": "2026-11-22: source-only current-stage CI #44996367981 PASS with 50 explicit timing/L2/ABC tests including 4 quality-wrapper tests on previous SHA 923cbaab. Registered candidate D in issue #97 comment 7075675938 before code: fixed 5s cells, <=10ms microburst blocks, random weak slack compositions, same seed404/64 replicas. Four local source-equivalent negative tests pass; D changes inter-burst spacing while preserving short gaps: Poisson186, momentum168 and periodic0 exactly across all 64. Thus zero power for that conditioned statistic; no calibrated p-values or real-market FDR, no new ABIDES.",
+  "resume_instruction": "NEXT_ACTION: confirm latest GitHub provenance CI executes test_public_period_positive_harmonics_v2.py 5/5, and other 54 timing tests remain passing. Then pre-register and run a source-free all-seven-period v2 comparison over fixed A/B/C/D 64 replicate hard negatives, including unrelated 20s periodic non-target, without phase selection or significance claims. Frozen legacy v1 must not be silently rewritten; master issue #72 stays OPEN.",
+  "last_session_result": "2026-11-22: provenance CI #44996522344 PASS on 415138e8 verifying 54 explicit current-stage source-free unit tests incl D microburst controls; discovered deterministic v1 zero-harmonic defect: short gaps 1ms counted as a 5–60s periodic hit. Issue #97 pretest comment 7075694957 froze v2 positive-integer harmonic rule before code. Separate v2 version added with five source-equivalent local tests PASS 5/5: v1 3/3 false all seven periods vs v2 0/3 on [1000..1003]; unrelated 20s background remains 5/5 hit for 5/10/20s, so no specificity/owner claims. New exact GitHub CI pending. No ABIDES experiments, market FDR or source data.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T06:51:04Z",
@@ -231,6 +231,12 @@
         "stage_end_time_utc": "2026-11-22T07:03:13Z",
         "elapsed_minutes": 12.15,
         "tests": "4 new local source-equivalent negative tests pass; short-gap count invariant 186/168/0 across 64 D replicas"
+      },
+      {
+        "stage": "preregistered v2 positive-harmonic scan correction, legacy v1 false 5–60s aliases",
+        "stage_end_time_utc": "2026-11-22T07:04:43Z",
+        "elapsed_minutes": 13.65,
+        "tests": "5 new source-equivalent local negatives pass; exact CI pending"
       }
     ],
     "final_elapsed_minutes": null,

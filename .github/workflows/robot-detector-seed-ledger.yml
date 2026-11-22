@@ -51,6 +51,8 @@ on:
       - 'projects/robot-detector/tests_background/test_public_intensity_quality_guard.py'
       - 'projects/robot-detector/tools/public_microburst_block_null.py'
       - 'projects/robot-detector/tests_background/test_public_microburst_block_null.py'
+      - 'projects/robot-detector/tools/public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tests_background/test_public_period_positive_harmonics_v2.py'
       - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
       - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
       - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
@@ -187,6 +189,8 @@ on:
       - 'projects/robot-detector/tests_background/test_public_intensity_quality_guard.py'
       - 'projects/robot-detector/tools/public_microburst_block_null.py'
       - 'projects/robot-detector/tests_background/test_public_microburst_block_null.py'
+      - 'projects/robot-detector/tools/public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tests_background/test_public_period_positive_harmonics_v2.py'
       - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
       - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
       - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
@@ -368,6 +372,7 @@ jobs:
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_l2_ambiguity.py' -v
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_quality_guard.py' -v
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_microburst_block_null.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_positive_harmonics_v2.py' -v
           PYTHONPATH=tools python tools/public_abc_report.py --output data/results/abc-constructed-source-free.json
       - name: Upload bounded constructed A/B/C aggregate only
         if: success()

@@ -509,6 +509,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-22 | Added prospectively described D 10ms microburst-block relocation (#97 comment 7075675938), preserving short gaps but allowing greater between-burst timing support than B; D exactly conserves <=10ms gap count in Poisson/momentum/periodic constructed controls, so that statistic has no inferential power under D. | Technical source-free method development only; CI pending |
 
+| 2026-11-22 | Identified v1 seven-period scan zero-harmonic bug: any 1–50ms gap matches all fixed 5–60s periods; froze distinct v2 that requires positive integer harmonic k>=1 and retained v1 historical code. Non-target 20s periodic still aliases 5/10/20s in v2. | Source-free methodological correction, v2 exact CI pending |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -707,4 +709,32 @@ labels or real market FDR.
 NEXT_ACTION: verify exact latest D CI, then predeclare separate
 long-period statistic and fixed periodic hard-negative family
 to audit whether D's extra support has useful identification limits.
+
+### 2026-11-22 — mathematical zero-harmonic defect in original seven-period scan
+
+[Pretest issue #97 record](https://github.com/IskanderAbdullin/Analytics/issues/97#issuecomment-7075694957)
+proves old \`public_period_scan.py\` treated 1ms adjacent gaps as
+5/10/15/20/30/45/60s cadence hits because its modulus rule allows
+the \`k=0\` multiple. Three consecutive 1ms gaps therefore produce
+**3/3 false “periodicity”** under every original v1 period.
+Without modifying the previously frozen v1, new explicit
+\`scan_positive_harmonics_v2\` requires \`k>=1\` and yields
+**0/3** for all periods on the same source-free input. It keeps all
+seven fixed periods and ±50ms tolerance; there is no favorable-period
+selection. Crucially, unrelated 20s fixed background still yields
+**5/5** hits for 5,10,20s under v2 (positive harmonic alias),
+so this is a measurement correction, **not** owner identification
+or a calibrated inference method.
+[Detailed negative v1/v2 record](PERIOD_ZERO_HARMONIC_V2_NEGATIVE_20261122.md).
+Five preregistered source-equivalent tests pass locally (5/5);
+exact new SHA CI pending. The preceding
+[provenance CI #44996522344](https://github.com/IskanderAbdullin/Analytics/actions/runs/44996522344)
+verified four D microburst-block tests and the previous 50 tests.
+No new original ABIDES runs, source holdouts or real-market claims.
+
+NEXT_ACTION: verify committed five v2 tests. Then compare frozen v2
+all-period responses on the already-seen independent *constructed*
+A/B/C/D hard negatives, emphasizing v2's residual positive-harmonic
+false identification on unrelated periodic backgrounds; preserve all
+negative results, no market p-values.
 
