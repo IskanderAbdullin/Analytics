@@ -56,6 +56,8 @@ def constructed_burst_falsification(*, replicates=64):
         start = cell * CELL_MS + 1000
         tape.extend(start + i for i in range(8))
         tape.extend([start] * 3)
+    # The public sampler requires chronological order; appended split fills must be sorted.
+    tape.sort()
     observed = within_cell_short_gap_count(tape)
     uniform = [
         within_cell_short_gap_count(
