@@ -195,8 +195,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Verify exact-source CI for train-only M0 baseline (commit 4f812ecc), fix failures if any. Then preregister M1 strictly previous-only L2 covariates and M2 predictable self-excitation with run-level disjoint fitting; add source-free adversarial controls and calibration before reserving new independent source seeds. Original 3301–3340 remain spent; no real-market FDR or owner claims.",
-  "last_session_result": "2026-11-22 12:08:52–12:09:50 UTC (measured stage): recovered remote HEAD 25201e77, 3 prior CI success; preregistered train-only M0, authored model and 9 tests, extended exact-source Python CI. New HEAD 4f812ecc; CI pending. No new source simulations.",
+  "resume_instruction": "NEXT_ACTION: verify exact-source public Python CI for M0 test_public_m0_train_only.py on branch; repair failures. Then implement prospective M1 lagged L2 design in docs/CONDITIONAL_M1_LAGGED_L2_PREREG_20261122.md with strict previous complete BBO, training-only median spread threshold, full exposure and adversarial tests. No new source seeds before run-disjoint M0/M1/M2 calibration protocol. Preserve spent 3301–3340; real-market FDR and owner identities unknown.",
+  "last_session_result": "2026-11-22 12:08:52–12:10:33 UTC (101 sec): verified remote HEAD 25201e77 and three successful prior CI; preregistered/implemented M0 cluster-rate train-only baseline, 9 new adversarial tests, expanded Python workflow; froze prospective M1 lagged-L2 design and synchronized living plan/issue. New HEAD before checkpoint 15564177. Exact M0 CI not yet verified, no new source experiments.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
@@ -207,8 +207,15 @@
         "stage_end_time_utc": "2026-11-22T12:09:50Z",
         "elapsed_minutes": 0.9667,
         "tests": "Nine new tests authored; CI pending; no source runs"
+      },
+      {
+        "stage": "Prospective M1 strictly lagged L2 spread-strata design freeze and living plan update",
+        "stage_end_time_utc": "2026-11-22T12:10:33Z",
+        "elapsed_minutes": 1.6833,
+        "tests": "Design only, no M1 tests or source experiments"
       }
     ],
-    "note": "Current run measured from UTC clock; not 50 minutes."
+    "note": "UTC clock measured 12:08:52–12:10:33 (101 seconds); environment-bounded stop before 50-minute target; exact new M0 CI unverified.",
+    "final_elapsed_minutes": 1.6833
   }
 }
