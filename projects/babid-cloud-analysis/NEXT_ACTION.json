@@ -11,7 +11,7 @@
     {
       "id": "B-009",
       "kind": "private_order_context_pending",
-      "description": "Нужна замороженная, SHA-256-проверенная локальная хронология полных OrderState Stream/Query и archive/restore для Sell2: source trade time предшествует Cancel/0 на 5.026 с, но fill обработан на 38.285 с после Cancel. Текущие transition-only логи не регистрируют silent FilledByState и Prune."
+      "description": "Нет разрешённой проверенной frozen-копии и статусной хронологии: новый публичный analysis/freeze_evidence.py + 8 синтетических тестов подготовлен, но на локальном ПК ещё не запускался; межфайловая атомарность и полнота stream не гарантированы."
     },
     {
       "id": "B-007",
@@ -21,7 +21,7 @@
     {
       "id": "B-010",
       "kind": "pc_script_endpoint_not_available",
-      "description": "Ранее запуск скрипта вернул PC_AGENT_HTTP_404; текущие безопасные попытки syntax-only через pc_script возвращают PC_AGENT_HTTP_400 (без исполнения). pc_status: sandboxAllowsUnpinnedScripts=false. Причина 400 не подтверждена; не обходить политик sandbox, не читать рабочий LIVE лог вместо frozen source."
+      "description": "PC script syntax-only endpoint возвращает HTTP 400 без исполнения, sandboxAllowsUnpinnedScripts=false; путь разрешённого запуска Python и доступ sandbox к пользовательской копии не проверены. Не обходить policy и не утверждать выполнение."
     }
   ],
   "prerequisites": [
@@ -42,10 +42,12 @@
     "При расчёте ошибок различать WRN и ERR; количество log api_30059 не эквивалентно числу сломанных заявок или биржевых ошибок",
     "Сначала убедиться, что PC script endpoint реально доступен и что входные логи заморожены; PC_AGENT_HTTP_404 не обходить, не считать скрипт выполненным.",
     "Разделять брокерскую метку времени исполнения из ReportedFill и локальное время получения/логирования; статус Cancel/0 не доказывает отсутствие ранее датированной сделки",
-    "В этом запуске syntax-only pc_script вернул HTTP 400; это не доказательство выполнения или пригодности команды; sandbox pin/policy не обходить"
+    "В этом запуске syntax-only pc_script вернул HTTP 400; это не доказательство выполнения или пригодности команды; sandbox pin/policy не обходить",
+    "Использовать подготовленный анализатор freeze_evidence.py только для read-only источника, с отдельным private output вне исходного проекта. В публичном CI только вымышленные файлы."
   ],
-  "next_command": "PC Agent: pc_status; подготовить отдельную неизменяемую локальную копию NVDA log и состояния с SHA-256 до/после; проверить разрешённый подписанный режим pc_script; только после этого запускать ограниченный приватный экстрактор на frozen source и читать отчёт через pc_read. Не исполнять текущий скрипт против рабочего live-каталога.",
+  "next_command": "После подтверждения доступного разрешённого канала: сначала запустить `python analysis/freeze_evidence.py --source-root <local Babid01-TInvest copy> --private-root <local babid-cloud-analysis/reports/private> --label nvda-20261121-verified` из Analytics на MYPC. Сверить SHA256 manifest и исходные файловые сигнатуры; только затем запускать адаптированный приватный экстрактор на `reports/private/nvda-20261121-verified/` (НЕ на рабочем LIVE каталоге). Все данные оставить локально. Если pc_script по-прежнему HTTP400 и копия недоступна — остановить эту ветку, не обходить ограничения.",
   "expected_artifacts": [
+    "Локальный reports/private/nvda-20261121-verified/manifest.json с SHA256 per file, atomic_across_files=false; сам frozen dataset не публикуется.",
     "Приватный компактный reports/private/nvda-late-fill-20261121.txt внутри локального аналитического проекта",
     "Контекст отменённой и закрывающей заявок, сообщений MoveOverclose и первого broker mismatch",
     "Заключение о статусах H-006/H-007 с отдельным указанием отсутствующей телеметрии archive",
