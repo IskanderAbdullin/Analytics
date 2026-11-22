@@ -36,3 +36,8 @@ Local 1-second lag +10-second age eligibility is descriptively high (8,927/8,974
 **Constraints:** official publicly offered historical demonstration, noncommercial scientific analysis, original ZIP/CSV never redistributed; no new independent market-days, ABIDES seed allocation, p-values, real-market owner/FDR claims. Workflow was switched to **manual-only** after this one successful bounded run to prevent duplicate source downloads.
 
 **NEXT_ACTION:** design and preregister a **lossless nanosecond (or exact Decimal) source-time normalization** plus original-world split/coverage checks before trying real LOBSTER M0/M1-v2/M2 predictive method. Preserve direct 1ms-coercion as a **FAILED source eligibility gate**, not a trigger to loosen model thresholds.
+
+
+## 2026-11-22 scientific scope clarification: ALL message times, not trade-only times
+
+**Essential denominator distinction:** the observed 110,818 millisecond floor collisions among 261,265 distinct Decimal timestamps were calculated on **ALL 269,748 message/book rows** (submissions, deletes, cancels, executions, etc.), NOT exclusively the 8,974 visible type-4 trade executions. The exact trade-only distinct-timestamp count and its floor-to-millisecond collision fraction have **not** been measured by this aggregate audit. Therefore 42.41594% is NOT a measured proportion of trade-only print clusters lost by flooring. It is strong evidence that the full reconstructed message/book clock cannot safely be coerced to milliseconds without semantic loss, while the size of the trade-only distortion remains UNKNOWN. Any future trade-intensity inference must first use event-type-aware projection and separately establish its source precision/coverage.
