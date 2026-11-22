@@ -16,7 +16,7 @@
     {
       "id": "B-007",
       "kind": "independent_broker_history_not_yet_available",
-      "description": "Независимые брокерские операции и свежесть GetPositions недоступны для окончательного подтверждения внешней -2"
+      "description": "Не предоставлена независимая брокерская история и нет отдельного разрешения на broker API. По официальным документам GetOrderState может не вернуть заявку старше суток; предпочтителен брокерский statement/export или GetOperationsByCursor с полной пагинацией, задержками и несовпадающими namespace trade IDs."
     },
     {
       "id": "B-010",
@@ -46,7 +46,8 @@
     "Использовать подготовленный анализатор freeze_evidence.py только для read-only источника, с отдельным private output вне исходного проекта. В публичном CI только вымышленные файлы.",
     "PC Agent staged frozen-input utility и её synthetic-only тест на MYPC без реального запуска; script endpoint всё ещё HTTP 404. Не считать наличие файла доказательством его исполнения.",
     "Математический модельный предикат late_fill_paths.py не запускает и не заменяет C# engine, не доказывает факт удаления заказа из журнала",
-    "Перегенерировать приватную историю через обновлённый position_forensics.py после frozen snapshot; старый incident_evidence.csv смешивает broker execution time с robot log observation и не является каузальной лентой."
+    "Перегенерировать приватную историю через обновлённый position_forensics.py после frozen snapshot; старый incident_evidence.csv смешивает broker execution time с robot log observation и не является каузальной лентой.",
+    "OrderTrade.date_time/OrderStage.execution_time — source execution UTC, OrderTrades.created_at — creation of broker message; независимый брокерский экспорт не получен. Отсутствие >1d GetOrderState не означает отсутствие исполненной сделки."
   ],
   "next_command": "После подтверждения доступного разрешённого канала: сначала запустить `python analysis/freeze_evidence.py --source-root <local Babid01-TInvest copy> --private-root <local babid-cloud-analysis/reports/private> --label nvda-20261121-verified` из Analytics на MYPC. Сверить SHA256 manifest и исходные файловые сигнатуры; только затем запускать адаптированный приватный экстрактор на `reports/private/nvda-20261121-verified/` (НЕ на рабочем LIVE каталоге). Все данные оставить локально. Если pc_script по-прежнему HTTP400 и копия недоступна — остановить эту ветку, не обходить ограничения.",
   "expected_artifacts": [
@@ -57,7 +58,8 @@
     "При разрешённой доступности независимого брокерского журнала — сопоставление исполнений, времени и позиции",
     "Достоверная оценка уникального покрытия истории отдельно от числа state/day CSV-строк; финансы только после независимой брокерской сверки",
     "Отдельная диагностическая ветка на вымышленных данных должна проверять и silent FilledByState update при неизменном State",
-    "Узкий private incident_evidence.csv с clock_domain и source_sequence (не публикация), где порядок не сливает execution time с локальной обработкой"
+    "Узкий private incident_evidence.csv с clock_domain и source_sequence (не публикация), где порядок не сливает execution time с локальной обработкой",
+    "После отдельного разрешения пользователя: локальный независимый broker export/statement или пагинированный операции CSV с source-provenance и явными несопоставленными trade IDs"
   ],
   "completion_criteria": [
     "Дополнительная локальная выдержка прочитана и проверена на полноту",
