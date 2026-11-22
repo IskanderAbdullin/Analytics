@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact public Python CI for post-event BBO projector, particularly tied last-book 1000ms causal lag and malformed provider fields; fix any failures without changing preregistered L2 lag. Then source precision real-sample capability review; no source downloads or seed allocation.",
+  "resume_instruction": "NEXT_ACTION: implement and test a source-free exact-Decimal LOBSTER AMZN message/post-event book timing audit as preregistered in docs/LOBSTER_PUBLIC_CLOCK_LAG_ELIGIBILITY_PREREG_20261122.md. One bounded original official demo source-only run only after negative tests and source/rights gate, no raw zip or prints/artifacts. Do not use this retrospective sample for bot truth/FDR.",
   "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:46:23.531Z",
-    "elapsed_minutes": 28.80445,
+    "latest_clock_utc": "2026-11-22T15:48:06.799Z",
+    "elapsed_minutes": 30.525583333333334,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Post-event BBO projector and 10 negative controls added; GitHub exact CI pending",
+    "stage": "Prospective exact-Decimal historical AMZN sample timestamp/L2 eligibility source-only prereg; no vendor fetch yet",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
