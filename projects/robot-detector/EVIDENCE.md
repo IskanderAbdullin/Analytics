@@ -48,3 +48,6 @@
 
 
 **ABIDES public source-family scientific NO-GO (2026-11-22):** [CI #45061407632](https://github.com/IskanderAbdullin/Analytics/actions/runs/45061407632) PASS 335/335 source-free tests with two aggregate-only CLI results; [pinned source-family readiness report](docs/ABIDES_SOURCE_FAMILY_CAUSAL_READINESS_AUDIT_20261122.md). Pinned ABIDES Unix-ns EXEC/sparse L2 differs from LOBSTER local-ns visible type4; event-only prior book success can fail full time-window quote age. Source-free non-target regular background has M1v4 LL gain +0.171965 over M0 despite no bot classification. Old 160 genuine original source compact file lacks aligned event/quote vectors so new model original LL cannot be reconstructed. No seed/owner/FDR claims.
+
+
+**ABIDES lossy CSV exact-ns LL partial identifiability (2026-11-22):** [exact Python source-free CI 364/364 #45062183157](https://github.com/IskanderAbdullin/Analytics/actions/runs/45062183157). [Pinned ABIDES scientific NO-GO audit](docs/ABIDES_SOURCE_FAMILY_CAUSAL_READINESS_AUDIT_20261122.md) now integrates public original capture-profile hard-stop, constructed 1ns-vs-CSV source-time LL bias +0.18232156 and sharp microsecond-bucket LL identification set [-0.192678,-0.010357]. This is NOT a CI or new original source case; real market FDR/owners and original 160-case M1v4 replay remain unknown/unreconstructable.
