@@ -58,6 +58,8 @@ on:
       - 'projects/robot-detector/tests/test_public_abides_sparse_l2_screen.py'
       - 'projects/robot-detector/tools/public_abides_full_window_exposure.py'
       - 'projects/robot-detector/tests/test_public_abides_full_window_exposure.py'
+      - 'projects/robot-detector/tools/public_abides_m0_m1v4_ll.py'
+      - 'projects/robot-detector/tests/test_public_abides_m0_m1v4_ll.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
