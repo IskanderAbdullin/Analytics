@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify 279 exact source-free Python tests after toy test-wrapper sentinel correction, including invalid None strict source tape. Then prereg separately ABIDES epoch-aware public execution/L2 eligibility with source truth/quote completeness caveats; no original ABIDES data jobs or market owner/FDR.",
+  "resume_instruction": "NEXT_ACTION: implement source-free ABIDES separate public fills and sparse quote causal eligibility gate according to docs/ABIDES_PUBLIC_SPARSE_L2_CAUSAL_PREREG_20261122.md. No original matching-engine source jobs, no LOBSTER event-type4 transfer or real market FDR. Cheap exact CI.",
   "last_session_result": "2026-11-22 ~19:21 UTC: source-free exact Python CI #45060256620 278/279 succeeded, 1 test failed only because helper tape(times=None) replaced explicitly invalid None with default valid synthetic tape. New sentinel distinguishes omitted from explicit None; production epoch converter and prereg unchanged. New CI pending; negative retained.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T19:17:10.421Z",
     "deadline_utc": "2026-11-22T19:47:10.421Z",
-    "latest_clock_utc": "2026-11-22T19:21:33.575Z",
-    "elapsed_minutes": 4.3859,
-    "stage": "New 279-test ABIDES Unix epoch source-free CI found one faulty local test wrapper treating explicit None as default; corrected test-only",
+    "latest_clock_utc": "2026-11-22T19:22:56.600Z",
+    "elapsed_minutes": 5.76965,
+    "stage": "ABIDES epoch-ns exact source-free CI 279/279 PASS, separately freeze public trade/sparse L2 causal eligibility before implementation",
     "previous_run_state_preserved_in_master_plan": true,
     "new_original_source_runs": 0,
     "new_simulator_seeds_allocated": 0
@@ -219,9 +219,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "366cd1c311c34367a0e74b2ad985a92e8dc92f5a",
-    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45057011095",
-    "result": "267/267 source-free Python tests and one-command aggregate-only demo; provenance CI succeeded at same SHA"
+    "sha": "e24ab53376fbefc2dfd1e445328cb87191ce898b",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45060315347",
+    "result": "279/279 source-free Python tests, includes 12 ABIDES source clock/legacy microsecond negatives"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
