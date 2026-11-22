@@ -200,28 +200,14 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: design/preregister scientifically powered independent original-source-run sample size and coverage/abstention acceptance criteria (4 frozen Poisson/fixed20/momentum/TWAP cohorts, seed-disjoint train/calibration/evaluation), verify source licenses and pinned revisions, plus calibration criteria BEFORE allocation of any new seeds or running original ABIDES. First check latest remote HEAD/CI and hourly agent overlap; do NOT interpret 75/75 deterministic unit tests as statistical validation. M1 remains stable-BBO asserted-coverage only, M2 prospective self-exciting hypothesis only, real-market owner/FDR unknown.",
+  "resume_instruction": "NEXT_ACTION: implement source-free exact binomial confidence bounds and seed-clustered paired inference tests on synthetic fake fixtures; include zero-event, missing-L2 abstention, and duplicate-source replay rejection. Review power, multiplicity, licenses and pinned ABIDES revision before freezing independent source protocol or reserving seeds. Proposed design docs/INDEPENDENT_SOURCE_EVALUATION_DESIGN_20261122.md is DESIGN ONLY, no new original source jobs. Verify latest HEAD/CI and avoid overlap.",
   "last_session_result": "2026-11-22 UTC single active chat session: updated existing Analytics/projects/robot-detector to UPDATE_EXISTING_CHAT standard without duplicate (83d9be1c), archived original AGENTS; M1 prereg f3d78068 and implementation 0f3728e1 (exact 51/51 Python PASS); restored provenance AGENTS contract 24f2e8ff (CI PASS); M2 prereg 167d9174 and implementation 8a28d374 (exact 63/63 Python PASS); overflow negative caught and corrected a90b8e2 (source-free CI PASS); prereg original-run split-integrity fe591340 before code 32caf2c1; latest exact public Python CI 75/75 PASS and provenance PASS. New source simulations/seeds=0; no market p-values, owner identity or real-market FDR.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
-    "start_time_utc": "2026-11-22T12:08:52Z",
-    "deadline_utc": "2026-11-22T12:58:52Z",
-    "measured_checkpoints": [
-      {
-        "stage": "Remote HEAD/CI recovery and preregistered train-only M0 implementation with adversarial tests",
-        "stage_end_time_utc": "2026-11-22T12:09:50Z",
-        "elapsed_minutes": 0.9667,
-        "tests": "Nine new tests authored; CI pending; no source runs"
-      },
-      {
-        "stage": "Prospective M1 strictly lagged L2 spread-strata design freeze and living plan update",
-        "stage_end_time_utc": "2026-11-22T12:10:33Z",
-        "elapsed_minutes": 1.6833,
-        "tests": "Design only, no M1 tests or source experiments"
-      }
-    ],
-    "note": "UTC clock measured 12:08:52–12:10:33 (101 seconds); environment-bounded stop before 50-minute target; exact new M0 CI unverified.",
-    "final_elapsed_minutes": 1.6833
+    "start_time_utc": "2026-11-22T13:07:30Z",
+    "deadline_utc": "2026-11-22T13:57:30Z",
+    "note": "Active run constrained by next hourly overlap guard at approximately 13:12 UTC; no 50-minute claim",
+    "stage": "Prospective independent source evaluation design; no source runs, tests not executed"
   },
   "project_goal": "GOAL.md",
   "project_map": "PROJECT_MAP.md",
