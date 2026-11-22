@@ -195,33 +195,13 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Confirm exact-source GitHub Python workflow for tests/test_public_intensity_rescaling.py (23 methods); fix any failures, and complete deterministic causal M0/M1/M2 feature/fitting specification with source-free adversarial cases. Freeze independent market-run training/calibration/evaluation and hyperparameters before allocating any new source seeds. Prior 3301–3340 are spent. No real FDR/owners. Keep #72 open.",
-  "last_session_result": "2026-11-22T10:13Z: Created lightweight public branch Python unittest workflow; fixed fail-open nonnumeric/boolean hazard type handling and added 2 negative tests; preregistered independent run-level allocation/falsification gate; updated MASTER_RESEARCH_PLAN. Exact GitHub CI outcome not yet confirmed; no new ABIDES/real market source or claims.",
+  "resume_instruction": "NEXT_ACTION: Verify exact-source Python CI for strict exposure flags, then implement deterministic causal M0/M1/M2 fit/predict interfaces with train-only parameter estimation and negative tests (zero rates, lookahead, timestamp clusters, missing L2). Freeze independent run-level train/calibration/test allocation before any new source seeds. Preserve 3301–3340 as spent; real FDR/owners unknown.",
+  "last_session_result": "2026-11-22T11:12Z: audited remote HEAD cae5aa4f and successful existing PR CI; found fail-open Exposure.complete/causal flags accepting truthy non-booleans; prepared strict type guard and source-free regression. No new source simulation or holdout.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
-    "start_time_utc": "2026-11-22T10:13:02Z",
-    "deadline_utc": "2026-11-22T11:03:02Z",
-    "measured_checkpoints": [
-      {
-        "stage": "Repository recovery, issue/CI review and source-free CI workflow",
-        "stage_end_time_utc": "2026-11-22T10:13:22Z",
-        "elapsed_minutes": 0.3333,
-        "tests": "Exact workflow created; not yet confirmed run"
-      },
-      {
-        "stage": "Fail-closed hazard type guard, two adversarial methods, prospective allocation preregistration",
-        "stage_end_time_utc": "2026-11-22T10:13:48Z",
-        "elapsed_minutes": 0.7667,
-        "tests": "Tests authored; execution not yet verified"
-      },
-      {
-        "stage": "Plan/checkpoint/issue synchronization and remote source guard verification",
-        "stage_end_time_utc": "2026-11-22T10:14:17Z",
-        "elapsed_minutes": 1.25,
-        "tests": "Source guard inspected; .NET CI queued; exact Python CI result not confirmed"
-      }
-    ],
-    "final_elapsed_minutes": 1.25,
-    "note": "Measured UTC from environment, 10:13:02 to 10:14:17 (75 seconds). Early bounded execution; no claim of 50 minutes."
+    "start_time_utc": "2026-11-22T11:12:33Z",
+    "deadline_utc": "2026-11-22T12:02:33Z",
+    "measured_checkpoints": [],
+    "note": "Current active run; exact stage-end times will be added after remote verification."
   }
 }

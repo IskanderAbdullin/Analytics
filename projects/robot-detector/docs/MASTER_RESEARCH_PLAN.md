@@ -803,3 +803,8 @@ Added lightweight public-branch-only `.github/workflows/robot-detector-public-in
 Prospective [independent allocation/falsification gate](CONDITIONAL_INTENSITY_ALLOCATION_GATE_20261122.md) records independent run-level train/calibration/evaluation partition, M0/M1/M2 design requirements, public-feature/oracle separation, source rights and hard negatives. It explicitly blocks fresh source seeds until hyperparameters and independent run allocation are frozen. No source data or holdout was consumed. Previous 3301–3340 remain spent.
 
 NEXT_ACTION: confirm exact source-free Python workflow and correct any failures; finish deterministic causal feature/fitting spec and adversarial controls before independent source registration. Preserve issue #97 and master #72 open.
+
+
+### 2026-11-22: conditional intensity exposure quality gate (source-free)
+
+Independent audit found that `Exposure.complete` and `Exposure.causal` accepted truthy non-boolean values (e.g. integer `1` or string `yes`). These are provenance/causality assertions and must be exactly Python booleans; otherwise the pipeline must ABSTAIN. A regression covering malformed flags is added before any new source run. This is a technical integrity fix, **not** evidence for M0/M1/M2 validity, calibrated significance, real-market FDR, or owner identification. Next: exact-source Python CI, then preregister and implement causal train-only model-fitting with prospective independent run-level split.

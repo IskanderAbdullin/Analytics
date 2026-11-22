@@ -39,6 +39,14 @@ class TestRescaling(unittest.TestCase):
             with self.subTest(rate=repr(bad)):
                 with self.assertRaisesRegex(Abstain, "INVALID_OR_NONCAUSAL"):
                     run([0,1000],[Exposure(0,1000,bad)])
+    def test_nonboolean_exposure_quality_abstains(self):
+        for field in ('complete', 'causal'):
+            for invalid in (1, 'yes', [], None):
+                with self.subTest(field=field, invalid=repr(invalid)):
+                    values = {'complete': True, 'causal': True}
+                    values[field] = invalid
+                    with self.assertRaisesRegex(Abstain, 'INVALID_OR_NONCAUSAL'):
+                        run([0, 1000], [Exposure(0, 1000, 1, **values)])
     def test_negative_hazard_abstains(self):
         with self.assertRaisesRegex(Abstain, "INVALID_OR_NONCAUSAL"):
             run([0,1000],[Exposure(0,1000,-1)])
