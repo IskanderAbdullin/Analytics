@@ -195,7 +195,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Execute exact committed tests_background/test_public_intensity_conditioned_null.py and CI for candidate C; add preregistered Poisson/momentum/unrelated periodic hard negatives and source-free descriptive comparison A/B/C across 64 replicates; preserve any failures and no market p-values. Verify branch head before changes; spent ABIDES 3301-3340.",
-  "last_session_result": "2026-11-22: Implemented 500ms intensity-conditioned cluster sampler with strict timestamp validation, fixed 500ms occupancy, rank-preserved exact-time print multiplicities, deterministic seed namespace; initial five adversarial tests committed. Tests moved into existing tests_background discovery folder. Execution and CI of new SHA not yet verified. No new ABIDES, source market data, or inference claims.",
+  "resume_instruction": "NEXT_ACTION: Verify latest HEAD CI and exact test discovery for tests_background/test_public_abc_constructed_controls.py (3 new tests), collect full 64-replicate A/B/C descriptive outputs for Poisson-like, momentum-like and unrelated periodic hard negatives, record every failure; no parameter retuning or p-values. Then audit local intensity confounding and precision abstentions. No new ABIDES seeds; #72 stays open.",
+  "last_session_result": "2026-11-22: Added source-free 64-replicate A/B/C constructed hard-negative comparison covering quantized exponential gaps, momentum-like bursts and unrelated periodic stream; added three adversarial tests. All empirical test results and CI for this new SHA pending. Previous HEAD 75dde9d7 had three successful GitHub CI workflows. No new ABIDES, real-market FDR, owner attribution or live trading.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
