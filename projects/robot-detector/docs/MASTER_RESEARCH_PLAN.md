@@ -511,6 +511,8 @@ grouped — NO TARGET; при девяти sparse 45s событиях оба д
 
 | 2026-11-22 | Identified v1 seven-period scan zero-harmonic bug: any 1–50ms gap matches all fixed 5–60s periods; froze distinct v2 that requires positive integer harmonic k>=1 and retained v1 historical code. Non-target 20s periodic still aliases 5/10/20s in v2. | Source-free methodological correction, v2 exact CI pending |
 
+| 2026-11-22 | Predeclared all-period v2 A/B/C/D constructed non-target controls (#97 comment 7075711877): periodic20s no-target 5/5 observed at 5/10/20s; momentum23/191 5s hits. A/B/C/D can dilute both without any exchangeability proof. | Source-free hard-negative, new exact CI pending |
+
 **Правило:** каждый существенный методологический поворот дополняет эту таблицу. Не переписывать историю, не удалять неожиданные отрицательные выводы и не называть собственное предположение полученным результатом.
 
 
@@ -737,4 +739,31 @@ all-period responses on the already-seen independent *constructed*
 A/B/C/D hard negatives, emphasizing v2's residual positive-harmonic
 false identification on unrelated periodic backgrounds; preserve all
 negative results, no market p-values.
+
+### 2026-11-22 — complete positive-harmonic A/B/C/D non-target panel
+
+Source-free constructed 3×4×7×64 comparison frozen in
+[issue #97 comment 7075711877](https://github.com/IskanderAbdullin/Analytics/issues/97#issuecomment-7075711877)
+before viewing the new v2×D outcomes. All samples are
+previously inspected, NOT new independent source data.
+[Full negative panel](ALLPERIOD_V2_ABCD_NEGATIVES_20261122.md):
+non-target momentum-like burst stream yields **23/191**
+5s hits; unrelated periodic20s stream yields **5/5**
+at 5s/10s/20s, despite zero injected target.
+Sampled 5s means for periodic non-target A/B/C/D:
+0.109375 / 0.125 / 0.796875 / 0.078125,
+versus observed 5. Randomization-induced apparent anomaly
+would be misleading without real source exchangeability.
+Poisson-like v2 scored zero observed/all samples.
+All 64 values for every candidate and period are preserved
+by the aggregate-only CLI; no cherry-picking.
+Three new source-equivalent integrity tests PASS locally
+(3/3), exact HEAD CI PENDING. Previous
+[CI #44996649423](https://github.com/IskanderAbdullin/Analytics/actions/runs/44996649423)
+confirmed five v2 tests. No p-values, real FDR,
+ownership or new ABIDES sources.
+
+NEXT_ACTION: confirm exact current CI/aggregate artifact;
+then register a scientifically independent new synthetic
+source or derive and falsify exchangeability conditions.
 

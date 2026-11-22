@@ -53,6 +53,8 @@ on:
       - 'projects/robot-detector/tests_background/test_public_microburst_block_null.py'
       - 'projects/robot-detector/tools/public_period_positive_harmonics_v2.py'
       - 'projects/robot-detector/tests_background/test_public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tools/public_allperiod_abcd_report.py'
+      - 'projects/robot-detector/tests_background/test_public_allperiod_abcd_report.py'
       - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
       - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
       - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
@@ -191,6 +193,8 @@ on:
       - 'projects/robot-detector/tests_background/test_public_microburst_block_null.py'
       - 'projects/robot-detector/tools/public_period_positive_harmonics_v2.py'
       - 'projects/robot-detector/tests_background/test_public_period_positive_harmonics_v2.py'
+      - 'projects/robot-detector/tools/public_allperiod_abcd_report.py'
+      - 'projects/robot-detector/tests_background/test_public_allperiod_abcd_report.py'
       - 'projects/robot-detector/tests_background/test_public_abc_constructed_controls.py'
       - 'projects/robot-detector/tests_background/test_public_intensity_conditioned_null.py'
       - 'projects/robot-detector/tests_background/test_public_burst_null_falsification.py'
@@ -373,6 +377,8 @@ jobs:
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_intensity_quality_guard.py' -v
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_microburst_block_null.py' -v
           PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_period_positive_harmonics_v2.py' -v
+          PYTHONPATH=tools python -m unittest discover -s tests_background -p 'test_public_allperiod_abcd_report.py' -v
+          PYTHONPATH=tools python tools/public_allperiod_abcd_report.py --output data/results/abcd-positive-harmonics-source-free.json
           PYTHONPATH=tools python tools/public_abc_report.py --output data/results/abc-constructed-source-free.json
       - name: Upload bounded constructed A/B/C aggregate only
         if: success()
@@ -380,5 +386,13 @@ jobs:
         with:
           name: robot-detector-abc-constructed-${{ github.run_id }}
           path: projects/robot-detector/data/results/abc-constructed-source-free.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: Upload bounded A/B/C/D positive-harmonic aggregate only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-detector-abcd-periods-${{ github.run_id }}
+          path: projects/robot-detector/data/results/abcd-positive-harmonics-source-free.json
           retention-days: 3
           if-no-files-found: error
