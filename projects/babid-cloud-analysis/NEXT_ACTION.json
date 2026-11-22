@@ -48,7 +48,8 @@
     "Математический модельный предикат late_fill_paths.py не запускает и не заменяет C# engine, не доказывает факт удаления заказа из журнала",
     "Перегенерировать приватную историю через обновлённый position_forensics.py после frozen snapshot; старый incident_evidence.csv смешивает broker execution time с robot log observation и не является каузальной лентой.",
     "OrderTrade.date_time/OrderStage.execution_time — source execution UTC, OrderTrades.created_at — creation of broker message; независимый брокерский экспорт не получен. Отсутствие >1d GetOrderState не означает отсутствие исполненной сделки.",
-    "Готов синтетический консервативный matcher broker_reconcile_synthetic.py, но входные TradeFact пока вымышленные. Не заявлять подтверждённую брокерскую сверку до фактического authorized source и проверки его SHA/completeness."
+    "Готов синтетический консервативный matcher broker_reconcile_synthetic.py, но входные TradeFact пока вымышленные. Не заявлять подтверждённую брокерскую сверку до фактического authorized source и проверки его SHA/completeness.",
+    "При офлайн пересчёте private incident_evidence.csv задать `--fill-execution-lookback-sec` с явно обоснованной границей до 86400 секунд; использовать поле execution_lookback, но не считать его временем фактической доставки."
   ],
   "next_command": "После подтверждения доступного разрешённого канала: сначала запустить `python analysis/freeze_evidence.py --source-root <local Babid01-TInvest copy> --private-root <local babid-cloud-analysis/reports/private> --label nvda-20261121-verified` из Analytics на MYPC. Сверить SHA256 manifest и исходные файловые сигнатуры; только затем запускать адаптированный приватный экстрактор на `reports/private/nvda-20261121-verified/` (НЕ на рабочем LIVE каталоге). Все данные оставить локально. Если pc_script по-прежнему HTTP400 и копия недоступна — остановить эту ветку, не обходить ограничения.",
   "expected_artifacts": [
@@ -61,7 +62,8 @@
     "Отдельная диагностическая ветка на вымышленных данных должна проверять и silent FilledByState update при неизменном State",
     "Узкий private incident_evidence.csv с clock_domain и source_sequence (не публикация), где порядок не сливает execution time с локальной обработкой",
     "После отдельного разрешения пользователя: локальный независимый broker export/statement или пагинированный операции CSV с source-provenance и явными несопоставленными trade IDs",
-    "После независимой авторизованной выгрузки — локальный отчёт confirmed_id/candidate/ambiguous/unmatched, где cross-namespace matches не считаются proof."
+    "После независимой авторизованной выгрузки — локальный отчёт confirmed_id/candidate/ambiguous/unmatched, где cross-namespace matches не считаются proof.",
+    "Приватное сравнение `fill_rows` и `selected_prior_execution_rows` с/без безопасного lookback; факт локального receipt устанавливать только по отдельным timestamp/log sequence."
   ],
   "completion_criteria": [
     "Дополнительная локальная выдержка прочитана и проверена на полноту",

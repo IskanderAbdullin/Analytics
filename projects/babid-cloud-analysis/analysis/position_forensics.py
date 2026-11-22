@@ -13,7 +13,7 @@ import csv
 import json
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from report_safety import validate_report_output
 
@@ -34,7 +34,17 @@ def output_csv(path: Path, names: list[str], rows: list[dict]):
         writer.writerows(rows)
 
 
-def examine_fills(source: Path, start: str, end: str):
+def examine_fills(source: Path, start: str, end: str,
+                  execution_lookback_sec: int = 0):
+    """Select ledger fills by *execution* time with an optional prior margin.
+
+    This margin admits an execution earlier than the robot observation window
+    that was delivered late. It does not prove when a fill was delivered.
+    """
+    if not 0 <= execution_lookback_sec <= 86400:
+        raise ValueError("execution lookback must be 0..86400 seconds")
+    first_execution = (datetime.fromisoformat(start)
+                       - timedelta(seconds=execution_lookback_sec)).isoformat(sep=" ")
     rows = []
     duplicates = []
     continuity = []
@@ -65,13 +75,14 @@ def examine_fills(source: Path, start: str, end: str):
                                        timestamp=row["time_msk"], anomaly="non-contiguous net-lots",
                                        detail=f"{last_net} + {sign}*{lots} != {net}"))
             last_net = net
-            if not time_between(row["time_msk"], start, end):
+            if not time_between(row["time_msk"], first_execution, end):
                 continue
             total_buy += lots if sign == 1 else 0
             total_sell += lots if sign == -1 else 0
             rows.append(dict(timestamp=row["time_msk"], source="fills.csv", level="FILL",
                              category="synthetic" if row.get("synthetic") == "1" else "execution",
                              clock_domain="broker_reported_execution", source_sequence=line_no,
+                             execution_lookback=(row["time_msk"][:19] < start[:19]),
                              order=row.get("order", ""), trade_id=row["trade_id"],
                              side=side, lots=lots, net_lots=net,
                              detail=f"price={row.get('price','')}; role={row.get('kind','')}; realized={row.get('realized','')}"))
@@ -96,7 +107,7 @@ def examine_logs(folder: Path, start: str, end: str):
                             else "order" if re.search(r"Order \d+:", message)
                             else "connection" if "stream" in message.lower() else "other")
                 events.append(dict(timestamp=at, source=path.name, level=level,
-                                   category=category, clock_domain="robot_log_observation",
+                                   category=category, clock_domain="robot_log_observation", execution_lookback=False,
                                    source_sequence=line_no, order="", trade_id="",
                                    side="", lots="", net_lots="", detail=message[:700]))
                 if "position outside" in message.lower():
@@ -111,7 +122,8 @@ def examine_logs(folder: Path, start: str, end: str):
 
 
 def run(root: Path, state_name: str, logs_name: str,
-        start: str, end: str, output: Path):
+        start: str, end: str, output: Path,
+        execution_lookback_sec: int = 0):
     root, output = validate_report_output(root, output)
     state, logs = (root / state_name).resolve(), (root / logs_name).resolve()
     for source in (state, logs):
@@ -124,7 +136,7 @@ def run(root: Path, state_name: str, logs_name: str,
     if end < start:
         raise ValueError("end precedes start")
     fills, dupes, gaps, buy, sell, last_net = examine_fills(
-        state / "fills.csv", start, end)
+        state / "fills.csv", start, end, execution_lookback_sec)
     events, checks = examine_logs(logs, start, end)
     # These are distinct clocks. Do NOT merge-sort by timestamp: a delayed
     # broker execution can predate a cancel that the engine observed first.
@@ -133,7 +145,7 @@ def run(root: Path, state_name: str, logs_name: str,
         r["clock_domain"], r["source"], r["source_sequence"]))
     output.mkdir(parents=True, exist_ok=False)
     output_csv(output / "incident_evidence.csv",
-               ["timestamp", "clock_domain", "source_sequence", "source", "level", "category",
+               ["timestamp", "clock_domain", "source_sequence", "execution_lookback", "source", "level", "category",
                 "order", "trade_id", "side",
                 "lots", "net_lots", "detail"], all_events)
     output_csv(output / "broker_journal_checks.csv",
@@ -158,6 +170,11 @@ def run(root: Path, state_name: str, logs_name: str,
                    position_check_events=len(checks), log_events=len(events),
                    risk_snapshot=risk, result="evidence only: no causal claim without broker trades",
                    source_native_order_preserved=True,
+                   execution_lookback_seconds=execution_lookback_sec,
+                   selected_prior_execution_rows=sum(
+                       row["execution_lookback"] for row in fills),
+                   selection_caveat="A fill selected by broker-reported execution time "
+                                    "cannot establish its local arrival time",
                    cross_clock_temporal_causality="not_inferred",
                    clock_domains={
                        "fills.csv": "reported execution timestamp; ledger physical rows retained",
@@ -178,11 +195,15 @@ def main():
     p.add_argument("--from-msk", dest="start", default="2026-11-21 14:40:00")
     p.add_argument("--to-msk", dest="end", default="2026-11-21 15:10:00")
     p.add_argument("--output", type=Path)
+    p.add_argument("--fill-execution-lookback-sec", type=int, default=0,
+                   help="Additional execution-time seconds before requested observation window, "
+                        "for late fills; output retains explicit clock domains (max 86400)")
     a = p.parse_args()
     try:
         root = a.root.resolve()
         summary = run(root, a.state, a.logs, a.start, a.end,
-                      a.output or root / "reports" / "nvda-incident")
+                      a.output or root / "reports" / "nvda-incident",
+                      execution_lookback_sec=a.fill_execution_lookback_sec)
     except (ValueError, OSError) as error:
         print("Forensic study failed: " + str(error), file=sys.stderr)
         return 1

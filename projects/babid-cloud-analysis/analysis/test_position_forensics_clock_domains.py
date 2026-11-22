@@ -50,5 +50,45 @@ class ClockDomainTests(unittest.TestCase):
             self.assertTrue(summary["source_native_order_preserved"])
 
 
+    def test_bounded_execution_lookback_does_not_claim_arrival_time(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            state, logs = root / "synthetic-state", root / "synthetic-logs"
+            state.mkdir()
+            logs.mkdir()
+            (state / "fills.csv").write_text(
+                "time_msk;order;exchange_id;trade_id;side;kind;price;lots;net_lots;realized\n"
+                "2026-01-01 10:00:30.000;7;fiction;demo;Sell;open;99;2;8;0\n",
+                encoding="utf-8",
+            )
+            (logs / "robot.log").write_text(
+                "2026-01-01 10:01:10.000 TRD FILL Sell 2 @ 99; order=7 (open)\n",
+                encoding="utf-8",
+            )
+            common = (root, "synthetic-state", "synthetic-logs",
+                      "2026-01-01 10:01:00", "2026-01-01 10:01:30")
+            without = run(*common, root / "reports" / "without")
+            self.assertEqual(without["fill_rows"], 0)
+            self.assertEqual(without["log_events"], 1)
+            with_lookback = run(
+                *common, root / "reports" / "with",
+                execution_lookback_sec=60,
+            )
+            self.assertEqual(with_lookback["fill_rows"], 1)
+            self.assertEqual(with_lookback["selected_prior_execution_rows"], 1)
+            self.assertEqual(with_lookback["execution_lookback_seconds"], 60)
+            self.assertEqual(with_lookback["cross_clock_temporal_causality"], "not_inferred")
+            with (root / "reports" / "with" / "incident_evidence.csv").open(
+                newline="", encoding="utf-8"
+            ) as stream:
+                rows = list(csv.DictReader(stream))
+            early = next(row for row in rows if row["source"] == "fills.csv")
+            self.assertEqual(early["execution_lookback"], "True")
+            self.assertEqual(early["clock_domain"], "broker_reported_execution")
+            with self.assertRaises(ValueError):
+                run(*common, root / "reports" / "invalid",
+                    execution_lookback_sec=-1)
+            self.assertFalse((root / "reports" / "invalid").exists())
+
 if __name__ == "__main__":
     unittest.main()

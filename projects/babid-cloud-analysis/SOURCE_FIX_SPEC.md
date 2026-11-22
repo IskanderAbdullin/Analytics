@@ -196,3 +196,9 @@
 ## 15. P0-S9 — независимые брокерские источники и время сделки (E-045)
 
 По официальной документации OrderTrade.date_time (и OrderStage.execution_time) — UTC-время совершения сделки, а OrderTrades.created_at — время создания сообщения; не использовать их как взаимозаменяемые с локальным received time. `GetOrderState` может не возвращать записи старше одного дня. Историческая сверка: авторизованный broker report или GetOperationsByCursor с полной пагинацией и caveats о задержанных операциях, меняющихся operation IDs и отличающихся trade_id namespaces. Не делать вызовы broker API без отдельного разрешения. Подробности в BROKER_RECONCILIATION_SPEC.md. Синтетический future T24 — abstain при неоднозначной привязке.
+
+## 16. P0-S10 — запаздывающий fill на границе окна (E-047)
+
+`position_forensics.py` до этой правки выбирал ledger fill по брокерскому execution-time *внутри* пользовательского локального observation window, что могло скрыть позднюю доставку исполнения, совершённого раньше начала окна. Новое opt-in `--fill-execution-lookback-sec N` (0 ≤ N ≤ 86400; default 0) допускает раннюю исходную execution запись, явно маркирует `execution_lookback=True`, выводит счётчик; время доставки из этого факта НЕ следует. Вывод по-прежнему сгруппирован по clock-domain и source row; междоменные причинные утверждения запрещены.
+
+**T25 synthetic:** execution row на 30 s раньше начала окна, наблюдение fill на 10 s после начала. При lookback 0 ledger row не включён, log включён; при 60s ledger включён и помечен prior-execution; отрицательный lookback отклонён. Реального NVDA анализа пока нет.
