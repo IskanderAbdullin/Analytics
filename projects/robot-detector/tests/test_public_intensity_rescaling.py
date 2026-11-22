@@ -1,6 +1,6 @@
 """Source-free falsifications, no market p-values or actor labels."""
 import unittest
-from tools.public_intensity_rescaling import Abstain, Exposure, rescaled_cluster_gaps as run
+from tools.public_intensity_rescaling import Abstain, Exposure, rescaled_cluster_gaps as run, validate_public_inputs
 
 class TestRescaling(unittest.TestCase):
     def test_constant_hazard(self):
@@ -39,4 +39,37 @@ class TestRescaling(unittest.TestCase):
         e=[Exposure(0,2000,1)]
         self.assertEqual(run(tape,e),run(tape,e))
 
+
+class TestPublicInputGate(unittest.TestCase):
+    def setUp(self):
+        self.prints=[{"timestamp_ms":100},{"timestamp_ms":200}]
+        self.books=[{"timestamp_ms":50,"complete":True}]
+    def test_valid_previous_only(self):
+        self.assertEqual(validate_public_inputs(self.prints,self.books,timestamp_resolution_ms=1),(100,200))
+    def test_private_agent_id_rejected(self):
+        with self.assertRaisesRegex(Abstain,"FORBIDDEN"):
+            validate_public_inputs([dict(self.prints[0],agent_id=7),self.prints[1]],self.books,timestamp_resolution_ms=1)
+    def test_same_time_l2_not_prior(self):
+        with self.assertRaisesRegex(Abstain,"NO_COMPLETE"):
+            validate_public_inputs(self.prints,[{"timestamp_ms":100,"complete":True}],timestamp_resolution_ms=1)
+    def test_future_l2_not_prior(self):
+        with self.assertRaisesRegex(Abstain,"NO_COMPLETE"):
+            validate_public_inputs(self.prints,[{"timestamp_ms":300,"complete":True}],timestamp_resolution_ms=1)
+    def test_coarse_precision_rejected(self):
+        with self.assertRaisesRegex(Abstain,"COARSE"):
+            validate_public_inputs(self.prints,self.books,timestamp_resolution_ms=10)
+    def test_incomplete_previous_l2_rejected(self):
+        with self.assertRaisesRegex(Abstain,"NO_COMPLETE"):
+            validate_public_inputs(self.prints,[{"timestamp_ms":50,"complete":False}],timestamp_resolution_ms=1)
+    def test_unsorted_l2_rejected(self):
+        with self.assertRaisesRegex(Abstain,"UNSORTED"):
+            validate_public_inputs(self.prints,[{"timestamp_ms":90,"complete":True},{"timestamp_ms":50,"complete":True}],timestamp_resolution_ms=1)
+    def test_nonboolean_coverage_rejected(self):
+        with self.assertRaisesRegex(Abstain,"COMPLETENESS"):
+            validate_public_inputs(self.prints,[{"timestamp_ms":50,"complete":1}],timestamp_resolution_ms=1)
+    def test_no_unique_cluster_rejected(self):
+        with self.assertRaisesRegex(Abstain,"INSUFFICIENT_UNIQUE"):
+            validate_public_inputs([self.prints[0],self.prints[0]],self.books,timestamp_resolution_ms=1)
+
 if __name__=="__main__": unittest.main()
+
