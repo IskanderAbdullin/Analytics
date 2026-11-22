@@ -8,7 +8,7 @@ The script reads source files only; it never talks to the broker or robot.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 import hashlib
 import json
 import os
@@ -16,7 +16,7 @@ from pathlib import Path
 import re
 import shutil
 import stat
-from typing import Iterable
+from collections.abc import Iterable
 
 # Explicit bounded P0 input set. No config, credentials, tokens, or network files.
 NVDA_INPUTS = (
@@ -152,7 +152,7 @@ def freeze_inputs(source_root: Path, private_root: Path, label: str,
                 "source_stable_during_copy": True,
                 "copied_file_verified": True,
             })
-        created = datetime.now(timezone.utc).isoformat()
+        created = datetime.now(UTC).isoformat()
         manifest = {
             "schema_version": 1,
             "created_utc": created,
@@ -187,9 +187,9 @@ def main() -> int:
                         help="Local ANALYSIS reports/private directory, outside source root")
     parser.add_argument("--label", help="New name without slashes; defaults to an UTC label")
     args = parser.parse_args()
-    label = args.label or "nvda-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    label = args.label or "nvda-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     manifest = freeze_inputs(args.source_root, args.private_root, label)
-    print("Private bounded freeze succeeded: %d inputs; per-file hashes verified; cross-file atomicity NOT claimed." % len(manifest["files"]))
+    print(f"Private bounded freeze succeeded: {len(manifest['files'])} inputs; per-file hashes verified; cross-file atomicity NOT claimed.")
     print("Keep frozen output in local reports/private; do NOT upload to public CI/GitHub.")
     return 0
 

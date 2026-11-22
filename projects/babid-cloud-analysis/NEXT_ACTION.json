@@ -21,7 +21,7 @@
     {
       "id": "B-010",
       "kind": "pc_script_endpoint_not_available",
-      "description": "PC script syntax-only endpoint возвращает HTTP 400 без исполнения, sandboxAllowsUnpinnedScripts=false; путь разрешённого запуска Python и доступ sandbox к пользовательской копии не проверены. Не обходить policy и не утверждать выполнение."
+      "description": "Исходники Python офлайн freeze и тестов уже локально staged через pc_write, но оба pc_script вызова возвращают PC_AGENT_HTTP_404 до исполнения (в предыдущих пробах 400); причина недоступности endpoint не диагностирована. Не менять политику и не обходить sandbox."
     }
   ],
   "prerequisites": [
@@ -43,7 +43,8 @@
     "Сначала убедиться, что PC script endpoint реально доступен и что входные логи заморожены; PC_AGENT_HTTP_404 не обходить, не считать скрипт выполненным.",
     "Разделять брокерскую метку времени исполнения из ReportedFill и локальное время получения/логирования; статус Cancel/0 не доказывает отсутствие ранее датированной сделки",
     "В этом запуске syntax-only pc_script вернул HTTP 400; это не доказательство выполнения или пригодности команды; sandbox pin/policy не обходить",
-    "Использовать подготовленный анализатор freeze_evidence.py только для read-only источника, с отдельным private output вне исходного проекта. В публичном CI только вымышленные файлы."
+    "Использовать подготовленный анализатор freeze_evidence.py только для read-only источника, с отдельным private output вне исходного проекта. В публичном CI только вымышленные файлы.",
+    "PC Agent staged frozen-input utility и её synthetic-only тест на MYPC без реального запуска; script endpoint всё ещё HTTP 404. Не считать наличие файла доказательством его исполнения."
   ],
   "next_command": "После подтверждения доступного разрешённого канала: сначала запустить `python analysis/freeze_evidence.py --source-root <local Babid01-TInvest copy> --private-root <local babid-cloud-analysis/reports/private> --label nvda-20261121-verified` из Analytics на MYPC. Сверить SHA256 manifest и исходные файловые сигнатуры; только затем запускать адаптированный приватный экстрактор на `reports/private/nvda-20261121-verified/` (НЕ на рабочем LIVE каталоге). Все данные оставить локально. Если pc_script по-прежнему HTTP400 и копия недоступна — остановить эту ветку, не обходить ограничения.",
   "expected_artifacts": [

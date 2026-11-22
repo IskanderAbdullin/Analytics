@@ -20,7 +20,7 @@ class FreezeEvidenceTests(unittest.TestCase):
         self.src.mkdir()
         self.private = self.base / "analysis" / "reports" / "private"
         self.items = ("logs-synthetic/fictional.log", "state-synthetic/fills.csv")
-        for n, content in zip(self.items, (b"SYNTHETIC order events\n", b"synthetic;2;99\n")):
+        for n, content in zip(self.items, (b"SYNTHETIC order events\n", b"synthetic;2;99\n"), strict=True):
             path = self.src / n
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
