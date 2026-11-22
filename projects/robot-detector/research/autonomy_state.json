@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement deterministic 6x3x4 marginal-binomial/Bonferroni joint-power feasibility grid frozen in docs/PAIRED_INDEPENDENT_POWER_GRID_PREREG_20261122.md. No new experimental source seeds; report zero/negative feasibility and within-world dependence limits honestly.",
+  "resume_instruction": "NEXT_ACTION: inspect exact Python CI for newly preregistered hypothetical power grid 6x3x4 including zero/low joint-power negative scenarios. If green, archive full aggregate output and compare to n=100 proposal; investigate any implausible thresholds without changing frozen p grids. Then verify ABIDES source cost/license and power feasibility BEFORE any new seed generation.",
   "last_session_result": "2026-11-22 15:17 UTC session: remote recovered 29bd4b80 all baseline CI green; preimplementation paired-world and numeric gates committed 54520189. This commit implements 2 bounds numeric regressions and 10 paired-world source-free tests; exact Github CI pending, no new source runs/seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:22:16.574Z",
-    "elapsed_minutes": 4.6885,
+    "latest_clock_utc": "2026-11-22T15:23:21.567Z",
+    "elapsed_minutes": 5.771716666666666,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Paired original-world inference exact 92/92 Python CI; preregister hypothetical joint-power source-free grid",
+    "stage": "Prospective 6x3x4 independent-world feasibility table implementation; exact CI pending",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",
