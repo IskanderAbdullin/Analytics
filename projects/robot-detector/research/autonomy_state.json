@@ -200,16 +200,16 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify CI workflow changes no longer start ABIDES/.NET on pure Python/documentation changes (PR auto removed but push and manual dispatch preserved); assess official source L2 timestamp/order semantics and license rights in a source capability gate. Preserve negative predictive result from all 3 non-target tapes; no fresh simulator seeds/real FDR/owner claims.",
+  "resume_instruction": "NEXT_ACTION: complete a source-free causal post-event-to-lagged-L2 projection method preregistration and negative tests, or improve independently validated source-quality gating. Do not import LOBSTER orderbook_i as pre-event for message_i, or claim 1ms fidelity/complete market source without file-specific evidence. No new ABIDES seeds until methodological power/source rights resolved.",
   "last_session_result": "2026-11-22 active study session: M1-v2 dynamic L2 initial exact Python CI #45038676354 FAILED 2 assertions (stale/one-stratum fixture expected rejection despite actually eligible data) and 1 unhandled numeric OverflowError for 10**500 quote. Failures retained and repaired in separate commit without changing preregistered 1000ms lag or 10s staleness; exact new CI pending. No new source/sim seeds.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T15:17:35.264Z",
     "deadline_utc": "2026-11-22T16:12:35.264Z",
-    "latest_clock_utc": "2026-11-22T15:42:21.599Z",
-    "elapsed_minutes": 24.77225,
+    "latest_clock_utc": "2026-11-22T15:43:54.974Z",
+    "elapsed_minutes": 26.3285,
     "concurrent_automation": "Market Robot Detector hourly automation disabled on inspection; no new agent created",
-    "stage": "Exactly observed crossmodel LL negative (all 3 tapes) + prevent automatic PR replay of costly ABIDES/.NET CI",
+    "stage": "Original LOBSTER post-event alignment / source precision / rights and ABIDES market-truth boundary audit",
     "previous_run_log_preserved_in_plan": true
   },
   "project_goal": "GOAL.md",

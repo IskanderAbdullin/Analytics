@@ -30,3 +30,6 @@
 
 
 **New negative predictive result (constructed, source-free):** [Exact Python CI #45039673176](https://github.com/IskanderAbdullin/Analytics/actions/runs/45039673176) PASS 149/149 and complete aggregate-only output. [Full report](docs/CROSSMODEL_HELDOUT_LL_NEGATIVE_20261122.md): all 3 non-target tapes M0 LL −3, M2 identical (training chose amplitude 0), M1-v2 worse than M0 in all 3 (ΔLL −0.62266, −0.95913, −0.62266). This is a negative toy result, not independently validated FDR or actor signal.
+
+
+**Real-source capability audit:** [2026-11-22 source rights/causal L2 report](docs/SOURCE_CAPABILITY_AND_CAUSAL_GATES_20261122.md), based on official LOBSTER output/sample docs, previous source QA and ABIDES evidence. Unverified 1ms event clock/full L2 continuity prevents treating a source-only M1-v2 toy as real-market validated; LOBSTER's book row i is POST-event i. No data/raw source export or new independent model validation.
