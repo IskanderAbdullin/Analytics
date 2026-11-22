@@ -8,6 +8,8 @@ on:
       - 'projects/robot-detector/tests/test_public_intensity_rescaling.py'
       - 'projects/robot-detector/tools/public_m0_train_only.py'
       - 'projects/robot-detector/tests/test_public_m0_train_only.py'
+      - 'projects/robot-detector/tools/public_m1_train_only.py'
+      - 'projects/robot-detector/tests/test_public_m1_train_only.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:

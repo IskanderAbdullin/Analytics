@@ -148,7 +148,8 @@
       "Freeze candidate period-agnostic public conditional-null family with occupancy and cluster preservation",
       "Strict public feature/oracle separation and no posthoc threshold/source selection",
       "New separate source-holdout protocol only after sufficient adversarial tests",
-      "Checkpoint, tests, CI, push and next scientific stage"
+      "Checkpoint, tests, CI, push and next scientific stage",
+      "Prospective train-only M1 conservative stable-BBO slice; exact CI pending; dynamic L2 abstains"
     ],
     "acceptance": [
       "All original 160 cases, two same-seed replay provenance and negative outcomes preserved",
@@ -195,8 +196,8 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: implement preregistered M1 strictly prior-only complete L2 exposure/median spread-strata fitting on TRAINING RUNS only, with fail-closed source coverage and negative controls; run exact-source Python tests, update master/issue/checkpoint, no fresh seeds until run-disjoint M0/M1/M2 evaluation frozen. Python M0 39 tests were verified in CI #45020856671; do not mistakenly mark M1 validated. Do not overlap hourly research agent.",
-  "last_session_result": "2026-11-22 12:08:52–12:10:33 UTC (101 sec): verified remote HEAD 25201e77 and three successful prior CI; preregistered/implemented M0 cluster-rate train-only baseline, 9 new adversarial tests, expanded Python workflow; froze prospective M1 lagged-L2 design and synchronized living plan/issue. New HEAD before checkpoint 15564177. Exact M0 CI not yet verified, no new source experiments.",
+  "resume_instruction": "NEXT_ACTION: verify exact checked-out GitHub public intensity Python CI for newly added test_public_m1_train_only.py (12 source-free tests), fix failures without retrospective prereg edits. Then preregister M2 predictable history intensity and train/calibration/evaluation original-source-run split with hard negative Poisson/fixed20/momentum and coverage/abstention. Current M1 is one-stable-prior-BBO window ONLY and relies on externally asserted continuity; dynamic L2 abstains. No new seeds before independent protocol; no real-market owner/FDR claims.",
+  "last_session_result": "2026-11-22 12:42 UTC existing-chat-standard migration completed at 83d9be1c; source-free M1 prereg addendum at f3d78068 then 12 new local standalone M1 tests PASS; exact full-project GitHub M1 CI pending. No source experiments, no new seeds, no market FDR/owner claims.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T12:08:52Z",
