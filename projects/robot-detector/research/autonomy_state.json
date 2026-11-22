@@ -195,7 +195,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: Implement deterministic source-free 5-second-cell conditional timing sampler per docs/BURST_PRESERVING_TIMING_NULL_PREREG_20261122.md; add cluster/occupancy invariance, periodic-background and self-exciting falsification tests; compare offset-preserving alternative; run cheap CI; do not report p-values. Existing b2c461b8 three PR workflow runs green. Keep #72 open.",
-  "last_session_result": "2026-11-22: Verified remote HEAD b2c461b8 and three successful PR workflow runs 44965920605, 44965920574, 44965920585. Preregistered unvalidated burst-occupancy conditional timing null and falsification gates before new experiments; no implementation or new simulation yet. Exchangeability within 5-second cells is unproven; no p-values, FDR, or owner inference.",
+  "resume_instruction": "NEXT_ACTION: Verify committed tests_background/test_public_conditional_timing_null.py (six source-free tests) and three CI workflows at latest HEAD. Fix failures. Then extend sampler to preserve full per-cell split-fill cluster-size vectors and add a constructed self-exciting burst falsification showing within-cell exchangeability failure; compare offset-preserving alternative. No p-values, new source seeds, FDR or owner inference.",
+  "last_session_result": "2026-11-22: Three CI workflows at original HEAD b2c461b8 verified successful. Preregistered timing-null candidate and implemented deterministic within-5-second-cell sampler plus six adversarial source-free tests; new committed tests not yet independently executed. Preserved prior ABIDES negative results and issue #72. No new ABIDES or real source runs, p-values, market FDR or owner attribution.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md"
 }
