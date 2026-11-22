@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact Python CI after source-free M1-v3 fixture correction, expect 195/195 tests; do not alter preregistered 1s lag/10s source book age. Then preregister ns heldout log-likelihood with explicit source-time unit and M1-v2 ms-aligned equivalence; source-free only.",
-  "last_session_result": "18:25 UTC exact Python CI #45054990701 FAILED 1/194 tests due to invalid fixture: quote at 34220s remains valid through 34226s (age 6 seconds < frozen 10sec), so a false ABSTAIN expectation failed. Kept the production 10s staleness unchanged, replaced fixture with 34215s (age 11s) and added positive valid single-book source-free test; new exact CI pending.",
+  "resume_instruction": "NEXT_ACTION: implement source-free fixed ns-native heldout LL of previously trained M1-v3 with strict typed NsPublicEventWindow, causal rate, full exposure; fixed numeric three-cluster score and analytic ms-vs-ns equivalence. Run exact CI and record negative outcomes. No real vendor source rerun or new seeds.",
+  "last_session_result": "2026-11-22 18:26 UTC: exact M1-v3 Python CI green 195/195 at SHA 80a4951b. Previous first CI 45054990701 failure was a wrong expected ABSTAIN for valid 6s-old quote, corrected fixture to 11s and added positive single-book test without changing code or thresholds. Separate ns heldout LL prereg committed BEFORE implementation.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:25:55.098Z",
-    "elapsed_minutes": 4.930516666666667,
-    "stage": "M1-v3 source-free CI one incorrect stale quote fixture; corrected and counterexample positive one-book test added, original fixed age unchanged",
+    "latest_clock_utc": "2026-11-22T18:26:53.472Z",
+    "elapsed_minutes": 5.903416666666667,
+    "stage": "M1-v3 exact source-free 195/195 CI confirmed; separate ns heldout log likelihood design frozen BEFORE implementation",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },
@@ -218,9 +218,9 @@
   "next_action_canonical": "resume_instruction",
   "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
   "last_confirmed_source_free_ci": {
-    "sha": "cfbe605294a6b18d20966cd8e55539834ae18ba4",
-    "run_url": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45054724064",
-    "result": "179/179 Python source-free tests, 10 strict Decimal→ns gates"
+    "sha": "80a4951bae5c2e06fb31f22eeb27f7112ac7a690",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45055049418",
+    "result": "195/195 source-free Python tests including 16 M1-v3 source-free tests, previous 1 invalid fixture failure documented"
   },
   "last_confirmed_ci_at_base": {
     "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
