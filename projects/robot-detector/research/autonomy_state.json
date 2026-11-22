@@ -7,7 +7,7 @@
   "master_issue": "https://github.com/IskanderAbdullin/Analytics/issues/72",
   "research_contract": "docs/AUTONOMOUS_RESEARCH_TZ.md",
   "status": "ACTIVE_RESEARCH_NOT_RELEASED",
-  "last_verified_base_commit": "3f166119b058ee178ed87ad23b4f3c97e29e900a",
+  "last_verified_base_commit": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
   "last_known_verified_results": [
     {
       "stage_id": "RD-ABIDES-POWER-15",
@@ -195,7 +195,7 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: verify exact-source public Python CI for M0 test_public_m0_train_only.py on branch; repair failures. Then implement prospective M1 lagged L2 design in docs/CONDITIONAL_M1_LAGGED_L2_PREREG_20261122.md with strict previous complete BBO, training-only median spread threshold, full exposure and adversarial tests. No new source seeds before run-disjoint M0/M1/M2 calibration protocol. Preserve spent 3301–3340; real-market FDR and owner identities unknown.",
+  "resume_instruction": "NEXT_ACTION: implement preregistered M1 strictly prior-only complete L2 exposure/median spread-strata fitting on TRAINING RUNS only, with fail-closed source coverage and negative controls; run exact-source Python tests, update master/issue/checkpoint, no fresh seeds until run-disjoint M0/M1/M2 evaluation frozen. Python M0 39 tests were verified in CI #45020856671; do not mistakenly mark M1 validated. Do not overlap hourly research agent.",
   "last_session_result": "2026-11-22 12:08:52–12:10:33 UTC (101 sec): verified remote HEAD 25201e77 and three successful prior CI; preregistered/implemented M0 cluster-rate train-only baseline, 9 new adversarial tests, expanded Python workflow; froze prospective M1 lagged-L2 design and synchronized living plan/issue. New HEAD before checkpoint 15564177. Exact M0 CI not yet verified, no new source experiments.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
@@ -217,5 +217,34 @@
     ],
     "note": "UTC clock measured 12:08:52–12:10:33 (101 seconds); environment-bounded stop before 50-minute target; exact new M0 CI unverified.",
     "final_elapsed_minutes": 1.6833
+  },
+  "project_goal": "GOAL.md",
+  "project_map": "PROJECT_MAP.md",
+  "evidence_index": "EVIDENCE.md",
+  "next_action_canonical": "resume_instruction",
+  "history_gap": "Full ChatGPT transcript is not preserved in GitHub; audit via existing research plan, issues, commits and evidence, not imagined verbatim history.",
+  "last_confirmed_source_free_ci": {
+    "sha": "4f812ecc20e995e162250748fe3003ecbabde3a4",
+    "workflow_run": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45020856671",
+    "result": "PASS 39 Python tests incl 9 M0; source/test paths unchanged through 8bd5a83b"
+  },
+  "last_confirmed_ci_at_base": {
+    "sha": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
+    "workflows": [
+      45020935082,
+      45020935078,
+      45020935086
+    ],
+    "result": "SUCCESS three workflows; M1 design-only"
+  },
+  "standard_upgrade": {
+    "date_utc": "2026-11-22",
+    "reason": "UPDATE_EXISTING_CHAT.md",
+    "working_branch": "agent/robot-detector-l2-binphase-20261121",
+    "pre_upgrade_head": "8bd5a83b7198bf148b96ff97f6836ec36a76bf0e",
+    "canonical_plan": "docs/MASTER_RESEARCH_PLAN.md",
+    "canonical_state": "research/autonomy_state.json",
+    "history_preserved": "existing master scientific chronology, issue #72/#97, git commits and archived AGENTS",
+    "notes": "No duplicate Info project, no raw vendor data, no private Actions/Computer Use."
   }
 }
