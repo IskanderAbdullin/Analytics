@@ -1,0 +1,106 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "bfa0910d-b219-4c59-a8d4-2f68fbf404f5",
+    "occurred_at": "2026-11-22T07:26:16.201Z",
+    "type": "development",
+    "title": "Prepare pinned-source C# Journal regression",
+    "summary": "Pinned public source matches local normalized Journal/Domain, and a standalone source-linked .NET harness with SHA-verified public checkout was prepared.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/csharp-journal-replay/JournalReplay.csproj",
+      "action": "created",
+      "summary": "Source-linked test project"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/csharp-journal-replay/Stubs.cs",
+      "action": "created",
+      "summary": "Compile-only persistence stubs"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/csharp-journal-replay/Program.cs",
+      "action": "created",
+      "summary": "Actual Journal structure synthetic cases"
+    },
+    {
+      "path": ".github/workflows/babid-cloud-pinned-journal.yml",
+      "action": "created",
+      "summary": "Pinned public C# CI without trading data"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "E-049 and checkpoint M-029"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "E-049 and checkpoint M-029"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-049 and checkpoint M-029"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "E-049 and checkpoint M-029"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "E-049 and checkpoint M-029"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-pinned-csharp-journal-e049.json",
+      "action": "created",
+      "summary": "Research event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "source-same",
+      "kind": "review",
+      "title": "Local C# equals pinned public source",
+      "status": "passed",
+      "summary": "Normalized Journal and Domain text identical"
+    },
+    {
+      "id": "pinned-ci",
+      "kind": "ci",
+      "title": "Pinned public source test",
+      "status": "not_run",
+      "summary": "CI pending after push"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "Actual archival sequence missing",
+      "state": "open",
+      "severity": "high",
+      "description": "Source test cannot prove live order history"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Frozen source/broker reconciliation",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No broker calls, live robot modifications or private input",
+    "Only Journal/Domain source is linked; engine event ordering excluded"
+  ]
+}

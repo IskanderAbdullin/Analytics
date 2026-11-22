@@ -206,3 +206,7 @@
 ## 17. P0-S11 — разрешённый канал PC Agent (E-048)
 
 Script sandbox функционирует **для уже подготовленных и разрешённых** проектов (контрольный Python unittest успешно завершён). Но каталог `projects/babid-cloud-analysis` есть в основном PC workspace и отсутствует в отдельном `PcAgentSandbox` workspace; попытка выполнить его через pc_script даёт HTTP404. `sandboxAllowsUnpinnedScripts=false`; нельзя превращать ранее одобренный synthetic fixture в механизм исполнения новых непривязанных скриптов и нельзя считывать LIVE trading source из sandbox. Следующая подготовка: штатный sandbox project + pinned SHA нового аналитического script + отдельная immutable копия нужных файлов с SHA manifest + вывод private only. Это эксплуатационная предпосылка, не доказательство причины NVDA.
+
+## 18. P0-S12 — pinned-source Journal regression (E-049)
+
+Компилировать real Journal.cs+Domain.cs из pinned public Babid-C-gpt- SHA `5b553afdffe0679960d1b161a4885a645175e60b`, сверять Git blob SHA, не трогать LIVE. Использовать только фиктивные side/size/clock для Prune grace, detached order/lookup, Restore, FilledByState и unsettled flags. Compile-only stubs заменяют только unused persistence, но **не** сам Journal. Это не full Engine.Orders и не broker data; успех не докажет фактический archive в 2026-11-21.

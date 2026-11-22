@@ -61,3 +61,5 @@ P0. P2 не может подменять P0; любое исключение о
 - M-027 / E-047 (22.11): добавлен ограниченный execution-time lookback для source rows в `position_forensics.py`. Исполнение до начала observation window теперь можно включить с явной маркировкой, не смешивая часы. Синтетический тест демонстрирует до/после; реальные NVDA данные не пересчитаны, итог RCA unresolved.
 
 - M-028 / E-048 (22.11): диагностирована граница PC Agent: штатный synthetic unittest в изолированном ранее разрешённом проекте исполняется (1/1 OK), но babid-cloud-analysis в sandbox отсутствует и unpinned запрещён. Предыдущий вывод «pc_script вообще недоступен» уточнён. Никакого обхода политики и доступа к private LIVE данным; нужен авторизованный sandbox staging/frozen-copy.
+
+- M-029 / E-049 (22.11): подготовлен pinned-source .NET 10 synthetic replay реальных Journal.cs/Domain.cs без модификации робота; входные source совпадают с MYPC после нормализации CRLF. Отдельный GitHub Actions workflow должен подтвердить сборку/тест. Root cause и реальные архивы ещё не доказаны.

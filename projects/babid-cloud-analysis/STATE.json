@@ -53,7 +53,8 @@
     "E-045",
     "E-046",
     "E-047",
-    "E-048"
+    "E-048",
+    "E-049"
   ],
   "hypotheses": [
     {
@@ -314,6 +315,13 @@
       "description": "Контрольная проверка показала, что PC Agent sandbox_proxy способен выполнять уже разрешённый Python unittest (1/1 OK, 547ms). Проект babid-cloud-analysis отсутствует в sandbox workspace, а unpinned scripts запрещены. Следовательно, ошибка HTTP404 на аналитическом запуске не означает глобальную недоступность PC Agent; P0 требует штатного sandbox staging и одобренного пути к frozen data.",
       "evidence_refs": [
         "E-048"
+      ]
+    },
+    {
+      "id": "M-029",
+      "description": "Подтверждена нормализованная идентичность двух локальных C# исходников с pinned публичным Babid commit; подготовлен реальный linked-source .NET harness без брокера. Его CI пока ожидается, actual Prune и брокерское расхождение не подтверждены.",
+      "evidence_refs": [
+        "E-049"
       ]
     }
   ],
