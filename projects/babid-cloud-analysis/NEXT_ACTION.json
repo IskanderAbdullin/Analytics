@@ -21,7 +21,7 @@
     {
       "id": "B-010",
       "kind": "pc_script_endpoint_not_available",
-      "description": "Исходники Python офлайн freeze и тестов уже локально staged через pc_write, но оба pc_script вызова возвращают PC_AGENT_HTTP_404 до исполнения (в предыдущих пробах 400); причина недоступности endpoint не диагностирована. Не менять политику и не обходить sandbox."
+      "description": "Уточнено E-048: pc_script WORKS для существующего разрешённого sandbox project AgentAcceptance1121/test_math.py (1 unittest, exit0); sandboxAllowsUnpinnedScripts=false. Проект babid-cloud-analysis отсутствует в sandbox workspace: pc_script по нему HTTP404, а syntax attempt в другом fixture HTTP400. Требуется штатно создать sandbox project, закрепить SHA/разрешение и передать только immutable private frozen copy изолированно, без обхода защиты."
     }
   ],
   "prerequisites": [
@@ -49,9 +49,10 @@
     "Перегенерировать приватную историю через обновлённый position_forensics.py после frozen snapshot; старый incident_evidence.csv смешивает broker execution time с robot log observation и не является каузальной лентой.",
     "OrderTrade.date_time/OrderStage.execution_time — source execution UTC, OrderTrades.created_at — creation of broker message; независимый брокерский экспорт не получен. Отсутствие >1d GetOrderState не означает отсутствие исполненной сделки.",
     "Готов синтетический консервативный matcher broker_reconcile_synthetic.py, но входные TradeFact пока вымышленные. Не заявлять подтверждённую брокерскую сверку до фактического authorized source и проверки его SHA/completeness.",
-    "При офлайн пересчёте private incident_evidence.csv задать `--fill-execution-lookback-sec` с явно обоснованной границей до 86400 секунд; использовать поле execution_lookback, но не считать его временем фактической доставки."
+    "При офлайн пересчёте private incident_evidence.csv задать `--fill-execution-lookback-sec` с явно обоснованной границей до 86400 секунд; использовать поле execution_lookback, но не считать его временем фактической доставки.",
+    "E-048: доступность PC script подтверждена только на уже разрешённом synthetic fixture (1 unittest OK); настоящий аналитический проект в песочнице отсутствует, unpinned execution запрещён."
   ],
-  "next_command": "После подтверждения доступного разрешённого канала: сначала запустить `python analysis/freeze_evidence.py --source-root <local Babid01-TInvest copy> --private-root <local babid-cloud-analysis/reports/private> --label nvda-20261121-verified` из Analytics на MYPC. Сверить SHA256 manifest и исходные файловые сигнатуры; только затем запускать адаптированный приватный экстрактор на `reports/private/nvda-20261121-verified/` (НЕ на рабочем LIVE каталоге). Все данные оставить локально. Если pc_script по-прежнему HTTP400 и копия недоступна — остановить эту ветку, не обходить ограничения.",
+  "next_command": "PC Agent: сначала штатно подготовить отдельный sandbox-проект babid-cloud-analysis с pinned/одобренным Python анализатором и ограниченными разрешениями. Согласовать безопасный перенос ТОЛЬКО frozen-копии (не live исходников) в приватную sandbox область, сверить SHA-256 до/после. Не пытаться использовать `AgentAcceptance1121` для обхода pin-политики или получения живых торговых каталогов. После успешного штатного доступа выполнить выбранный offline extractor и сравнить три времени событий; broker API без отдельного согласия запрещён.",
   "expected_artifacts": [
     "Локальный reports/private/nvda-20261121-verified/manifest.json с SHA256 per file, atomic_across_files=false; сам frozen dataset не публикуется.",
     "Приватный компактный reports/private/nvda-late-fill-20261121.txt внутри локального аналитического проекта",
