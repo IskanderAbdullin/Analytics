@@ -808,3 +808,10 @@ NEXT_ACTION: confirm exact source-free Python workflow and correct any failures;
 ### 2026-11-22: conditional intensity exposure quality gate (source-free)
 
 Independent audit found that `Exposure.complete` and `Exposure.causal` accepted truthy non-boolean values (e.g. integer `1` or string `yes`). These are provenance/causality assertions and must be exactly Python booleans; otherwise the pipeline must ABSTAIN. A regression covering malformed flags is added before any new source run. This is a technical integrity fix, **not** evidence for M0/M1/M2 validity, calibrated significance, real-market FDR, or owner identification. Next: exact-source Python CI, then preregister and implement causal train-only model-fitting with prospective independent run-level split.
+
+
+### 2026-11-22 — prospective train-only M0 public cluster intensity baseline
+
+Before implementation, frozen [M0 protocol](CONDITIONAL_M0_TRAIN_ONLY_PREREG_20261122.md) defined the exposure denominator, unique-timestamp cluster counting, training-only estimation, explicit run-level split responsibility and nine adversarial checks. New `tools/public_m0_train_only.py` fits constant M0 hazard from declared training runs only and emits a fixed `Exposure` for evaluation without accepting evaluation event counts. `tests/test_public_m0_train_only.py` adds nine source-free tests, including split-fill multiplicity, pooled exposure, no-training, zero counts, malformed windows, unsorted/out-of-window timestamps, boolean/fractional times, evaluation-window invariance and invalid model. Lightweight Python CI workflow now discovers both public-intensity and M0 tests. **These tests are authored, not yet confirmed green on new HEAD.** No source data, new ABIDES seeds, calibration, p-values or real owner/FDR inference. M0 is a falsifiable baseline, not a detector.
+
+NEXT_ACTION: confirm exact-source CI and repair failures; preregister M1 strictly previous-only L2 and M2 predictable self-excitation with run-disjoint fitting and mandatory hard negatives before allocating independent source seeds. All 3301–3340 remain spent.
