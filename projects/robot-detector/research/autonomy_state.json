@@ -200,15 +200,15 @@
     "pc_agent_only_with_explicit_user_approval": true,
     "do_not_close_master_issue_after_single_stage": true
   },
-  "resume_instruction": "NEXT_ACTION: inspect exact committed Python CI for type4-only visible training adapter, expected 257/257 tests and rates .75/.5 over 4sec/4sec, check physical original source replay/quality negatives. Preserve failures and fix only actual test/code issues without rewriting prereg. Then write source-readiness and scientific negative audit, no ABIDES seeds/market FDR claims.",
-  "last_session_result": "2026-11-22 18:37 UTC: strict prereg type4-only public source-bound train adapter implemented (no caller-supplied training event timestamps), 2 frozen original toy worlds and 14 tests. Prior 243/243 source-only CI green; current exact new CI pending. No original vendor source or seed allocation.",
+  "resume_instruction": "NEXT_ACTION: verify exact Python CI after source-free typed type4-only training 1ns insertion order fix. Should be 257/257; no change to source estimator, event definition or lag. Then run independent scientific source-readiness audit (clock exactness, source continuity, data rights, independent unit/power) and record all release blockers.",
+  "last_session_result": "Initial exact Python source-free CI #45056210929 FAILED one of 257 tests: one 1ns-later visible event inserted before earlier original public t34203.5 event; source projector correctly rejected UNSORTED. Only moved insertion to chronological position after original 34203.5, preserving exact 1ns and no changes to model/source rules. Corrected CI pending; negative retained.",
   "master_research_plan": "docs/MASTER_RESEARCH_PLAN.md",
   "active_run_time_log": {
     "start_time_utc": "2026-11-22T18:20:59.267Z",
     "target_end_utc": "2026-11-22T18:50:59.267Z",
-    "latest_clock_utc": "2026-11-22T18:38:03.377Z",
-    "elapsed_minutes": 17.0685,
-    "stage": "Bound original public ns TYPE4-only training into exact prior M1-v3 source-free model, 14 hard negative tests, CI pending",
+    "latest_clock_utc": "2026-11-22T18:38:42.694Z",
+    "elapsed_minutes": 17.723783333333333,
+    "stage": "Bound source type4-only M1v3 initial 257-test CI: 1 invalid order test fixture; repair without relaxing source chronological gate",
     "previous_run_utc": "2026-11-22T15:17:35.264Z",
     "concurrent_research_agent": "No new agents created"
   },

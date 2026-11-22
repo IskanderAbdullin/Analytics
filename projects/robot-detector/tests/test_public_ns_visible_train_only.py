@@ -88,7 +88,7 @@ class BoundVisibleOnlyTrainingFalsifiers(unittest.TestCase):
 
     def test_one_ns_new_visible_type4_is_distinct_and_train_rate_changes(self):
         rows=list(low_rows())
-        rows.insert(3,row("34203.500000001",4,ask=104))
+        rows.insert(4,row("34203.500000001",4,ask=104))
         result=train([low(rows),high()])
         self.assertEqual(result.safe_aggregate["training_unique_type4_ns_timestamp_clusters"],6)
         self.assertEqual((result.model.low_cluster_count,result.model.high_cluster_count),(4,2))
