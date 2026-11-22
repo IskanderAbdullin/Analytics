@@ -62,6 +62,8 @@ on:
       - 'projects/robot-detector/tests/test_public_abides_m0_m1v4_ll.py'
       - 'projects/robot-detector/tools/public_abides_m1v4_nontarget_panel.py'
       - 'projects/robot-detector/tests/test_public_abides_m1v4_nontarget_panel.py'
+      - 'projects/robot-detector/tools/public_abides_compact_160_eligibility.py'
+      - 'projects/robot-detector/tests/test_public_abides_compact_160_eligibility.py'
       - '.github/workflows/robot-detector-public-intensity.yml'
   workflow_dispatch:
 permissions:
@@ -78,6 +80,9 @@ jobs:
       - name: Reproduce fixed ns public visible-type4 source-free aggregate
         working-directory: projects/robot-detector
         run: python -m tools.public_ns_repro_demo
+      - name: Audit committed ABIDES 160 original compact metadata sufficiency only
+        working-directory: projects/robot-detector
+        run: python -m tools.public_abides_compact_160_eligibility
       - name: Emit ABIDES non-target LL falsifier source-free aggregate
         working-directory: projects/robot-detector
         run: python -m tools.public_abides_m1v4_nontarget_panel
