@@ -166,3 +166,51 @@
 Отдельный контроль: в `CheckInternalConsistency` `TradesSynchronized(_journal.TrackedOrders())` не охватывает архивированные по `_byRequestId` объекты, и поэтому не может служить гарантией полноты всех трейдов. Future design: ledger completeness из durable order index, отдельный статус reconciliation-pending для завершённых ордеров, fail-closed вместо молчаливого `Pnl ← Journal`. Все изменения основного бота вне scope, только спецификация.
 
 Локальный диагностический скрипт в этом сеансе не выполнился (`PC_AGENT_HTTP_404`), а текущий путь источников указывает на рабочий каталог: прежде любого воспроизведения необходим frozen archive + SHA-256 manifest. Это не установленная историческая первопричина.
+
+## 11. P0-S6 — независимые часы и очередность поздней доставки (22.11, E-040)
+
+В приватном инциденте метка исполнения из `fills.csv` на 5.026 секунды **раньше** сообщения `Cancel/0`, но робот обработал исполнение через 38.285 секунды **после** этого сообщения. Источник метки: `ReportedFill.TimeUtc` из `OrderTrade.DateTime` (stream) либо `OrderStage.ExecutionTime` (query), затем `Fill.TimeUtc` и преобразование UTC→МСК в ledger. Значит, термин «поздний fill» здесь должен относиться к получению/обработке сведений, **не обязательно** к времени совершения сделки. Сама метка времени, её синхронизация и консистентность статуса брокера без независимого источника не подтверждены.
+
+Для будущего исправления строго разнести `SourceExecutionUtc` (как сообщил брокер), `BrokerReportReceivedUtc`, `EngineAppliedUtc`, `OrderStateObservedUtc`, `JournalArchivedUtc` и `SnapshotVersion`. Идентификатор корреляции сообщения и независимая история брокерского исполнения нужны для выводов о порядке. `Cancel/0` с более поздним локальным временем **не** означает, что брокер не исполнил объём ранее. Архивировать терминальный нулевой остаток без подтверждённой полноты истории сделок нельзя считать безопасным для учёта; изменение LIVE-кода в этом проекте запрещено.
+
+**T20 (future mock-broker, synthetic):** вымышленная заявка получает trade execution timestamp T0, ответ Cancel/0 наблюдается T0+5 s, сообщение с этой сделкой приходит T0+43 s; наблюдаемые и source timestamps хранятся отдельно, поздняя доставка не превращается в «execution after Cancel». При наличии неразрешённого FilledByState/архивирования система должна сохранять возможность сверки, не удваивать/не терять исполнение и оставаться fail-closed до независимого подтверждения. Отдельно проверить поток status update с тем же OrderState и ростом FilledByState: отсутствие логовой строки смены State не равно отсутствию обновления. Тест не доказывает факты о реальном заказе.
+
+## 12. Ограниченный forensic freeze (E-041)
+
+Перед воспроизведением A-001 применять `analysis/freeze_evidence.py` лишь для локального копирования конкретных input (21.11 NVDA log, fills.csv, journal.json, journal.wal, risk.json) с контрольными SHA-256 до/во время/после копии. `reports/private` — отдельный локальный приватный каталог, не source root. Утилита не является атомарным snapshot across files, не подтверждает брокерские исполнения/полноту и не разрешает работать с LIVE торговыми процессами. Входную копию необходимо оценивать по независимым временным и брокерским источникам после копирования.
+
+**T21 (синтетический):** копирование вымышленных файлов с SHA256; изменения источника в момент копирования, symlink, traversal, duplicate destination и отсутствующие входы должны приводить к запрету/удалению неполной копии. Эти тесты проверяют инструментарий, а не первопричину реального инцидента.
+
+## 13. P0-S7 — условный предикат Prune и альтернатива precredit (E-043)
+
+Статически установлено: `Order.Filled=max(FilledByState,FilledByFills)`, `FillsSynchronized = FilledByFills>=FilledByState`, а `PruneOrders` удаляет лишь terminal zero-filled Settled (grace=5s, no NeedsCheck/ResyncNeeded/QueryInFlight). Поэтому Cancel/0 мог перейти в eligible state через 5 секунд, оставляя 33.285 секунды до обработки Sell2 **только при отсутствии запрещающих событий**. Silent FilledByState>0 до Prune делает удаление невозможным для данного состояния. Реальные `UpdatedUtc`/флаги/ArchivedUtc не наблюдались.
+
+**T22 (synthetic):** 9 тестов условного предиката и счёта (отдельный `late_fill_paths.py`, не C# эмулятор), включая grace, статусную precredit, нехватку синхронизации, флаги и требуемое раннее смещение счёта для гипотезы H-007. На исторических данных гипотезы не подтверждены. Робот не изменялся.
+
+## 14. P0-S8 — независимые оси часов в аналитическом инцидентном отчёте (E-044)
+
+Старый `position_forensics.py` создавал `incident_evidence.csv`, сортируя вместе broker-reported timestamp из fills.csv и локальную метку сообщения логгера. Это не причинная хронология: ledger содержит trade event time, а лог — receipt/processing observation time. Анализатор теперь маркирует clock_domain, source_sequence и группирует output в source-native order; сводка содержит явный `not_inferred` для междоменных причинных связей. Старые приватные отчёты повторно применять для RCA только после пересчёта, не переставляя физические строки fills.csv по времени исполнения.
+
+**T23 (synthetic):** две записи ledger в физическом порядке с инверсией reported trade timestamps плюс отдельные строки отмены и позднего FILL в robot log. Проверить независимые clock-domain/source-sequence, absence joint sort и отсутствие утверждения о причинности. Реальные данные и робот не задействованы.
+
+## 15. P0-S9 — независимые брокерские источники и время сделки (E-045)
+
+По официальной документации OrderTrade.date_time (и OrderStage.execution_time) — UTC-время совершения сделки, а OrderTrades.created_at — время создания сообщения; не использовать их как взаимозаменяемые с локальным received time. `GetOrderState` может не возвращать записи старше одного дня. Историческая сверка: авторизованный broker report или GetOperationsByCursor с полной пагинацией и caveats о задержанных операциях, меняющихся operation IDs и отличающихся trade_id namespaces. Не делать вызовы broker API без отдельного разрешения. Подробности в BROKER_RECONCILIATION_SPEC.md. Синтетический future T24 — abstain при неоднозначной привязке.
+
+## 16. P0-S10 — запаздывающий fill на границе окна (E-047)
+
+`position_forensics.py` до этой правки выбирал ledger fill по брокерскому execution-time *внутри* пользовательского локального observation window, что могло скрыть позднюю доставку исполнения, совершённого раньше начала окна. Новое opt-in `--fill-execution-lookback-sec N` (0 ≤ N ≤ 86400; default 0) допускает раннюю исходную execution запись, явно маркирует `execution_lookback=True`, выводит счётчик; время доставки из этого факта НЕ следует. Вывод по-прежнему сгруппирован по clock-domain и source row; междоменные причинные утверждения запрещены.
+
+**T25 synthetic:** execution row на 30 s раньше начала окна, наблюдение fill на 10 s после начала. При lookback 0 ledger row не включён, log включён; при 60s ledger включён и помечен prior-execution; отрицательный lookback отклонён. Реального NVDA анализа пока нет.
+
+## 17. P0-S11 — разрешённый канал PC Agent (E-048)
+
+Script sandbox функционирует **для уже подготовленных и разрешённых** проектов (контрольный Python unittest успешно завершён). Но каталог `projects/babid-cloud-analysis` есть в основном PC workspace и отсутствует в отдельном `PcAgentSandbox` workspace; попытка выполнить его через pc_script даёт HTTP404. `sandboxAllowsUnpinnedScripts=false`; нельзя превращать ранее одобренный synthetic fixture в механизм исполнения новых непривязанных скриптов и нельзя считывать LIVE trading source из sandbox. Следующая подготовка: штатный sandbox project + pinned SHA нового аналитического script + отдельная immutable копия нужных файлов с SHA manifest + вывод private only. Это эксплуатационная предпосылка, не доказательство причины NVDA.
+
+## 18. P0-S12 — pinned-source Journal regression (E-049)
+
+Компилировать real Journal.cs+Domain.cs из pinned public Babid-C-gpt- SHA `5b553afdffe0679960d1b161a4885a645175e60b`, сверять Git blob SHA, не трогать LIVE. Использовать только фиктивные side/size/clock для Prune grace, detached order/lookup, Restore, FilledByState и unsettled flags. Compile-only stubs заменяют только unused persistence, но **не** сам Journal. Это не full Engine.Orders и не broker data; успех не докажет фактический archive в 2026-11-21.
+
+## 19. Безопасная отмена C# CI на закрытый source (E-050)
+
+Предыдущая задумка P0-S12 из E-049 не была исполнима в публичном GitHub Actions: pinned checkout из Babid-C-gpt- вернул `Repository not found` при обычном runner. Возможность connector читать исходник НЕ доказывает, что он публичный. Исходный код не включать в публичный Analytics или артефакты CI; удалён workflow и C# harness из публичного PR. Для future tests использовать только отдельный локальный private test project с разрешённым штатным `pc_run dotnet-test` на том же компьютере и без доступа к живому брокеру; приватные тестовые результаты не отправлять на GitHub.

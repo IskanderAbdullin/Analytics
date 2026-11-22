@@ -11,17 +11,17 @@
     {
       "id": "B-009",
       "kind": "private_order_context_pending",
-      "description": "Необходим ограниченный дополнительный локальный отчёт о статусах отменённой заявки, закрывающей заявки и позиции в 13:07–13:08"
+      "description": "Условное окно Prune после пятисекундного grace до позднего Sell2 — 33.285 с. Чтобы различить H-006 и H-007, нужны frozen runtime flags (FilledByState/FilledByFills, NeedsCheck/ResyncNeeded/QueryInFlight, UpdatedUtc), факт Housekeeping/Archived, status chronology и независимый broker execution report."
     },
     {
       "id": "B-007",
       "kind": "independent_broker_history_not_yet_available",
-      "description": "Независимые брокерские операции и свежесть GetPositions недоступны для окончательного подтверждения внешней -2"
+      "description": "Не предоставлена независимая брокерская история и нет отдельного разрешения на broker API. По официальным документам GetOrderState может не вернуть заявку старше суток; предпочтителен брокерский statement/export или GetOperationsByCursor с полной пагинацией, задержками и несовпадающими namespace trade IDs."
     },
     {
       "id": "B-010",
       "kind": "pc_script_endpoint_not_available",
-      "description": "pc_script вызов для заранее подготовленного Extract-NVDA-LateFill.ps1 вернул PC_AGENT_HTTP_404; выполнение не состоялось. Текущий исходный скрипт читает рабочие каталоги, для строгого frozen evidence нужен SHA-манифест и отдельная неизменяемая копия."
+      "description": "Уточнено E-048: pc_script WORKS для существующего разрешённого sandbox project AgentAcceptance1121/test_math.py (1 unittest, exit0); sandboxAllowsUnpinnedScripts=false. Проект babid-cloud-analysis отсутствует в sandbox workspace: pc_script по нему HTTP404, а syntax attempt в другом fixture HTTP400. Требуется штатно создать sandbox project, закрепить SHA/разрешение и передать только immutable private frozen copy изолированно, без обхода защиты."
     }
   ],
   "prerequisites": [
@@ -40,16 +40,32 @@
     "Когда обновлённый анализатор Analytics будет запущен только на замороженной локальной копии, проверить history/accounting_alignments.csv и поле accounting_alignment_rows_omitted; локально установленный старый скрипт не обязан содержать это дополнение",
     "Не трактовать legacy `days_with_fills` и `equity_days` как уникальные календарные дни: в локальной копии это (state,date) строки; сопоставить новым *_calendar_days",
     "При расчёте ошибок различать WRN и ERR; количество log api_30059 не эквивалентно числу сломанных заявок или биржевых ошибок",
-    "Сначала убедиться, что PC script endpoint реально доступен и что входные логи заморожены; PC_AGENT_HTTP_404 не обходить, не считать скрипт выполненным."
+    "Сначала убедиться, что PC script endpoint реально доступен и что входные логи заморожены; PC_AGENT_HTTP_404 не обходить, не считать скрипт выполненным.",
+    "Разделять брокерскую метку времени исполнения из ReportedFill и локальное время получения/логирования; статус Cancel/0 не доказывает отсутствие ранее датированной сделки",
+    "В этом запуске syntax-only pc_script вернул HTTP 400; это не доказательство выполнения или пригодности команды; sandbox pin/policy не обходить",
+    "Использовать подготовленный анализатор freeze_evidence.py только для read-only источника, с отдельным private output вне исходного проекта. В публичном CI только вымышленные файлы.",
+    "PC Agent staged frozen-input utility и её synthetic-only тест на MYPC без реального запуска; script endpoint всё ещё HTTP 404. Не считать наличие файла доказательством его исполнения.",
+    "Математический модельный предикат late_fill_paths.py не запускает и не заменяет C# engine, не доказывает факт удаления заказа из журнала",
+    "Перегенерировать приватную историю через обновлённый position_forensics.py после frozen snapshot; старый incident_evidence.csv смешивает broker execution time с robot log observation и не является каузальной лентой.",
+    "OrderTrade.date_time/OrderStage.execution_time — source execution UTC, OrderTrades.created_at — creation of broker message; независимый брокерский экспорт не получен. Отсутствие >1d GetOrderState не означает отсутствие исполненной сделки.",
+    "Готов синтетический консервативный matcher broker_reconcile_synthetic.py, но входные TradeFact пока вымышленные. Не заявлять подтверждённую брокерскую сверку до фактического authorized source и проверки его SHA/completeness.",
+    "При офлайн пересчёте private incident_evidence.csv задать `--fill-execution-lookback-sec` с явно обоснованной границей до 86400 секунд; использовать поле execution_lookback, но не считать его временем фактической доставки.",
+    "E-048: доступность PC script подтверждена только на уже разрешённом synthetic fixture (1 unittest OK); настоящий аналитический проект в песочнице отсутствует, unpinned execution запрещён.",
+    "E-049/050 correction: попытка GitHub Actions source-linked C# harness НЕ выполнялась (checkout repo 404); workflow удалён из публичного PR. Если нужен реальный C# test, делать локально в private workspace штатным pc_run dotnet-test, не публикуя исходник и не обходя sandbox."
   ],
-  "next_command": "powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File \"$env:LOCALAPPDATA\\PC-Agent\\workspace\\projects\\babid-cloud-analysis\\Extract-NVDA-LateFill.ps1\"",
+  "next_command": "PC Agent: сначала штатно подготовить отдельный sandbox-проект babid-cloud-analysis с pinned/одобренным Python анализатором и ограниченными разрешениями. Согласовать безопасный перенос ТОЛЬКО frozen-копии (не live исходников) в приватную sandbox область, сверить SHA-256 до/после. Не пытаться использовать `AgentAcceptance1121` для обхода pin-политики или получения живых торговых каталогов. После успешного штатного доступа выполнить выбранный offline extractor и сравнить три времени событий; broker API без отдельного согласия запрещён. Для отдельного C# тестирования Journal/Domain использовать только локальные приватные тесты без публикации исходника; public CI workflow отменён E-050.",
   "expected_artifacts": [
+    "Локальный reports/private/nvda-20261121-verified/manifest.json с SHA256 per file, atomic_across_files=false; сам frozen dataset не публикуется.",
     "Приватный компактный reports/private/nvda-late-fill-20261121.txt внутри локального аналитического проекта",
     "Контекст отменённой и закрывающей заявок, сообщений MoveOverclose и первого broker mismatch",
     "Заключение о статусах H-006/H-007 с отдельным указанием отсутствующей телеметрии archive",
     "При разрешённой доступности независимого брокерского журнала — сопоставление исполнений, времени и позиции",
     "Достоверная оценка уникального покрытия истории отдельно от числа state/day CSV-строк; финансы только после независимой брокерской сверки",
-    "Отдельная диагностическая ветка на вымышленных данных должна проверять и silent FilledByState update при неизменном State"
+    "Отдельная диагностическая ветка на вымышленных данных должна проверять и silent FilledByState update при неизменном State",
+    "Узкий private incident_evidence.csv с clock_domain и source_sequence (не публикация), где порядок не сливает execution time с локальной обработкой",
+    "После отдельного разрешения пользователя: локальный независимый broker export/statement или пагинированный операции CSV с source-provenance и явными несопоставленными trade IDs",
+    "После независимой авторизованной выгрузки — локальный отчёт confirmed_id/candidate/ambiguous/unmatched, где cross-namespace matches не считаются proof.",
+    "Приватное сравнение `fill_rows` и `selected_prior_execution_rows` с/без безопасного lookback; факт локального receipt устанавливать только по отдельным timestamp/log sequence."
   ],
   "completion_criteria": [
     "Дополнительная локальная выдержка прочитана и проверена на полноту",

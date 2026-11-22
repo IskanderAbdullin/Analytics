@@ -1,0 +1,87 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "959fa6d9-9e1b-4710-a6dc-1aa4e65baf91",
+    "occurred_at": "2026-11-22T07:23:03.898Z",
+    "type": "research",
+    "title": "Diagnose PC Agent script sandbox gap without bypass",
+    "summary": "An existing authorized sandbox Python unittest completed successfully; babid analysis project is absent in sandbox and unpinned execution remains forbidden.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "E-048/M-028 correction of PC script blocker and safe next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "E-048/M-028 correction of PC script blocker and safe next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-048/M-028 correction of PC script blocker and safe next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "E-048/M-028 correction of PC script blocker and safe next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "E-048/M-028 correction of PC script blocker and safe next step"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-sandbox-diagnosis-e048.json",
+      "action": "created",
+      "summary": "Evidence of sandbox scope and approved control test"
+    }
+  ],
+  "checks": [
+    {
+      "id": "pc-existing-sandbox",
+      "title": "Existing approved sandbox Python unittest",
+      "kind": "test",
+      "status": "passed",
+      "summary": "1/1 synthetic test, exitCode=0, 547 ms"
+    },
+    {
+      "id": "pc-new-project",
+      "title": "New analysis script project",
+      "kind": "integration",
+      "status": "blocked",
+      "summary": "Project absent from sandbox and unpinned scripts disallowed"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-010",
+      "title": "Missing approved analysis sandbox",
+      "state": "open",
+      "severity": "medium",
+      "description": "Not service-wide outage; requires pinned project and separate private frozen dataset"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Prepare allowed sandbox project and frozen input",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No live source, broker, or robot touched",
+    "No sandbox escape, policy bypass, or unpinned code execution",
+    "Approved fixture success does not mean new scripts authorized"
+  ]
+}

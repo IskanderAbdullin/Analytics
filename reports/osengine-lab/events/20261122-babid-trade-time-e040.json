@@ -1,0 +1,94 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "8c44e482-1692-4f37-9e42-89b7b30d750e",
+    "occurred_at": "2026-11-22T06:59:08.498Z",
+    "type": "research",
+    "title": "Distinguish broker execution timestamp from delayed fill processing",
+    "summary": "Read-only source and private aggregate corroboration: timestamp of execution precedes cancel notice, while fill reaches engine much later. Historical archive and broker mismatch remain unresolved.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Update evidence, hypothesis uncertainty and safe continuation after trade-time provenance check"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Update evidence, hypothesis uncertainty and safe continuation after trade-time provenance check"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Update evidence, hypothesis uncertainty and safe continuation after trade-time provenance check"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Update evidence, hypothesis uncertainty and safe continuation after trade-time provenance check"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Update evidence, hypothesis uncertainty and safe continuation after trade-time provenance check"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-trade-time-e040.json",
+      "action": "created",
+      "summary": "Research event with safety and source provenance"
+    }
+  ],
+  "checks": [
+    {
+      "id": "public-state-invariants",
+      "title": "Checkpoint invariants",
+      "kind": "static",
+      "status": "passed",
+      "summary": "Locally validated consistency of IDs, evidence references, blocked P0 and non-completion; GitHub Actions pending"
+    },
+    {
+      "id": "synthetic-ci",
+      "title": "Ubuntu/Windows synthetic test suite",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "GitHub PR workflows not yet triggered; no private inputs"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "No frozen original order-state/archive chronology",
+      "state": "open",
+      "severity": "high",
+      "description": "Cannot distinguish Prune from silent status FilledByState with available transition-only logs"
+    },
+    {
+      "id": "B-010",
+      "title": "Sandbox script rejected without execution",
+      "state": "open",
+      "severity": "medium",
+      "description": "Syntax-only PC Agent attempts returned HTTP 400; do not bypass pin or policy"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Frozen forensic input plus independent broker reconciliation",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No raw broker logs, IDs, secrets or private files published",
+    "No live trading/robot modification; no independent broker confirmation",
+    "Timestamp mapping corroborated from local source, not independently verified venue clock"
+  ]
+}

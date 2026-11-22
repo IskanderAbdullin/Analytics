@@ -1,0 +1,97 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "1200e538-2e56-4c7f-9b09-39e8a790d0ec",
+    "occurred_at": "2026-11-22T07:12:52.423Z",
+    "type": "research",
+    "title": "Separate broker execution and robot observation clock domains",
+    "summary": "Prevent old offline forensic merged timestamp sort from implying false event causality; record original source row sequence and clock domain.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/position_forensics.py",
+      "action": "modified",
+      "summary": "Separate timestamp domains and preserve source-native row order"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_position_forensics_clock_domains.py",
+      "action": "created",
+      "summary": "Regression on synthetic inverted-time ledger and delayed FILL log"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "New evidence E-044 and checkpoint M-024"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "New evidence E-044 and checkpoint M-024"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "New evidence E-044 and checkpoint M-024"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "New evidence E-044 and checkpoint M-024"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "New evidence E-044 and checkpoint M-024"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-dual-clock-audit-e044.json",
+      "action": "created",
+      "summary": "Development event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-ci",
+      "kind": "ci",
+      "title": "Offline synthetic CI",
+      "status": "not_run",
+      "summary": "New PR commit tests pending; no private files"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "No frozen raw order history",
+      "state": "open",
+      "severity": "high",
+      "description": "Cannot regenerate real private reports until approved sandbox execution works"
+    },
+    {
+      "id": "B-010",
+      "title": "PC Agent script endpoint error",
+      "state": "open",
+      "severity": "medium",
+      "description": "Remote execution HTTP404, no bypass"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Reprocess dual-clock private evidence from frozen input",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No independent broker confirmation or actual archive event",
+    "No user trade logs/IDs uploaded to GitHub",
+    "Only offline analysis code changed; live robot untouched"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "970391d0-4a2c-41ba-95d7-3b370a4324fe",
+    "occurred_at": "2026-11-22T07:18:09.508Z",
+    "type": "development",
+    "title": "Conservative synthetic broker execution matching",
+    "summary": "Safe offline matcher and 12 synthetic tests for differing trade-ID namespaces, ambiguity, duplicate records, UTC requirements, and no evidence case.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/broker_reconcile_synthetic.py",
+      "action": "created",
+      "summary": "Conservative offline candidate matcher, no broker access"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_broker_reconcile_synthetic.py",
+      "action": "created",
+      "summary": "Twelve synthetic tests without private files"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Update evidence E-046/checkpoint M-026 without claiming real reconciliation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Update evidence E-046/checkpoint M-026 without claiming real reconciliation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Update evidence E-046/checkpoint M-026 without claiming real reconciliation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Update evidence E-046/checkpoint M-026 without claiming real reconciliation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BROKER_RECONCILIATION_SPEC.md",
+      "action": "modified",
+      "summary": "Update evidence E-046/checkpoint M-026 without claiming real reconciliation"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-broker-match-synthetic-e046.json",
+      "action": "created",
+      "summary": "Research event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "local-synthetic",
+      "kind": "test",
+      "title": "Synthetic unit tests",
+      "status": "passed",
+      "summary": "12 new plus 17 prior synthetic tests, 29 passed in isolated Python"
+    },
+    {
+      "id": "new-pr-ci",
+      "kind": "ci",
+      "title": "GitHub CI",
+      "status": "not_run",
+      "summary": "Pending head SHA; no trading data uploaded"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-007",
+      "title": "Independent historical broker data still missing",
+      "state": "open",
+      "severity": "high",
+      "description": "No authorization to fetch broker executions"
+    },
+    {
+      "id": "B-010",
+      "title": "PC script endpoint HTTP404",
+      "state": "open",
+      "severity": "medium",
+      "description": "No frozen live data yet"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Authorized broker report and frozen local order status chronology",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Synthetic data is not a broker transaction proof",
+    "No live robot modification",
+    "No user personal order or account IDs uploaded"
+  ]
+}

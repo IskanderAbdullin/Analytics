@@ -1,0 +1,99 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "16dc907c-809f-4e47-96ee-169711fc4d4a",
+    "occurred_at": "2026-11-22T07:15:04.560Z",
+    "type": "research",
+    "title": "Official API timestamp semantics and archival broker-source limitations",
+    "summary": "Official TInvest docs establish trade time versus message time; GetOrderState may lack >1d histories, operation trade IDs can differ and reports remain authoritative. No broker access.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/BROKER_RECONCILIATION_SPEC.md",
+      "action": "created",
+      "summary": "Conservative historical broker data acquisition and reconciliation specification"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "E-045, milestone M-025 and new independent-evidence plan"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "E-045, milestone M-025 and new independent-evidence plan"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "E-045, milestone M-025 and new independent-evidence plan"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "E-045, milestone M-025 and new independent-evidence plan"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "E-045, milestone M-025 and new independent-evidence plan"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-official-api-provenance-e045.json",
+      "action": "created",
+      "summary": "Research event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "api-public-docs",
+      "kind": "review",
+      "title": "Official public API documentation",
+      "status": "passed",
+      "summary": "Verified execution vs message creation timestamps and historic API limitations"
+    },
+    {
+      "id": "ci",
+      "kind": "ci",
+      "title": "GitHub CI",
+      "status": "not_run",
+      "summary": "Pending new commit; no private inputs"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-007",
+      "title": "Historical broker reconciliation unproven",
+      "state": "open",
+      "severity": "high",
+      "description": "GetOrderState may expire; no user permission to call broker"
+    },
+    {
+      "id": "B-010",
+      "title": "PC Agent script unavailable",
+      "state": "open",
+      "severity": "medium",
+      "description": "HTTP404 before execution"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Frozen local chronology and independent broker reconciliation",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No real account, broker connection or trade data",
+    "Official docs cannot prove actual archive event",
+    "No live robot modifications"
+  ]
+}

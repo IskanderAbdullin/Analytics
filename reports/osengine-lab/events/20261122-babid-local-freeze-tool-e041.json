@@ -1,0 +1,104 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "fd9eed50-eb1c-489b-8455-f80c64ca2e01",
+    "occurred_at": "2026-11-22T07:04:44.368Z",
+    "type": "development",
+    "title": "Prepare SHA-verified local-only frozen forensic inputs (E-041)",
+    "summary": "Created a no-broker local-only, bounded forensic copy utility and eight passing synthetic tests; real data not frozen, no root-cause conclusion.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/freeze_evidence.py",
+      "action": "created",
+      "summary": "SHA256 pre/copy/post verification with private destination and explicit non-atomic limitations"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_freeze_evidence.py",
+      "action": "created",
+      "summary": "8 synthetic tests including mutation, traversal, and symlink checks"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Update evidence E-041, progress M-021, blockers and next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Update evidence E-041, progress M-021, blockers and next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Update evidence E-041, progress M-021, blockers and next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Update evidence E-041, progress M-021, blockers and next step"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Update evidence E-041, progress M-021, blockers and next step"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-local-freeze-tool-e041.json",
+      "action": "created",
+      "summary": "Durable OsEngine Lab v2 research event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "synthetic-offline-local",
+      "title": "Python unittest tests for frozen local evidence",
+      "kind": "test",
+      "status": "passed",
+      "summary": "8/8 tests passed in isolated container, only synthetic fixture data"
+    },
+    {
+      "id": "synthetic-ci",
+      "title": "GitHub Actions Ubuntu and Windows",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending head SHA update and PR CI; no real inputs"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "Actual frozen NVDA input not yet available",
+      "state": "open",
+      "severity": "high",
+      "description": "Tool is not the frozen dataset, no independent broker execution history"
+    },
+    {
+      "id": "B-010",
+      "title": "PC script endpoint unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "PC script syntax probes returned HTTP400; do not bypass sandbox restrictions"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Run allowed local freeze then examine unlogged FilledByState vs Prune",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No actual user files copied or uploaded",
+    "No live robot action or broker connection",
+    "Per-file hashes do not guarantee an atomic multi-file snapshot"
+  ]
+}

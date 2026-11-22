@@ -1,0 +1,97 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "43cd4393-39a5-4e35-aeb9-e9b5c6061be0",
+    "occurred_at": "2026-11-22T07:21:05.060Z",
+    "type": "development",
+    "title": "Guard against missing late fills at the observation-window boundary",
+    "summary": "Read-only forensic window now supports a bounded broker execution-time lookback and explicit row flags, with synthetic regression test and no claim about arrival time.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/position_forensics.py",
+      "action": "modified",
+      "summary": "Execution lookback parameter, explicit selection marker and count"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_position_forensics_clock_domains.py",
+      "action": "modified",
+      "summary": "Synthetic lookback regression test"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Document E-047/M-027, blocked P0 and private rerun prerequisite"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Document E-047/M-027, blocked P0 and private rerun prerequisite"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Document E-047/M-027, blocked P0 and private rerun prerequisite"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Document E-047/M-027, blocked P0 and private rerun prerequisite"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Document E-047/M-027, blocked P0 and private rerun prerequisite"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-late-fill-window-e047.json",
+      "action": "created",
+      "summary": "Development event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "new-commit-ci",
+      "title": "Synthetic tests and lint",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "Pending branch push; real trading inputs never used"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "Actual frozen NVDA data missing",
+      "state": "open",
+      "severity": "high",
+      "description": "Cannot rerun private evidence from source without authorized execution"
+    },
+    {
+      "id": "B-010",
+      "title": "PC script service HTTP404",
+      "state": "open",
+      "severity": "medium",
+      "description": "Script execution blocked; not bypassed"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Retry offline frozen source when PC script service available",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "Only synthetic tests, real source files not processed",
+    "No trading robot or broker access",
+    "Source execution timestamp is not a local arrival timestamp"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "agent/babid-trade-time-provenance-20261122",
+    "component_id": "projects/babid-cloud-analysis"
+  },
+  "event": {
+    "id": "4d388f30-63f0-4102-b68a-d8ad2e44f36e",
+    "occurred_at": "2026-11-22T07:09:42.611Z",
+    "type": "research",
+    "title": "Prune eligibility versus silent FilledByState",
+    "summary": "Source conditions and a conditional 33.285-second window mapped in nine synthetic-only tests; actual archive/broker cause unresolved.",
+    "basis": "observed_by_agent"
+  },
+  "changes": [
+    {
+      "path": "projects/babid-cloud-analysis/analysis/late_fill_paths.py",
+      "action": "created",
+      "summary": "Mathematical conditional predicate, not engine emulation"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/analysis/test_late_fill_paths.py",
+      "action": "created",
+      "summary": "Nine synthetic tests"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/STATE.json",
+      "action": "modified",
+      "summary": "Evidence E-043, checkpoint M-023 and next-action refinements"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/NEXT_ACTION.json",
+      "action": "modified",
+      "summary": "Evidence E-043, checkpoint M-023 and next-action refinements"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Evidence E-043, checkpoint M-023 and next-action refinements"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/BACKLOG.md",
+      "action": "modified",
+      "summary": "Evidence E-043, checkpoint M-023 and next-action refinements"
+    },
+    {
+      "path": "projects/babid-cloud-analysis/SOURCE_FIX_SPEC.md",
+      "action": "modified",
+      "summary": "Evidence E-043, checkpoint M-023 and next-action refinements"
+    },
+    {
+      "path": "reports/osengine-lab/events/20261122-babid-prune-conditions-e043.json",
+      "action": "created",
+      "summary": "Research event"
+    }
+  ],
+  "checks": [
+    {
+      "id": "local-synthetic",
+      "title": "Synthetic tests",
+      "kind": "test",
+      "status": "passed",
+      "summary": "9 new conditional-model tests locally, 17 total with freeze tests"
+    },
+    {
+      "id": "new-commit-ci",
+      "title": "PR CI",
+      "kind": "ci",
+      "status": "not_run",
+      "summary": "GitHub CI pending new SHA"
+    }
+  ],
+  "issues": [
+    {
+      "id": "B-009",
+      "title": "Real archive/status telemetry unavailable",
+      "state": "open",
+      "severity": "high",
+      "description": "No historical flags or independent broker execution log"
+    },
+    {
+      "id": "B-010",
+      "title": "PC script endpoint HTTP404",
+      "state": "open",
+      "severity": "medium",
+      "description": "Sandbox execution unavailable, no policy bypass"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "A-001",
+      "title": "Collect local frozen runtime status evidence",
+      "state": "blocked",
+      "priority": "high"
+    }
+  ],
+  "limitations": [
+    "No raw trading logs or IDs in public GitHub",
+    "No live robot change or broker access",
+    "Synthetic conditional model not historical evidence"
+  ]
+}
