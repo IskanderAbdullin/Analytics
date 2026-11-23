@@ -47,13 +47,14 @@ def main():
     # called 'settings'; application/json returns HTTP 415.
     payload={"env":{"SERVERSPACE_API_ENABLED":{"type":"plain_text","text":"true"}}}
     boundary="----BabitSettings"+uuid.uuid4().hex
-    body=(
-        "--"+boundary+"\\r\\n"+
-        'Content-Disposition: form-data; name="settings"\\r\\n'+
-        "Content-Type: application/json\\r\\n\\r\\n"+
-        json.dumps(payload)+"\\r\\n"+
-        "--"+boundary+"--\\r\\n"
-    ).encode()
+    crlf=bytes([13,10])
+    body=b"".join([
+        ("--"+boundary).encode(),crlf,
+        b'Content-Disposition: form-data; name="settings"',crlf,
+        b"Content-Type: application/json",crlf,crlf,
+        json.dumps(payload).encode(),crlf,
+        ("--"+boundary+"--").encode(),crlf
+    ])
     api("PATCH",BASE+"/settings",body,"multipart/form-data; boundary="+boundary)
     emit("read_only_activation","settings_patch_accepted")
     candidate=None
