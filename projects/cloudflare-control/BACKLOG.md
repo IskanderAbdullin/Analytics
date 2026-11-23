@@ -27,3 +27,5 @@ A-014 PENDING — collect actual sole-provider server count/on-off aggregate aft
 A-015 DONE (source stage, not deployed) — s2ctl-backed no-execution provider power contract: 6/6 tests in public Analytics; private draft PR #20 with a separate locked entrypoint, no real POST.
 A-016 NEXT — check Linux WSS device session after private export fix; determine endpoint/credential mismatch or offline agent without reboot/trade changes.
 A-017 NEXT — refresh ChatGPT `t_invest_IIS` OAuth plugin discovery for `serverspace_list_servers`.
+
+A-014 DONE — exact sanitized Serverspace aggregate from [45273824455 attempt 3](https://github.com/IskanderAbdullin/Analytics/actions/runs/45273824455): one VPS, powered on; Cron disabled after success. Continue A-016 Linux WSS and A-017 MCP catalogue; no actual power action.

@@ -1,0 +1,79 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "vps-api-control"
+  },
+  "event": {
+    "id": "2c7fb0ca-5ef4-4a0e-b12d-a4db1fd12a47",
+    "occurred_at": "2026-11-23T22:06:00Z",
+    "type": "testing",
+    "title": "Live Serverspace power-state aggregate: one VPS powered on",
+    "summary": "Reused existing private diagnostic Worker and KV, corrected competing cron trigger, confirmed one provider VPS powered on without disclosing identifying metadata; stopped cron after proof.",
+    "basis": "observed_by_agent",
+    "source_commit": "ae1e490393f74af3d375503cc8a04148856fc30c"
+  },
+  "changes": [
+    {
+      "path": "projects/vps-api-control/summary_probe.py",
+      "action": "reviewed",
+      "summary": "Read-only result accepted via strict count/power-state schema; no provider IDs logged."
+    }
+  ],
+  "checks": [
+    {
+      "id": "serverspace-aggregate-live",
+      "title": "Provider list aggregate and Cron stop on success",
+      "kind": "integration",
+      "status": "passed",
+      "command": "python -u projects/vps-api-control/summary_probe.py (read mode, GitHub Actions rerun attempt 3)",
+      "exit_code": 0,
+      "tested_commit": "9992c794bb9187299f57f5947e9ae8423258683d",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45273824455"
+        }
+      ],
+      "summary": "Confirmed count=1, powered_on=1, powered_off=0, power_unknown=0; same run disabled Cron after success."
+    }
+  ],
+  "issues": [
+    {
+      "id": "linux-wss-503-remains",
+      "title": "Authenticated owner VPS status still HTTP 503 after missing export repaired",
+      "state": "open",
+      "severity": "high",
+      "description": "Read-only inventory confirms the VPS is powered on; WSS availability is a separate unverified issue, does not justify power cycle."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "linux-admin-reconnect",
+      "title": "Diagnose Linux WSS device session or independent provider remote console",
+      "state": "todo",
+      "priority": "high",
+      "notes": "No shell/power/trading action as a connectivity test."
+    },
+    {
+      "id": "oauth-plugin-discovery",
+      "title": "Refresh ChatGPT MCP tool catalogue for owner-only serverspace_list_servers",
+      "state": "todo",
+      "priority": "medium",
+      "notes": "Server-side tool deployed, but not advertised in this session."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45273824455"
+    }
+  ],
+  "limitations": [
+    "Provider aggregate does not include actual host identity or attest to Linux OS/SSH connectivity.",
+    "No VPS power, shell, mutation, or trading operation performed.",
+    "Official universal_lab.py record/validate CLI not executed in connector-only environment; event authored to the v2 schema."
+  ]
+}
