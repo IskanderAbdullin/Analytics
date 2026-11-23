@@ -1,0 +1,25 @@
+name: Serverspace provider control-plane contract (offline)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-provider-contract.yml'
+      - 'projects/vps-api-control/provider_contract.py'
+      - 'projects/vps-api-control/test_provider_contract.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exercise pure planning and schema checks without credentials
+        working-directory: projects/vps-api-control
+        run: python -m unittest -v test_provider_contract.py
