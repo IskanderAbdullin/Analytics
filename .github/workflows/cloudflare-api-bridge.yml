@@ -37,6 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -44,6 +45,7 @@ jobs:
             -f state="success" \
             -f context="cloudflare-control-offline-tests" \
             -f description="Offline mock tests passed" \
+            -f target_url="https://github.com/$REPO/actions/runs/$RUN_ID" \
             >/dev/null
       - name: Read fixed Cloudflare Worker metadata
         id: cloudflare
@@ -76,6 +78,7 @@ jobs:
           RESULT: ${{ steps.cloudflare.outcome }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -90,4 +93,5 @@ jobs:
             -f state="$state" \
             -f context="cloudflare-readonly-audit" \
             -f description="$description" \
+            -f target_url="https://github.com/$REPO/actions/runs/$RUN_ID" \
             >/dev/null
