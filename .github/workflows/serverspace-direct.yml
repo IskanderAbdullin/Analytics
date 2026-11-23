@@ -1,0 +1,33 @@
+name: Serverspace API direct Worker deploy and probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/cloudflare-control/serverspace_deploy.py.gz'
+      - '.github/workflows/serverspace-direct.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: direct-serverspace-worker-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore transparent gzip Python utility
+        shell: bash
+        run: |
+          gzip -dc projects/cloudflare-control/serverspace_deploy.py.gz > "$RUNNER_TEMP/serverspace_deploy.py"
+          python -m py_compile "$RUNNER_TEMP/serverspace_deploy.py"
+      - name: Apply additive code-only Worker update and live Serverspace probe
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: python "$RUNNER_TEMP/serverspace_deploy.py"
