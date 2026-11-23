@@ -181,8 +181,8 @@ def main():
             store.get("type")!="kv_namespace" or store.get("namespace_id")!=ns):
             raise ProbeError("existing_worker_bindings_unexpected")
         emit("canary","existing_bindings_verified")
-        api("DELETE","/storage/kv/namespaces/"+ns+"/values/result")
-        emit("canary","kv_result_cleared")
+        # Keep any completed sanitized result across reruns; clearing it
+        # could erase a real Cron execution before the reader sees it.
         api("PUT",base+"/schedules",json.dumps([{"cron":"* * * * *"}]).encode())
         emit("canary","schedule_updated")
         emit("canary","existing_worker_rearmed_without_code_change")
@@ -201,10 +201,13 @@ def main():
         if not isinstance(code,str) or not re.fullmatch(r"[a-z0-9_]{3,55}",code):
             raise ProbeError("probe_result_invalid")
         emit("cloudflare_private_call",code)
-        # Disable recurrence after any final response, preserve diagnostics.
-        api("PUT",base+"/schedules",json.dumps([]).encode())
-        emit("canary","cron_disabled")
-        return 0 if code=="serverspace_inventory_ok" else 4
+        # Keep the isolated probe scheduled on transient/provider errors.
+        # Disable recurrence only after a genuine successful provider reply.
+        if code=="serverspace_inventory_ok":
+            api("PUT",base+"/schedules",json.dumps([]).encode())
+            emit("canary","cron_disabled_after_success")
+            return 0
+        return 4
     emit("cloudflare_private_call","pending_cron_propagation")
     return 5
 
