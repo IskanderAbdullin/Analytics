@@ -193,7 +193,7 @@ def main():
         try:
             payload=json.loads(api("GET",key,raw=True))
         except ProbeError as exc:
-            if str(exc)=="http_404": continue
+            if str(exc).startswith("http_404"): continue
             raise
         except ValueError:
             raise ProbeError("probe_result_invalid")
