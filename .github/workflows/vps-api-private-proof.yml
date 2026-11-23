@@ -24,7 +24,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile and check isolated implementation
-        run: python -m py_compile projects/vps-api-control/canary.py
+        run: python -m py_compile projects/vps-api-control/canary.py projects/vps-api-control/enable_inventory.py
+      - name: Activate existing read-only Serverspace API flag
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python -u projects/vps-api-control/enable_inventory.py
       - name: Probe private Cloudflare Service binding
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
