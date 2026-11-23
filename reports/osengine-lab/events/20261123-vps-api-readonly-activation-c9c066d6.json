@@ -63,9 +63,9 @@
       "id": "cf-private-canary-cron",
       "title": "Cloudflare independent private Service binding and Cron trigger setup",
       "kind": "integration",
-      "status": "passed",
+      "status": "failed",
       "command": "python -u projects/vps-api-control/canary.py (Cloudflare setup phase only)",
-      "exit_code": 0,
+      "exit_code": 3,
       "tested_commit": "cb81960db38aaa3a2fa2478838ac8192f7d16e49",
       "evidence": [
         {
@@ -73,7 +73,7 @@
           "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45264086055"
         }
       ],
-      "summary": "Private worker Service and KV bindings verified, Cron schedule accepted. This check covers setup phase only; workflow ultimately exited 3 because missing KV result was initially mishandled."
+      "summary": "Cron trigger and private bindings were accepted in the live run, but the full probe exited 3 on missing KV key (HTTP404); no provider response verified. Setup-phase observations were real despite failed full command."
     },
     {
       "id": "provider-private-inventory",
