@@ -1,6 +1,7 @@
 """Inspect live OAuth Worker compatibility without disclosing code or bindings."""
 from __future__ import annotations
 import json
+import re
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "cloudflare-control"))
@@ -48,6 +49,8 @@ def audit():
     },sort_keys=True))
 if __name__=="__main__":
     try:audit()
-    except SafeError:
-        print('{"stage":"oauth_caller_audit","result":"blocked"}')
+    except SafeError as exc:
+        raw=str(exc)
+        code=raw if re.fullmatch(r"[A-Za-z0-9_:-]{2,72}",raw) else "cloudflare_api_error"
+        print(json.dumps({"stage":"oauth_caller_audit","result":"blocked","code":code}))
         raise SystemExit(3)

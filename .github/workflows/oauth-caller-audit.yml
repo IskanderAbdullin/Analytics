@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/oauth-caller-audit.yml'
+      - 'projects/cloudflare-control/caller_audit.py'
   workflow_dispatch:
 permissions:
   contents: read
