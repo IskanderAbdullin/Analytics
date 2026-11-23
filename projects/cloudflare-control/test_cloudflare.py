@@ -71,7 +71,7 @@ class Tests(unittest.TestCase):
     def test_invalid_account_and_shape(self):
         with self.assertRaisesRegex(AuditError,"INVALID_ACCOUNT_ID"):
             get("evil","fake",WORKERS[0],"/settings",lambda *_: Reply([]))
-        result=audit("a"*32,"fake",lambda *_: Reply({"unexpected":"X"}))
+        result=audit("a"*32,"fake",lambda req, timeout: Reply({"unexpected":"X"}))
         self.assertFalse(result["connected"])
         self.assertEqual(result["workers"][0]["error"],"INVALID_SETTINGS_SCHEMA")
 
