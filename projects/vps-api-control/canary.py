@@ -166,7 +166,7 @@ def main():
                 raise ProbeError("new_worker_version_not_found")
             api("POST",base+"/deployments",json.dumps({"strategy":"percentage",
                 "versions":[{"version_id":vs[0]["id"],"percentage":100}]}).encode())
-        api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
+        api("PUT",base+"/schedules",json.dumps([{"cron":"* * * * *"}]).encode())
         emit("canary","cron_enabled")
     else:
         # No overwrite and no mutating an unrelated pre-existing Worker.
@@ -183,7 +183,7 @@ def main():
         emit("canary","existing_bindings_verified")
         api("DELETE","/storage/kv/namespaces/"+ns+"/values/result")
         emit("canary","kv_result_cleared")
-        api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
+        api("PUT",base+"/schedules",json.dumps([{"cron":"* * * * *"}]).encode())
         emit("canary","schedule_updated")
         emit("canary","existing_worker_rearmed_without_code_change")
     # Cron propagation may take up to 15 minutes; a timeout is not a failed API.
@@ -202,7 +202,7 @@ def main():
             raise ProbeError("probe_result_invalid")
         emit("cloudflare_private_call",code)
         # Disable recurrence after any final response, preserve diagnostics.
-        api("PUT",base+"/schedules",json.dumps({"schedules":[]}).encode())
+        api("PUT",base+"/schedules",json.dumps([]).encode())
         emit("canary","cron_disabled")
         return 0 if code=="serverspace_inventory_ok" else 4
     emit("cloudflare_private_call","pending_cron_propagation")
