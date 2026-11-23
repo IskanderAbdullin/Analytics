@@ -116,12 +116,16 @@ def main():
             break
     if not candidate:
         raise SafeError("VERSION_INTEGRITY_NOT_CONFIRMED")
-    if active_version(cf)!=old:
+    active_now=active_version(cf)
+    if active_now==old:
+        cf.call("POST",TARGET+"/deployments",json.dumps({
+            "strategy":"percentage",
+            "versions":[{"version_id":candidate,"percentage":100}]
+        }).encode("utf-8"),"application/json")
+    elif active_now==candidate:
+        emit("activation","automatically_live")
+    else:
         raise SafeError("CONCURRENT_ACTIVATION")
-    cf.call("POST",TARGET+"/deployments",json.dumps({
-        "strategy":"percentage",
-        "versions":[{"version_id":candidate,"percentage":100}]
-    }).encode("utf-8"),"application/json")
     if active_version(cf)!=candidate:
         raise SafeError("ACTIVATION_NOT_CONFIRMED")
     _,live_exports,live_names=inspect(cf,candidate)
