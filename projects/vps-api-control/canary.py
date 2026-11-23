@@ -73,7 +73,16 @@ def api(method, path, data=None, mime="application/json", raw=False):
                 raise ProbeError("cloudflare_rejected")
             return result.get("result")
     except HTTPError as exc:
-        raise ProbeError("http_"+str(exc.code)) from None
+        # Cloudflare's numeric errors are useful without exposing response
+        # text (which might contain bindings, account data or resource IDs).
+        try:
+            obj=json.loads(exc.read(20000))
+            codes=[str(x["code"]) for x in obj.get("errors",[])
+                   if isinstance(x,dict) and type(x.get("code")) is int]
+        except (ValueError,UnicodeError,KeyError,TypeError,AttributeError):
+            codes=[]
+        raise ProbeError("http_"+str(exc.code)+
+                         ("_cf_"+"_".join(codes[:3]) if codes else "")) from None
     except (URLError,TimeoutError,OSError):
         raise ProbeError("connection_failed") from None
     except (ValueError,UnicodeError):
@@ -160,8 +169,17 @@ def main():
         api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
         emit("canary","cron_enabled")
     else:
-        # This is our fixed diagnostic Worker; only re-arm its known KV key
-        # and cron. Never update or replace the existing script or bindings.
+        # No overwrite and no mutating an unrelated pre-existing Worker.
+        settings=api("GET",base+"/settings")
+        bindings=settings.get("bindings",[]) if isinstance(settings,dict) else []
+        service=next((x for x in bindings if isinstance(x,dict)
+                      and x.get("name")=="SERVERSPACE_SERVICE"),{})
+        store=next((x for x in bindings if isinstance(x,dict)
+                    and x.get("name")=="PROBE_RESULTS"),{})
+        if (service.get("type")!="service" or service.get("service")!=BRIDGE or
+            service.get("entrypoint")!="ServerspaceReadOnlyEntrypoint" or
+            store.get("type")!="kv_namespace" or store.get("namespace_id")!=ns):
+            raise ProbeError("existing_worker_bindings_unexpected")
         api("DELETE","/storage/kv/namespaces/"+ns+"/values/result")
         api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
         emit("canary","existing_worker_rearmed_without_code_change")
