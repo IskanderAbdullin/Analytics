@@ -155,7 +155,11 @@ def audit():
              if v.get("percentage")==100),None)
     if not isinstance(dv,str):
         raise SafeError("DEDICATED_VERSION_UNKNOWN")
-    dmeta=cf.call("GET","/workers/scripts/babit-vps-bridge/versions/"+dv)
+    detail=raw_content("/workers/scripts/babit-vps-bridge/versions/"+dv)
+    if detail is None:
+        raise SafeError("DEDICATED_VERSION_LOOKUP_UNAVAILABLE")
+    dmeta=json.loads(detail[0])
+    dmeta=dmeta.get("result",{}) if isinstance(dmeta,dict) else {}
     dexports=((dmeta.get("resources") or {}).get("script_runtime") or {}).get("exports") or {}
     print(json.dumps({"stage":"oauth_caller_audit","phase":"dedicated_named_exports",
        "vps_admin_entrypoint_live":dexports.get("VpsAdminEntrypoint",{}).get("type")=="worker",
