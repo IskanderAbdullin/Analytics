@@ -65,7 +65,11 @@ def main():
         for entry in versions[:10]:
             version=entry.get("id") if isinstance(entry,dict) else None
             if not isinstance(version,str): continue
-            names,exports,active=inspect(version)
+            try:
+                names,exports,active=inspect(version)
+            except ProbeError:
+                # Older versions may predate the private entrypoint.
+                continue
             if active and names==expected_names|{"SERVERSPACE_API_ENABLED"} and exports==expected_exports:
                 candidate=version
                 break
