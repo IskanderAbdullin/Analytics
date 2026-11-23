@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from urllib.error import HTTPError
+
 from cloudflare import WORKERS, AuditError, audit, check_request, get
 
 
