@@ -46,3 +46,25 @@ remain out of scope.
 - Workflow can now be triggered repeatedly from ChatGPT by a repo-scoped
   GitHub update to request.json in main. The owner only needs to add
   Analytics-scoped Secrets for the live read-only API verification.
+
+## 2026-11-23 UTC 19:43 — authenticated Cloudflare API SUCCESS
+- Owner provisioned both `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+  as Analytics Actions Secrets. Secret values were not accessed or printed.
+- Main branch committed `projects/cloudflare-control/request.json` nonce 2→3:
+  `5e176e37404cf4c2fdf437a3d5010606be2d44e1`.
+- Authenticated GitHub Actions run
+  https://github.com/IskanderAbdullin/Analytics/actions/runs/45251925905
+  completed SUCCESS; job `137963545927`.
+- Read-only Cloudflare API returned `connected=true`, with
+  `settings_ok=true`, `deployed=true` for both `babit-vps-bridge` and
+  `t-invest-mcp-proxy`.
+- The `SERVERSPACE_API_KEY` binding name is present in
+  `babit-vps-bridge`; `VPS_AGENT_ENABLED` binding name is present in
+  `t-invest-mcp-proxy`. The API does not reveal secret values.
+- No updates, power operations or script deployments were run.
+- **G-001 read-only GitHub→Cloudflare access achieved.**
+- NEXT: inspect deployed version/binding compatibility safely before
+  implementing Serverspace read-only extension from private MCP-proxi PR #18.
+  The broad Cloudflare token has more rights than this GET-only workflow uses;
+  all added operations need separately reviewed guardrails. Avoid returning
+  secret-bearing Cloudflare response data to public GitHub logs.

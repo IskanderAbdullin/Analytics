@@ -35,3 +35,15 @@ branch chatgpt/cloudflare-control-20261123 in IskanderAbdullin/Analytics.
   returned offline success, Cloudflare missing-secrets failure.
 - Direct authenticated Cloudflare API still not called; all cloud resources
   untouched; public logs reveal no token or raw Cloudflare responses.
+
+## Authenticated production Cloudflare GET proof — 2026-11-23T19:43:52Z
+- Source commit: `5e176e37404cf4c2fdf437a3d5010606be2d44e1`.
+- GitHub run: `45251925905`, job `137963545927` success.
+- Public-safe JSON:
+  `{"connected":true,"mode":"read_only","schema_version":1,"workers":[{"binding_present":true,"deployed":true,"expected_binding":"SERVERSPACE_API_KEY","settings_ok":true,"worker":"babit-vps-bridge"},{"binding_present":true,"deployed":true,"expected_binding":"VPS_AGENT_ENABLED","settings_ok":true,"worker":"t-invest-mcp-proxy"}]}`.
+- Scripts made two fixed GET requests per Worker, one for settings and one for
+  deployments. No writing to Cloudflare or VPS; no broker orders.
+- `cloudflare-control-offline-tests` and `cloudflare-readonly-audit`
+  both `success` with Actions URL in GitHub commit statuses.
+- `SERVERSPACE_API_KEY` binding presence does not prove the Serverspace API
+  itself works or that the staged PR #18 code is deployed.
