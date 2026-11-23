@@ -43,7 +43,7 @@ jobs:
           else: versions=[]
           if not isinstance(versions,list): raise SystemExit("VERSIONS_SCHEMA")
           selected=None
-          for item in versions[:10]:
+          for index,item in enumerate(versions[:10]):
               v=item.get("id") if isinstance(item,dict) else None
               if not isinstance(v,str) or not re.fullmatch("[a-fA-F0-9-]{30,40}",v):
                   continue
@@ -52,6 +52,12 @@ jobs:
               exports=(resources.get("script_runtime") or {}).get("exports") or {}
               bindings=resources.get("bindings") or []
               names={x.get("name") for x in bindings if isinstance(x,dict)} if isinstance(bindings,list) else set()
+              print(json.dumps({"version_rank":index,
+                  "serverspace_entry":exports.get("ServerspaceReadOnlyEntrypoint",{}).get("type")=="worker",
+                  "vps_relay_entry":"VpsAgentRelay" in exports,
+                  "serverspace_key_bound":"SERVERSPACE_API_KEY" in names,
+                  "relay_bound":"VPS_AGENT_RELAY" in names,
+                  "binding_list":isinstance(bindings,list)}))
               if exports.get("ServerspaceReadOnlyEntrypoint",{}).get("type")=="worker" and "VpsAgentRelay" in exports and {"SERVERSPACE_API_KEY","VPS_AGENT_RELAY"}.issubset(names):
                   selected=v
                   break
