@@ -47,3 +47,13 @@ branch chatgpt/cloudflare-control-20261123 in IskanderAbdullin/Analytics.
   both `success` with Actions URL in GitHub commit statuses.
 - `SERVERSPACE_API_KEY` binding presence does not prove the Serverspace API
   itself works or that the staged PR #18 code is deployed.
+
+## 2026-11-23 — live private entrypoint deployment evidence
+- User explicitly authorized editing/testing existing `babit-vps-bridge` Worker.
+- First code-only Cloudflare update via public Analytics GH Actions 45254233185 reported `stage=patch,result=updated`, but **was not yet active**; later updated with explicit `exports` metadata via full script upload.
+- Active earlier version inspection reported `private_serverspace_export=false`; the code-only patch lacked named export registration (run 45255330134).
+- Full script + inherited bindings publisher was checked in as `projects/cloudflare-control/serverspace_rebuild.py` and workflow `.github/workflows/serverspace-full-deploy.yml` under commit `a744e6c61975d4f744c6cff05165a4356329320d`; Actions run `45255927652`, job `137977600334`, exit success.
+- Its sanitized output: `{"stage":"full_upload","result":"accepted"}`; `{"stage":"activation","result":"live","serverspace_private_entrypoint":true,"vps_relay_preserved":true}`.
+- The private `ServerspaceReadOnlyEntrypoint` uses fixed authenticated Serverspace RU GET, responds with allowlisted metadata (ID/name/state/power) and is available only via same-account private Service binding. Source API key value never read or logged. No real trade or VPS changes.
+- All public workers.dev probes from GH runner were `HTTP 403`, including existing `babit-vps-bridge` and `t-invest-mcp-proxy`, source run `45254882866`, job `137973964681`. Ephemeral canary script(s) were deleted, not left enabled.
+- **Unverified:** actual Serverspace network/API response, OAuth caller Service binding/MCP tool. Requires separate private caller wiring; do not claim fully end-to-end ready.

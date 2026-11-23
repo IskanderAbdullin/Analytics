@@ -68,3 +68,11 @@ remain out of scope.
   The broad Cloudflare token has more rights than this GET-only workflow uses;
   all added operations need separately reviewed guardrails. Avoid returning
   secret-bearing Cloudflare response data to public GitHub logs.
+
+## 2026-11-23 UTC 20:06:55 — Serverspace WorkerEntryPoint LIVE
+- Owner explicitly approved a direct live deployment of the existing `babit-vps-bridge` without extra exploratory tests; no PC-Agent or Computer Use.
+- Public Analytics Actions deployed additive Cloudflare source update, then fixed the initial code-only version metadata by a full script upload carrying inherited bindings and explicit exports.
+- Final successful run: https://github.com/IskanderAbdullin/Analytics/actions/runs/45255927652 ; job `137977600334` observed `{"stage":"full_upload","result":"accepted"}` and `{"stage":"activation","result":"live","serverspace_private_entrypoint":true,"vps_relay_preserved":true}`.
+- **Verified:** Cloudflare active deployment now advertises the named private `ServerspaceReadOnlyEntrypoint` (WorkerEntrypoint), retains `VpsAgentRelay` and `SERVERSPACE_API_KEY`, is deployed 100%. No actual VPS power, Linux service or trading changes.
+- **Not verified:** outbound authenticated Serverspace reply through this entrypoint. Ephemeral canary Workers were created/deleted; all requests from GH Actions to checked `*.videns42.workers.dev` return Cloudflare 403, including pre-existing Worker addresses, so this is not proof of entrypoint failure.
+- NEXT: connect an authenticated private Cloudflare Service binding (the OAuth MCP caller or a Cloudflare-internal canary) to this named entrypoint, then read only the sanitized list of servers. Do not expose Serverspace through a public URL or assume cloud resource management automatically provides SSH.
