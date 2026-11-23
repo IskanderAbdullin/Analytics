@@ -24,6 +24,21 @@ jobs:
         shell: bash
         run: |
           gzip -dc projects/cloudflare-control/serverspace_deploy.py.gz > "$RUNNER_TEMP/serverspace_deploy.py"
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          p=Path(os.environ["RUNNER_TEMP"])/"serverspace_deploy.py"
+          s=p.read_text()
+          old="            except (HTTPError,URLError,TimeoutError):\\n                time.sleep(2)"
+          new=("            except HTTPError as exc:\\n"
+               "                print(json.dumps({'stage':'probe_http','code':exc.code}))\\n"
+               "                time.sleep(2)\\n"
+               "            except (URLError,TimeoutError):\\n"
+               "                print(json.dumps({'stage':'probe_network'}))\\n"
+               "                time.sleep(2)")
+          if old not in s: raise SystemExit("PATCH_ANCHOR_MISSING")
+          p.write_text(s.replace(old,new))
+          PY
           python -m py_compile "$RUNNER_TEMP/serverspace_deploy.py"
       - name: Apply additive code-only Worker update and live Serverspace probe
         env:
