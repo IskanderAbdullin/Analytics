@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/vps-api-activate.yml'
+      - 'projects/vps-api-control/enable_inventory.py'
   workflow_dispatch:
 permissions:
   contents: read
