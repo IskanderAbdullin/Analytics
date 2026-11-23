@@ -57,15 +57,17 @@ def audit():
     response=raw_content(TARGET+"/content/v2") or raw_content(TARGET)
     if response is None:raise SafeError("SOURCE_READ_UNAVAILABLE")
     source, source_type, main_header=response
-    modules, main=decode_worker(source_type,source,main_header)
-    body=next((m.content for m in modules if m.filename==main),b"")
+    # Count source markers directly: the dedicated-Worker decoder enforces a
+    # small per-module limit intended for the tiny VPS bridge, not the OAuth bundle.
+    body=source
+    module_count=source.count(b"Content-Disposition:") if source_type.startswith("multipart/") else 1
     if not body:raise SafeError("CALLER_SOURCE_UNKNOWN")
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
         flags[key] = "true" if b and (b.get("text") or b.get("value"))=="true" else "not_true"
     print(json.dumps({"stage":"oauth_caller_audit","result":"inspected",
-      "module_count":len(modules),"main_module_bytes":len(body),
+      "multipart_part_hints":module_count,"raw_content_bytes":len(body),
       "known_bindings_present":{k:k in names for k in ("OAUTH_KV",
        "GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET","COOKIE_ENCRYPTION_KEY",
        "ALLOWED_GOOGLE_EMAIL","TINVEST_TOKEN","PC_AGENT_RELAY",
