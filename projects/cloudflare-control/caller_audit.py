@@ -2,10 +2,12 @@
 from __future__ import annotations
 import json
 import re
+import os
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "cloudflare-control"))
 from serverspace_deploy import Cloudflare, SafeError, decode_worker
+from cloudflare import get as audited_get, AuditError
 
 TARGET="/workers/scripts/t-invest-mcp-proxy"
 CHECK=("list_upstream_tool_names","list_allowed_market_tools","call_market_tool",
@@ -16,7 +18,7 @@ CHECK=("list_upstream_tool_names","list_allowed_market_tools","call_market_tool"
 def audit():
     cf=Cloudflare()
     print('{"stage":"oauth_caller_audit","phase":"deployments"}',flush=True)
-    ds=cf.call("GET", TARGET+"/deployments")
+    ds=audited_get(os.environ["CLOUDFLARE_ACCOUNT_ID"],os.environ["CLOUDFLARE_API_TOKEN"],"t-invest-mcp-proxy","/deployments")
     ds=ds.get("deployments") if isinstance(ds,dict) else ds
     if not isinstance(ds,list) or not ds:
         raise SafeError("CALLER_DEPLOYMENT_MISSING")
@@ -52,7 +54,7 @@ def audit():
     },sort_keys=True))
 if __name__=="__main__":
     try:audit()
-    except SafeError as exc:
+    except (SafeError,AuditError) as exc:
         raw=str(exc)
         code=raw if re.fullmatch(r"[A-Za-z0-9_:-]{2,72}",raw) else "cloudflare_api_error"
         print(json.dumps({"stage":"oauth_caller_audit","result":"blocked","code":code}))
