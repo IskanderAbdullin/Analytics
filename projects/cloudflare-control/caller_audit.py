@@ -100,7 +100,8 @@ def audit():
         versions=vp.get("items",vp.get("versions",[])) if isinstance(vp,dict) else vp
         print(json.dumps({"stage":"oauth_caller_audit","phase":"versions",
             "version_count":len(versions) if isinstance(versions,list) else -1,
-            "active_in_list":any(x.get("id")==active for x in versions if isinstance(x,dict)) if isinstance(versions,list) else False
+            "active_in_list":any(x.get("id")==active for x in versions if isinstance(x,dict)) if isinstance(versions,list) else False,
+            "active_is_latest":bool(isinstance(versions,list) and versions and versions[0].get("id")==active)
         }),flush=True)
         if isinstance(versions,list) and versions:
             selected=next((x for x in versions if isinstance(x,dict) and x.get("id")==active),versions[0])
