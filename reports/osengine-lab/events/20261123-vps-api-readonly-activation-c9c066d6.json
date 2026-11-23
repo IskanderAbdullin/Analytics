@@ -1,0 +1,146 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "vps-api-control"
+  },
+  "event": {
+    "id": "c9c066d6-57c6-4fb7-8f6c-d2c6e63f8e9a",
+    "occurred_at": "2026-11-23T20:54:07Z",
+    "type": "development",
+    "title": "Dedicated Cloudflare Serverspace private API activation and canary",
+    "summary": "Used public Analytics GitHub Actions with existing private Secrets to enable SERVERSPACE_API_ENABLED on active babit-vps-bridge through source-preserving inherited Worker upload. Independent private Service-binding canary created, verified bindings and Cloudflare Cron scheduling; live provider inventory response remains pending.",
+    "basis": "observed_by_agent",
+    "source_commit": "cb81960db38aaa3a2fa2478838ac8192f7d16e49"
+  },
+  "changes": [
+    {
+      "path": "projects/vps-api-control/canary.py",
+      "action": "added",
+      "summary": "Private no-public-route scheduled Serverspace inventory canary with fixed named Service binding, result-code-only KV and sanitised GitHub logs"
+    },
+    {
+      "path": "projects/vps-api-control/enable_inventory.py",
+      "action": "added",
+      "summary": "One-flag production enablement via full Worker version upload preserving all existing source, Secrets, Durable Object bindings and named exports"
+    },
+    {
+      "path": ".github/workflows/vps-api-activate.yml",
+      "action": "added",
+      "summary": "Audited GitHub Actions Cloudflare flag activation via existing Analytics Secrets"
+    },
+    {
+      "path": ".github/workflows/vps-api-private-proof.yml",
+      "action": "added",
+      "summary": "Checks production entrypoint, Service binding and provider inventory response via Cloudflare Cron"
+    },
+    {
+      "path": "projects/vps-api-control/README.md",
+      "action": "added",
+      "summary": "Describes independent diagnostic path and boundary between Serverspace API and Ubuntu shell"
+    }
+  ],
+  "checks": [
+    {
+      "id": "cf-live-readonly-flag",
+      "title": "Production Cloudflare full-version upload and read-only flag activation",
+      "kind": "deployment",
+      "status": "passed",
+      "command": "PYTHONPATH=$RUNNER_TEMP python -u projects/vps-api-control/enable_inventory.py",
+      "exit_code": 0,
+      "tested_commit": "77cef0c022b97c04793d5c2bf6611635f25cac1e",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45263676970"
+        }
+      ],
+      "summary": "Cloudflare accepted source-preserving upload; activated at 100%, VPS relay verified preserved."
+    },
+    {
+      "id": "cf-private-canary-cron",
+      "title": "Cloudflare independent private Service binding and Cron trigger setup",
+      "kind": "integration",
+      "status": "passed",
+      "command": "python -u projects/vps-api-control/canary.py (Cloudflare setup phase only)",
+      "exit_code": 0,
+      "tested_commit": "cb81960db38aaa3a2fa2478838ac8192f7d16e49",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45264086055"
+        }
+      ],
+      "summary": "Private worker Service and KV bindings verified, Cron schedule accepted. This check covers setup phase only; workflow ultimately exited 3 because missing KV result was initially mishandled."
+    },
+    {
+      "id": "provider-private-inventory",
+      "title": "Real authenticated provider inventory through scheduled private Service binding",
+      "kind": "integration",
+      "status": "not_run",
+      "summary": "Cloudflare Cron propagation and end-to-end result not yet evidenced; follow-up canary run pending."
+    },
+    {
+      "id": "vps-command-execution",
+      "title": "Live Ubuntu command execution via existing VPS WSS relay",
+      "kind": "integration",
+      "status": "failed",
+      "command": "mcp__t_invest_IIS__vps_exec({command:'whoami', timeoutSeconds:8})",
+      "exit_code": 1,
+      "source_fingerprint": "BabitVpsAgent MCP VPS bridge 2026-11-23 20:37 UTC",
+      "evidence": [
+        {
+          "kind": "manual_observation",
+          "ref": "MCP tool returned VPS_AGENT_HTTP_504"
+        }
+      ],
+      "summary": "A one-off status succeeded; subsequent exec and status failed HTTP503/504, so OS shell access is not established."
+    }
+  ],
+  "issues": [
+    {
+      "id": "vps-relay-503-504",
+      "title": "BabitVpsAgent WebSocket intermittently disconnected",
+      "state": "open",
+      "severity": "high",
+      "description": "Status succeeded once but subsequent status/exec returned Cloudflare 503/504."
+    },
+    {
+      "id": "provider-inventory-not-yet-proven",
+      "title": "Cloudflare-to-Serverspace inventory response pending",
+      "state": "in_progress",
+      "severity": "high",
+      "description": "Named entrypoint, provider secret, enabled flag, private diagnostic Service binding and Cron schedule verified; real inventory response not yet confirmed."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "vps-api-get-result",
+      "title": "Read Cron KV sanitized outcome and verify live Serverspace inventory",
+      "state": "in_progress",
+      "priority": "high",
+      "notes": "Treat missing KV result as normal pending; do not expose server IDs/public URLs."
+    },
+    {
+      "id": "vps-api-owner-oauth",
+      "title": "Wire owner-only OAuth caller private Service binding to existing dedicated entrypoint",
+      "state": "todo",
+      "priority": "high",
+      "notes": "Preserve OAuth, T-Invest and PC-Agent bindings; verify private caller and source before deployment."
+    },
+    {
+      "id": "vps-api-full-operations",
+      "title": "Add documented provider power/VM operations and reliable Ubuntu execution channel",
+      "state": "todo",
+      "priority": "high",
+      "notes": "Provider API and Ubuntu shell are distinct; do not reboot trading VPS to test access."
+    }
+  ],
+  "limitations": [
+    "GitHub Actions public logs contain only sanitised outcome codes; provider responses and credentials are never published.",
+    "Cloudflare Cron propagation may delay first result, and Workers WSS relay remains intermittently disconnected.",
+    "Official OsEngine Lab universal_lab.py record/validate were not run in this GitHub-only environment."
+  ]
+}
