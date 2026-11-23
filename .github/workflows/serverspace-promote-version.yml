@@ -1,0 +1,76 @@
+name: Promote deployed Serverspace bridge version
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/serverspace-promote-version.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Activate latest verified Serverspace entrypoint version
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,os,re,urllib.request,urllib.error
+          account=os.environ.get("CLOUDFLARE_ACCOUNT_ID","")
+          token=os.environ.get("CLOUDFLARE_API_TOKEN","")
+          if not re.fullmatch("[a-fA-F0-9]{32}",account) or len(token)<16:
+              raise SystemExit("SECRETS_UNAVAILABLE")
+          base="https://api.cloudflare.com/client/v4/accounts/"+account+"/workers/scripts/babit-vps-bridge/"
+          def api(method,path,payload=None):
+              data=None if payload is None else json.dumps(payload).encode()
+              req=urllib.request.Request(base+path,data=data,method=method,
+                headers={"Authorization":"Bearer "+token,"Accept":"application/json",
+                         **({"Content-Type":"application/json"} if data else {})})
+              try:
+                  with urllib.request.urlopen(req,timeout=16) as res:
+                      r=json.loads(res.read(200000))
+              except urllib.error.HTTPError as e:
+                  raise SystemExit("CF_HTTP_"+str(e.code)) from None
+              if not isinstance(r,dict) or not r.get("success"):
+                  raise SystemExit("CLOUDFLARE_REJECTED")
+              return r.get("result")
+          latest=api("GET","versions?per_page=10")
+          if isinstance(latest,list): versions=latest
+          elif isinstance(latest,dict): versions=latest.get("items") or latest.get("versions") or latest.get("result") or []
+          else: versions=[]
+          if not isinstance(versions,list): raise SystemExit("VERSIONS_SCHEMA")
+          selected=None
+          for item in versions[:10]:
+              v=item.get("id") if isinstance(item,dict) else None
+              if not isinstance(v,str) or not re.fullmatch("[a-fA-F0-9-]{30,40}",v):
+                  continue
+              detail=api("GET","versions/"+v)
+              resources=detail.get("resources") or {}
+              exports=(resources.get("script_runtime") or {}).get("exports") or {}
+              bindings=resources.get("bindings") or []
+              names={x.get("name") for x in bindings if isinstance(x,dict)} if isinstance(bindings,list) else set()
+              if exports.get("ServerspaceReadOnlyEntrypoint",{}).get("type")=="worker" and "VpsAgentRelay" in exports and {"SERVERSPACE_API_KEY","VPS_AGENT_RELAY"}.issubset(names):
+                  selected=v
+                  break
+          if not selected:raise SystemExit("NO_SAFE_SERVSPACE_VERSION")
+          deployments=api("GET","deployments")
+          ds=deployments.get("deployments") if isinstance(deployments,dict) else deployments
+          if not isinstance(ds,list):raise SystemExit("DEPLOYMENTS_SCHEMA")
+          active=None
+          for ver in ((ds[0].get("versions") or []) if ds else []):
+              if ver.get("percentage")==100: active=ver.get("version_id")
+          if active==selected:
+              print(json.dumps({"status":"already_active","serverspace_export":True,"preserved_vps_relay":True}))
+          else:
+              api("POST","deployments",{"strategy":"percentage","versions":[{"version_id":selected,"percentage":100}]})
+              observed=api("GET","deployments")
+              arr=observed.get("deployments") if isinstance(observed,dict) else observed
+              confirmed=any(x.get("version_id")==selected and x.get("percentage")==100
+                 for x in ((arr[0].get("versions") or []) if arr else []))
+              print(json.dumps({"status":"promoted" if confirmed else "promotion_unconfirmed",
+                    "serverspace_export":True,"preserved_vps_relay":True}))
+              if not confirmed:raise SystemExit("PROMOTION_UNCONFIRMED")
+          PY
