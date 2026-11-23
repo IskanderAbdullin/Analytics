@@ -5,6 +5,8 @@ import re
 import os
 import sys
 from pathlib import Path
+from email.parser import BytesParser
+from email.policy import default as email_policy
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "cloudflare-control"))
@@ -62,12 +64,28 @@ def audit():
     body=source
     module_count=source.count(b"Content-Disposition:") if source_type.startswith("multipart/") else 1
     if not body:raise SafeError("CALLER_SOURCE_UNKNOWN")
+    parts=[]
+    if source_type.startswith("multipart/"):
+        message=BytesParser(policy=email_policy).parsebytes(
+            b"MIME-Version: 1.0\r\nContent-Type: "+source_type.encode("ascii")+
+            b"\r\n\r\n"+source
+        )
+        for part in message.iter_parts():
+            content=part.get_payload(decode=True) or b""
+            parts.append({"name":part.get_param("name",header="content-disposition") or "",
+                "js": "javascript" in part.get_content_type(),
+                "bytes":len(content),
+                "create_server":content.count(b"function createServer("),
+                "return_server":content.count(b"return server;"),
+                "list_allowed":content.count(b"list_allowed_market_tools"),
+                "vps_status":content.count(b"vps_status"),
+                "source_map":part.get_content_type()=="application/source-map"})
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
         flags[key] = "true" if b and (b.get("text") or b.get("value"))=="true" else "not_true"
     print(json.dumps({"stage":"oauth_caller_audit","result":"inspected",
-      "multipart_part_hints":module_count,"raw_content_bytes":len(body),
+      "multipart_part_hints":module_count,"raw_content_bytes":len(body),"parts":parts,
       "known_bindings_present":{k:k in names for k in ("OAUTH_KV",
        "GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET","COOKIE_ENCRYPTION_KEY",
        "ALLOWED_GOOGLE_EMAIL","TINVEST_TOKEN","PC_AGENT_RELAY",
