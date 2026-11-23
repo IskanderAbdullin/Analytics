@@ -38,19 +38,6 @@ jobs:
               schedules=api("GET",base+"/schedules")
               sc=schedules.get("schedules") if isinstance(schedules,dict) else schedules
               if not isinstance(sc,list):sc=[]
-              source=None
-              try:
-                  from pathlib import Path
-                  sys.path.insert(0,"projects/cloudflare-control")
-                  import gzip
-                  from importlib.util import spec_from_file_location,module_from_spec
-                  spec=spec_from_file_location("serverspace_deploy","/tmp/serverspace_deploy.py")
-                  Path("/tmp/serverspace_deploy.py").write_bytes(gzip.decompress(Path("projects/cloudflare-control/serverspace_deploy.py.gz").read_bytes()))
-                  m=module_from_spec(spec);spec.loader.exec_module(m)
-                  from canary import api as a
-                  # Script contents are never output to CI.
-              except Exception:
-                  pass
               emit("diagnostic_worker","version_state",active=bool(vid),
                    schedules_active=bool(sc),schedule_count=len(sc),
                    binding_count=len(settings.get("bindings",[])))
