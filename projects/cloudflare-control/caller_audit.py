@@ -25,13 +25,12 @@ def audit():
     active=next((v.get("version_id") for v in ds[0].get("versions",[])
                  if v.get("percentage")==100),None)
     if not isinstance(active,str): raise SafeError("CALLER_ACTIVE_UNKNOWN")
-    print('{"stage":"oauth_caller_audit","phase":"version"}',flush=True)
-    version=cf.call("GET", TARGET+"/versions/"+active)
-    resources=version.get("resources") or {}
-    bindings=resources.get("bindings") or []
+    print('{"stage":"oauth_caller_audit","phase":"settings"}',flush=True)
+    settings=audited_get(os.environ["CLOUDFLARE_ACCOUNT_ID"],os.environ["CLOUDFLARE_API_TOKEN"],"t-invest-mcp-proxy","/settings")
+    bindings=settings.get("bindings") or []
     names={b.get("name") for b in bindings if isinstance(b,dict)}
     types={b.get("name"):b.get("type") for b in bindings if isinstance(b,dict)}
-    runtime=resources.get("script_runtime") or {}
+    runtime=settings.get("script_runtime") or {}
     print('{"stage":"oauth_caller_audit","phase":"content"}',flush=True)
     source, source_type, main_header=cf.call("GET", TARGET+"/content/v2", raw=True)
     modules, main=decode_worker(source_type,source,main_header)
