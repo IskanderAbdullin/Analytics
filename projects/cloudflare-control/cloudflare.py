@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, HTTPRedirectHandler, build_opener
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 ROOT = "https://api.cloudflare.com/client/v4/accounts"
 WORKERS = ("babit-vps-bridge", "t-invest-mcp-proxy")

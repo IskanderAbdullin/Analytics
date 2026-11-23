@@ -5,7 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 from urllib.error import HTTPError
-from cloudflare import AuditError, WORKERS, audit, check_request, get
+from cloudflare import WORKERS, AuditError, audit, check_request, get
+
 
 class Reply:
     status=200

@@ -52,7 +52,23 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: python cloudflare.py
+        run: |
+          set +e
+          python cloudflare.py > "$RUNNER_TEMP/cloudflare-audit.json"
+          code=$?
+          set -e
+          cat "$RUNNER_TEMP/cloudflare-audit.json"
+          if grep -q '"status":"secrets_unavailable"' "$RUNNER_TEMP/cloudflare-audit.json"; then
+            reason="Analytics Secrets not configured"
+          elif grep -q '"error": "HTTP_403"' "$RUNNER_TEMP/cloudflare-audit.json"; then
+            reason="Cloudflare API permission denied"
+          elif grep -q '"error": "HTTP_401"' "$RUNNER_TEMP/cloudflare-audit.json"; then
+            reason="Cloudflare API unauthorized"
+          else
+            reason="Cloudflare API audit unavailable"
+          fi
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          exit "$code"
       - name: Publish public-safe GitHub commit status
         if: always()
         env:
@@ -68,7 +84,7 @@ jobs:
             description="Cloudflare read-only inventory succeeded"
           else
             state=failure
-            description="Cloudflare read-only inventory unavailable"
+            description="${{ steps.cloudflare.outputs.reason }}"
           fi
           gh api --method POST "repos/$REPO/statuses/$SHA" \
             -f state="$state" \
