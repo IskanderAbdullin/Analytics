@@ -138,3 +138,5 @@ if __name__=="__main__":
         code=raw if re.fullmatch(r"[A-Za-z0-9_:-]{2,72}",raw) else "cloudflare_api_error"
         print(json.dumps({"stage":"oauth_caller_audit","result":"blocked","code":code}))
         raise SystemExit(3)
+
+# Audit rerun after Cloudflare content-and-binding update (no production writes).
