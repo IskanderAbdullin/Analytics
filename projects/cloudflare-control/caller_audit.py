@@ -26,8 +26,8 @@ def raw_content(path):
     req=Request(url,method="GET",headers={"Authorization":"Bearer "+token,"Accept":"*/*"})
     try:
         with opener.open(req,timeout=20) as res:
-            data=res.read(6000001)
-            if len(data)>6000000:raise SafeError("SOURCE_TOO_LARGE")
+            data=res.read(40000001)
+            if len(data)>40000000:raise SafeError("SOURCE_TOO_LARGE")
             return data,res.headers.get("Content-Type",""),res.headers.get("CF-Worker-Main-Module-Part","")
     except HTTPError as exc:
         print(json.dumps({"stage":"oauth_caller_audit","phase":"script_api","route":"content_v2" if path.endswith("/content/v2") else "script","http":exc.code}),flush=True)
