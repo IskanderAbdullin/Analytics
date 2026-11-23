@@ -6,6 +6,7 @@ Never reads secret values, prints server/account IDs or executes VPS commands.
 """
 import json
 import time
+import uuid
 from canary import api, emit, ProbeError, BRIDGE
 
 BASE="/workers/scripts/"+BRIDGE
@@ -42,8 +43,18 @@ def main():
     if enabled:
         emit("read_only_activation","already_enabled")
         return 0
+    # API's /settings PATCH requires multipart/form-data with a field
+    # called 'settings'; application/json returns HTTP 415.
     payload={"env":{"SERVERSPACE_API_ENABLED":{"type":"plain_text","text":"true"}}}
-    api("PATCH",BASE+"/settings",json.dumps(payload).encode())
+    boundary="----BabitSettings"+uuid.uuid4().hex
+    body=(
+        "--"+boundary+"\\r\\n"+
+        'Content-Disposition: form-data; name="settings"\\r\\n'+
+        "Content-Type: application/json\\r\\n\\r\\n"+
+        json.dumps(payload)+"\\r\\n"+
+        "--"+boundary+"--\\r\\n"
+    ).encode()
+    api("PATCH",BASE+"/settings",body,"multipart/form-data; boundary="+boundary)
     emit("read_only_activation","settings_patch_accepted")
     candidate=None
     for _ in range(5):
