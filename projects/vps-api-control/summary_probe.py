@@ -97,6 +97,32 @@ def verified_existing(ns):
     emit("summary_probe","existing_diagnostic_confirmed")
     return base
 
+def audit_scheduled_version(base):
+    deployments=api("GET",base+"/deployments")
+    records=deployments.get("deployments") if isinstance(deployments,dict) else deployments
+    if not isinstance(records,list) or not records:
+        raise ProbeError("diagnostic_deployments_schema")
+    active=next((v.get("version_id") for v in records[0].get("versions",[])
+                 if v.get("percentage")==100),None)
+    if not isinstance(active,str):
+        raise ProbeError("diagnostic_active_version_unknown")
+    versions=api("GET",base+"/versions?per_page=10")
+    options=versions.get("items",versions.get("versions",[])) if isinstance(versions,dict) else versions
+    if not isinstance(options,list) or not options or not isinstance(options[0].get("id"),str):
+        raise ProbeError("diagnostic_versions_schema")
+    latest=options[0]["id"]
+    def scheduled_for(version):
+        resource=api("GET",base+"/versions/"+version)
+        script=(resource or {}).get("resources",{}).get("script",{})
+        return "scheduled" in (script.get("handlers") or [])
+    active_scheduled=scheduled_for(active)
+    latest_scheduled=scheduled_for(latest)
+    emit("summary_probe","deployment_audit",
+         active_scheduled=active_scheduled,
+         latest_scheduled=latest_scheduled,
+         active_is_latest=active==latest)
+    return active,latest,active_scheduled,latest_scheduled
+
 def stage(ns):
     base=verified_existing(ns)
     # The source is script-only and public-safe, but the uploaded package
@@ -126,6 +152,7 @@ def stage(ns):
 
 def read(ns):
     base=verified_existing(ns)
+    audit_scheduled_version(base)
     try:
         payload=json.loads(api("GET","/storage/kv/namespaces/"+ns+
                                "/values/"+KEY,raw=True))
