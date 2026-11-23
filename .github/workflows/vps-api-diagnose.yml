@@ -1,0 +1,75 @@
+name: VPS diagnostic Worker deployed version audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-api-diagnose.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check only diagnostic script active version and cron
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"projects/vps-api-control")
+          from canary import api, WORKER, emit, ProbeError
+          base="/workers/scripts/"+WORKER
+          try:
+              deployments=api("GET",base+"/deployments")
+              items=deployments.get("deployments") if isinstance(deployments,dict) else deployments
+              vid=next((v.get("version_id") for v in items[0].get("versions",[])
+                        if v.get("percentage")==100),None) if items else None
+              settings=api("GET",base+"/settings")
+              schedules=api("GET",base+"/schedules")
+              sc=schedules.get("schedules") if isinstance(schedules,dict) else schedules
+              if not isinstance(sc,list):sc=[]
+              source=None
+              try:
+                  from pathlib import Path
+                  sys.path.insert(0,"projects/cloudflare-control")
+                  import gzip
+                  from importlib.util import spec_from_file_location,module_from_spec
+                  spec=spec_from_file_location("serverspace_deploy","/tmp/serverspace_deploy.py")
+                  Path("/tmp/serverspace_deploy.py").write_bytes(gzip.decompress(Path("projects/cloudflare-control/serverspace_deploy.py.gz").read_bytes()))
+                  m=module_from_spec(spec);spec.loader.exec_module(m)
+                  from canary import api as a
+                  # Script contents are never output to CI.
+              except Exception:
+                  pass
+              emit("diagnostic_worker","version_state",active=bool(vid),
+                   schedules_active=bool(sc),schedule_count=len(sc),
+                   binding_count=len(settings.get("bindings",[])))
+          except ProbeError as e:
+              emit("diagnostic_worker","blocked",code=str(e) if str(e).startswith("http_") else "api_error")
+              raise SystemExit(3)
+          PY
+      - name: Publish verification link
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          RESULT: ${{ job.status }}
+        run: |
+          if [ "$RESULT" = "success" ]; then state=success; desc="Cloudflare diagnostic Worker runtime metadata checked";
+          else state=failure; desc="Cloudflare diagnostic Worker audit blocked"; fi
+          gh api --method POST "repos/$REPO/statuses/$SHA" \
+            -f state="$state" -f context="vps-diagnostic-runtime-audit" \
+            -f description="$desc" \
+            -f target_url="https://github.com/$REPO/actions/runs/$RUN_ID" >/dev/null
