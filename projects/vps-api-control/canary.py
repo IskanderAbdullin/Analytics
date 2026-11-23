@@ -180,8 +180,11 @@ def main():
             service.get("entrypoint")!="ServerspaceReadOnlyEntrypoint" or
             store.get("type")!="kv_namespace" or store.get("namespace_id")!=ns):
             raise ProbeError("existing_worker_bindings_unexpected")
+        emit("canary","existing_bindings_verified")
         api("DELETE","/storage/kv/namespaces/"+ns+"/values/result")
+        emit("canary","kv_result_cleared")
         api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
+        emit("canary","schedule_updated")
         emit("canary","existing_worker_rearmed_without_code_change")
     # Cron propagation may take up to 15 minutes; a timeout is not a failed API.
     key="/storage/kv/namespaces/"+ns+"/values/result"
