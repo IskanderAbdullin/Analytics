@@ -160,7 +160,11 @@ def main():
         api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
         emit("canary","cron_enabled")
     else:
-        emit("canary","existing_worker_not_overwritten")
+        # This is our fixed diagnostic Worker; only re-arm its known KV key
+        # and cron. Never update or replace the existing script or bindings.
+        api("DELETE","/storage/kv/namespaces/"+ns+"/values/result")
+        api("PUT",base+"/schedules",json.dumps({"schedules":[{"cron":"* * * * *"}]}).encode())
+        emit("canary","existing_worker_rearmed_without_code_change")
     # Cron propagation may take up to 15 minutes; a timeout is not a failed API.
     key="/storage/kv/namespaces/"+ns+"/values/result"
     for attempt in range(19):
