@@ -1,5 +1,5 @@
 {
   "schema_version": 1,
-  "nonce": 4,
-  "operation": "stage"
+  "nonce": 5,
+  "operation": "read"
 }
