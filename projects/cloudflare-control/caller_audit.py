@@ -176,6 +176,23 @@ def audit():
         "admin_status_path_marker_present":b"/v1/vps/status" in dsbytes,
         "serverspace_class_marker_present":b"ServerspaceReadOnlyEntrypoint" in dsbytes
     },sort_keys=True),flush=True)
+    # A disabled workers.dev route would prevent the Linux WSS client
+    # reaching dedicated Worker even if private admin RPC is correctly bound.
+    for script in ("babit-vps-bridge","t-invest-mcp-proxy"):
+        route=raw_content("/workers/scripts/"+script+"/subdomain")
+        if route is None:
+            print(json.dumps({"stage":"oauth_caller_audit","phase":"workers_dev_route",
+                              "worker":script,"result":"unavailable"}),flush=True)
+            continue
+        value=json.loads(route[0])
+        value=value.get("result") if isinstance(value,dict) and "result" in value else value
+        if not isinstance(value,dict):
+            raise SafeError("SUBDOMAIN_SCHEMA")
+        print(json.dumps({"stage":"oauth_caller_audit","phase":"workers_dev_route",
+           "worker":script,
+           "enabled":value.get("enabled") is True,
+           "previews_enabled":value.get("previews_enabled") is True
+        },sort_keys=True),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
