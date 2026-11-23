@@ -19,3 +19,11 @@ A-006 SERVER-SIDE DONE — existing OAuth `t-invest-mcp-proxy` now has private `
 A-009 NEXT — refresh/discover authenticated `t_invest_IIS` connector's tools, call new `serverspace_list_servers`; validate safe inventory and errors.
 A-010 NEXT AFTER A-009 — decide separately permitted Serverspace provider control actions (power/config) and Linux shell path; do not touch live VPS or trades without explicit scoped approval.
 A-011 LOW — source map was dropped by Cloudflare settings update; restore only if it impacts debugging. Existing main script verified present.
+
+## 2026-11-23 22:04 UTC priorities
+A-012 DONE — restore missing `VpsAdminEntrypoint` named export, independently verified live in 45274182466 attempt 2; `vps_status` still 503 because WSS/agent remains disconnected or unverified.
+A-013 DONE — isolate competing GitHub workflow Cron triggers so summary probe is not cleared by old successful diagnostic; existing Worker reused.
+A-014 PENDING — collect actual sole-provider server count/on-off aggregate after Cloudflare Cron propagation, no IDs in public logs. Last `summary_v1` was pending around 22:00 UTC.
+A-015 DONE (source stage, not deployed) — s2ctl-backed no-execution provider power contract: 6/6 tests in public Analytics; private draft PR #20 with a separate locked entrypoint, no real POST.
+A-016 NEXT — check Linux WSS device session after private export fix; determine endpoint/credential mismatch or offline agent without reboot/trade changes.
+A-017 NEXT — refresh ChatGPT `t_invest_IIS` OAuth plugin discovery for `serverspace_list_servers`.

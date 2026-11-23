@@ -1,0 +1,223 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "vps-api-control"
+  },
+  "event": {
+    "id": "da22ac20-aa4d-4b79-93d6-c1d15eb87cc8",
+    "occurred_at": "2026-11-23T22:04:00Z",
+    "type": "development",
+    "title": "Restore private VPS admin export and stage independent Serverspace control plane",
+    "summary": "Confirmed and repaired missing named VPS admin Worker export; remaining Linux WSS returned 503. Isolated competing summary Cron trigger; staged pure power contract and private draft PR, without real server operations.",
+    "basis": "observed_by_agent",
+    "source_commit": "1733cd66940ab3a3720e35a9fbfcc4ee27857b48"
+  },
+  "changes": [
+    {
+      "path": "projects/vps-api-control/summary_probe.py",
+      "action": "added",
+      "summary": "Private scheduled summary in original diagnostic Worker with redacted aggregate-only KV result."
+    },
+    {
+      "path": ".github/workflows/vps-api-private-proof.yml",
+      "action": "modified",
+      "summary": "Narrowed old trigger to avoid stopping newly scheduled summary Cron."
+    },
+    {
+      "path": "projects/vps-api-control/provider_contract.py",
+      "action": "added",
+      "summary": "Nonexecuting one-target Serverspace power and task response contract."
+    },
+    {
+      "path": "projects/cloudflare-control/vps_admin_export.py",
+      "action": "added",
+      "summary": "Source-preserving export recovery with inherited original bindings, corrected for Cloudflare autoactivation."
+    },
+    {
+      "path": "projects/cloudflare-control/caller_audit.py",
+      "action": "modified",
+      "summary": "Independent live private export, routing and workers.dev diagnostics."
+    }
+  ],
+  "checks": [
+    {
+      "id": "private-admin-diagnosis",
+      "title": "Detect missing named VPS admin export",
+      "status": "passed",
+      "command": "python -u projects/cloudflare-control/caller_audit.py",
+      "exit_code": 0,
+      "tested_commit": "e49e864f36c0fbd7842bcdf9b2c2a314568a2391",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45274001199"
+        }
+      ],
+      "summary": "Live script was missing named VPS admin export; source class present in later independent audit.",
+      "kind": "integration"
+    },
+    {
+      "id": "admin-export-preflight",
+      "title": "Source preserving export dry-run",
+      "status": "passed",
+      "command": "python -u projects/cloudflare-control/vps_admin_export.py (dry_run)",
+      "exit_code": 0,
+      "tested_commit": "b2fcde04b5107e5124b04b103c5d59d2194da25e",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45274414567"
+        }
+      ],
+      "summary": "One source module and seven existing bindings; no Cloudflare write.",
+      "kind": "integration"
+    },
+    {
+      "id": "admin-export-deploy",
+      "title": "Cloudflare accepted admin export Worker upload but automated script exited 3",
+      "status": "failed",
+      "command": "python -u projects/cloudflare-control/vps_admin_export.py (activate)",
+      "exit_code": 3,
+      "tested_commit": "81ceb625e7ccc53c45ece9eda6b050abfe24c4a1",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45274491529"
+        }
+      ],
+      "summary": "Upload accepted; Cloudflare autoactivated and script flagged CONCURRENT_ACTIVATION; independent audit verified live state.",
+      "kind": "deployment"
+    },
+    {
+      "id": "admin-export-live",
+      "title": "Independent post-deploy proof of named exports",
+      "status": "passed",
+      "command": "python -u projects/cloudflare-control/caller_audit.py (GitHub Actions rerun attempt 2)",
+      "exit_code": 0,
+      "tested_commit": "3ed3099ec206f34a1e7f69295fd681a98c2f86be",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45274182466"
+        }
+      ],
+      "summary": "Both named private entrypoints and VPS relay active; required binding names unchanged.",
+      "kind": "deployment"
+    },
+    {
+      "id": "aggregate-schedule",
+      "title": "Existing diagnostic Worker summary Cron rearmed after trigger isolation",
+      "status": "passed",
+      "command": "python -u projects/vps-api-control/summary_probe.py (stage)",
+      "exit_code": 0,
+      "tested_commit": "9457694b932c1715a307fe7b593093cdb48f8215",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45273731893"
+        }
+      ],
+      "summary": "Already-staged aggregate-only JS; scheduled Cron accepted.",
+      "kind": "integration"
+    },
+    {
+      "id": "power-contract-offline",
+      "title": "Nonexecuting provider power contract unit tests",
+      "status": "passed",
+      "command": "python -m unittest -v test_provider_contract.py",
+      "exit_code": 0,
+      "tested_commit": "ffffb5b68fcf00cf2184f512bc91773548da27db",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45272478653"
+        }
+      ],
+      "summary": "Six genuine offline tests passed in public Analytics runner.",
+      "kind": "unit"
+    },
+    {
+      "id": "summary-actual-result",
+      "title": "Existing diagnostic KV aggregate inventory",
+      "kind": "integration",
+      "status": "not_run",
+      "summary": "No confirmed summary at checkpoint; read returned pending even after Cron scheduling. Track separately."
+    },
+    {
+      "id": "staged-private-power-tests",
+      "title": "Private PR #20 TypeScript mock tests",
+      "kind": "unit",
+      "status": "not_run",
+      "summary": "Code and tests staged in private GitHub, tests not executed and no production deploy."
+    }
+  ],
+  "issues": [
+    {
+      "id": "vps-wss-503",
+      "title": "Linux WSS admin status remains HTTP503",
+      "state": "open",
+      "severity": "high",
+      "description": "Named private export repaired and workers.dev enabled, but active Linux device session/credential/endpoint not yet confirmed."
+    },
+    {
+      "id": "summary-kv-pending",
+      "title": "Aggregate Cron KV result pending",
+      "state": "in_progress",
+      "severity": "medium",
+      "description": "After fixing cross-workflow Cron cancellation, summary was still pending; verify after propagation."
+    },
+    {
+      "id": "mcp-tool-catalog-stale",
+      "title": "Connected ChatGPT OAuth tool catalogue lacks serverspace_list_servers",
+      "state": "open",
+      "severity": "medium",
+      "description": "Server-side code and Cloudflare Service binding live; newly deployed tool not advertised by current ChatGPT connector."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "aggregate-read-after-propagation",
+      "title": "Read sanitized aggregate summary from existing diagnostic KV",
+      "state": "in_progress",
+      "priority": "high",
+      "notes": "Read existing result; no reupload/new Worker; disable Cron on confirmed success only."
+    },
+    {
+      "id": "vps-agent-session",
+      "title": "Diagnose Linux WSS device session from dedicated relay",
+      "state": "todo",
+      "priority": "high",
+      "notes": "Do not reboot VPS or use trading/PC GUI. Need authoritative session info without credentials disclosure."
+    },
+    {
+      "id": "mcp-tool-catalogue",
+      "title": "Refresh owner OAuth MCP connector tool discovery",
+      "state": "todo",
+      "priority": "medium",
+      "notes": "Then call serverspace_list_servers; avoid creating duplicate plugins/workers."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45274182466"
+    },
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45272478653"
+    },
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/IskanderAbdullin/MCP-proxi/pull/20"
+    }
+  ],
+  "limitations": [
+    "No live VPS power/SSH/shell/trading performed.",
+    "Current ChatGPT connector lacks new provider-list MCP action.",
+    "Private PR20 tests were authored but not executed.",
+    "Official universal_lab.py record/validate CLI not executed in connector-only environment; event created using official v2 schema fields."
+  ]
+}
