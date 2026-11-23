@@ -80,6 +80,18 @@ def audit():
                 "list_allowed":content.count(b"list_allowed_market_tools"),
                 "vps_status":content.count(b"vps_status"),
                 "source_map":part.get_content_type()=="application/source-map"})
+    runtime_settings=raw_content(TARGET+"/script-settings")
+    if runtime_settings:
+        payload=json.loads(runtime_settings[0])
+        payload=payload.get("result") if isinstance(payload,dict) and "result" in payload else payload
+        if not isinstance(payload,dict):raise SafeError("SCRIPT_SETTINGS_INVALID")
+        exports=payload.get("exports") or {}
+        print(json.dumps({"stage":"oauth_caller_audit","phase":"runtime_metadata",
+          "keys":sorted(payload.keys()),
+          "named_exports":{k:v.get("type") for k,v in exports.items() if isinstance(v,dict)},
+          "flags_present":bool(payload.get("compatibility_flags")),
+          "compatibility_date_present":bool(payload.get("compatibility_date"))
+        },sort_keys=True),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
