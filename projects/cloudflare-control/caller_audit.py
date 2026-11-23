@@ -5,6 +5,8 @@ import re
 import os
 import sys
 from pathlib import Path
+from urllib.request import Request, build_opener, HTTPRedirectHandler
+from urllib.error import HTTPError, URLError
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "cloudflare-control"))
 from serverspace_deploy import Cloudflare, SafeError, decode_worker
 from cloudflare import get as audited_get, AuditError
@@ -14,6 +16,24 @@ CHECK=("list_upstream_tool_names","list_allowed_market_tools","call_market_tool"
        "pc_status","vps_status","serverspace_list_servers",
        "function createServer", "function createServer(", "return server;",
        "registerTool(", "SERVERSPACE_SERVICE", "SERVERSPACE_ENABLED")
+
+def raw_content(path):
+    account=os.environ["CLOUDFLARE_ACCOUNT_ID"]
+    token=os.environ["CLOUDFLARE_API_TOKEN"]
+    if not re.fullmatch(r"[0-9a-fA-F]{32}",account):raise SafeError("INVALID_ACCOUNT")
+    url="https://api.cloudflare.com/client/v4/accounts/"+account+path
+    opener=build_opener()
+    req=Request(url,method="GET",headers={"Authorization":"Bearer "+token,"Accept":"*/*"})
+    try:
+        with opener.open(req,timeout=20) as res:
+            data=res.read(6000001)
+            if len(data)>6000000:raise SafeError("SOURCE_TOO_LARGE")
+            return data,res.headers.get("Content-Type",""),res.headers.get("CF-Worker-Main-Module-Part","")
+    except HTTPError as exc:
+        print(json.dumps({"stage":"oauth_caller_audit","phase":"script_api","route":"content_v2" if path.endswith("/content/v2") else "script","http":exc.code}),flush=True)
+        return None
+    except (URLError,TimeoutError):
+        raise SafeError("SOURCE_NETWORK_ERROR") from None
 
 def audit():
     cf=Cloudflare()
@@ -32,7 +52,9 @@ def audit():
     types={b.get("name"):b.get("type") for b in bindings if isinstance(b,dict)}
     runtime=settings.get("script_runtime") or {}
     print('{"stage":"oauth_caller_audit","phase":"content"}',flush=True)
-    source, source_type, main_header=cf.call("GET", TARGET+"/content/v2", raw=True)
+    response=raw_content(TARGET+"/content/v2") or raw_content(TARGET)
+    if response is None:raise SafeError("SOURCE_READ_UNAVAILABLE")
+    source, source_type, main_header=response
     modules, main=decode_worker(source_type,source,main_header)
     body=next((m.content for m in modules if m.filename==main),b"")
     if not body:raise SafeError("CALLER_SOURCE_UNKNOWN")
