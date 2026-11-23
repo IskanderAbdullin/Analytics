@@ -57,3 +57,13 @@ branch chatgpt/cloudflare-control-20261123 in IskanderAbdullin/Analytics.
 - The private `ServerspaceReadOnlyEntrypoint` uses fixed authenticated Serverspace RU GET, responds with allowlisted metadata (ID/name/state/power) and is available only via same-account private Service binding. Source API key value never read or logged. No real trade or VPS changes.
 - All public workers.dev probes from GH runner were `HTTP 403`, including existing `babit-vps-bridge` and `t-invest-mcp-proxy`, source run `45254882866`, job `137973964681`. Ephemeral canary script(s) were deleted, not left enabled.
 - **Unverified:** actual Serverspace network/API response, OAuth caller Service binding/MCP tool. Requires separate private caller wiring; do not claim fully end-to-end ready.
+
+## 2026-11-23 UTC 21:29 — independent Serverspace provider + OAuth deployment evidence
+- Provider list: run [45265270517](https://github.com/IskanderAbdullin/Analytics/actions/runs/45265270517), `cloudflare_private_call=serverspace_inventory_ok`, valid allowlisted schema, diagnostic Cron disabled.
+- OAuth production preflight: run [45268781717](https://github.com/IskanderAbdullin/Analytics/actions/runs/45268781717): 25 existing bindings, PC/VPS true, no Serverspace tool/binding, 2 original modules.
+- Dry-run syntax and target checks passed: [45269497666](https://github.com/IskanderAbdullin/Analytics/actions/runs/45269497666).
+- Deploy attempt: [45269625921](https://github.com/IskanderAbdullin/Analytics/actions/runs/45269625921), two API mutation calls accepted; workflow error `MODULE_LAYOUT_UNEXPECTED` only in final verifier after source-map normalization.
+- Independent live caller audit: [45269740240](https://github.com/IskanderAbdullin/Analytics/actions/runs/45269740240) confirmed active main JS has owner-only MCP tool, `SERVERSPACE_SERVICE` is a Service binding and `SERVERSPACE_ENABLED=true`, all original PC/VPS/OAuth/broker bindings present; 27 total. JS source map was dropped by Cloudflare during setting update.
+- Post-deploy no-write idempotence check: [45269882505](https://github.com/IskanderAbdullin/Analytics/actions/runs/45269882505), success with patch_needed=false, binding_needed=false, 27 bindings.
+- Owner OAuth call to existing `list_allowed_market_tools` via connected `t_invest_IIS` returned success. New `serverspace_list_servers` was not advertised among this session's callable connector tools; **no ChatGPT MCP end-to-end proof yet**.
+- Code: `projects/cloudflare-control/oauth_rollout.py`, `oauth_rollout_request.json`, `caller_audit.py` and corresponding Actions workflows. Secrets and Cloudflare script content never committed.

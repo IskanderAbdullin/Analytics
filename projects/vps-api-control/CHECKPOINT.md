@@ -88,3 +88,9 @@ server IDs, Worker sources fetched from Cloudflare, hostnames or raw replies.
 The ChatGPT Automations attempt to schedule a 20-minute recheck was
 rejected by plan limit (5 active tasks); no automation was created.
 Do not claim that this chat continues asynchronously.
+
+## 2026-11-23 UTC 21:29 — provider success and OAuth integration update
+- Earlier `pending_no_result` was superseded: independent Cloudflare private Service binding got an authenticated, sanitized Serverspace RU list response, `serverspace_inventory_ok`, run https://github.com/IskanderAbdullin/Analytics/actions/runs/45265270517. Cron stopped after success.
+- Production OAuth `t-invest-mcp-proxy` now contains registered owner-only `serverspace_list_servers` and the correct Cloudflare Service binding; live audited in run https://github.com/IskanderAbdullin/Analytics/actions/runs/45269740240, with PC/VPS/broker/OAuth binding names preserved. Dry-run after deployment https://github.com/IskanderAbdullin/Analytics/actions/runs/45269882505 succeeded.
+- **NOT YET VERIFIED**: new tool invoked from ChatGPT-connected MCP. The current session's advertised `t_invest_IIS` tools do not list it (existing market tool still works). Reconnect/refresh provider's exposed tool schema if possible; then execute real read-only call.
+- Provider mutation (power/create/delete), Ubuntu shell reliability and trading control are outside the proven read-only bridge.

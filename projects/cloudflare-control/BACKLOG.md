@@ -13,3 +13,9 @@ A-007 OPTIONAL — diagnose workers.dev 403 from GH runners if needed;
                  unrelated to actual private entrypoint registration.
 A-008 DEFERRED — explicit owner-scoped Serverspace power API actions
                  after proof that read-only private request succeeds.
+
+## 2026-11-23 UTC 21:29 update
+A-006 SERVER-SIDE DONE — existing OAuth `t-invest-mcp-proxy` now has private `SERVERSPACE_SERVICE` to dedicated entrypoint, `SERVERSPACE_ENABLED=true` and owner-only `serverspace_list_servers` code. Verified by independent live API audit [45269740240](https://github.com/IskanderAbdullin/Analytics/actions/runs/45269740240). End-to-end tool call still pending.
+A-009 NEXT — refresh/discover authenticated `t_invest_IIS` connector's tools, call new `serverspace_list_servers`; validate safe inventory and errors.
+A-010 NEXT AFTER A-009 — decide separately permitted Serverspace provider control actions (power/config) and Linux shell path; do not touch live VPS or trades without explicit scoped approval.
+A-011 LOW — source map was dropped by Cloudflare settings update; restore only if it impacts debugging. Existing main script verified present.

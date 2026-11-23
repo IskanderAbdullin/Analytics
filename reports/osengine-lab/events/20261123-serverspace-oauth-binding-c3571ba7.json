@@ -1,0 +1,202 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "cloudflare-control"
+  },
+  "event": {
+    "id": "c3571ba7-a074-4dd7-8f43-669b2f738b39",
+    "occurred_at": "2026-11-23T21:30:28.630Z",
+    "type": "release",
+    "title": "Serverspace RU private inventory and authenticated OAuth MCP caller deployment",
+    "summary": "Independently confirmed live Serverspace private inventory; deployed owner-only OAuth MCP read-only tool with private same-account binding while preserving original 25 bindings; ChatGPT connector tool refresh still required.",
+    "basis": "observed_by_agent",
+    "source_commit": "d0eda87bc1f57f8f98be401ee8bdccc06d52a11d"
+  },
+  "changes": [
+    {
+      "path": "projects/cloudflare-control/oauth_rollout.py",
+      "action": "added",
+      "summary": "Exact production OAuth JS injection, syntax-only dry run, code-only upload and binding-inheritance patch"
+    },
+    {
+      "path": "projects/cloudflare-control/caller_audit.py",
+      "action": "added",
+      "summary": "Sanitized production OAuth Worker compatibility and post-deploy audit without exposing source"
+    },
+    {
+      "path": ".github/workflows/oauth-serverspace-rollout.yml",
+      "action": "added",
+      "summary": "Action with read-only default and explicitly triggered deployment"
+    },
+    {
+      "path": "projects/cloudflare-control/oauth_rollout_request.json",
+      "action": "added",
+      "summary": "Explicit mode/nonce; reverted to dry_run after rollout"
+    }
+  ],
+  "checks": [
+    {
+      "id": "cf-private-provider-readonly",
+      "title": "Real Cloudflare Service Binding to Serverspace list API",
+      "kind": "integration",
+      "status": "passed",
+      "command": "python -u projects/vps-api-control/canary.py",
+      "exit_code": 0,
+      "tested_commit": "f27cc4a392c589421c175faaefa6b6ad221c6268",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45265270517"
+        }
+      ],
+      "summary": "Live private Cloudflare Cron reported serverspace_inventory_ok and disabled recurring Cron"
+    },
+    {
+      "id": "cf-oauth-dryrun",
+      "title": "Compile/insertion syntax check against current OAuth JS",
+      "kind": "build",
+      "status": "passed",
+      "command": "python -u projects/cloudflare-control/oauth_rollout.py (dry_run; includes node --check)",
+      "exit_code": 0,
+      "tested_commit": "59d44188fb6445a925e5ce16b57cbc0b63f6bb9b",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269497666"
+        }
+      ],
+      "summary": "Compatible 2-module bundle and 25 original bindings"
+    },
+    {
+      "id": "cf-oauth-activate",
+      "title": "Deploy OAuth code and settings through isolated Cloudflare APIs",
+      "kind": "deployment",
+      "status": "failed",
+      "command": "python -u projects/cloudflare-control/oauth_rollout.py (activate)",
+      "exit_code": 3,
+      "tested_commit": "d8389ed01028b387f5d9f5aefbf625c8449f467a",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269625921"
+        }
+      ],
+      "summary": "Cloudflare accepted code and binding writes; verifier rejected post-patch one-module layout; production mutations independently confirmed later"
+    },
+    {
+      "id": "cf-oauth-live-audit",
+      "title": "Independent live OAuth Worker verification",
+      "kind": "deployment",
+      "status": "passed",
+      "command": "python -u projects/cloudflare-control/caller_audit.py",
+      "exit_code": 0,
+      "tested_commit": "195e3bf1f7c6c88041cd168595355793f5a8f724",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269740240"
+        }
+      ],
+      "summary": "Live source has owner-only MCP tool, Service binding, flag true, existing PC/VPS/OAuth/broker binding names preserved"
+    },
+    {
+      "id": "cf-oauth-idempotent",
+      "title": "Post-deploy no-write dry-run",
+      "kind": "deployment",
+      "status": "passed",
+      "command": "python -u projects/cloudflare-control/oauth_rollout.py (dry_run)",
+      "exit_code": 0,
+      "tested_commit": "d0eda87bc1f57f8f98be401ee8bdccc06d52a11d",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269882505"
+        }
+      ],
+      "summary": "One JS module accepted; no new patch needed, 27 bindings remain"
+    },
+    {
+      "id": "cf-chatgpt-new-tool",
+      "title": "New Serverspace MCP tool called directly from ChatGPT",
+      "kind": "integration",
+      "status": "not_run",
+      "summary": "Connected tool catalogue currently does not advertise serverspace_list_servers; existing OAuth market-tools call does work"
+    }
+  ],
+  "issues": [
+    {
+      "id": "cf-chatgpt-tool-discovery",
+      "title": "ChatGPT MCP tool catalogue has not refreshed",
+      "state": "open",
+      "severity": "medium",
+      "description": "Production tool source and binding active, but new tool unavailable among currently exposed connector actions"
+    },
+    {
+      "id": "cf-sourcemap-normalized",
+      "title": "Cloudflare active OAuth bundle no longer contains source map",
+      "state": "mitigated",
+      "severity": "low",
+      "description": "After Cloudflare code+settings patches the active content has index.js only; debugger mapping may be reduced, runtime code and original bindings remain"
+    },
+    {
+      "id": "cf-analytics-ci-baseline",
+      "title": "Analytics CI Ruff lint fails in existing public project",
+      "state": "open",
+      "severity": "low",
+      "description": "Main CI run reports 73 Ruff violations including previously existing VPS utilities; independent Cloudflare audits passed"
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "cf-refresh-new-mcp-tool",
+      "title": "Refresh MCP tool discovery and execute owner-only Serverspace list",
+      "state": "todo",
+      "priority": "high",
+      "notes": "Use existing authenticated t_invest_IIS connector; do not expose private API through a public route"
+    },
+    {
+      "id": "cf-provider-controls",
+      "title": "Plan separately authorized provider control operations and reliable Ubuntu command channel",
+      "state": "blocked",
+      "priority": "medium",
+      "notes": "Read-only integration is proven; VPS power and shell are separate unverified capabilities"
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45265270517"
+    },
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269740240"
+    },
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269882505"
+    }
+  ],
+  "deployments": [
+    {
+      "environment": "Cloudflare production t-invest-mcp-proxy",
+      "status": "observed_live",
+      "source_commit": "d0eda87bc1f57f8f98be401ee8bdccc06d52a11d",
+      "verification_method": "Cloudflare REST read-only settings, deployment metadata and script content via independent Analytics runner",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45269740240"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No Serverspace server IDs, credential values or raw Worker source published in public Actions.",
+    "ChatGPT MCP new tool not yet called; provider inventory was proved via Cloudflare Cron diagnostic.",
+    "Script source map absent in active bundle after Cloudflare settings update.",
+    "Universal Lab record/validate CLI not executed in this connector-only environment; event modeled after official v2 schema and existing validated repository event."
+  ]
+}
