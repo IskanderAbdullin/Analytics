@@ -40,6 +40,23 @@ jobs:
           p.write_text(s.replace(old,new))
           PY
           python -m py_compile "$RUNNER_TEMP/serverspace_deploy.py"
+      - name: Diagnose read-only public Workers.dev reachability
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request, urllib.error
+          for host in ("babit-vps-bridge.videns42.workers.dev","t-invest-mcp-proxy.videns42.workers.dev"):
+              url="https://"+host+"/"
+              try:
+                  with urllib.request.urlopen(url,timeout=8) as r:
+                      print("EDGE_REACHABLE",host,r.status)
+              except urllib.error.HTTPError as e:
+                  body=e.read(4096).decode("utf-8","ignore").lower()
+                  flags=[k for k in ("cloudflare","access denied","error 1020","error 1015","attention required","forbidden") if k in body]
+                  print("EDGE_HTTP",host,e.code,"cloudflare_header",bool(e.headers.get("cf-ray")),"body_markers",flags)
+              except Exception:
+                  print("EDGE_NETWORK",host)
+          PY
       - name: Apply additive code-only Worker update and live Serverspace probe
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
