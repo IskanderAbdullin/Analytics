@@ -148,7 +148,8 @@ def unpack(root,token):
         if not isinstance(name,str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,120}",name):
             raise Halt("MODULE_NAME_UNEXPECTED")
         modules.append((name,part.get_content_type(),part.get_payload(decode=True) or b""))
-    if sorted(name for name,_,_ in modules)!=["index.js","index.js.map"]:
+    names=sorted(name for name,_,_ in modules)
+    if names not in (["index.js"],["index.js","index.js.map"]):
         raise Halt("MODULE_LAYOUT_UNEXPECTED")
     js=next(payload for name,_,payload in modules if name=="index.js")
     source=js.decode("utf-8")
