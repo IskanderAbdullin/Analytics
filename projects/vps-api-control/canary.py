@@ -128,12 +128,13 @@ def main():
                   if isinstance(x,dict) and x.get("name")=="SERVERSPACE_API_ENABLED"),None)
     emit("bridge_audit","entrypoint_present",api_enabled=(enabled=="true"))
     ns=get_namespace()
+    emit("canary","kv_namespace_ready")
     # Never overwrite an unknown Worker. If this exact one already exists,
     # inspect its schedules and result only rather than replacing its script.
     base="/workers/scripts/"+WORKER
     existing=False
     try:
-        api("GET",base)
+        api("GET",base+"/settings")
         existing=True
     except ProbeError as exc:
         if str(exc)!="http_404": raise
