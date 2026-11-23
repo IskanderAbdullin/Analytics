@@ -51,6 +51,7 @@ def audit():
     if not isinstance(active,str): raise SafeError("CALLER_ACTIVE_UNKNOWN")
     print('{"stage":"oauth_caller_audit","phase":"settings"}',flush=True)
     settings=audited_get(os.environ["CLOUDFLARE_ACCOUNT_ID"],os.environ["CLOUDFLARE_API_TOKEN"],"t-invest-mcp-proxy","/settings")
+    print(json.dumps({"stage":"oauth_caller_audit","phase":"legacy_settings","keys":sorted(settings.keys())}),flush=True)
     bindings=settings.get("bindings") or []
     names={b.get("name") for b in bindings if isinstance(b,dict)}
     types={b.get("name"):b.get("type") for b in bindings if isinstance(b,dict)}
@@ -92,6 +93,29 @@ def audit():
           "flags_present":bool(payload.get("compatibility_flags")),
           "compatibility_date_present":bool(payload.get("compatibility_date"))
         },sort_keys=True),flush=True)
+    versions_response=raw_content(TARGET+"/versions?per_page=10")
+    if versions_response:
+        vp=json.loads(versions_response[0])
+        vp=vp.get("result") if isinstance(vp,dict) and "result" in vp else vp
+        versions=vp.get("items",vp.get("versions",[])) if isinstance(vp,dict) else vp
+        print(json.dumps({"stage":"oauth_caller_audit","phase":"versions",
+            "version_count":len(versions) if isinstance(versions,list) else -1,
+            "active_in_list":any(x.get("id")==active for x in versions if isinstance(x,dict)) if isinstance(versions,list) else False
+        }),flush=True)
+        if isinstance(versions,list) and versions:
+            selected=next((x for x in versions if isinstance(x,dict) and x.get("id")==active),versions[0])
+            if isinstance(selected,dict) and isinstance(selected.get("id"),str):
+                details_response=raw_content(TARGET+"/versions/"+selected["id"])
+                if details_response:
+                    dp=json.loads(details_response[0])
+                    dp=dp.get("result") if isinstance(dp,dict) and "result" in dp else dp
+                    resources=dp.get("resources",{}) if isinstance(dp,dict) else {}
+                    meta=resources.get("script_runtime",{})
+                    print(json.dumps({"stage":"oauth_caller_audit","phase":"version_detail",
+                       "export_types":{k:v.get("type") for k,v in (meta.get("exports") or {}).items() if isinstance(v,dict)},
+                       "compatibility_date_present":bool(meta.get("compatibility_date")),
+                       "compatibility_flags_count":len(meta.get("compatibility_flags") or [])
+                    }),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
