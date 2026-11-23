@@ -15,6 +15,7 @@ CHECK=("list_upstream_tool_names","list_allowed_market_tools","call_market_tool"
 
 def audit():
     cf=Cloudflare()
+    print('{"stage":"oauth_caller_audit","phase":"deployments"}',flush=True)
     ds=cf.call("GET", TARGET+"/deployments")
     ds=ds.get("deployments") if isinstance(ds,dict) else ds
     if not isinstance(ds,list) or not ds:
@@ -22,12 +23,14 @@ def audit():
     active=next((v.get("version_id") for v in ds[0].get("versions",[])
                  if v.get("percentage")==100),None)
     if not isinstance(active,str): raise SafeError("CALLER_ACTIVE_UNKNOWN")
+    print('{"stage":"oauth_caller_audit","phase":"version"}',flush=True)
     version=cf.call("GET", TARGET+"/versions/"+active)
     resources=version.get("resources") or {}
     bindings=resources.get("bindings") or []
     names={b.get("name") for b in bindings if isinstance(b,dict)}
     types={b.get("name"):b.get("type") for b in bindings if isinstance(b,dict)}
     runtime=resources.get("script_runtime") or {}
+    print('{"stage":"oauth_caller_audit","phase":"content"}',flush=True)
     source, source_type, main_header=cf.call("GET", TARGET+"/content/v2", raw=True)
     modules, main=decode_worker(source_type,source,main_header)
     body=next((m.content for m in modules if m.filename==main),b"")
