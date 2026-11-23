@@ -127,6 +127,22 @@ def audit():
       "legacy_hmac_binding_present":"VPS_AGENT_HMAC_SECRET" in names,
       "vps_device_id_binding_present":"VPS_AGENT_DEVICE_ID" in names
     },sort_keys=True),flush=True)
+    # Dedicated Worker WSS readiness is independent of Serverspace inventory.
+    dedicated_settings=audited_get(os.environ["CLOUDFLARE_ACCOUNT_ID"],
+        os.environ["CLOUDFLARE_API_TOKEN"],"babit-vps-bridge","/settings")
+    dedicated_bindings=dedicated_settings.get("bindings") or []
+    dedicated_names={b.get("name") for b in dedicated_bindings if isinstance(b,dict)}
+    enabled_item=next((b for b in dedicated_bindings if isinstance(b,dict) and
+                       b.get("name")=="VPS_AGENT_ENABLED"),{})
+    enabled_value=enabled_item.get("text") or enabled_item.get("value")
+    print(json.dumps({"stage":"oauth_caller_audit","phase":"dedicated_wss_readiness",
+        "vps_agent_enabled":enabled_value=="true",
+        "vps_agent_enabled_var_present":"VPS_AGENT_ENABLED" in dedicated_names,
+        "device_id_binding_present":"VPS_AGENT_DEVICE_ID" in dedicated_names,
+        "device_secret_binding_present":"VPS_AGENT_DEVICE_SECRET" in dedicated_names,
+        "hmac_secret_binding_present":"VPS_AGENT_HMAC_SECRET" in dedicated_names,
+        "relay_binding_present":"VPS_AGENT_RELAY" in dedicated_names
+    },sort_keys=True),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
