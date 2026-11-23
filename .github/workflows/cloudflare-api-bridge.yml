@@ -1,0 +1,97 @@
+name: Cloudflare API bridge (read-only)
+
+on:
+  push:
+    branches:
+      - main
+      - chatgpt/cloudflare-control-20261123
+    paths:
+      - '.github/workflows/cloudflare-api-bridge.yml'
+      - 'projects/cloudflare-control/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: analytics-cloudflare-readonly-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline checks without Secrets
+        working-directory: projects/cloudflare-control
+        run: python -m unittest discover -p 'test_*.py' -v
+      - name: Report offline tests as commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$REPO/statuses/$SHA" \
+            -f state="success" \
+            -f context="cloudflare-control-offline-tests" \
+            -f description="Offline mock tests passed" \
+            -f target_url="https://github.com/$REPO/actions/runs/$RUN_ID" \
+            >/dev/null
+      - name: Read fixed Cloudflare Worker metadata
+        id: cloudflare
+        continue-on-error: true
+        working-directory: projects/cloudflare-control
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set +e
+          python cloudflare.py > "$RUNNER_TEMP/cloudflare-audit.json"
+          code=$?
+          set -e
+          cat "$RUNNER_TEMP/cloudflare-audit.json"
+          if grep -q '"status":"secrets_unavailable"' "$RUNNER_TEMP/cloudflare-audit.json"; then
+            reason="Analytics Secrets not configured"
+          elif grep -q '"error": "HTTP_403"' "$RUNNER_TEMP/cloudflare-audit.json"; then
+            reason="Cloudflare API permission denied"
+          elif grep -q '"error": "HTTP_401"' "$RUNNER_TEMP/cloudflare-audit.json"; then
+            reason="Cloudflare API unauthorized"
+          else
+            reason="Cloudflare API audit unavailable"
+          fi
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          exit "$code"
+      - name: Publish public-safe GitHub commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ steps.cloudflare.outcome }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$RESULT" = "success" ]; then
+            state=success
+            description="Cloudflare read-only inventory succeeded"
+          else
+            state=failure
+            description="${{ steps.cloudflare.outputs.reason }}"
+          fi
+          gh api --method POST "repos/$REPO/statuses/$SHA" \
+            -f state="$state" \
+            -f context="cloudflare-readonly-audit" \
+            -f description="$description" \
+            -f target_url="https://github.com/$REPO/actions/runs/$RUN_ID" \
+            >/dev/null
