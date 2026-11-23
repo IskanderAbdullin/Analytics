@@ -26,3 +26,12 @@ branch chatgpt/cloudflare-control-20261123 in IskanderAbdullin/Analytics.
   state still untested because Analytics-repository Secrets are not present.
 - GitHub Actions token only posts safe commit status; logs remain public.
 - Full static/CI testing is evidence of code validity, not live API access.
+
+## Main deployment and repeat trigger
+- PR #101 merged: https://github.com/IskanderAbdullin/Analytics/pull/101
+- main repository workflow is enabled and branch-filtered, read-only.
+- Main repeat trigger: commit 637a016429788d20fb0b71c74aac18ee9e9560c3,
+  Action run https://github.com/IskanderAbdullin/Analytics/actions/runs/45240223355
+  returned offline success, Cloudflare missing-secrets failure.
+- Direct authenticated Cloudflare API still not called; all cloud resources
+  untouched; public logs reveal no token or raw Cloudflare responses.

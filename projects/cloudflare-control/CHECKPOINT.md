@@ -33,3 +33,16 @@ commit statuses and sanitized logs; never upload private Worker scripts.
 
 Cloudflare deployment/rollback, VPS power, OS shell and broker actions
 remain out of scope.
+
+## 2026-11-23 — deployed on public Analytics main
+- PR #101 was squash-merged into main, commit 22f646cb0fb4dca8979a63cbeb61513cf0d40623.
+- The real GitHub connector updated request.json nonce 1→2 directly on main:
+  commit 637a016429788d20fb0b71c74aac18ee9e9560c3.
+- Public GitHub Actions run 45240223355 returned
+  cloudflare-control-offline-tests=success, cloudflare-readonly-audit=failure.
+- Earlier public Actions run 45239723887 exposed sanitized output
+  secrets_unavailable; neither CLOUDFLARE_API_TOKEN nor CLOUDFLARE_ACCOUNT_ID
+  was configured in Analytics. No real Cloudflare request, no deployment.
+- Workflow can now be triggered repeatedly from ChatGPT by a repo-scoped
+  GitHub update to request.json in main. The owner only needs to add
+  Analytics-scoped Secrets for the live read-only API verification.
