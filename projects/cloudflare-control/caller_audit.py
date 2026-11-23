@@ -144,6 +144,24 @@ def audit():
         "hmac_secret_binding_present":"VPS_AGENT_HMAC_SECRET" in dedicated_names,
         "relay_binding_present":"VPS_AGENT_RELAY" in dedicated_names
     },sort_keys=True),flush=True)
+    # Confirm the named admin entrypoint actually exists in the ACTIVE
+    # dedicated version. Service binding presence alone is insufficient.
+    dd=audited_get(os.environ["CLOUDFLARE_ACCOUNT_ID"],
+        os.environ["CLOUDFLARE_API_TOKEN"],"babit-vps-bridge","/deployments")
+    dr=dd.get("deployments") if isinstance(dd,dict) else dd
+    if not isinstance(dr,list) or not dr:
+        raise SafeError("DEDICATED_DEPLOYMENT_MISSING")
+    dv=next((v.get("version_id") for v in dr[0].get("versions",[])
+             if v.get("percentage")==100),None)
+    if not isinstance(dv,str):
+        raise SafeError("DEDICATED_VERSION_UNKNOWN")
+    dmeta=cf.call("GET","/workers/scripts/babit-vps-bridge/versions/"+dv)
+    dexports=((dmeta.get("resources") or {}).get("script_runtime") or {}).get("exports") or {}
+    print(json.dumps({"stage":"oauth_caller_audit","phase":"dedicated_named_exports",
+       "vps_admin_entrypoint_live":dexports.get("VpsAdminEntrypoint",{}).get("type")=="worker",
+       "serverspace_entrypoint_live":dexports.get("ServerspaceReadOnlyEntrypoint",{}).get("type")=="worker",
+       "vps_relay_export_live":("VpsAgentRelay" in dexports)
+    },sort_keys=True),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
