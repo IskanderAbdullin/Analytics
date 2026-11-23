@@ -116,6 +116,17 @@ def audit():
                        "compatibility_date_present":bool(meta.get("compatibility_date")),
                        "compatibility_flags_count":len(meta.get("compatibility_flags") or [])
                     }),flush=True)
+    # Read safe routing metadata only; never disclose device IDs, HMACs or secrets.
+    route=next((b.get("text") or b.get("value")
+                for b in bindings if isinstance(b,dict) and
+                b.get("name")=="VPS_AGENT_ROUTE"),None)
+    print(json.dumps({"stage":"oauth_caller_audit","phase":"vps_routing",
+      "selected_route":route if route in ("legacy","dedicated") else "unset_or_other",
+      "vps_service_present":"VPS_AGENT_SERVICE" in names,
+      "dedicated_hmac_binding_present":"VPS_AGENT_DEDICATED_HMAC_SECRET" in names,
+      "legacy_hmac_binding_present":"VPS_AGENT_HMAC_SECRET" in names,
+      "vps_device_id_binding_present":"VPS_AGENT_DEVICE_ID" in names
+    },sort_keys=True),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
