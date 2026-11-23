@@ -166,6 +166,16 @@ def audit():
        "serverspace_entrypoint_live":dexports.get("ServerspaceReadOnlyEntrypoint",{}).get("type")=="worker",
        "vps_relay_export_live":("VpsAgentRelay" in dexports)
     },sort_keys=True),flush=True)
+    dedicated_content=raw_content("/workers/scripts/babit-vps-bridge/content/v2")
+    if dedicated_content is None:
+        raise SafeError("DEDICATED_SOURCE_UNAVAILABLE")
+    dsbytes=dedicated_content[0]
+    print(json.dumps({"stage":"oauth_caller_audit","phase":"dedicated_admin_source",
+        "admin_class_marker_present":b"VpsAdminEntrypoint" in dsbytes,
+        "private_admin_fetch_marker_present":b"privateAdminFetch" in dsbytes,
+        "admin_status_path_marker_present":b"/v1/vps/status" in dsbytes,
+        "serverspace_class_marker_present":b"ServerspaceReadOnlyEntrypoint" in dsbytes
+    },sort_keys=True),flush=True)
     flags={}
     for key in ("PC_AGENT_ENABLED","VPS_AGENT_ENABLED","SERVERSPACE_ENABLED"):
         b=next((x for x in bindings if isinstance(x,dict) and x.get("name")==key),None)
