@@ -3,7 +3,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'projects/vps-api-control/**'
+      - 'projects/vps-api-control/canary.py'
+      - 'projects/vps-api-control/enable_inventory.py'
       - '.github/workflows/vps-api-private-proof.yml'
   workflow_dispatch:
 permissions:
