@@ -29,12 +29,12 @@ jobs:
           import os
           p=Path(os.environ["RUNNER_TEMP"])/"serverspace_deploy.py"
           s=p.read_text()
-          old="            except (HTTPError,URLError,TimeoutError):\\n                time.sleep(2)"
-          new=("            except HTTPError as exc:\\n"
-               "                print(json.dumps({'stage':'probe_http','code':exc.code}))\\n"
-               "                time.sleep(2)\\n"
-               "            except (URLError,TimeoutError):\\n"
-               "                print(json.dumps({'stage':'probe_network'}))\\n"
+          old="            except (HTTPError,URLError,TimeoutError):\n                time.sleep(2)"
+          new=("            except HTTPError as exc:\n"
+               "                print(json.dumps({'stage':'probe_http','code':exc.code}))\n"
+               "                time.sleep(2)\n"
+               "            except (URLError,TimeoutError):\n"
+               "                print(json.dumps({'stage':'probe_network'}))\n"
                "                time.sleep(2)")
           if old not in s: raise SystemExit("PATCH_ANCHOR_MISSING")
           p.write_text(s.replace(old,new))
