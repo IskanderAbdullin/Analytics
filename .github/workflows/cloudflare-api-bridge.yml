@@ -32,6 +32,19 @@ jobs:
       - name: Offline checks without Secrets
         working-directory: projects/cloudflare-control
         run: python -m unittest discover -p 'test_*.py' -v
+      - name: Report offline tests as commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$REPO/statuses/$SHA" \
+            -f state="success" \
+            -f context="cloudflare-control-offline-tests" \
+            -f description="Offline mock tests passed" \
+            >/dev/null
       - name: Read fixed Cloudflare Worker metadata
         id: cloudflare
         continue-on-error: true
