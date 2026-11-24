@@ -91,6 +91,21 @@ def audit(get):
     code = next(b for n, _, b in mods if n == "index.js")
     source = code.decode("utf-8")
     anchors = list(REG.finditer(source))
+    # Check the new registration invokes exactly the same signed status route,
+    # using the same captured server, schema library and invoke closure.
+    check(len(anchors) == 1, "STATUS_ANCHOR_NOT_UNIQUE")
+    a = anchors[0]
+    new_reg = re.compile(re.escape(a["server"]) + r'\.registerTool\("pc_job_list",\s*\{\s*description:\s*"[^"]*",\s*inputSchema:\s*' + re.escape(a["z"]) + r'\.object\(\{\s*project:\s*' + re.escape(a["z"]) + r'\.string\(\)\.regex\(/\^\[A-Za-z0-9\]\[A-Za-z0-9\._ -\]\{0,62\}\$/\),\s*limit:\s*' + re.escape(a["z"]) + r'\.number\(\)\.int\(\)\.min\(1\)\.max\(50\)\.default\(20\)\s*\}\)\.strict\(\)\s*\},\s*async\s*\(\{\s*project,\s*limit\s*\}\)\s*=>\s*' + re.escape(a["invoke"]) + r'\("/v1/script-status",\s*\{\s*project,\s*limit\s*\}\)\s*\);')
+    job_shape_count = len(new_reg.findall(source))
+    previous_meta = get("/versions/" + EXPECTED)
+    old_resources = previous_meta.get("resources") or {}
+    new_resources = meta.get("resources") or {}
+    old_bindings = old_resources.get("bindings")
+    new_bindings = new_resources.get("bindings")
+    check(isinstance(old_bindings, list) and isinstance(new_bindings, list), "VERSION_BINDINGS_UNKNOWN")
+    # Compare every returned binding field in memory, never emit raw values.
+    bindings_exact = sorted(old_bindings, key=lambda b:b["name"]) == sorted(new_bindings, key=lambda b:b["name"])
+    runtime_exact = old_resources.get("script_runtime") == new_resources.get("script_runtime")
     runtime = (meta.get("resources") or {}).get("script_runtime") or {}
     check(active(get) == v, "ACTIVE_DRIFT")
     return {"status": "read_only_passed", "version": v, "expected_baseline": v == EXPECTED,
@@ -98,7 +113,8 @@ def audit(get):
             "module_sha256": digest(code), "module_count": len(mods),
             "pc_status_registration_count": source.count('registerTool("pc_script_status"'),
             "status_exact_shape_count": len(anchors), "pc_job_list_registration_count": source.count('registerTool("pc_job_list"'),
-            "runtime_metadata_present": bool(runtime), "dedicated_routes_preserved": True,
+            "job_list_exact_shape_count": job_shape_count, "version_bindings_exact": bindings_exact,
+            "runtime_metadata_exact": runtime_exact, "runtime_metadata_present": bool(runtime), "dedicated_routes_preserved": True,
             "cloud_write_attempted": False}
 
 if __name__ == "__main__":
