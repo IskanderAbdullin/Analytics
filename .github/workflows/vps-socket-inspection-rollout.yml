@@ -1,0 +1,35 @@
+name: VPS existing private DO socket inspection rollout
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-socket-inspection-rollout.yml'
+      - 'projects/cloudflare-control/socket_health_rollout.py'
+      - 'projects/cloudflare-control/socket_health_rollout_request.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: vps-private-readonly-do-socket-rollout
+  cancel-in-progress: false
+jobs:
+  rollout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile only
+        run: |
+          gzip -dc projects/cloudflare-control/serverspace_deploy.py.gz > "$RUNNER_TEMP/serverspace_deploy.py"
+          python -m py_compile "$RUNNER_TEMP/serverspace_deploy.py" projects/cloudflare-control/serverspace_rebuild.py projects/cloudflare-control/socket_health_rollout.py
+      - name: Dry-run only unless explicitly requested and baseline confirmed
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PYTHONPATH: ${{ runner.temp }}
+        run: python -u projects/cloudflare-control/socket_health_rollout.py
