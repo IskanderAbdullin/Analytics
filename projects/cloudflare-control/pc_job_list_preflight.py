@@ -110,3 +110,5 @@ if __name__ == "__main__":
     except Exception:
         print('{"status":"blocked","code":"API_OR_SCHEMA_FAILURE","cloud_write_attempted":false}', flush=True)
         sys.exit(3)
+
+# Explicit read-only Actions run after branch creation.
