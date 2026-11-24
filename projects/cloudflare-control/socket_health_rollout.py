@@ -103,7 +103,7 @@ def operation():
     if(not isinstance(conf,dict) or set(conf)!={"schema_version","nonce","operation"}
        or conf["schema_version"]!=1 or type(conf["nonce"]) is not int
        or not 0<=conf["nonce"]<=2147483647
-       or conf["operation"] not in ("dry_run","activate")):
+       or conf["operation"] not in ("dry_run","activate","rollback")):
         raise Halt("REQUEST_INVALID")
     return conf["operation"]
 
@@ -168,11 +168,50 @@ def syntax(code):
             stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=30)
         if r.returncode:raise Halt("SYNTAX_FAILED")
 
+def rollback(cf,active,original_exports,binding_names):
+    if ENTRY not in original_exports:
+        emit("rollback","already_without_inspection")
+        return 0
+    history=get_versions(cf)
+    candidates=[]
+    for entry in history[:15]:
+        version=entry.get("id") if isinstance(entry,dict) else None
+        if not isinstance(version,str) or version==active:
+            continue
+        try:
+            _,exports,names=evidence(cf,version)
+        except SafeError:
+            continue
+        if (ENTRY not in exports and
+            len(exports)==len(original_exports)-1 and
+            all(exports.get(k)==value for k,value in original_exports.items()
+                if k!=ENTRY) and names==binding_names):
+            candidates.append(version)
+    if not candidates:
+        raise Halt("ROLLBACK_VERSION_NOT_CONFIRMED")
+    if current_version(cf)!=active:
+        raise Halt("CONCURRENT_DEPLOYMENT")
+    restore=candidates[0]
+    cf.call("POST",TARGET+"/deployments",json.dumps({
+      "strategy":"percentage",
+      "versions":[{"version_id":restore,"percentage":100}]
+    }).encode("utf-8"),"application/json")
+    if current_version(cf)!=restore:
+        raise Halt("ROLLBACK_NOT_CONFIRMED")
+    _,exports,names=evidence(cf,restore)
+    if exports.get(ENTRY) is not None or names!=binding_names:
+        raise Halt("ROLLBACK_INTEGRITY_FAILURE")
+    emit("rollback","verified",original_private_exports_restored=True,
+         original_bindings_preserved=True)
+    return 0
+
 def main():
     mode=operation()
     cf=Cloudflare()
     active=current_version(cf)
     item,exports,names=evidence(cf,active)
+    if mode=="rollback":
+        return rollback(cf,active,exports,names)
     modules,mainfile,needed,code=patched_source(cf)
     syntax(code)
     if ENTRY in exports and exports[ENTRY].get("type")!="worker":
