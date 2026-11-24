@@ -1,0 +1,32 @@
+name: OAuth existing MCP owner-only provider power plan
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/oauth-provider-plan-rollout.yml'
+      - 'projects/cloudflare-control/oauth_plan_tool.py'
+      - 'projects/cloudflare-control/oauth_plan_request.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: oauth-owner-provider-plan
+  cancel-in-progress: false
+jobs:
+  rollout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Python source
+        run: python -m py_compile projects/cloudflare-control/oauth_rollout.py projects/cloudflare-control/oauth_plan_tool.py
+      - name: Preflight only by default, preserve original OAuth bindings
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python -u projects/cloudflare-control/oauth_plan_tool.py
