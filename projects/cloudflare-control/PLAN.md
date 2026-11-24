@@ -27,3 +27,7 @@
 2. Controlled and reversible administration-agent-only deployment, followed by bounded classification of real reconnect failures. Correct evidenced cause, not speculative Cloudflare worker fixes.
 3. Refresh owner ChatGPT connector tool schema to expose existing server-side `serverspace_list_servers`, or an officially supported tool-discovery mechanism. No extra plugin/worker duplicates.
 4. Keep separately staged [provider-power PR #20](https://github.com/IskanderAbdullin/MCP-proxi/pull/20) disabled; only a targeted owner-approved command may ever enable mutation. The actual Serverspace project has one powered-on VPS.
+
+## 2026-11-24 05:24 UTC
+- Existing t-invest_IIS **private plugin manifest** updated in place to v1.0.1 with the same App binding. Tool catalogue in the current session remained unchanged (18 tools, no serverspace_list_servers). Do not duplicate or repeatedly republish the plugin; prioritize actually supported re-discovery at a new session boundary.
+- Linux root shell proven but WSS stability not achieved; next actionable fix requires compiling and deploying source-only categorized WSS logging in private [PR #21](https://github.com/IskanderAbdullin/MCP-proxi/pull/21). Separate provider-control [PR #20](https://github.com/IskanderAbdullin/MCP-proxi/pull/20) remains disabled and unshipped.

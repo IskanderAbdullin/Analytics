@@ -1,0 +1,84 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "cloudflare-control"
+  },
+  "event": {
+    "id": "19aaf264-e299-4f27-9f1b-8366474e33df",
+    "occurred_at": "2026-11-24T05:24:00Z",
+    "type": "maintenance",
+    "title": "Refresh original t-invest_IIS private plugin release in place to re-evaluate MCP tool discovery",
+    "summary": "Official Plugin Creator updated existing user plugin 1.0.0 to 1.0.1 while preserving app identity and connection; same chat tool schema stayed at 18 methods and still did not expose serverspace_list_servers. No new plugin or Cloudflare change.",
+    "basis": "observed_by_agent",
+    "source_commit": "4c96a8fde55a84c50a5db519721d2f842dfd7de1"
+  },
+  "changes": [
+    {
+      "path": "projects/cloudflare-control/CHECKPOINT.md",
+      "action": "modified",
+      "summary": "Record owned personal plugin in-place release update and unchanged current tool discovery."
+    },
+    {
+      "path": "projects/cloudflare-control/PLAN.md",
+      "action": "modified",
+      "summary": "Specify next discovery context while avoiding repeated package publication."
+    }
+  ],
+  "checks": [
+    {
+      "id": "plugin-release-updated",
+      "title": "Existing plugin release bumped to 1.0.1 preserving identity",
+      "kind": "integration",
+      "status": "passed",
+      "command": "Plugin_Creator.update_plugin(plugin_asdk_app_6afc16e32f888191915ccdcd2d04b061, version=1.0.1, expected_release_id=PluginRelease_9e3d819b25448191a20dda2382cb2606)",
+      "exit_code": 0,
+      "source_fingerprint": "Owned personal plugin; new release pluginrel_6b051f1c2e6481918c430c495eac7c4a",
+      "evidence": [
+        {
+          "kind": "manual_observation",
+          "ref": "Plugin Creator update_plugin tool response, 2026-11-24T05:23Z",
+          "detail": "status=updated, same plugin id, version 1.0.1, scope USER, visibility PRIVATE."
+        }
+      ],
+      "summary": "Same plugin release successfully updated without App ID change."
+    },
+    {
+      "id": "serverspace-tool-discovery",
+      "title": "Advertise new owner-only serverspace_list_servers method in this conversation",
+      "kind": "integration",
+      "status": "blocked",
+      "summary": "Tool catalogue still contains 18 t_invest_IIS functions and no Serverspace method after package update."
+    }
+  ],
+  "issues": [
+    {
+      "id": "stale-plugin-tool-schema",
+      "title": "ChatGPT current conversation tool schema not refreshed by in-place plugin release",
+      "state": "open",
+      "severity": "medium",
+      "description": "New tool is deployed on OAuth Worker but session still exposes original tool set."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "fresh-session-rediscovery",
+      "title": "At a supported fresh conversation boundary re-discover existing connected private t-invest_IIS plugin",
+      "state": "todo",
+      "priority": "medium",
+      "notes": "Do not duplicate plugin or change Cloudflare Workers. Only call new tool after host advertises it."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "manual_observation",
+      "ref": "Plugin Creator current_release_id pluginrel_6b051f1c2e6481918c430c495eac7c4a"
+    }
+  ],
+  "limitations": [
+    "Manifest relaunch does not hot-refresh current ChatGPT tool inventory.",
+    "No new plugin was installed; owner may still need UI connection refresh depending on platform."
+  ]
+}
