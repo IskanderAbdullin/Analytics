@@ -6,6 +6,7 @@ on:
       - '.github/workflows/oauth-provider-plan-rollout.yml'
       - 'projects/cloudflare-control/oauth_plan_tool.py'
       - 'projects/cloudflare-control/oauth_plan_request.json'
+      - 'projects/cloudflare-control/test_oauth_plan_tool.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +26,42 @@ jobs:
           python-version: '3.12'
       - name: Validate Python source
         run: python -m py_compile projects/cloudflare-control/oauth_rollout.py projects/cloudflare-control/oauth_plan_tool.py
+      - name: Offline owner-only tool wiring and raw input schema tests
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,"projects/cloudflare-control")
+          from oauth_plan_tool import SNIPPET
+          header='''const z={enum(values){return {kind:"enum",values}}};
+          let authorized=true;let fakeState="ready";let fakeStatus=200;
+          const calls=[];
+          const env={SERVERSPACE_ENABLED:"true",
+            SERVERSPACE_POWER_PLAN_SERVICE:{
+              async fetch(uri,opts){
+                calls.push([String(uri),opts.method,JSON.parse(opts.body)]);
+                const body={state:fakeState,action:JSON.parse(opts.body).action,
+                            execution_enabled:false,hard_power:false};
+                return new Response(JSON.stringify(body),{status:fakeStatus,
+                   headers:{"Content-Type":"application/json"}});
+              }
+            }
+          };
+          const registered=[];
+          const server={registerTool(name,config,handler){
+            registered.push({name,config,handler});
+          }};
+          function requireUser(){if(!authorized)throw Error("OWNER_REQUIRED");}
+          '''
+          footer='''export {registered,calls};
+            export function setAuthorized(next){authorized=next;}
+            export function setFakeState(next){fakeState=next;}
+            export function setFakeStatus(next){fakeStatus=next;}
+          '''
+          Path("projects/cloudflare-control/oauth-plan-fixture.mjs").write_text(
+            header+SNIPPET+"\n"+footer,encoding="utf-8")
+          PY
+          node --test projects/cloudflare-control/test_oauth_plan_tool.mjs
       - name: Preflight only by default, preserve original OAuth bindings
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
