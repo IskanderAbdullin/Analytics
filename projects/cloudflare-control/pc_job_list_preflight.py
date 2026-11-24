@@ -12,7 +12,7 @@ from email.policy import default
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
 TARGET = "/workers/scripts/t-invest-mcp-proxy"
-EXPECTED = "f686130c-f90c-41e6-abaf-09a5516bc842"
+EXPECTED = "46cff029-e225-46a8-bc4a-4d3efbb48914"
 REG = re.compile(r'(?P<server>[A-Za-z_$][\w$]*)\.registerTool\("pc_script_status",\s*\{\s*description:\s*"[^"]*",\s*inputSchema:\s*(?P<z>[A-Za-z_$][\w$]*)\.object\(\{\s*jobId:\s*(?P=z)\.string\(\)\.regex\(/\^\[0-9a-fA-F\]\{32\}\$/\)\s*\}\)\s*\},\s*async\s*\(\{\s*jobId\s*\}\)\s*=>\s*(?P<invoke>[A-Za-z_$][\w$]*)\("/v1/script-status",\s*\{\s*jobId\s*\}\)\s*\);')
 UUID = re.compile(r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
 class Blocked(Exception):
@@ -128,3 +128,5 @@ if __name__ == "__main__":
         sys.exit(3)
 
 # Explicit read-only Actions run after branch creation.
+
+# D150 authorized PC maintenance preflight: GET only, no production write.
