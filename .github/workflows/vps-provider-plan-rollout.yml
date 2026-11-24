@@ -6,6 +6,7 @@ on:
       - '.github/workflows/vps-provider-plan-rollout.yml'
       - 'projects/cloudflare-control/provider_plan_rollout.py'
       - 'projects/cloudflare-control/provider_plan_request.json'
+      - 'projects/vps-api-control/test_provider_plan_worker.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,6 +28,22 @@ jobs:
         run: |
           gzip -dc projects/cloudflare-control/serverspace_deploy.py.gz > "$RUNNER_TEMP/serverspace_deploy.py"
           python -m py_compile "$RUNNER_TEMP/serverspace_deploy.py" projects/cloudflare-control/serverspace_rebuild.py projects/cloudflare-control/provider_plan_rollout.py
+      - name: Test all read-only Plan Worker branches with a fake provider
+        env:
+          PYTHONPATH: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,"projects/cloudflare-control")
+          from provider_plan_rollout import JS
+          before='import { WorkerEntrypoint as __ServerspacePrivatePlanBase } from "cloudflare:workers";'
+          after='class __ServerspacePrivatePlanBase { constructor(env){this.env=env;} }'
+          if JS.count(before)!=1:raise SystemExit("private_import_not_unique")
+          Path("projects/vps-api-control/provider-plan-worker-fixture.mjs").write_text(
+            JS.replace(before,after),encoding="utf-8")
+          PY
+          node --test projects/vps-api-control/test_provider_plan_worker.mjs
       - name: Dry run or add only private read-only power plan
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
