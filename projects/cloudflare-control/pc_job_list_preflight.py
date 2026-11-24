@@ -117,8 +117,59 @@ def audit(get):
             "runtime_metadata_exact": runtime_exact, "runtime_metadata_present": bool(runtime), "dedicated_routes_preserved": True,
             "cloud_write_attempted": False}
 
+
+def metrics():
+    # Fixed read-only GraphQL queries; no user input, raw results, account IDs or credentials logged.
+    from datetime import datetime, timedelta, timezone
+    from urllib.error import HTTPError
+    account = os.getenv("CLOUDFLARE_ACCOUNT_ID","")
+    token = os.getenv("CLOUDFLARE_API_TOKEN","")
+    check(re.fullmatch("[a-fA-F0-9]{32}", account) and len(token)>=20,"AUTH_MISSING")
+    end=datetime.now(timezone.utc).replace(microsecond=0)
+    start=end-timedelta(hours=1)
+    def fmt(t): return t.strftime("%Y-%m-%dT%H:%M:%SZ")
+    def gql(dataset,fields,script):
+        query="{ viewer { accounts(filter:{accountTag:"+json.dumps(account)+"}) { "+dataset+"(limit:100,filter:{datetime_geq:"+json.dumps(fmt(start))+",datetime_leq:"+json.dumps(fmt(end))+",scriptName:"+json.dumps(script)+"}) { "+fields+" } } } }"
+        req=Request("https://api.cloudflare.com/client/v4/graphql", data=json.dumps({"query":query}).encode(),headers={"Authorization":"Bearer "+token,"Content-Type":"application/json"},method="POST")
+        try:
+            with build_opener(NoRedirect()).open(req,timeout=25) as res:
+                raw=res.read(2_000_001)
+            if len(raw)>2_000_000:return {"result":"response_too_large"}
+            p=json.loads(raw)
+            if p.get("errors"):
+                # Classify errors without printing returned strings.
+                msgs=" ".join(str(e.get("message","")) for e in p["errors"] if isinstance(e,dict)).lower()
+                return {"result":"graphql_error","permission_denied":any(x in msgs for x in ("permission","not authorized","not have access","forbidden","access denied","authentication")),"schema_error":any(x in msgs for x in ("unknown field","cannot query field","unknown argument","not defined","does not exist"))}
+            rows=p["data"]["viewer"]["accounts"][0][dataset]
+            if not isinstance(rows,list):return {"result":"invalid_schema"}
+            safe=[]
+            allowed={"success","clientDisconnected","scriptThrewException","exceededResources","internalError","unknown","exceededCpu","exceededMemory","canceled"}
+            for row in rows:
+                dims=row.get("dimensions",{})
+                status=dims.get("status","ungrouped")
+                if status not in allowed and status!="ungrouped":status="other"
+                item={"status":status}
+                for k in ("requests","errors"):
+                    v=row.get("sum",{}).get(k)
+                    if isinstance(v,(int,float)) and 0<=v<1e15:item[k]=v
+                for k in ("cpuTimeP50","cpuTimeP99","wallTimeP50","wallTimeP99"):
+                    v=row.get("quantiles",{}).get(k)
+                    if isinstance(v,(int,float)) and 0<=v<1e15:item[k]=v
+                safe.append(item)
+            return {"result":"ok","rows":safe}
+        except HTTPError as e:return {"result":"http_error","http_status":e.code}
+        except Exception:return {"result":"network_or_schema_error"}
+    results={}
+    for script,label in (("t-invest-mcp-proxy","shared_worker"),("babit-vps-bridge","dedicated_worker")):
+        results[label]={
+            "workers":gql("workersInvocationsAdaptive","sum { requests errors } quantiles { cpuTimeP50 cpuTimeP99 wallTimeP50 wallTimeP99 } dimensions { status }",script),
+            "durable_objects":gql("durableObjectsInvocationsAdaptiveGroups","sum { requests } quantiles { cpuTimeP99 } dimensions { status }",script)
+        }
+    print(json.dumps({"metrics_read_only":True,"start_utc":fmt(start),"end_utc":fmt(end),"results":results},sort_keys=True),flush=True)
+
 if __name__ == "__main__":
     try:
+        metrics()
         print(json.dumps(audit(read_factory()), sort_keys=True), flush=True)
     except Blocked as exc:
         print(json.dumps({"status": "blocked", "code": str(exc), "cloud_write_attempted": False}), flush=True)
