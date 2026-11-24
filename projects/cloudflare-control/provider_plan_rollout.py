@@ -118,8 +118,9 @@ def baseline(cf,version):
     resources=(item or {}).get("resources") or {}
     bindings=resources.get("bindings") or []
     if(len(bindings)!=len(names) or not REQUIRED.issubset(names)
-       or not all(exports.get(k,{}).get("type")==v
-         for k,v in EXPECTED_EXPORTS.items())
+       or "VpsAgentRelay" not in exports
+       or not all(exports.get(k,{}).get("type")=="worker"
+           for k in ("VpsAdminEntrypoint","ServerspaceReadOnlyEntrypoint"))
        or len(names)<7):
        raise Halt("PRODUCTION_BASELINE_UNEXPECTED")
     if not isinstance(exports,dict):
