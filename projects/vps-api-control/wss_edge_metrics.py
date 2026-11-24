@@ -65,22 +65,32 @@ def main():
         return 4
     result=data.get("result") or {}
     stats=(result.get("statistics") or {}) if isinstance(result,dict) else {}
-    summaries=((result.get("calculations") or {}) if isinstance(result,dict) else {})
-    # Cloudflare versions differ; fail closed if grouping schema is unknown.
-    raw_rows=summaries.get("groups") if isinstance(summaries,dict) else None
-    if not isinstance(raw_rows,list):
-        output("response_schema_unknown",top_level_keys=sorted(result)[:12])
+    calculations=(result.get("calculations") or []) if isinstance(result,dict) else []
+    # Official telemetry schema: calculations[] -> aggregates[] with count +
+    # groups:[{key:"$metadata.statusCode",value:NUMBER}]. Print only codes/counts.
+    if not isinstance(calculations,list):
+        output("response_schema_unknown",calculations_shape="not_array")
         return 4
     codes={}
-    for row in raw_rows:
-        if not isinstance(row,dict):continue
-        group=row.get("groups") or {}
-        aggr=row.get("aggregates") or {}
-        code=group.get("$metadata.statusCode") if isinstance(group,dict) else None
-        n=aggr.get("requests") if isinstance(aggr,dict) else None
-        if type(code) is int and 100<=code<=599 and type(n) is int and 0<=n<=1_000_000:
-            codes[str(code)]=n
-    output("aggregate_ok",status_counts=codes,rows_total=len(raw_rows),
+    total_rows=0
+    for item in calculations:
+        if not isinstance(item,dict) or item.get("alias") not in ("requests",None):
+            continue
+        rows=item.get("aggregates") or []
+        if not isinstance(rows,list):
+            output("response_schema_unknown",aggregates_shape="not_array")
+            return 4
+        for row in rows:
+            total_rows+=1
+            if not isinstance(row,dict):continue
+            group=row.get("groups") or []
+            if not isinstance(group,list):continue
+            code=next((g.get("value") for g in group
+                if isinstance(g,dict) and g.get("key")=="$metadata.statusCode"),None)
+            n=row.get("count")
+            if type(code) is int and 100<=code<=599 and type(n) in (int,float) and 0<=n<=1_000_000:
+                codes[str(code)]=round(float(n),2)
+    output("aggregate_ok",status_counts=codes,rows_total=total_rows,
            window_hours=6,source_sampling_caveat=True)
     return 0
 if __name__=="__main__":
