@@ -1,0 +1,170 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "vps-api-control"
+  },
+  "event": {
+    "id": "ba46b53a-b6bb-4725-b72f-f668117214cf",
+    "occurred_at": "2026-11-24T05:16:00Z",
+    "type": "testing",
+    "title": "Live OAuth-to-Ubuntu root command succeeds; WSS reconnections intermittent",
+    "summary": "Authenticated read-only status and harmless shell reached Ubuntu 26.04 through existing owner MCP, confirming sudo root; observed 579 generic disconnects / 4 connects since midnight, with stable systemd process. Diagnostic classified C# logging staged in private draft PR #21, not deployed.",
+    "basis": "observed_by_agent",
+    "source_commit": "49caea9076020bb1d94a1dca8bab2b0541684e1f"
+  },
+  "changes": [
+    {
+      "path": "projects/cloudflare-control/CHECKPOINT.md",
+      "action": "modified",
+      "summary": "Record verified root-level Linux access and the remaining unstable WebSocket channel."
+    },
+    {
+      "path": "projects/vps-api-control/CHECKPOINT.md",
+      "action": "modified",
+      "summary": "Update final goal and next action with evidence from actual VPS exec."
+    },
+    {
+      "path": "projects/cloudflare-control/PLAN.md",
+      "action": "modified",
+      "summary": "Reprioritize from basic shell access to connection reliability and MCP tool discovery."
+    }
+  ],
+  "checks": [
+    {
+      "id": "vps-live-status",
+      "title": "Live owner MCP status on Ubuntu 26.04",
+      "kind": "integration",
+      "status": "passed",
+      "command": "t_invest_IIS.vps_status({})",
+      "exit_code": 0,
+      "source_fingerprint": "BabitVpsAgent v0.1.0 / Ubuntu 26.04 LTS / observed 2026-11-24T05:11:00Z",
+      "evidence": [
+        {
+          "kind": "manual_observation",
+          "ref": "authenticated ChatGPT connected MCP tool vps_status at 2026-11-24T05:11:00Z",
+          "detail": "Returned BabitVpsAgent 0.1.0 running under babit-admin on Ubuntu 26.04 LTS."
+        }
+      ],
+      "summary": "Live device responded, confirms ownership path works intermittently."
+    },
+    {
+      "id": "vps-root-command",
+      "title": "Harmless real shell command and noninteractive sudo root",
+      "kind": "integration",
+      "status": "passed",
+      "command": "t_invest_IIS.vps_exec({command:\"id -un; sudo -n id -un; systemctl is-active babit-vps-agent\", timeoutSeconds:10})",
+      "exit_code": 0,
+      "source_fingerprint": "BabitVpsAgent v0.1.0 / Ubuntu 26.04 LTS / observed 2026-11-24T05:11:06Z",
+      "evidence": [
+        {
+          "kind": "manual_observation",
+          "ref": "authenticated ChatGPT connected MCP tool vps_exec at 2026-11-24T05:11:06Z",
+          "detail": "exit 0: babit-admin / root / active; no changes to trading or VPS state."
+        }
+      ],
+      "summary": "Successfully executed a bounded real shell command with sudo root, proving Linux administration access."
+    },
+    {
+      "id": "vps-disconnects",
+      "title": "Read-only systemd and journal evidence of unstable WSS session",
+      "kind": "integration",
+      "status": "passed",
+      "command": "t_invest_IIS.vps_exec({command:\"systemctl show babit-vps-agent ...; journalctl -u babit-vps-agent --since 2026-11-24T00:00Z ... | awk\", timeoutSeconds:12})",
+      "exit_code": 0,
+      "source_fingerprint": "BabitVpsAgent v0.1.0 / Ubuntu 26.04 LTS / observed 2026-11-24T05:11Z",
+      "evidence": [
+        {
+          "kind": "manual_observation",
+          "ref": "authenticated ChatGPT connected MCP tool vps_exec at 2026-11-24T05:11Z",
+          "detail": "NRestarts=0, 579 WSS disconnected messages, four connected messages since midnight."
+        }
+      ],
+      "summary": "Source of instability within WSS session and/or handshake; exact failure category not yet known."
+    },
+    {
+      "id": "vps-unsigned-hmac-probe",
+      "title": "Private HMAC rejection without signed administration request",
+      "kind": "integration",
+      "status": "passed",
+      "command": "python -u projects/vps-api-control/auth_probe.py (read mode)",
+      "exit_code": 0,
+      "tested_commit": "49caea9076020bb1d94a1dca8bab2b0541684e1f",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45276914259"
+        }
+      ],
+      "summary": "Expected HTTP401 and Cron stopped on real private entrypoint; no command dispatched."
+    },
+    {
+      "id": "wss-staged-telemetry-build",
+      "title": "Build private C# phase/category telemetry patch",
+      "kind": "build",
+      "status": "not_run",
+      "summary": "C# patch staged in draft PR21 but no .NET10 SDK compiler available to verify exact source."
+    }
+  ],
+  "issues": [
+    {
+      "id": "vps-wss-intermittence",
+      "title": "Admin WSS connection unstable despite genuine root command access",
+      "state": "in_progress",
+      "severity": "high",
+      "description": "At least one VPS exec returned HTTP503; systemd agent never restarted and logs show 579 reconnect failures vs four successful connects. Need redacted WSS error taxonomy before behavior change."
+    },
+    {
+      "id": "mcp-tool-discovery",
+      "title": "New Serverspace MCP tool not advertised to current ChatGPT plugin",
+      "state": "open",
+      "severity": "medium",
+      "description": "Server-side OAuth tool live, but connected advertised function list unchanged."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "admin-wss-build",
+      "title": "Build draft PR21 WSS telemetry C# in .NET10 environment",
+      "state": "todo",
+      "priority": "high",
+      "notes": "Do not deploy uncompiled code; no trading service restart."
+    },
+    {
+      "id": "admin-wss-root-cause",
+      "title": "After safe admin-only telemetry deployment classify disconnect failure phase",
+      "state": "todo",
+      "priority": "high",
+      "notes": "Preserve rollback, then fix evidenced root cause. No power cycles."
+    },
+    {
+      "id": "refresh-mcp-tools",
+      "title": "Refresh owner OAuth tool catalogue for serverspace_list_servers",
+      "state": "todo",
+      "priority": "medium",
+      "notes": "Do not make duplicate plugin or expose public provider API."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45276914259"
+    },
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/IskanderAbdullin/MCP-proxi/pull/21"
+    },
+    {
+      "kind": "manual_observation",
+      "ref": "authenticated t_invest_IIS status and exec tools, 2026-11-24T05:11Z"
+    }
+  ],
+  "limitations": [
+    "Intermittent WSS failures remain; do not claim stable shell access.",
+    "C# diagnostic PR21 uncompiled and undeployed; private power PR20 remains disabled and undeployed.",
+    "An attempted bearer-key diagnostic was blocked before execution and was not repeated.",
+    "Provider API and trading operations were not executed."
+  ]
+}

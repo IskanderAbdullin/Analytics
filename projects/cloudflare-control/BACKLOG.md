@@ -29,3 +29,7 @@ A-016 NEXT — check Linux WSS device session after private export fix; determin
 A-017 NEXT — refresh ChatGPT `t_invest_IIS` OAuth plugin discovery for `serverspace_list_servers`.
 
 A-014 DONE — exact sanitized Serverspace aggregate from [45273824455 attempt 3](https://github.com/IskanderAbdullin/Analytics/actions/runs/45273824455): one VPS, powered on; Cron disabled after success. Continue A-016 Linux WSS and A-017 MCP catalogue; no actual power action.
+
+A-016 PARTIAL SUCCESS 2026-11-24 — root Linux shell command executed through existing owner MCP, exit 0, sudo root. Still highly intermittent: systemd service active/NRestarts=0; observed 579 disconnects vs 4 WSS connects since midnight. Separate private [PR #21](https://github.com/IskanderAbdullin/MCP-proxi/pull/21) stages safe categories, not compiled or deployed. NEXT: build, review, controlled admin-only deployment, diagnose.
+A-018 DONE — unsigned private HMAC rejection probe [45276914259](https://github.com/IskanderAbdullin/Analytics/actions/runs/45276914259) returned expected HTTP401, Cron stopped; no credential consumed.
+A-017 STILL BLOCKED — ChatGPT MCP tool discovery does not include `serverspace_list_servers`; connected market upstream names do not list local owner-only tool, so do not confuse the two.

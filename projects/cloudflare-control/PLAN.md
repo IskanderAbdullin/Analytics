@@ -20,3 +20,10 @@
 2. Restore Linux WSS device connectivity through existing dedicated route: active admin export has been repaired, bindings and workers.dev are enabled, but `vps_status` still gives HTTP 503. Next diagnosis needs device session / Linux agent environment, not more Cloudflare export uploads.
 3. Resolve OAuth MCP tool discovery; no direct ChatGPT `serverspace_list_servers` call confirmed though provider Service binding and code live.
 4. Review and test staged draft MCP-proxi PR #20 privately, with control flags disabled and separate targeted owner authorization, before any power API deploy. Real Linux root shell is a distinct channel from Serverspace provider power endpoints.
+
+## 2026-11-24 05:16 UTC — re-prioritized based on real SSH-equivalent root command success
+**Proven**: owner OAuth `vps_status` and `vps_exec` can reach live Ubuntu 26.04 as `babit-admin` and `sudo root`. The goal of basic Linux shell access is achieved; **the reliability objective remains open** (579 agent WSS disconnects since 00:00Z against four connects by 05:11Z).
+1. Build and review [private PR #21](https://github.com/IskanderAbdullin/MCP-proxi/pull/21) redacted phase/error telemetry without secrets; do not deploy uncompiled C# or restart trading.
+2. Controlled and reversible administration-agent-only deployment, followed by bounded classification of real reconnect failures. Correct evidenced cause, not speculative Cloudflare worker fixes.
+3. Refresh owner ChatGPT connector tool schema to expose existing server-side `serverspace_list_servers`, or an officially supported tool-discovery mechanism. No extra plugin/worker duplicates.
+4. Keep separately staged [provider-power PR #20](https://github.com/IskanderAbdullin/MCP-proxi/pull/20) disabled; only a targeted owner-approved command may ever enable mutation. The actual Serverspace project has one powered-on VPS.
