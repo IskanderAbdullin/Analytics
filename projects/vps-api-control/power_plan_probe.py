@@ -160,7 +160,19 @@ def read(ns):
                            raw=True))
     except ProbeError as exc:
         if str(exc).startswith("http_404"):
-            emit("private_plan","pending")
+            # A missing KV record after propagation is materially different
+            # from a private provider/API error: diagnose the Cron itself.
+            try:
+                result=api("GET",base+"/schedules")
+                schedules=result.get("schedules") if isinstance(result,dict) else result
+                count=len(schedules) if isinstance(schedules,list) else -1
+                script=api("GET",base+"/content/v2",raw=True)
+                emit("private_plan","pending",
+                     cron_schedule_count=count,
+                     scheduled_handler_marker=b"provider_plan_v1" in script,
+                     private_binding_present=True)
+            except ProbeError:
+                emit("private_plan","pending",diagnostic="schedules_unavailable")
             return 5
         raise
     except (ValueError,TypeError):
