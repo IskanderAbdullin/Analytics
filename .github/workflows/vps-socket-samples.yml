@@ -1,0 +1,41 @@
+name: VPS private Durable Object socket samples (redacted)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-socket-samples.yml'
+      - 'projects/vps-api-control/socket_health_probe.py'
+      - 'projects/vps-api-control/socket_health_probe_request.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: vps-existing-private-socket-samples-canary
+  cancel-in-progress: false
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile Python and parse diagnostic JS
+        run: |
+          python -m py_compile projects/vps-api-control/socket_health_probe.py
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,"projects/vps-api-control")
+          from socket_health_probe import JS
+          Path("/tmp/vps-socket-sample.mjs").write_text(JS)
+          PY
+          node --check /tmp/vps-socket-sample.mjs
+      - name: Dry-run or use existing private Worker and KV
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python -u projects/vps-api-control/socket_health_probe.py
