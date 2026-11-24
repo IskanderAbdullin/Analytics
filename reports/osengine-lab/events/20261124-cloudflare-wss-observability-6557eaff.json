@@ -1,0 +1,92 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "main",
+    "component_id": "vps-api-control"
+  },
+  "event": {
+    "id": "6557eaff-1b91-4d2f-9b7d-44851f2d9ad4",
+    "occurred_at": "2026-11-24T05:19:00Z",
+    "type": "research",
+    "title": "Cloudflare WSS response status aggregation was authorized but yielded zero telemetry rows",
+    "summary": "Queried official Cloudflare Workers Observability aggregate API through existing GitHub Actions without raw invocations/URLs/secrets. Endpoint accepted but returned no sampled rows; prevents status-code inference. Private C# error classification remains the next diagnostic path.",
+    "basis": "observed_by_agent",
+    "source_commit": "4e5bb48f54142ade258e294f31892a4eae4d93b3"
+  },
+  "changes": [
+    {
+      "path": "projects/vps-api-control/wss_edge_metrics.py",
+      "action": "added",
+      "summary": "Read-only bounded Cloudflare Worker response status aggregate query; outputs numeric status groups only."
+    },
+    {
+      "path": ".github/workflows/vps-wss-edge-metrics.yml",
+      "action": "added",
+      "summary": "Isolated existing-secret authenticated read-only query in GitHub Actions."
+    },
+    {
+      "path": "projects/cloudflare-control/EVIDENCE.md",
+      "action": "modified",
+      "summary": "Record zero-row result and no-data interpretation."
+    }
+  ],
+  "checks": [
+    {
+      "id": "workers-obs-query",
+      "title": "Official Cloudflare aggregate-only status-code query",
+      "status": "passed",
+      "kind": "integration",
+      "command": "python -u projects/vps-api-control/wss_edge_metrics.py",
+      "exit_code": 0,
+      "tested_commit": "4e5bb48f54142ade258e294f31892a4eae4d93b3",
+      "evidence": [
+        {
+          "kind": "workflow",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45332379431"
+        }
+      ],
+      "summary": "API accepted, zero aggregate rows over 6h; no conclusions about individual HTTP statuses."
+    },
+    {
+      "id": "edge-status-distribution",
+      "title": "Classify WSS handshake HTTP status by Observability",
+      "status": "blocked",
+      "kind": "research",
+      "summary": "No stored telemetry rows returned (not zero WSS requests)."
+    }
+  ],
+  "issues": [
+    {
+      "id": "workers-telemetry-empty",
+      "title": "No Worker observability rows available",
+      "state": "mitigated",
+      "severity": "info",
+      "description": "Read-only successful query returned zero result groups; avoid retry unless observability collection changes."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "wss-telemetry-build",
+      "title": "Compile and review private agent WSS categorization PR #21",
+      "state": "todo",
+      "priority": "high",
+      "notes": "No access to .NET 10 SDK in current container or Ubuntu production host; leave live agent untouched."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "workflow",
+      "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45332379431"
+    },
+    {
+      "kind": "external_source",
+      "ref": "https://developers.cloudflare.com/api/resources/workers/subresources/observability/subresources/telemetry/methods/query/"
+    }
+  ],
+  "limitations": [
+    "Zero telemetry rows cannot distinguish 101/401/409 statuses.",
+    "No Cloudflare resource mutating action or VPS shell/power command from this workflow."
+  ]
+}
