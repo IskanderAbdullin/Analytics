@@ -1,0 +1,21 @@
+name: Synthetic .NET WebSocket keepalive experiment
+on:
+  push:
+    branches:
+      - research/vps-wss-keepalive-20261124
+    paths:
+      - 'projects/vps-api-control/experiments/keepalive/**'
+      - '.github/workflows/vps-wss-keepalive-experiment.yml'
+permissions:
+  contents: read
+jobs:
+  loopback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build and run isolated loopback experiment
+        run: dotnet run --project projects/vps-api-control/experiments/keepalive/Keepalive.csproj --configuration Release
