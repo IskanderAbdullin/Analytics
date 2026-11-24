@@ -1,16 +1,16 @@
-"""Read-only future VPS power planning in the existing private Serverspace entrypoint.
+"""Add an isolated, fixed, read-only Serverspace power plan WorkerEntrypoint.
 
-This script never sends Serverspace power API requests. It edits only the
-existing privately bound WorkerEntryPoint route to call its already-proven
-read-only list provider. Public default WSS route and existing OAuth/DO/HMAC
-bindings, exports and secrets are strictly preserved.
+No modification of existing public fetch, OAuth, VPS WSS, Durable Object,
+original Serverspace inventory entrypoint or bindings. New private named
+export is read-only: the ONLY provider call is GET /api/v1/servers.
+No actual provider power POST is possible in the uploaded source patch.
 
-GitHub Actions dry_run by default. Raw deployed code and account identifiers
-stay exclusively in ephemeral runner memory; only safe structural outcomes
-are printed in public logs.
+Production source bytes and all Cloudflare credentials stay exclusively inside
+the ephemeral GitHub Actions runner, not this public repository.
 """
 from __future__ import annotations
 
+import dataclasses
 import json
 import re
 import subprocess
@@ -22,76 +22,88 @@ from serverspace_rebuild import (Cloudflare, TARGET, SafeError, decode_worker,
                                  encode_upload, fetch_version, get_versions)
 
 REQ=Path(__file__).with_name("provider_plan_request.json")
-ROUTE="/internal/serverspace/power-plan"
-MARK="__serverspacePrivatePowerPlanV1"
+ENTRY="ServerspacePowerPlanEntrypoint"
+MARK="__serverspacePrivatePowerPlanV2"
 REQUIRED={"SERVERSPACE_API_ENABLED","SERVERSPACE_API_KEY",
           "VPS_AGENT_RELAY","VPS_AGENT_ENABLED","VPS_AGENT_DEVICE_ID",
           "VPS_AGENT_DEVICE_SECRET","VPS_AGENT_HMAC_SECRET"}
-EXPECTED_EXPORTS={"VpsAgentRelay":"durable_object",
-                  "VpsAdminEntrypoint":"worker",
-                  "ServerspaceReadOnlyEntrypoint":"worker"}
-# Strictly private and strictly read-only: the only network call here is
-# the already deployed, fixed private function for inventory.
 JS=r'''
-async function __serverspacePrivatePowerPlanV1(request,env){
-  const reply=(payload,status=200)=>new Response(JSON.stringify(payload),{
-    status,headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"}
+// Separate named private Cloudflare entrypoint; no default fetch route changed.
+// This component has NO provider POST, shell, restart or mutation operation.
+import { WorkerEntrypoint as __ServerspacePrivatePlanBase } from "cloudflare:workers";
+async function __serverspacePrivatePowerPlanV2(request,env){
+  const reply=(data,status=200)=>new Response(JSON.stringify(data),{
+    status,headers:{"Content-Type":"application/json; charset=utf-8",
+                    "Cache-Control":"no-store"}
   });
-  const failure=(code,status=400)=>reply({error:code},status);
+  const fail=(code,status=400)=>reply({error:code},status);
   try{
     const u=new URL(request.url);
     if(u.pathname!=="/internal/serverspace/power-plan"||u.search||u.hash)
-      return failure("NOT_FOUND",404);
-    if(request.method!=="POST")return failure("METHOD_NOT_ALLOWED",405);
+      return fail("NOT_FOUND",404);
+    if(request.method!=="POST")return fail("METHOD_NOT_ALLOWED",405);
+    if(env.SERVERSPACE_API_ENABLED!=="true"||
+       typeof env.SERVERSPACE_API_KEY!=="string"||
+       env.SERVERSPACE_API_KEY.length<16)return fail("NOT_CONFIGURED",503);
     if(Number(request.headers.get("content-length")||0)>2048)
-      return failure("BODY_TOO_LARGE",413);
+      return fail("BODY_TOO_LARGE",413);
     const raw=await request.text();
-    if(new TextEncoder().encode(raw).length>2048)return failure("BODY_TOO_LARGE",413);
+    if(new TextEncoder().encode(raw).length>2048)
+      return fail("BODY_TOO_LARGE",413);
     let input;
-    try{input=JSON.parse(raw);}catch{return failure("INVALID_JSON");}
+    try{input=JSON.parse(raw);}catch{return fail("INVALID_JSON");}
     if(!input||typeof input!=="object"||Array.isArray(input)||
        Object.keys(input).sort().join(",")!=="action,mode,target"||
        input.mode!=="plan"||input.target!=="sole"||
        typeof input.action!=="string"||
        !["on","shutdown","reboot","off","reset"].includes(input.action))
-       return failure("INVALID_ARGUMENTS");
-    // Call only the already reviewed provider GET /api/v1/servers via existing
-    // private no-body function. Never call /power, no requests except list.
-    const upstream=await serverspacePrivateFetch(
-       new Request("http://serverspace.internal/internal/serverspace/list-servers",
-                   {method:"POST"}),env);
-    if(!upstream.ok)return failure("INVENTORY_UNAVAILABLE",502);
-    if(!upstream.headers.get("content-type")?.toLowerCase().includes("application/json"))
-       return failure("INVENTORY_SCHEMA",502);
-    const json=await upstream.text();
-    if(new TextEncoder().encode(json).length>128000)
-       return failure("INVENTORY_TOO_LARGE",502);
-    const payload=JSON.parse(json);
-    if(!payload||!Array.isArray(payload.servers)||payload.servers.length!==1||
-       payload.count!==1) return failure("TARGET_NOT_UNIQUE",409);
-    const only=payload.servers[0];
-    if(!only||typeof only!=="object"||typeof only.id!=="string"||
-       !/^l[0-9]+s[0-9]+$/.test(only.id)||
-       typeof only.is_power_on!=="boolean")
-       return failure("TARGET_SCHEMA_INVALID",502);
-    const on=only.is_power_on;
-    if((input.action==="on"&&on)||
-       (["off","shutdown"].includes(input.action)&&!on))
-       return reply({state:"no_change",action:input.action,execution_enabled:false});
-    if(["reboot","reset"].includes(input.action)&&!on)
-       return failure("POWER_STATE_CONFLICT",409);
-    return reply({state:"ready",action:input.action,
-      method_if_authorized:"POST",hard_power:["off","reset"].includes(input.action),
-      execution_enabled:false});
-  }catch(_){return failure("PLAN_UNAVAILABLE",502);}
+      return fail("INVALID_ARGUMENTS");
+    // Only read the owner's inventory; NEVER call Serverspace /power.
+    const res=await fetch("https://api.serverspace.ru/api/v1/servers",{
+      method:"GET",redirect:"manual",
+      headers:{"X-API-KEY":env.SERVERSPACE_API_KEY,"Accept":"application/json"},
+      signal:AbortSignal.timeout(8000)});
+    if(res.status===401||res.status===403)
+      return fail("PROVIDER_AUTH_DENIED",502);
+    if(res.status===429)
+      return fail("PROVIDER_THROTTLED",503);
+    if(!res.ok)return fail("PROVIDER_UNAVAILABLE",502);
+    if(!res.headers.get("content-type")?.toLowerCase().includes("application/json"))
+      return fail("INVENTORY_SCHEMA",502);
+    if(Number(res.headers.get("content-length")||0)>128000)
+      return fail("INVENTORY_TOO_LARGE",502);
+    const rawInventory=await res.text();
+    if(new TextEncoder().encode(rawInventory).length>128000)
+      return fail("INVENTORY_TOO_LARGE",502);
+    const data=JSON.parse(rawInventory);
+    if(!data||!Array.isArray(data.servers)||data.servers.length!==1)
+      return fail("TARGET_NOT_UNIQUE",409);
+    const server=data.servers[0];
+    if(!server||typeof server!=="object"||typeof server.id!=="string"||
+       !/^l[0-9]+s[0-9]+$/.test(server.id)||
+       typeof server.is_power_on!=="boolean")
+      return fail("TARGET_SCHEMA_INVALID",502);
+    const on=server.is_power_on,act=input.action;
+    if((act==="on"&&on)||
+       ((act==="off"||act==="shutdown")&&!on))
+      return reply({state:"no_change",action:act,execution_enabled:false});
+    if((act==="reboot"||act==="reset")&&!on)
+      return fail("POWER_STATE_CONFLICT",409);
+    return reply({state:"ready",action:act,method_if_authorized:"POST",
+                  hard_power:act==="off"||act==="reset",
+                  execution_enabled:false});
+  }catch(_){return fail("PLAN_UNAVAILABLE",502);}
+}
+export class ServerspacePowerPlanEntrypoint extends __ServerspacePrivatePlanBase {
+  fetch(request){return __serverspacePrivatePowerPlanV2(request,this.env);}
 }
 '''
 class Halt(SafeError):
     pass
 
-def emit(stage,outcome,**kw):
+def emit(phase,outcome,**kw):
     print(json.dumps({"stage":"serverspace_private_power_plan",
-                      "phase":stage,"outcome":outcome,**kw},sort_keys=True),flush=True)
+                      "phase":phase,"outcome":outcome,**kw},sort_keys=True),flush=True)
 
 def conf():
     obj=json.loads(REQ.read_text("utf-8"))
@@ -135,84 +147,86 @@ def patch(cf):
     hits=[i for i,m in enumerate(modules) if m.filename==main]
     if len(hits)!=1:
         raise Halt("MAIN_MODULE_UNEXPECTED")
-    index=hits[0]
-    source=modules[index].content.decode("utf-8")
-    # Idempotent safe exit if the new private plan already exists.
+    ix=hits[0]
+    source=modules[ix].content.decode("utf-8")
+    # No source-specific regex replacement or changes to prior functions.
     if MARK in source:
-        if ROUTE not in source:raise Halt("PARTIAL_DEPLOYMENT")
+        if ENTRY not in source:
+            raise Halt("PARTIAL_SOURCE_UNEXPECTED")
         return modules,main,False,source
-    targets=list(re.finditer(r"\breturn\s+serverspacePrivateFetch\s*\(\s*(\w+)\s*,\s*this\.env\s*\)\s*;",source))
-    emit("source_structure","observed",matching_dispatches=len(targets),
-         class_name_present="ServerspaceReadOnlyEntrypoint" in source,
-         handler_present="serverspacePrivateFetch" in source)
-    if len(targets)!=1:
-        raise Halt("PRIVATE_DISPATCH_ANCHOR_UNEXPECTED")
-    match=targets[0]
-    scope=source[max(0,match.start()-1600):match.start()]
-    if "ServerspaceReadOnlyEntrypoint" not in scope or "fetch(" not in scope:
-        raise Halt("PRIVATE_ENTRYPOINT_SCOPE_UNEXPECTED")
-    arg=match.group(1)
-    replacement=(f'if(new URL({arg}.url).pathname==="{ROUTE}")'
-                 f' return {MARK}({arg},this.env);\n    '+match.group(0))
-    updated=(source[:match.start()]+replacement+source[match.end():]
-              +"\n"+JS)
-    original=modules[index]
-    modules[index]=original._replace(content=updated.encode("utf-8"))
+    if "ServerspaceReadOnlyEntrypoint" not in source or "VpsAdminEntrypoint" not in source:
+        raise Halt("PREVIOUS_ENTRYPOINTS_NOT_FOUND")
+    updated=source.rstrip()+"\n"+JS+"\n"
+    old=modules[ix]
+    if hasattr(old,"_replace"):
+        modules[ix]=old._replace(content=updated.encode("utf-8"))
+    elif dataclasses.is_dataclass(old):
+        modules[ix]=dataclasses.replace(old,content=updated.encode("utf-8"))
+    else:
+        raise Halt("MODULE_UPDATE_UNSUPPORTED")
     return modules,main,True,updated
 
-def check_js(code):
+def check_js(source):
     with tempfile.TemporaryDirectory() as tmp:
         file=Path(tmp)/"index.mjs"
-        file.write_text(code,"utf-8")
+        file.write_text(source,"utf-8")
         p=subprocess.run(["node","--check",str(file)],stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE,timeout=30)
         if p.returncode:
             raise Halt("SYNTAX_FAILURE")
 
 def main():
-    op=conf()
+    mode=conf()
     cf=Cloudflare()
     old=deployed(cf)
     info,exports,names=baseline(cf,old)
     modules,main_name,needed,source=patch(cf)
     check_js(source)
+    if ENTRY in exports and exports[ENTRY].get("type")!="worker":
+        raise Halt("ENTRYPOINT_NAME_CONFLICT")
+    if (not needed) != (ENTRY in exports):
+        raise Halt("SOURCE_METADATA_MISMATCH")
     emit("preflight","passed",patch_needed=needed,
-         inherited_binding_count=len(names),private_export_count=len(exports),
+         inherited_binding_count=len(names),old_export_count=len(exports),
          syntax_valid=True,public_route_unchanged=True,
-         provider_power_request_possible=False)
-    if op=="dry_run":
+         provider_mutation_path_absent=True)
+    if mode=="dry_run":
         return 0
     if not needed:
-        emit("activation","already_present")
+        emit("activation","already_live")
         return 0
-    if deployed(cf)!=old:raise Halt("CONCURRENT_DEPLOYMENT")
+    if deployed(cf)!=old:
+        raise Halt("CONCURRENT_DEPLOYMENT")
     runtime=((info.get("resources") or {}).get("script_runtime") or {})
     day=str(runtime.get("compatibility_date") or "2026-11-22")[:10]
+    new_exports=dict(exports)
+    new_exports[ENTRY]={"type":"worker"}
     meta={"main_module":main_name,"compatibility_date":day,
           "bindings":[{"type":"inherit","name":x} for x in sorted(names)],
-          "exports":dict(exports),
-          "annotations":{"workers/message":"Add private read-only Serverspace power planning"}}
+          "exports":new_exports,
+          "annotations":{"workers/message":"Private read-only Serverspace power planning"}}
     flags=runtime.get("compatibility_flags")
-    if isinstance(flags,list):meta["compatibility_flags"]=flags
+    if isinstance(flags,list):
+        meta["compatibility_flags"]=flags
     body,ctype=encode_upload(modules,main_name,meta)
     cf.call("PUT",TARGET+"?bindings_inherit=strict",body,ctype)
     emit("upload","accepted")
     candidates=[]
     for entry in get_versions(cf)[:10]:
         vid=entry.get("id") if isinstance(entry,dict) else None
-        if not isinstance(vid,str):continue
+        if not isinstance(vid,str):
+            continue
         try:
             _,exp,binding_names=baseline(cf,vid)
-        except (Halt,SafeError):continue
-        if exp==exports and binding_names==names:
+        except (Halt,SafeError):
+            continue
+        if exp==new_exports and binding_names==names:
             candidates.append(vid)
     active_now=deployed(cf)
     if active_now==old:
-        # Uploaded immutable version needs explicit 100% activation.
-        newest=next((x for x in get_versions(cf)[:10]
-                     if isinstance(x,dict) and x.get("id") in candidates),None)
-        if not newest:raise Halt("VERSION_NOT_CONFIRMED")
-        candidate=newest["id"]
+        if not candidates:
+            raise Halt("NEW_VERSION_NOT_CONFIRMED")
+        candidate=candidates[0]
         cf.call("POST",TARGET+"/deployments",json.dumps({
           "strategy":"percentage",
           "versions":[{"version_id":candidate,"percentage":100}]
@@ -225,22 +239,22 @@ def main():
     if deployed(cf)!=candidate:
         raise Halt("ACTIVATION_NOT_CONFIRMED")
     _,live_exports,live_names=baseline(cf,candidate)
-    if live_exports!=exports or live_names!=names:
-        raise Halt("POST_DEPLOYMENT_BINDINGS_CHANGED")
-    _,_,requires_patch,live_source=patch(cf)
-    if requires_patch or MARK not in live_source:
-        raise Halt("POST_DEPLOYMENT_SOURCE_NOT_PRESENT")
-    emit("activation","verified_live",owner_private_plan=True,
-         all_bindings_preserved=True,all_exports_preserved=True,
-         provider_mutation_path_absent=True)
+    if live_exports!=new_exports or live_names!=names:
+        raise Halt("BINDINGS_OR_EXPORTS_LOST")
+    _,_,still_missing,live_source=patch(cf)
+    if still_missing or MARK not in live_source:
+        raise Halt("SOURCE_VERIFY_FAILED")
+    emit("activation","verified_live",private_readonly_plan=True,
+         all_bindings_preserved=True,all_original_exports_preserved=True,
+         live_provider_power_calls_possible=False)
     return 0
 
 if __name__=="__main__":
     try:
         sys.exit(main())
-    except (Halt,SafeError) as e:
-        code=str(e)
-        if not re.fullmatch("[A-Z0-9_]{3,80}",code):
+    except (Halt,SafeError) as exc:
+        code=str(exc)
+        if not re.fullmatch(r"[A-Z0-9_]{3,80}",code):
             code="PROVIDER_PLAN_BLOCKED"
         emit("halt","blocked",code=code)
         sys.exit(3)
