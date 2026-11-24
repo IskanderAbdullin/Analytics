@@ -24,7 +24,7 @@ SNIPPET=r'''
   if(env.SERVERSPACE_ENABLED==="true"){
     server.registerTool("serverspace_plan_power",{
       description:"Preview whether the sole Serverspace RU VPS could be powered on/off or rebooted. Read-only provider GET. Does not execute any command.",
-      inputSchema:z.object({action:z.enum(["on","shutdown","reboot","off","reset"])})
+      inputSchema:{action:z.enum(["on","shutdown","reboot","off","reset"])}
     },async ({action})=>{
       try{
         requireUser();
