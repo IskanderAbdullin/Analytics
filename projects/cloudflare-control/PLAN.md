@@ -31,3 +31,8 @@
 ## 2026-11-24 05:24 UTC
 - Existing t-invest_IIS **private plugin manifest** updated in place to v1.0.1 with the same App binding. Tool catalogue in the current session remained unchanged (18 tools, no serverspace_list_servers). Do not duplicate or repeatedly republish the plugin; prioritize actually supported re-discovery at a new session boundary.
 - Linux root shell proven but WSS stability not achieved; next actionable fix requires compiling and deploying source-only categorized WSS logging in private [PR #21](https://github.com/IskanderAbdullin/MCP-proxi/pull/21). Separate provider-control [PR #20](https://github.com/IskanderAbdullin/MCP-proxi/pull/20) remains disabled and unshipped.
+
+## 2026-11-24 11:30 UTC — agent update installed and authenticated VPS shell restored
+- PR #21 exact single-file artifact installed by owner, SHA256 confirmed remotely. Real vps_status and vps_exec succeeded, sudo root confirmed, PID 69813. Eight initial HTTP409 followed by WSS connection; one observed session disconnect recovered in 2s. Long-term stability and cause of 409 not yet proven. No Cloudflare or trading changes.
+- VPS direct public GitHub reachable, private repository access not verified; Git installed, dotnet unavailable. GitHub-first mandated in MCP-proxi AGENTS. Next delivery should use authorized private direct fetch/build or release rather than home PC SCP.
+- Provider API PR #20 still staged, not deployed; separate full build and connector discovery work remains.
