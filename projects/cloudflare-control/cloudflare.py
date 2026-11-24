@@ -1,4 +1,5 @@
 """Fixed, read-only Cloudflare Workers inventory. Public logs contain no API bodies."""
+import hashlib
 import json
 import os
 import re
@@ -71,6 +72,48 @@ def _deployed(data):
         raise AuditError("INVALID_DEPLOYMENTS_SCHEMA")
     return len(v)>0
 
+
+# PC-Agent release D143: fixed read-only baseline comparison. Public output
+# contains only booleans and counts, not version IDs, raw bindings or values.
+PC_BASELINE_VERSION_DIGEST = "e0a22ff28dcc4d8f769dbe71b95135a25170b1a8e4d063b1d2031bfd2d1ff2dd"
+PC_BASELINE_BINDINGS_DIGEST = "bd832cdf22f62e24fc67732e2ba519fd31b8dcc3c8f9dca6ee33f81c1e53c3ec"
+
+def pc_baseline(settings, deployments):
+    bindings = settings.get("bindings") if isinstance(settings, dict) else None
+    deployments = deployments.get("deployments") if isinstance(deployments, dict) else deployments
+    rows = bindings if isinstance(bindings, list) else []
+    well_formed = all(isinstance(b, dict) and isinstance(b.get("name"), str)
+                      and isinstance(b.get("type"), str) for b in rows)
+    by_name = {b["name"]: b for b in rows} if well_formed else {}
+    digest = hashlib.sha256("\n".join(sorted(
+        b["type"] + ":" + b["name"] for b in rows
+    )).encode()).hexdigest() if well_formed else ""
+    binding_match = (len(rows) == len(by_name) == 27
+                     and digest == PC_BASELINE_BINDINGS_DIGEST)
+    versions = deployments[0].get("versions", []) if (
+        isinstance(deployments, list) and deployments and isinstance(deployments[0], dict)
+    ) else []
+    active = versions[0] if isinstance(versions, list) and len(versions) == 1 and isinstance(versions[0], dict) else {}
+    vid = active.get("version_id")
+    version_match = bool(active.get("percentage") == 100 and isinstance(vid, str)
+                         and hashlib.sha256(vid.encode()).hexdigest() == PC_BASELINE_VERSION_DIGEST)
+    def var(name, expected):
+        b = by_name.get(name, {})
+        return b.get("type") == "plain_text" and b.get("text", b.get("value")) == expected
+    def service(name, entrypoint):
+        b = by_name.get(name, {})
+        return (b.get("type") == "service" and b.get("service") == "babit-vps-bridge"
+                and b.get("entrypoint") == entrypoint)
+    routes = (var("PC_AGENT_ENABLED", "true") and var("PC_AGENT_TRANSPORT", "wss")
+              and var("VPS_AGENT_ENABLED", "true") and var("VPS_AGENT_ROUTE", "dedicated")
+              and var("SERVERSPACE_ENABLED", "true"))
+    services = (service("VPS_AGENT_SERVICE", "VpsAdminEntrypoint")
+                and service("SERVERSPACE_SERVICE", "ServerspaceReadOnlyEntrypoint"))
+    return {"binding_count": len(rows), "binding_set_matches": binding_match,
+            "active_version_matches": version_match, "route_flags_match": routes,
+            "service_entrypoints_match": services,
+            "baseline_matches": binding_match and version_match and routes and services}
+
 def audit(account, token, transport=None):
     out={"schema_version":1,"mode":"read_only","workers":[]}
     for worker in WORKERS:
@@ -81,7 +124,10 @@ def audit(account, token, transport=None):
             settings=get(account,token,worker,"/settings",transport)
             item["binding_present"]=_bindings(settings,expected)
             item["settings_ok"]=True
-            item["deployed"]=_deployed(get(account,token,worker,"/deployments",transport))
+            deployments=get(account,token,worker,"/deployments",transport)
+            item["deployed"]=_deployed(deployments)
+            if worker=="t-invest-mcp-proxy":
+                item["pc_baseline"]=pc_baseline(settings,deployments)
         except AuditError as e:
             item["error"]=str(e)
         out["workers"].append(item)

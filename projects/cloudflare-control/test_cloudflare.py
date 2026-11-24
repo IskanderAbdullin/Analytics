@@ -77,5 +77,42 @@ class Tests(unittest.TestCase):
         self.assertFalse(result["connected"])
         self.assertEqual(result["workers"][0]["error"],"INVALID_SETTINGS_SCHEMA")
 
+
+    def test_pc_baseline_never_discloses_metadata_values(self):
+        from cloudflare import pc_baseline
+        result = pc_baseline({"bindings":[{"name":"PRIVATE_NAME","type":"plain_text",
+                             "text":"PRIVATE_VALUE"}]},
+                             {"deployments":[{"versions":[{"percentage":100,
+                                  "version_id":"PRIVATE_ID"}]}]})
+        self.assertFalse(result["baseline_matches"])
+        self.assertEqual(result["binding_count"],1)
+        self.assertNotIn("PRIVATE",json.dumps(result))
+        self.assertFalse(pc_baseline({},None)["active_version_matches"])
+
+    def test_pc_baseline_checks_expected_digests_and_routes(self):
+        import hashlib
+        from unittest.mock import patch
+        from cloudflare import pc_baseline
+        bindings = [
+            {"name":k,"type":"plain_text","text":v} for k,v in (
+                ("PC_AGENT_ENABLED","true"),("PC_AGENT_TRANSPORT","wss"),
+                ("VPS_AGENT_ENABLED","true"),("VPS_AGENT_ROUTE","dedicated"),
+                ("SERVERSPACE_ENABLED","true"))]
+        bindings += [{"name":k,"type":"service","service":"babit-vps-bridge","entrypoint":v}
+                     for k,v in (("VPS_AGENT_SERVICE","VpsAdminEntrypoint"),
+                                 ("SERVERSPACE_SERVICE","ServerspaceReadOnlyEntrypoint"))]
+        bindings += [{"name":"mock_"+str(i),"type":"secret_text","value":"DO_NOT_REPORT"}
+                     for i in range(20)]
+        settings={"bindings":bindings}
+        deploy={"deployments":[{"versions":[{"version_id":"mock_version","percentage":100}]}]}
+        digest=hashlib.sha256("\n".join(sorted(b["type"]+":"+b["name"] for b in bindings)).encode()).hexdigest()
+        with patch("cloudflare.PC_BASELINE_BINDINGS_DIGEST",digest), patch(
+             "cloudflare.PC_BASELINE_VERSION_DIGEST",hashlib.sha256(b"mock_version").hexdigest()):
+            result=pc_baseline(settings,deploy)
+            self.assertTrue(result["baseline_matches"])
+            self.assertNotIn("DO_NOT_REPORT",json.dumps(result))
+            deploy["deployments"][0]["versions"][0]["percentage"]=50
+            self.assertFalse(pc_baseline(settings,deploy)["baseline_matches"])
+
 if __name__=="__main__":
     unittest.main()
