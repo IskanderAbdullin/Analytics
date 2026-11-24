@@ -6,6 +6,7 @@ on:
       - '.github/workflows/vps-socket-inspection-rollout.yml'
       - 'projects/cloudflare-control/socket_health_rollout.py'
       - 'projects/cloudflare-control/socket_health_rollout_request.json'
+      - 'projects/vps-api-control/test_socket_health_wrapper.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,6 +28,27 @@ jobs:
         run: |
           gzip -dc projects/cloudflare-control/serverspace_deploy.py.gz > "$RUNNER_TEMP/serverspace_deploy.py"
           python -m py_compile "$RUNNER_TEMP/serverspace_deploy.py" projects/cloudflare-control/serverspace_rebuild.py projects/cloudflare-control/socket_health_rollout.py
+      - name: Exercise sandboxed socket wrapper with no Worker deployment
+        env:
+          PYTHONPATH: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,"projects/cloudflare-control")
+          from socket_health_rollout import JS
+          header='''class VpsAgentRelay {
+            constructor(state){ this.state=state; this.original_calls=0; }
+            fetch(request){ this.original_calls++; return new Response("original",{status:200}); }
+          }
+          '''
+          old='import {WorkerEntrypoint as __PrivateVpsSocketBase} from "cloudflare:workers";'
+          new='class __PrivateVpsSocketBase { constructor(env){this.env=env;} }'
+          if JS.count(old)!=1: raise SystemExit("mock_import_anchor_mismatch")
+          Path("projects/vps-api-control/vps-socket-wrapper-fixture.mjs").write_text(
+             header+JS.replace(old,new)+'\nexport {VpsAgentRelay};\n',encoding="utf-8")
+          PY
+          node --test projects/vps-api-control/test_socket_health_wrapper.mjs
       - name: Dry-run only unless explicitly requested and baseline confirmed
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
