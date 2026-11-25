@@ -1,0 +1,5 @@
+# YouTube archive owner Worker
+
+Independent Worker `youtube-archive-owner`. Public-safe code only. No user IDs, credentials, captions or private data are committed or logged. The deploy script refuses to overwrite an existing Worker. No routes or bindings of other Workers are modified.
+
+`GET /healthz` gives only service status. `POST /mcp` supports discovery and four strictly read-only owner tools. Authenticated calls require a caller-supplied Google OAuth access token, not the Cloudflare API token. All YouTube calls use fixed GET URLs and verify ownership. The Worker stores no OAuth tokens. Access to the real owner's data requires a separate Google OAuth client/consent and a compatible ChatGPT MCP OAuth configuration; this release does not implement an OAuth authorization server, token refresh or a complete installed plugin. Google scope `youtube.force-ssl` is necessary for captions even though the service only reads. Do not send tokens to chat or logs. No live caption download is claimed until owner consent is tested. Deploy is via existing Analytics Cloudflare Secrets.
