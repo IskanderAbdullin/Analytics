@@ -2,6 +2,8 @@ import json,os,subprocess,sys,time,tempfile,urllib.request,urllib.parse,xml.etre
 from pathlib import Path
 from faster_whisper import WhisperModel
 import imageio_ffmpeg
+import numpy as np
+import wave
 FEED="https://cloud.mave.digital/66566"
 GUID="533a5c34-eca2-4ff3-9689-9e0e7c758b8e"
 with urllib.request.urlopen(FEED,timeout=20) as r:root=ET.fromstring(r.read(12000000))
@@ -18,7 +20,10 @@ with tempfile.TemporaryDirectory() as tmp:
  model=WhisperModel("small",device="cpu",compute_type="int8",cpu_threads=2,num_workers=1)
  init_time=time.monotonic()-started
  started=time.monotonic()
- segments,info=model.transcribe(str(p),beam_size=3,vad_filter=True)
+ with wave.open(str(p),'rb') as w:
+  assert w.getframerate()==16000 and w.getnchannels()==1 and w.getsampwidth()==2
+  samples=np.frombuffer(w.readframes(w.getnframes()),dtype='<i2').astype(np.float32)/32768.0
+ segments,info=model.transcribe(samples,beam_size=3,vad_filter=True)
  seg=list(segments);sec=time.monotonic()-started
  chars=sum(len(s.text) for s in seg)
  print("ASR_PROBE "+json.dumps({"sample_seconds":90,"fetch_decode_seconds":round(audio_time,2),"model_load_seconds":round(init_time,2),"transcribe_seconds":round(sec,2),"rtf":round(sec/90,3),"language":info.language,"language_probability":round(info.language_probability,3),"segments":len(seg),"chars":chars,"last_end":round(max((s.end for s in seg),default=0),2),"cpu_threads":2,"model":"small/int8"}),flush=True)
