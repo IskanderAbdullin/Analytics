@@ -30,3 +30,5 @@
 - D185: fixed read-only Log Explorer SQL query (POST query endpoint, no mutation). Only aggregated close reasons for D183/D184 temporary Worker name prefixes and exact historical time window. No raw log records, IDs, source/destination addresses, token, dataset creation or paid enablement. No new connection tests.
 
 - D186: owner supplied fresh evidence of established QUIC and local TCP22 listener; one repeat of D184 fixed connectivity diagnostic authorized under same scope. Separate sanitized categories for API shape, timeout, proxy error; no raw exception text, SSH data, credentials, new routes or other targets. No HTTP origin repeat (8765 absent).
+
+- D189: public CI synthetic SSH compatibility fixture only: ephemeral loopback server, generated disposable fixture keys, pinned ssh2 library, no real host address, actual credentials, Cloudflare deployment, commands, forwarding or secrets. Test host-key rejection and public-key authentication through standard Node/Web streams.

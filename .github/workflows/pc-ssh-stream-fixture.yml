@@ -1,0 +1,23 @@
+name: SSH stream compatibility fixture
+on:
+  push:
+    branches: [chatgpt/cloudflare-control-20261123]
+    paths:
+      - '.github/workflows/pc-ssh-stream-fixture.yml'
+      - 'projects/cloudflare-control/fixtures/ssh-stream/**'
+permissions:
+  contents: read
+jobs:
+  fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned SSH library without install scripts
+        working-directory: projects/cloudflare-control/fixtures/ssh-stream
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Local synthetic authentication
+        working-directory: projects/cloudflare-control/fixtures/ssh-stream
+        run: node fixture.mjs
