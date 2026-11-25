@@ -100,5 +100,7 @@ def run(queue,ledger,limit,reserved,execute):
 def main():
     p=argparse.ArgumentParser();p.add_argument("queue",type=Path);p.add_argument("ledger",type=Path)
     p.add_argument("--limit",type=int,default=3);p.add_argument("--reserved-attempts",type=int,default=0,help="Other calls in current rolling hour; conservative count")
-    p.add_argument("--execute",action="store_true");a=p.parse_args();run(a.queue,a.ledger,a.limit,a.reserved_attempts,a.execute)
+    p.add_argument("--execute",action="store_true");p.add_argument("--require-key",action="store_true");a=p.parse_args()
+    if a.require_key and not os.environ.get("FREETRANSCRIPT_API_KEY","").strip():raise SystemExit("Authenticated pilot requires FREETRANSCRIPT_API_KEY; no request sent")
+    run(a.queue,a.ledger,a.limit,a.reserved_attempts,a.execute)
 if __name__=="__main__":main()

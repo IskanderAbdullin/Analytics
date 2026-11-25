@@ -1,0 +1,2 @@
+# Authenticated-only test
+Create a free key at https://freetranscriptapi.com/ and add it as repository Actions secret FREETRANSCRIPT_API_KEY. Do not paste keys into chat or files. After key provision, explicitly request a run; update trigger.json on this branch to start the isolated three-call integration test. Missing key exits before any provider call. No trigger file created now. No payment or automated schedule.
