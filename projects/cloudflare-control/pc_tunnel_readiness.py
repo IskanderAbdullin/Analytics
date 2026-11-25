@@ -19,6 +19,8 @@ def response(url, token):
 
 
 def config_summary(obj):
+    if obj is None or (isinstance(obj, dict) and obj.get("config") is None):
+        return {"result": "configuration_not_returned"}
     if not isinstance(obj, dict) or not isinstance(obj.get("config"), dict):
         return {"result": "invalid_schema"}
     cfg = obj["config"]
@@ -59,7 +61,28 @@ def audit(account, token):
     out["connections"] = meta
     meta, cfg = response(base + "/configurations", token)
     out["configuration"] = config_summary(cfg) if meta.get("result") == "ok" else meta
+    meta, services = response(ROOT + "/" + account + "/connectivity/directory/services?per_page=100&type=http", token)
+    if meta.get("result") == "ok":
+        meta = service_summary(services, ident)
+    out["existing_vpc_service"] = meta
     return out
+
+
+def service_summary(rows, tunnel_id):
+    if not isinstance(rows, list):
+        return {"result":"invalid_schema"}
+    matches = [x for x in rows if isinstance(x, dict) and x.get("name") == "pc-agent-loopback"]
+    if len(matches) != 1:
+        return {"result":"not_found_or_ambiguous"}
+    row = matches[0]
+    host = row.get("host")
+    if not isinstance(host, dict):
+        return {"result":"invalid_schema"}
+    network = host.get("network")
+    return {"result":"ok", "type_http":row.get("type") == "http",
+            "loopback":host.get("ipv4") == "127.0.0.1",
+            "port_8765":row.get("http_port") == 8765,
+            "same_tunnel":isinstance(network, dict) and network.get("tunnel_id") == tunnel_id}
 
 
 if __name__ == "__main__":
