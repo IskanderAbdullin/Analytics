@@ -24,3 +24,5 @@
 - D181 follow-up: fixed read-only GET connectivity/directory/services filtered to HTTP, summarize only exact existing pc-agent-loopback service using booleans. No service modification, raw identifiers or values.
 
 - D183: fixed one-message diagnostic via existing exact HTTP VPC service only. Unsigned POST /v1/status (expected 401 if origin is live), record HTTP status only; no authentication bypass, commands, body retention, new network route, public endpoint or shared Worker changes. Temporary Worker/Queue/KV cleanup as in D180.
+
+- D184: one fixed TCP22 connectivity probe via a temporary VPC Network binding to the unique existing named pc-agent-private tunnel only, NOT Mesh or default network. Target literal 127.0.0.1:22, no SSH bytes written/read, no credentials, no general execution or proxy, no public endpoint, no changes to tunnel routes or other services. One queue event and cleanup as D180. This is not an SSH client or new persistent access mechanism.
