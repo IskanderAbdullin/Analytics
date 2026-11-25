@@ -1,0 +1,26 @@
+name: Authorized subtitle import offline tests
+on:
+  push:
+    branches: [chatgpt/youtube-transcript-probe-20261125]
+    paths: ['projects/subtitle-import/**','.github/workflows/subtitle-import-tests.yml']
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Synthetic offline tests
+        working-directory: projects/subtitle-import
+        run: python -m unittest -v
+      - name: Record success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state=success -f context=subtitle-import-tests -f description="Synthetic offline import tests passed" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null
