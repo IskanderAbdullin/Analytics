@@ -1,0 +1,29 @@
+name: Official mirror and podcast catalog
+on:
+  push:
+    branches: [chatgpt/youtube-transcript-probe-20261125]
+    paths: ['projects/official-mirror-probe/**', '.github/workflows/official-mirror-probe.yml']
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet yt-dlp
+      - name: Enumerate official public mirrors
+        run: python projects/official-mirror-probe/mirrors.py | tee "$RUNNER_TEMP/mirrors.log"
+      - name: Report result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          description=$(grep -E '^(PODCAST_COUNT|RUTUBE_COUNT)' "$RUNNER_TEMP/mirrors.log" | cut -c1-55 | tr '\n' ';' | cut -c1-130 || true)
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state=success -f context=official-mirror-probe -f description="${description:-No catalog counts}" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null
