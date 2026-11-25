@@ -183,3 +183,5 @@ if __name__ == "__main__":
 # D150 authorized PC maintenance preflight: GET only, no production write.
 
 # D151: refresh read-only live baseline during simultaneous PC/VPS transport timeouts.
+
+# D176: refresh existing read-only exact baseline and aggregate metrics after PC_AGENT_HTTP_503.
