@@ -17,21 +17,22 @@ async function api(token,path,params,text=false){
  return res.json();
 }
 const mine=(token,pt)=>api(token,"channels",{part:"id,contentDetails",mine:"true",maxResults:50,pageToken:pt});
-async function ownedChannel(token,channel){
+async function ownedChannel(token,channel,allowedChannel){
+ if(allowedChannel&&channel!==allowedChannel)throw new Error('Channel outside this grant');
  let pt;for(let i=0;i<20;i++){const a=await mine(token,pt);const match=a.items?.find(v=>v.id===channel);if(match)return match;pt=a.nextPageToken;if(!pt)break}throw new Error("Channel not owned by this authorization");
 }
-async function ownedVideo(token,video){const a=await api(token,"videos",{part:"snippet,status",id:video});const v=a.items?.find(v=>v.id===video);if(!v)throw new Error("Video unavailable to this authorization");await ownedChannel(token,v.snippet.channelId);return v}
+async function ownedVideo(token,video,allowedChannel){const a=await api(token,"videos",{part:"snippet,status",id:video});const v=a.items?.find(v=>v.id===video);if(!v)throw new Error("Video unavailable to this authorization");await ownedChannel(token,v.snippet.channelId,allowedChannel);return v}
 const tracks=(token,video)=>api(token,"captions",{part:"snippet",videoId:video});
-async function call(name,args,token){
- if(name==="youtube_owner_channels")return mine(token,page(args.pageToken));
- if(name==="youtube_owner_uploads"){const ch=await ownedChannel(token,id(args.channelId,"channel"));const playlist=ch.contentDetails?.relatedPlaylists?.uploads;if(!playlist)throw new Error("Uploads playlist unavailable");return api(token,"playlistItems",{part:"snippet,contentDetails,status",playlistId:playlist,maxResults:50,pageToken:page(args.pageToken)})}
- if(name==="youtube_owner_captions"){const v=id(args.videoId,"video");await ownedVideo(token,v);return tracks(token,v)}
- if(name==="youtube_owner_caption_download"){const v=id(args.videoId,"video"),c=id(args.captionId,"caption");await ownedVideo(token,v);const a=await tracks(token,v);if(!a.items?.some(x=>x.id===c&&x.snippet?.videoId===v))throw new Error("Caption does not belong to the requested video");const s=await api(token,"captions/"+encodeURIComponent(c),{tfmt:"srt"},true);return {videoId:v,captionId:c,format:"srt",text:s}}
+async function call(name,args,token,allowedChannel){
+ if(name==="youtube_owner_channels")return allowedChannel?{items:[await ownedChannel(token,allowedChannel,allowedChannel)]}:mine(token,page(args.pageToken));
+ if(name==="youtube_owner_uploads"){const ch=await ownedChannel(token,id(args.channelId,"channel"),allowedChannel);const playlist=ch.contentDetails?.relatedPlaylists?.uploads;if(!playlist)throw new Error("Uploads playlist unavailable");return api(token,"playlistItems",{part:"snippet,contentDetails,status",playlistId:playlist,maxResults:50,pageToken:page(args.pageToken)})}
+ if(name==="youtube_owner_captions"){const v=id(args.videoId,"video");await ownedVideo(token,v,allowedChannel);return tracks(token,v)}
+ if(name==="youtube_owner_caption_download"){const v=id(args.videoId,"video"),c=id(args.captionId,"caption");await ownedVideo(token,v,allowedChannel);const a=await tracks(token,v);if(!a.items?.some(x=>x.id===c&&x.snippet?.videoId===v))throw new Error("Caption does not belong to the requested video");const s=await api(token,"captions/"+encodeURIComponent(c),{tfmt:"srt"},true);return {videoId:v,captionId:c,format:"srt",text:s}}
  throw new Error("Unknown tool");
 }
 const rpc=(id,result)=>json({jsonrpc:"2.0",id,result});
 const error=(id,code,message)=>json({jsonrpc:"2.0",id,error:{code,message}});
-export default {async fetch(req){
+export default {async fetch(req,env={}){
  const url=new URL(req.url);
  if(url.pathname==="/healthz"&&req.method==="GET")return json({ok:true,service:"youtube-archive",mode:"owner-token-read-only",googleOAuth:"caller-provided; not yet provisioned"});
  if(url.pathname!=="/mcp")return json({error:"not_found"},404);
@@ -45,6 +46,6 @@ export default {async fetch(req){
  if(msg.method!=="tools/call")return error(msg.id,-32601,"Method not found");
  const token=req.headers.get("authorization")??"";
  if(!/^Bearer [A-Za-z0-9._~+\/=-]{10,4096}$/i.test(token))return json({error:"Google OAuth bearer token required"},401);
- try{const name=msg.params?.name,args=msg.params?.arguments??{};if(!args||typeof args!=="object"||Array.isArray(args))throw new Error("Invalid arguments");const result=await call(name,args,token);return rpc(msg.id,{content:[{type:"text",text:JSON.stringify(result)}]})}
+ try{const name=msg.params?.name,args=msg.params?.arguments??{};if(!args||typeof args!=="object"||Array.isArray(args))throw new Error("Invalid arguments");const result=await call(name,args,token,env.allowedChannel);return rpc(msg.id,{content:[{type:"text",text:JSON.stringify(result)}]})}
  catch(e){return rpc(msg.id,{isError:true,content:[{type:"text",text:e instanceof Error?e.message:"YouTube request failed"}]})}
 }};

@@ -1,0 +1,38 @@
+name: YouTube archive OAuth Worker rollout
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/youtube-archive-worker-oauth.yml'
+      - 'projects/youtube-archive-worker/oauth.mjs'
+      - 'projects/youtube-archive-worker/oauth-logic.mjs'
+      - 'projects/youtube-archive-worker/deploy-oauth.mjs'
+      - 'projects/youtube-archive-worker/oauth.test.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: youtube-archive-worker-create
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline owner and OAuth tests
+        run: node --test projects/youtube-archive-worker/worker.test.mjs projects/youtube-archive-worker/oauth.test.mjs
+      - name: Bundle pinned Cloudflare OAuth provider
+        working-directory: projects/youtube-archive-worker
+        run: |
+          npm install --no-save --ignore-scripts --no-audit --no-fund @cloudflare/workers-oauth-provider@1.2.4 esbuild@0.25.12
+          npx --no-install esbuild oauth.mjs --bundle --format=esm --platform=browser --external:cloudflare:* --outfile="$RUNNER_TEMP/youtube-archive-oauth.mjs"
+      - name: Update only new Worker and verify OAuth discovery
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node projects/youtube-archive-worker/deploy-oauth.mjs "$RUNNER_TEMP/youtube-archive-oauth.mjs"
