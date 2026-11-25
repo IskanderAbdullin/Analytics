@@ -95,3 +95,11 @@ jobs:
             -f description="$description" \
             -f target_url="https://github.com/$REPO/actions/runs/$RUN_ID" \
             >/dev/null
+
+      - name: Read status of existing PC tunnel only
+        continue-on-error: true
+        working-directory: projects/cloudflare-control
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python pc_tunnel_status.py
