@@ -7,7 +7,7 @@ import secrets
 import time
 from pc_tcp_probe import ROOT, api, request, Blocked
 
-OUTCOMES = {"tcp_open","timeout","connection_failed","connection_refused","connection_timeout","destination_unavailable","destination_not_found","destination_ip_prohibited","destination_ip_unroutable","dns_error","http_request_denied","proxy_internal_error"}
+OUTCOMES = {"tcp_open","timeout","connection_failed","connection_refused","connection_timeout","destination_unavailable","destination_not_found","destination_ip_prohibited","destination_ip_unroutable","dns_error","http_request_denied","proxy_internal_error","connection_read_timeout","connection_write_timeout","rate_limited","connection_reset","tls_error","unknown_proxy_error","connect_type_error","socket_type_error","connect_other_error","socket_other_error","missing_connect_method","invalid_socket_shape"}
 
 
 def japi(url, method, token, payload):

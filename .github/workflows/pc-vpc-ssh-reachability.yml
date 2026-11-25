@@ -22,6 +22,7 @@ jobs:
         run: |
           python -m py_compile projects/cloudflare-control/pc_vpc_ssh_reachability.py
           node --check projects/cloudflare-control/pc_vpc_ssh_reachability.mjs
+          node --test projects/cloudflare-control/test_pc_vpc_ssh_reachability.mjs
       - name: Fixed loopback TCP 22 reachability
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

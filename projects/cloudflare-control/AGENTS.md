@@ -28,3 +28,5 @@
 - D184: one fixed TCP22 connectivity probe via a temporary VPC Network binding to the unique existing named pc-agent-private tunnel only, NOT Mesh or default network. Target literal 127.0.0.1:22, no SSH bytes written/read, no credentials, no general execution or proxy, no public endpoint, no changes to tunnel routes or other services. One queue event and cleanup as D180. This is not an SSH client or new persistent access mechanism.
 
 - D185: fixed read-only Log Explorer SQL query (POST query endpoint, no mutation). Only aggregated close reasons for D183/D184 temporary Worker name prefixes and exact historical time window. No raw log records, IDs, source/destination addresses, token, dataset creation or paid enablement. No new connection tests.
+
+- D186: owner supplied fresh evidence of established QUIC and local TCP22 listener; one repeat of D184 fixed connectivity diagnostic authorized under same scope. Separate sanitized categories for API shape, timeout, proxy error; no raw exception text, SSH data, credentials, new routes or other targets. No HTTP origin repeat (8765 absent).
