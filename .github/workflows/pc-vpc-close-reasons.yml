@@ -1,0 +1,26 @@
+name: D185 existing diagnostic session close reasons
+on:
+  push:
+    branches: [chatgpt/cloudflare-control-20261123]
+    paths:
+      - '.github/workflows/pc-vpc-close-reasons.yml'
+      - 'projects/cloudflare-control/pc_vpc_close_reasons.py'
+      - 'projects/cloudflare-control/test_pc_vpc_close_reasons.py'
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Unit tests
+        working-directory: projects/cloudflare-control
+        run: python -m unittest test_pc_vpc_close_reasons -v
+      - name: Fixed aggregate read only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python projects/cloudflare-control/pc_vpc_close_reasons.py

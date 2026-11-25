@@ -26,3 +26,5 @@
 - D183: fixed one-message diagnostic via existing exact HTTP VPC service only. Unsigned POST /v1/status (expected 401 if origin is live), record HTTP status only; no authentication bypass, commands, body retention, new network route, public endpoint or shared Worker changes. Temporary Worker/Queue/KV cleanup as in D180.
 
 - D184: one fixed TCP22 connectivity probe via a temporary VPC Network binding to the unique existing named pc-agent-private tunnel only, NOT Mesh or default network. Target literal 127.0.0.1:22, no SSH bytes written/read, no credentials, no general execution or proxy, no public endpoint, no changes to tunnel routes or other services. One queue event and cleanup as D180. This is not an SSH client or new persistent access mechanism.
+
+- D185: fixed read-only Log Explorer SQL query (POST query endpoint, no mutation). Only aggregated close reasons for D183/D184 temporary Worker name prefixes and exact historical time window. No raw log records, IDs, source/destination addresses, token, dataset creation or paid enablement. No new connection tests.
