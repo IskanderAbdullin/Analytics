@@ -1,0 +1,31 @@
+name: Private Cloudflare TCP 22 queue probe
+on:
+  push:
+    branches: [chatgpt/cloudflare-control-20261123]
+    paths:
+      - '.github/workflows/pc-queue-probe.yml'
+      - 'projects/cloudflare-control/pc_queue_probe.*'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: private-pc-queue-probe
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Syntax checks
+        run: |
+          python -m py_compile projects/cloudflare-control/pc_queue_probe.py
+          node --check projects/cloudflare-control/pc_queue_probe.mjs
+      - name: Run fixed TCP diagnostic
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PC_SSH_PROBE_HOST: ${{ secrets.PC_SSH_PROBE_HOST }}
+        run: python projects/cloudflare-control/pc_queue_probe.py
