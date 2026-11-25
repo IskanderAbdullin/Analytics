@@ -1,0 +1,31 @@
+name: YouTube public catalog probe
+on:
+  push:
+    branches: [chatgpt/youtube-transcript-probe-20261125]
+    paths:
+      - '.github/workflows/youtube-catalog-probe.yml'
+      - 'projects/youtube-catalog-probe/**'
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet yt-dlp
+      - name: Enumerate public catalog
+        run: python projects/youtube-catalog-probe/catalog.py | tee "$RUNNER_TEMP/catalog.log"
+      - name: Report result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          description=$(grep 'CATALOG_COUNT' "$RUNNER_TEMP/catalog.log" | tr '\n' ';' | cut -c1-130 || true)
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state=success -f context=youtube-catalog-probe -f description="${description:-No catalog counts}" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null
