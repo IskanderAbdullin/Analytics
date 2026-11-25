@@ -1,0 +1,33 @@
+name: Local WASM SSH initialization fixture
+on:
+  push:
+    branches: [chatgpt/cloudflare-control-20261123]
+    paths:
+      - '.github/workflows/pc-ssh-wasm-runtime.yml'
+      - 'projects/cloudflare-control/fixtures/ssh-wasm-runtime/**'
+permissions:
+  contents: read
+jobs:
+  fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      WRANGLER_SEND_METRICS: "false"
+    defaults:
+      run:
+        working-directory: projects/cloudflare-control/fixtures/ssh-wasm-runtime
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect published dependency metadata
+        run: npm view wasm-ssh-client@0.2.1 version license repository dist.integrity --json
+      - name: Install pinned dependencies without scripts
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Bundle only no deploy
+        run: npx --no-install wrangler deploy --dry-run --outdir dist
+      - name: Initialize WASM in local workerd
+        run: bash run-local.sh

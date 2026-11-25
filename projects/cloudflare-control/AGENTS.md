@@ -34,3 +34,5 @@
 - D189: public CI synthetic SSH compatibility fixture only: ephemeral loopback server, generated disposable fixture keys, pinned ssh2 library, no real host address, actual credentials, Cloudflare deployment, commands, forwarding or secrets. Test host-key rejection and public-key authentication through standard Node/Web streams.
 
 - D190: local Miniflare/workerd compatibility fixture, Wrangler dry-run bundling only. No actual cloud deployment, secrets, live tunnel/SSH, remote host, commands or production bindings. Generated in-memory fixture key only.
+
+- D191: offline local WASM candidate initialization fixture, pinned package, no install scripts, no SSH transport, real host, keys, commands, Cloudflare deployment, VPC bindings or production credentials. Not a production library endorsement.
