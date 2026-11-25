@@ -53,3 +53,6 @@ Owner-provided evidence: local TCP22 listener and established QUIC, TCP8765 abse
 
 ## D190 first runtime fixture (2026-11-25T11:26:44.958Z)
 Actual Wrangler 4.50.0 dry-run bundle failed with unresolved optional cpufeatures.node, no runtime test or deploy. Analytics source 86da9a30f1b1a87cb8a5bae2417247a3751e4977, run 45604473969/job 139171624976. Upstream reports same optional native addon error (#1226), plus ssh2 module-load dynamic WASM incompatibility (#1494). Next local-only fixture uses current 4.168.0 reported by Wrangler, current compatibility date and alias for optional native CPU detection only. No crypto change, no real target or credentials.
+
+
+D190 second fixture (11:27:43Z): Wrangler 4.168.0 dry-run succeeds with optional CPU detection alias. Miniflare constructor rejects old schema; actual Worker code not executed. Run 45604603335/job 139172089445. Replace harness by supported local Wrangler dev CLI. No deploy or real host/keys.

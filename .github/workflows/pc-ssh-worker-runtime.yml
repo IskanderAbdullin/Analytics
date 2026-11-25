@@ -28,4 +28,4 @@ jobs:
       - name: Bundle only no deploy
         run: npx --no-install wrangler deploy --dry-run --outdir dist
       - name: Execute local workerd synthetic fixture
-        run: node run.mjs
+        run: bash run-local.sh
