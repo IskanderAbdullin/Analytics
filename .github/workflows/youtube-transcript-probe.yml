@@ -1,0 +1,77 @@
+name: YouTube transcript connectivity probe
+on:
+  push:
+    branches: [chatgpt/youtube-transcript-probe-20261125]
+    paths:
+      - '.github/workflows/youtube-transcript-probe.yml'
+      - 'projects/youtube-transcript-probe/**'
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Direct access test
+        run: |
+          python -m pip install --quiet youtube-transcript-api
+          python projects/youtube-transcript-probe/direct.py | tee "$RUNNER_TEMP/direct.json"
+      - name: Publish direct result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > "$RUNNER_TEMP/description"
+          import json,os
+          try:
+           d=json.load(open(os.environ["RUNNER_TEMP"]+"/direct.json"))
+           print("oEmbed="+str(d["oembed"].get("status"))+" watch="+str(d["watch"].get("status"))+" captions="+str(d["captions"].get("error",d["captions"].get("segments"))))
+          except Exception: print("Direct probe did not complete")
+          PY
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state=success -f context=youtube-direct-probe -f description="$(cat "$RUNNER_TEMP/description")" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null
+      - name: Temporary fixed-target Cloudflare Worker test
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID"
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers"
+          name="youtube-transcript-probe-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          auth="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          get_code=$(curl -sS --max-time 15 -o "$RUNNER_TEMP/existing.json" -w '%{http_code}' -H "$auth" "$api/scripts/$name")
+          test "$get_code" = 404
+          cleanup() {
+            curl -sS --max-time 15 -X DELETE -H "$auth" "$api/scripts/$name" -o "$RUNNER_TEMP/cleanup.json"
+            python -c 'import json,sys; d=json.load(open(sys.argv[1])); print("Temporary Worker cleanup:",d.get("success",False))' "$RUNNER_TEMP/cleanup.json"
+          }
+          trap cleanup EXIT
+          curl -fsS --max-time 20 -X PUT -H "$auth" -F 'metadata={"main_module":"worker.mjs","compatibility_date":"2026-11-01"};type=application/json' -F 'worker.mjs=@projects/youtube-transcript-probe/worker.mjs;type=application/javascript+module' "$api/scripts/$name" > "$RUNNER_TEMP/upload.json"
+          python -c 'import json,sys; assert json.load(open(sys.argv[1]))["success"]' "$RUNNER_TEMP/upload.json"
+          curl -fsS --max-time 15 -X POST -H "$auth" -H 'Content-Type: application/json' --data '{"enabled":true}' "$api/scripts/$name/subdomain" > "$RUNNER_TEMP/enable.json"
+          subdomain=$(curl -fsS --max-time 15 -H "$auth" "$api/subdomain" | python -c 'import json,sys; print(json.load(sys.stdin)["result"]["subdomain"])')
+          sleep 5
+          curl -fsS --max-time 25 "https://$name.$subdomain.workers.dev/probe" > "$RUNNER_TEMP/cloudflare-probe.json"
+          python -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$RUNNER_TEMP/cloudflare-probe.json"
+      - name: Publish Cloudflare result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > "$RUNNER_TEMP/cfdescription"
+          import json,os
+          try:
+           d=json.load(open(os.environ["RUNNER_TEMP"]+"/cloudflare-probe.json"))
+           print("oEmbed="+str(d["oembed"].get("status"))+" watch="+str(d["watch"].get("status"))+" captionTracks="+str(d["watch"].get("caption_tracks")))
+          except Exception: print("Cloudflare probe did not complete")
+          PY
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state=success -f context=youtube-cloudflare-probe -f description="$(cat "$RUNNER_TEMP/cfdescription")" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null
