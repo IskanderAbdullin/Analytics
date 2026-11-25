@@ -1,0 +1,26 @@
+name: Native transcript collector offline tests
+on:
+  push:
+    branches: [chatgpt/youtube-transcript-probe-20261125]
+    paths: ['projects/native-transcript-collector/**', '.github/workflows/native-transcript-tests.yml']
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline unit tests
+        working-directory: projects/native-transcript-collector
+        run: python -m unittest -v
+      - name: Report success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state=success -f context=native-transcript-offline-tests -f description="Offline tests passed" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null
