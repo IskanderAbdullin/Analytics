@@ -2,7 +2,7 @@ import json,subprocess,sys
 channel="https://www.youtube.com/channel/UCo1RPtO57Izwy2wjBmPMjCw"
 for tab in ("streams","videos"):
  try:
-  p=subprocess.run([sys.executable,"-m","yt_dlp","--flat-playlist","--dump-single-json","--no-warnings","--skip-download",channel+"/"+tab],capture_output=True,text=True,timeout=100)
+  p=subprocess.run([sys.executable,"-m","yt_dlp","--flat-playlist","--extractor-args","youtubetab:approximate_date","--dump-single-json","--no-warnings","--skip-download",channel+"/"+tab],capture_output=True,text=True,timeout=100)
   if p.returncode:
    print("CATALOG_ERROR",tab,p.returncode,p.stderr[:500].replace("\n"," "),flush=True);continue
   d=json.loads(p.stdout); rows=d.get("entries",[])
