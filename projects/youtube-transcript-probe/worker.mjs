@@ -9,8 +9,8 @@ export default {async fetch(req){
  const tracks=extractArray(html,"captionTracks");out.tracks=Array.isArray(tracks)?tracks.map(x=>({language:x.languageCode,kind:x.kind||"manual"})):null;
  const track=tracks?.find(x=>x.languageCode==="ru"||x.languageCode==="ru-orig");if(!track?.baseUrl)return Response.json({...out,stop:"no_russian_public_track"});
  const u=new URL(track.baseUrl);if(!["youtube.com","www.youtube.com"].includes(u.hostname)||u.protocol!=="https:"||u.pathname!=="/api/timedtext")return Response.json({...out,stop:"unexpected_track_url"});
- const cap=await fetch(u,{redirect:"error"});const text=await cap.text();out.captions={status:cap.status,chars:text.length,content_type:cap.headers.get("content-type")};
+ out.stage="caption_request"; const cap=await fetch(u.toString(),{redirect:"manual"});out.captions={status:cap.status,content_type:cap.headers.get("content-type")};if(cap.status>=300&&cap.status<400){try{const loc=new URL(cap.headers.get("location"),u);out.captions.redirect_host=loc.hostname;out.captions.redirect_path=loc.pathname;}catch{}return Response.json({...out,stop:"redirect_observed"});}if(!cap.ok)return Response.json({...out,stop:"caption_http_error"});out.stage="caption_body";const text=await cap.text();out.captions.chars=text.length;
  if(cap.ok&&text.length){try{const j=JSON.parse(text);out.captions.events=j.events?.length??null;out.captions.last_end_ms=Math.max(0,...(j.events||[]).map(e=>(e.tStartMs||0)+(e.dDurationMs||0)))}catch{const all=[...text.matchAll(/<text\b[^>]*\bstart="([\d.]+)"[^>]*\bdur="([\d.]+)"/g)];out.captions.xml_segments=all.length;out.captions.last_end_seconds=Math.max(0,...all.map(m=>Number(m[1])+Number(m[2])));out.captions.xml_root=/<transcript\b/.test(text);out.captions.srv3_root=/<timedtext\b/.test(text)}}
- }catch(e){out.error="fetch_or_parse_failed"}
+ }catch(e){out.error="fetch_or_parse_failed";out.error_name=e?.name??"unknown";out.error_category=/redirect/i.test(e?.message??"")?"redirect":/network|fetch|connect/i.test(e?.message??"")?"network":/invalid|url/i.test(e?.message??"")?"invalid_url":"other";}
  return Response.json(out,{headers:{"Cache-Control":"no-store"}});
 }};
