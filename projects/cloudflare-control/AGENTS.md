@@ -18,3 +18,5 @@
 - D179: владелец отдельно разрешил одноразовый временный Worker только для проверки TCP 22 своего хоста. Адрес только из закрытого Actions Secret PC_SSH_PROBE_HOST; порт фиксирован, без SSH-аутентификации, команд или проксирования. Отдельный случайный Worker, одноразовый авторизованный вызов с коротким сроком, удаление в finally; не менять существующие Worker. Без закрытого адреса не создавать ресурсы. Это исключение не расширяет обычный read-only bridge.
 
 - D180: одноразовый TCP 22 probe разрешён также через штатную Cloudflare Queue + временный KV для результата, без публичного HTTP и изменения Access. Одна фиксированная команда проверки доступности (не SSH-команда), случайные отдельные ресурсы, короткое истечение, cleanup; никаких пользовательских команд, проксирования или чужих ресурсов.
+
+- D181: read-only readiness audit of existing exact named PC tunnel: GET filtered list, then GET connections/configurations for the uniquely matched UUID; output status, config source and booleans only. No token endpoint, no route/config changes, no raw values.
