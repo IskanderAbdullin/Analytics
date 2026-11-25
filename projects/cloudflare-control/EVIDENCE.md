@@ -49,3 +49,6 @@ Actual Wrangler 4.50.0 dry-run bundle failed with unresolved optional cpufeature
 
 
 D190 second fixture (11:27:43Z): Wrangler 4.168.0 dry-run succeeds with optional CPU detection alias. Miniflare constructor rejects old schema; actual Worker code not executed. Run 45604603335/job 139172089445. Replace harness by supported local Wrangler dev CLI. No deploy or real host/keys.
+
+
+D190 third fixture (2026-11-25T11:28:40.630Z): current Wrangler dry-run passed, then local workerd startup failed in ssh2/lib/agent.js with ReferenceError: __dirname is not defined. Run 45604736765/job 139172581225, source 2ae65195eb18e3b7b06704d6695925fa98f65ca7. Import never completed; stream, generated-key sign/verify and Client construction not executed. Upstream ssh2 #1494 independently reports module-init WASM failure (not observed by this fixture). Do not conflate reported and reproduced errors or bypass workerd restrictions; no production deploy or real host/keys. Standard Cloudflare SSH client path remains candidate.
