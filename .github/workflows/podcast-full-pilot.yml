@@ -1,0 +1,41 @@
+name: Full episode transcript pipeline integration test
+on:
+  push:
+    branches: [chatgpt/youtube-transcript-probe-20261125]
+    paths: ['projects/podcast-full-pilot/**', '.github/workflows/podcast-full-pilot.yml']
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: podcast-full-pilot-one-shot
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install --quiet faster-whisper imageio-ffmpeg numpy
+      - name: Verify full-episode pipeline and private archive
+        id: integration
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -o pipefail
+          python projects/podcast-full-pilot/pilot.py | tee "$RUNNER_TEMP/pilot.log"
+      - name: Report verification status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          state=failure
+          description="Full episode integration failed or incomplete"
+          if grep -q '"stage": "archived_verified"' "$RUNNER_TEMP/pilot.log"; then state=success; description="Full episode archived; readback SHA256 verified"; fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context=podcast-full-pilot -f description="$description" -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >/dev/null

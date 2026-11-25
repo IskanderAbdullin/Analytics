@@ -1,0 +1,1 @@
+One full-length end-to-end integration test of corpus software. This is not a production ASR batch. Only source RSS public enclosure, fixed episode, verified private KV. No raw audio or full text is exposed via CI or Git. Timeline is podcast-specific, not verified against YouTube. Runtime cap 27 minutes.
