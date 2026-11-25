@@ -1,0 +1,92 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "development_event",
+  "project": {
+    "repository": "IskanderAbdullin/Analytics",
+    "branch": "chatgpt/cloudflare-control-20261123",
+    "component_id": "cloudflare-control"
+  },
+  "event": {
+    "id": "d1770749-1125-4a70-8b22-177000000001",
+    "occurred_at": "2026-11-25T07:49:08Z",
+    "type": "development",
+    "title": "Fixed read-only PC tunnel status probe",
+    "summary": "Added a fixed GET of named existing PC tunnel, no resource identifiers in output. Public Actions 15 tests pass; real API shows inactive.",
+    "basis": "observed_by_agent",
+    "source_commit": "a69a445302bfdfee0831515bb10af8925c908c07"
+  },
+  "changes": [
+    {
+      "path": "projects/cloudflare-control/pc_tunnel_status.py",
+      "action": "added",
+      "summary": "Sanitized fixed existing-tunnel status."
+    },
+    {
+      "path": "projects/cloudflare-control/test_pc_tunnel_status.py",
+      "action": "added",
+      "summary": "Eight mock cases."
+    },
+    {
+      "path": ".github/workflows/cloudflare-api-bridge.yml",
+      "action": "modified",
+      "summary": "Separate status-only step."
+    }
+  ],
+  "checks": [
+    {
+      "id": "unit",
+      "title": "Offline unit tests",
+      "kind": "unit",
+      "status": "passed",
+      "command": "python -m unittest discover -p 'test_*.py' -v",
+      "exit_code": 0,
+      "tested_commit": "a69a445302bfdfee0831515bb10af8925c908c07",
+      "counts": {
+        "passed": 15,
+        "failed": 0
+      },
+      "evidence": [
+        {
+          "kind": "test_log",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45571035288/job/139057446085"
+        }
+      ]
+    },
+    {
+      "id": "live",
+      "title": "Actual fixed tunnel API",
+      "kind": "integration",
+      "status": "passed",
+      "command": "python pc_tunnel_status.py",
+      "exit_code": 0,
+      "tested_commit": "a69a445302bfdfee0831515bb10af8925c908c07",
+      "summary": "API result ok; tunnel inactive.",
+      "evidence": [
+        {
+          "kind": "test_log",
+          "ref": "https://github.com/IskanderAbdullin/Analytics/actions/runs/45571035288/job/139057446085"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "pc-tunnel-inactive",
+      "title": "PC tunnel no edge connection",
+      "state": "open",
+      "severity": "high",
+      "description": "Existing named tunnel returned inactive; local connector/network required."
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "local",
+      "title": "Resolve local connector or restore existing WSS",
+      "state": "blocked",
+      "priority": "critical"
+    }
+  ],
+  "limitations": [
+    "No tunnel mutation, token endpoint or actual Windows connectivity. Official Lab CLI not run."
+  ]
+}

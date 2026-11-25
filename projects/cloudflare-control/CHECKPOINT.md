@@ -33,3 +33,7 @@ commit statuses and sanitized logs; never upload private Worker scripts.
 
 Cloudflare deployment/rollback, VPS power, OS shell and broker actions
 remain out of scope.
+
+
+## D177 — actual read-only existing PC tunnel status (2026-11-25T07:49:08Z)
+Analytics Secrets authorized for existing bridge; Worker inventory and new fixed named tunnel GET executed in public run 45571035288 / job 139057446085. Exact source a69a445302bfdfee0831515bb10af8925c908c07. Offline unittest 15/15 PASS (0.441 s), live tunnel result at 07:48:49Z: ok, inactive, edge_connected=false. No token endpoint or resource mutation. Do not treat Worker deployment as tunnel connectivity. No private resource IDs or raw responses in logs. Next: owner-side connector/network recovery; do not create duplicate tunnel based on this result. Existing shared Worker remains unchanged. Official Lab CLI not available in chat runtime; event prepared using existing schema.
