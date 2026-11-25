@@ -1,9 +1,9 @@
 {
   "name": "ssh-runtime-synthetic-fixture",
   "main": "worker.js",
-  "compatibility_date": "2025-11-01",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "workers_dev": false
+  "compatibility_date": "2026-11-17",
+  "workers_dev": false,
+  "alias": {
+    "cpu-features": "./optional-native.cjs"
+  }
 }

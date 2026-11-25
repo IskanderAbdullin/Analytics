@@ -3,6 +3,6 @@
   "type": "module",
   "dependencies": {
     "ssh2": "1.17.0",
-    "wrangler": "4.50.0"
+    "wrangler": "4.168.0"
   }
 }

@@ -49,3 +49,7 @@ Owner reports cloudflared exclusion from VPN and restart. Live tunnel metadata c
 
 ## D186 — private TCP path verified (2026-11-25T11:01:39.755Z)
 Owner-provided evidence: local TCP22 listener and established QUIC, TCP8765 absent. Improved fixed-target test uses documented connect promise, checks socket shape and emits sanitized error classes. 8 mock tests and syntax checks passed. Actual run 45600344241/job 139157308232: tcp_open, source cloudflare_vpc_tunnel, port22; cleanup 4/4. Source fabf2ecf30727ab567f208fafb85863c19f5f9f7. No SSH bytes, authentication, commands or persistent endpoint. Exact reason D184 failed is not established. No shared resource or Windows changes. No further identical test absent new evidence. See https://github.com/IskanderAbdullin/Analytics/actions/runs/45600344241/job/139157308232 .
+
+
+## D190 first runtime fixture (2026-11-25T11:26:44.958Z)
+Actual Wrangler 4.50.0 dry-run bundle failed with unresolved optional cpufeatures.node, no runtime test or deploy. Analytics source 86da9a30f1b1a87cb8a5bae2417247a3751e4977, run 45604473969/job 139171624976. Upstream reports same optional native addon error (#1226), plus ssh2 module-load dynamic WASM incompatibility (#1494). Next local-only fixture uses current 4.168.0 reported by Wrangler, current compatibility date and alias for optional native CPU detection only. No crypto change, no real target or credentials.
