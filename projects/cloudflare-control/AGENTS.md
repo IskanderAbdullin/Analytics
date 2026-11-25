@@ -22,3 +22,5 @@
 - D181: read-only readiness audit of existing exact named PC tunnel: GET filtered list, then GET connections/configurations for the uniquely matched UUID; output status, config source and booleans only. No token endpoint, no route/config changes, no raw values.
 
 - D181 follow-up: fixed read-only GET connectivity/directory/services filtered to HTTP, summarize only exact existing pc-agent-loopback service using booleans. No service modification, raw identifiers or values.
+
+- D183: fixed one-message diagnostic via existing exact HTTP VPC service only. Unsigned POST /v1/status (expected 401 if origin is live), record HTTP status only; no authentication bypass, commands, body retention, new network route, public endpoint or shared Worker changes. Temporary Worker/Queue/KV cleanup as in D180.
