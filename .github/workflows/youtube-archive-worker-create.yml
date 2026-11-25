@@ -1,25 +1,21 @@
-name: YouTube archive Worker route diagnosis
+name: YouTube archive OAuth live diagnosis
 on:
   push:
     branches: [main]
     paths:
       - '.github/workflows/youtube-archive-worker-create.yml'
-      - 'projects/youtube-archive-worker/probe.py'
+      - 'projects/youtube-archive-worker/probe-oauth.mjs'
 permissions:
   contents: read
-concurrency:
-  group: youtube-archive-worker-create
-  cancel-in-progress: false
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Read-only diagnosis of new Worker
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: python3 projects/youtube-archive-worker/probe.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node projects/youtube-archive-worker/probe-oauth.mjs
